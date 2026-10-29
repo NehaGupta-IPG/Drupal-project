@@ -37,11 +37,13 @@ class FormElementMaxlengthTest extends KernelTestBase implements FormInterface {
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['title'] = [
       '#type' => 'textfield',
+      '#title' => 'Title',
       '#maxlength' => 255,
     ];
 
     $form['description'] = [
       '#type' => 'textarea',
+      '#title' => 'Description',
       '#maxlength' => 255,
     ];
 

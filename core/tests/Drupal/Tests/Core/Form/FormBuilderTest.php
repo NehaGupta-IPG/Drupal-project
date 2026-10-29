@@ -70,6 +70,7 @@ class FormBuilderTest extends FormTestBase {
     ];
     $form['options'] = [
       '#type' => 'radios',
+      '#title' => 'Options',
       '#options' => [
         'foo' => 'foo',
         'bar' => 'bar',
@@ -757,6 +758,7 @@ class FormBuilderTest extends FormTestBase {
       ],
       'child2' => [
         '#type' => 'fieldset',
+        '#title' => 'child2',
         'child2.0' => [
           '#type' => 'checkbox',
         ],

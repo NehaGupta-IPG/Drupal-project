@@ -91,11 +91,10 @@ class FormTestLabelForm extends FormBase {
       '#title' => $this->t('Textfield test for required with title'),
       '#required' => TRUE,
     ];
-    $form['form_textfield_test_no_title_required'] = [
+    $form['form_textfield_test_hidden_title_required'] = [
       '#type' => 'textfield',
-      // We use an empty title, since not setting #title suppresses the label
-      // and required marker.
-      '#title' => '',
+      '#title' => $this->t('Textfield test for required with invisible title'),
+      '#title_display' => 'invisible',
       '#required' => TRUE,
     ];
     $form['form_textfield_test_title'] = [
@@ -118,6 +117,10 @@ class FormTestLabelForm extends FormBase {
     ];
     // Textfield test for title set not to display.
     $form['form_textfield_test_title_no_show'] = [
+      // #title must not be empty, but should be completely omitted from
+      // the page.
+      '#title' => 'form_textfield_test_title_no_show',
+      '#title_display' => 'none',
       '#type' => 'textfield',
     ];
     // Checkboxes & radios with title as attribute.
@@ -173,6 +176,11 @@ class FormTestLabelForm extends FormBase {
       }
       if ($type === 'datetime') {
         $form['form_' . $type . '_title_no_xss']['#default_value'] = NULL;
+      }
+      if ($type === 'password_confirm') {
+        // Override `none` value from PasswordConfirm so that expected
+        // title is displayed.
+        $form['form_' . $type . '_title_no_xss']['#title_display'] = 'before';
       }
     }
 

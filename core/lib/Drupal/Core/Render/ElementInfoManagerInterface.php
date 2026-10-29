@@ -33,8 +33,11 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    *   - #pre_render: array of callables taking $element.
    *   - #post_render: array of callables taking $children and $element.
    *   - #submit: array of callback functions taking $form and $form_state.
+   *   - #title: Defines the accessible name of form elements.
+   *     Allowing missing titles for form elements is deprecated and will cause
+   *     an error in later versions.
    *   - #title_display: optional string indicating if and how #title should be
-   *     displayed (see form-element.html.twig).
+   *     displayed (see FormPreprocess::preprocessFormElement).
    *
    * @see \Drupal\Core\Render\Element\ElementInterface
    * @see \Drupal\Core\Render\Element\ElementInterface::getInfo()

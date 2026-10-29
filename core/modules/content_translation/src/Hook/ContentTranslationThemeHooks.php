@@ -77,10 +77,10 @@ class ContentTranslationThemeHooks {
                 'bundle' => [
                   '#prefix' => '<span class="visually-hidden">',
                   '#suffix' => '</span> ',
-                  '#plain_text' => $element[$bundle]['settings']['#label'],
+                  '#plain_text' => $element[$bundle]['settings']['#title'],
                 ],
                 'field' => [
-                  '#plain_text' => $field_element['#label'],
+                  '#plain_text' => $field_element['#title'],
                 ],
               ],
               'class' => ['field'],
@@ -112,12 +112,12 @@ class ContentTranslationThemeHooks {
                     'bundle' => [
                       '#prefix' => '<span class="visually-hidden">',
                       '#suffix' => '</span> ',
-                      '#plain_text' => $element[$bundle]['settings']['#label'],
+                      '#plain_text' => $element[$bundle]['settings']['#title'],
                     ],
                     'field' => [
                       '#prefix' => '<span class="visually-hidden">',
                       '#suffix' => '</span> ',
-                      '#plain_text' => $field_element['#label'],
+                      '#plain_text' => $field_element['#title'],
                     ],
                     'columns' => [
                       '#plain_text' => $column_label,

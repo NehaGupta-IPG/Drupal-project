@@ -99,7 +99,7 @@ class ContentTranslationFormLanguageHooks {
           foreach ($fields as $field_name => $definition) {
             if ($definition->isComputed() || (!empty($storage_definitions[$field_name]) && $this->isFieldTranslatabilityConfigurable($entity_type, $storage_definitions[$field_name]))) {
               $form['settings'][$entity_type_id][$bundle]['fields'][$field_name] = [
-                '#label' => $definition->getLabel(),
+                '#title' => $definition->getLabel(),
                 '#type' => 'checkbox',
                 '#default_value' => $definition->isTranslatable(),
               ];
@@ -121,6 +121,8 @@ class ContentTranslationFormLanguageHooks {
             // the entity might have fields and if there are fields to
             // translate.
             $form['settings'][$entity_type_id][$bundle]['translatable'] = [
+              '#title' => $this->t('Translatable'),
+              '#title_display' => 'invisible',
               '#type' => 'checkbox',
               '#default_value' => $this->contentTranslationManager->isEnabled($entity_type_id, $bundle),
             ];
@@ -147,7 +149,7 @@ class ContentTranslationFormLanguageHooks {
 
           $translatable_fields = isset($settings[$entity_type][$bundle]['fields']) ? array_filter($settings[$entity_type][$bundle]['fields']) : FALSE;
           if (empty($translatable_fields)) {
-            $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#label']];
+            $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#title']];
             $form_state->setErrorByName($name, t('At least one field needs to be translatable to enable %bundle for translation.', $t_args));
           }
 

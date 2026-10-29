@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -116,7 +117,12 @@ class ComponentInFormTest extends ComponentKernelTestBase implements FormInterfa
   /**
    * Tests that fields validation messages are sorted in the fields order.
    */
+  #[IgnoreDeprecations]
   public function testFormRenderingAndSubmission(): void {
+    // @todo Determine best way to resolve this. Should some components have #title?
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "banner" of #type "component" from form "component_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "banner][banner_body" of #type "component" from form "component_in_form_test" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+
     /** @var \Drupal\Core\Form\FormBuilderInterface $form_builder */
     $form_builder = \Drupal::service('form_builder');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */

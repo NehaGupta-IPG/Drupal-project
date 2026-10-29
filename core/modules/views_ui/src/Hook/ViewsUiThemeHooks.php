@@ -217,7 +217,8 @@ class ViewsUiThemeHooks {
     $form_state = new FormState();
     $form['default_group'] = Radios::processRadios($form['default_group'], $form_state, $form);
     $form['default_group_multiple'] = Checkboxes::processCheckboxes($form['default_group_multiple'], $form_state, $form);
-    $form['default_group']['All']['#title'] = '';
+    $form['default_group']['All']['#title_display'] = $this->t('- Any -');
+    $form['default_group']['All']['#title_display'] = 'invisible';
 
     $rows[] = [
       ['data' => $form['default_group']['All']],

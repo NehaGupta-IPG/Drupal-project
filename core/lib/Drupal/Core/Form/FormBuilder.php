@@ -1075,6 +1075,29 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
       $element['#processed'] = TRUE;
     }
+    $types_to_skip = [
+      'field_ui_table',
+      'table',
+      'tableselect',
+      'hidden',
+      'token',
+      'value',
+      'item',
+      'datelist',
+      // password_confirm widgets expand the element into two text boxes
+      // that have their own #title properties.
+      'password_confirm',
+    ];
+    // `fieldset` elements must have a `legend`, and therefore a `#title`.
+    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && ($element['#type'] == 'fieldset' || !empty($element['#input']))) {
+      $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
+      // Check for empty or unset value.
+      // For buttons with missing #value declarations, #value will be '' here.
+      // trim() is used for simple check against accidental strings of spaces.
+      if (!strlen(trim($element[$title_key] ?? ''))) {
+        @trigger_error(sprintf('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "%s" of #type "%s" from form "%s" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004', implode('][', $element['#array_parents']), $element['#type'], $form_id), E_USER_DEPRECATED);
+      }
+    }
 
     // We start off assuming all form elements are in the correct order.
     $element['#sorted'] = TRUE;

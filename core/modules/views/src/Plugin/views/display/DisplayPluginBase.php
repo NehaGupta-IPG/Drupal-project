@@ -1733,6 +1733,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
         $form['link_display'] = [
           '#type' => 'radios',
+          '#title' => $this->t('Link display'),
+          '#title_display' => 'invisible',
           '#options' => $options,
           '#description' => $this->t("Which display to use to get this display's path for things like summary links, rss feed links, more links, etc."),
           '#default_value' => $this->getOption('link_display'),

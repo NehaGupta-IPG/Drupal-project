@@ -6,6 +6,7 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -38,7 +39,12 @@ class SettingsTest extends UITestBase {
   /**
    * Tests the settings for the edit ui.
    */
+  #[IgnoreDeprecations]
   public function testEditUI(): void {
+    // The element with missing `#title` is for a fieldset and is not easily
+    // hidden.
+    $this->expectUserDeprecationMessage('Support for form elements with empty #title attributes is deprecated in drupal:11.4.0 and is removed in drupal:13.0.0. Form element "extenders][display_extenders" of #type "checkboxes" from form "views_ui_admin_settings_advanced" has an empty #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+
     $this->drupalLogin($this->adminUser);
 
     // Test the settings tab exists.

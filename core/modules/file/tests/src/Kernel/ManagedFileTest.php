@@ -35,6 +35,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
    */
   public function buildForm(array $form, FormStateInterface $form_state, string $file_value_callback = 'managedFileValueCallbackTrusted'): array {
     $form['managed_file'] = [
+      '#title' => 'managed_file',
       '#type' => 'managed_file',
       '#file_value_callbacks' => [[$this, $file_value_callback]],
     ];

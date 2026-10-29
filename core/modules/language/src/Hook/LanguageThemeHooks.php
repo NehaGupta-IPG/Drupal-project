@@ -149,7 +149,7 @@ class LanguageThemeHooks {
             'data' => [
               '#prefix' => '<label>',
               '#suffix' => '</label>',
-              '#plain_text' => $element[$bundle]['settings']['#label'],
+              '#plain_text' => $element[$bundle]['settings']['#title'],
             ],
             'class' => ['bundle'],
           ],

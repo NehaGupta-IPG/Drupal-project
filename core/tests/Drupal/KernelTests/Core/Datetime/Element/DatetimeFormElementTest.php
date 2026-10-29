@@ -56,6 +56,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
   public function buildForm(array $form, FormStateInterface $form_state): array {
     // Test datetime-local element.
     $form['datetime_local_picker'] = [
+      '#title' => 'datetime_local_picker',
       '#type' => 'datetime',
       '#date_date_element' => 'datetime-local',
       '#date_time_element' => 'none',
@@ -64,6 +65,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
     // Test time-only element.
     $form['datetime_time_only'] = [
       '#type' => 'datetime',
+      '#title' => 'datetime',
       '#date_date_element' => 'none',
       '#date_time_element' => 'time',
       '#date_time_format' => 'H:i',

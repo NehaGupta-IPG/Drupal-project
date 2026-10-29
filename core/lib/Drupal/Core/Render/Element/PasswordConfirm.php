@@ -18,7 +18,6 @@ use Drupal\Core\Render\Attribute\FormElement;
  * @code
  * $form['pass'] = [
  *   '#type' => 'password_confirm',
- *   '#title' => $this->t('Password'),
  *   '#size' => 25,
  * ];
  * @endcode
