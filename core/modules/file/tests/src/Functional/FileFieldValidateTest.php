@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
@@ -162,6 +163,31 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
     $this->assertFileEntryExists($node_file, 'File entry exists after uploading a file with extension checking.');
+
+    // Test maximum length of extensions.
+    // Generate 256 random extensions (3 characters each). Taken together with
+    // one space delimiter, this will be 1023 characters long, and should fit
+    // into the allowed extensions text field.
+    $edit = [];
+    $extensions = [];
+    while (count($extensions) < 256) {
+      $random_extension = $this->randomMachineName(3);
+      if (!in_array($random_extension, $extensions) && !preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, $random_extension)) {
+        $extensions[] = $random_extension;
+      }
+    }
+    $edit['settings[file_extensions]'] = implode(' ', $extensions);
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $field_name);
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
+
+    // Edit the field again and save without making any changes. If the
+    // extensions are correctly imploded with only one delimiter, we should be
+    // able to save it again without getting any errors.
+    $edit = [];
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.' . $field_name);
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
   }
 
   /**

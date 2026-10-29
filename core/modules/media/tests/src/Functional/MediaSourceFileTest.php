@@ -44,7 +44,7 @@ class MediaSourceFileTest extends MediaFunctionalTestBase {
     $this->drupalGet("admin/structure/media/manage/$media_type_id/fields/media.$media_type_id.field_media_file");
 
     // Verify that new extension is present.
-    $assert_session->fieldValueEquals('settings[file_extensions]', 'txt, doc, docx, pdf, odt');
+    $assert_session->fieldValueEquals('settings[file_extensions]', 'txt doc docx pdf odt');
     $this->assertSame('txt doc docx pdf odt', FieldConfig::load("media.$media_type_id.field_media_file")->get('settings')['file_extensions']);
   }
 

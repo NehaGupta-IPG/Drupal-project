@@ -192,16 +192,14 @@ class FileItem extends EntityReferenceItem {
       '#weight' => 3,
     ];
 
-    // Make the extension list a little more human-friendly by comma-separation.
-    $extensions = str_replace(' ', ', ', $settings['file_extensions']);
     $element['file_extensions'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Allowed file extensions'),
-      '#default_value' => $extensions,
+      '#default_value' => $settings['file_extensions'],
       '#description' => $this->t("Separate extensions with a comma or space. Each extension can contain alphanumeric characters, '.', and '_', and should start and end with an alphanumeric character."),
       '#element_validate' => [[static::class, 'validateExtensions']],
       '#weight' => 1,
-      '#maxlength' => 256,
+      '#maxlength' => 1024,
       // By making this field required, we prevent a potential security issue
       // that would allow files of any type to be uploaded.
       '#required' => TRUE,
