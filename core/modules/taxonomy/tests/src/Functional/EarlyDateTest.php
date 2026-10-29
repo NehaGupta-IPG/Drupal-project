@@ -64,7 +64,11 @@ class EarlyDateTest extends TaxonomyTestBase {
   }
 
   /**
-   * Tests taxonomy functionality with nodes prior to 1970.
+   * Tests taxonomy functionality with nodes published before 1970.
+   *
+   * Nodes with a publication date earlier than January 1, 1970,
+   * are not inserted into the taxonomy index. This test ensures that
+   * taxonomy terms still function correctly with backdated content.
    */
   public function testTaxonomyEarlyDateNode(): void {
     // Posts an article with a taxonomy term and a date prior to 1970.
