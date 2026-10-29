@@ -1,0 +1,7 @@
+name: 'Custom Image Normalizer'
+type: module
+description: 'Ensures REST output respects image style from Manage Display in Views using Entity format.'
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - serialization
