@@ -3,14 +3,14 @@
 namespace Drupal\media;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
+use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\media\Entity\MediaType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,15 +71,6 @@ class MediaTypeForm extends EntityForm {
   }
 
   /**
-   * Ajax callback triggered by the type provider select element.
-   */
-  public function ajaxHandlerData(array $form, FormStateInterface $form_state) {
-    $response = new AjaxResponse();
-    $response->addCommand(new ReplaceCommand('#source-dependent', $form['source_dependent']));
-    return $response;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
@@ -130,6 +121,7 @@ class MediaTypeForm extends EntityForm {
       '#type' => 'container',
       '#attributes' => ['id' => 'source-dependent'],
     ];
+    $form_url = Url::fromRouteMatch($this->getRouteMatch());
 
     if (!$this->entity->isNew()) {
       $source_description = $this->t('<em>The media source cannot be changed after the media type is created.</em>');
@@ -143,12 +135,18 @@ class MediaTypeForm extends EntityForm {
       '#default_value' => $source ? $source->getPluginId() : NULL,
       '#options' => $options,
       '#description' => $source_description,
-      '#ajax' => ['callback' => '::ajaxHandlerData'],
       '#required' => TRUE,
       // Once the media type is created, its source plugin cannot be changed
       // anymore.
       '#disabled' => !$this->entity->isNew(),
     ];
+    (new Htmx())
+      ->post($form_url)
+      ->onlyMainContent()
+      ->select('#source-dependent')
+      ->target('#source-dependent')
+      ->swap('outerHTML')
+      ->applyTo($form['source_dependent']['source']);
 
     if ($source) {
       // Media source plugin configuration.
@@ -330,8 +328,8 @@ class MediaTypeForm extends EntityForm {
     // a button. This rebuilds the form with the media source's configuration
     // form visible, instead of saving the media type. This allows users to
     // create a media type without JavaScript enabled. With JavaScript enabled,
-    // this rebuild occurs during an AJAX request.
-    // @see \Drupal\media\MediaTypeForm::ajaxHandlerData()
+    // this rebuild occurs during an HTMX request.
+    // @see \Drupal\media\MediaTypeForm::form()
     if (empty($this->getEntity()->get('source'))) {
       $actions['submit']['#type'] = 'button';
     }
