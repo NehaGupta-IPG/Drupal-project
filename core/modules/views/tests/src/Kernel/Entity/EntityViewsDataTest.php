@@ -523,6 +523,10 @@ class EntityViewsDataTest extends KernelTestBase {
           'value' => 0,
           'numeric' => TRUE,
         ],
+        [
+          'field' => 'langcode',
+          'left_field' => 'langcode',
+        ],
       ],
     ], $data['entity_test_mul__string']['table']['join']['entity_test_mul_property_data']);
   }
@@ -655,6 +659,10 @@ class EntityViewsDataTest extends KernelTestBase {
           'value' => 0,
           'numeric' => TRUE,
         ],
+        [
+          'field' => 'langcode',
+          'left_field' => 'langcode',
+        ],
       ],
     ], $data['entity_test_mulrev__string']['table']['join']['entity_test_mulrev_property_data']);
 
@@ -668,6 +676,10 @@ class EntityViewsDataTest extends KernelTestBase {
           'field' => 'deleted',
           'value' => 0,
           'numeric' => TRUE,
+        ],
+        [
+          'field' => 'langcode',
+          'left_field' => 'langcode',
         ],
       ],
     ], $data['entity_test_mulrev_revision__string']['table']['join']['entity_test_mulrev_property_revision']);

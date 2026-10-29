@@ -334,6 +334,12 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
             ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
           ],
         ];
+        if ($data_table && $field_storage_definition->isTranslatable()) {
+          $data[$table]['table']['join'][$views_base_table]['extra'][] = [
+            'field' => $entity_keys['langcode'],
+            'left_field' => $entity_keys['langcode'],
+          ];
+        }
 
         if ($revisionable) {
           $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_definition);
@@ -347,6 +353,12 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
               ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
             ],
           ];
+          if ($revision_data_table && $field_storage_definition->isTranslatable()) {
+            $data[$revision_table]['table']['join'][$views_revision_base_table]['extra'][] = [
+              'field' => $entity_keys['langcode'],
+              'left_field' => $entity_keys['langcode'],
+            ];
+          }
         }
       }
     }

@@ -236,6 +236,13 @@ class ViewsViewsHooks {
           'base field' => $target_entity_type->getKey('id'),
           'relationship field' => $field_name . '_target_id',
         ];
+        if ($target_base_table && $field_storage->isTranslatable()) {
+          $data[$table_name][$field_name]['relationship']['extra'][] = [
+            'field' => 'langcode',
+            'left_field' => 'langcode',
+          ];
+        }
+
         // Provide a reverse relationship for the entity type that is referenced
         // by the field.
         $args['@entity'] = $entity_type->getLabel();
@@ -263,6 +270,12 @@ class ViewsViewsHooks {
             ],
           ],
         ];
+        if ($target_base_table && $field_storage->isTranslatable()) {
+          $data[$target_base_table][$pseudo_field_name]['relationship']['join_extra'][] = [
+            'field' => 'langcode',
+            'left_field' => 'langcode',
+          ];
+        }
       }
       // Provide an argument plugin that has a meaningful titleQuery()
       // implementation getting the entity label.

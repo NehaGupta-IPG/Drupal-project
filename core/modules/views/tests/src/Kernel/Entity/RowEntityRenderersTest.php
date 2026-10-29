@@ -283,65 +283,35 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
   protected function checkLanguageRenderersRelationship(string $display, array $values): void {
     $expected = [
       $values[1]['en'],
-      $values[1]['en'],
-      $values[1]['en'],
       $values[2]['en'],
-      $values[2]['en'],
-      $values[2]['en'],
-      $values[0]['en'],
-      $values[0]['en'],
       $values[0]['en'],
     ];
     $this->assertTranslations($display, '***LANGUAGE_language_content***', $expected, 'The current language renderer behaves as expected.');
 
     $expected = [
       $values[1]['l0'],
-      $values[1]['l0'],
-      $values[1]['l0'],
       $values[2]['l1'],
-      $values[2]['l1'],
-      $values[2]['l1'],
-      $values[0]['en'],
-      $values[0]['en'],
       $values[0]['en'],
     ];
     $this->assertTranslations($display, '***LANGUAGE_entity_default***', $expected, 'The default language renderer behaves as expected.');
 
     $expected = [
       $values[1]['en'],
-      $values[1]['l0'],
-      $values[1]['l1'],
       $values[2]['en'],
-      $values[2]['l0'],
-      $values[2]['l1'],
       $values[0]['en'],
-      $values[0]['l0'],
-      $values[0]['l1'],
     ];
     $this->assertTranslations($display, '***LANGUAGE_entity_translation***', $expected, 'The translation language renderer behaves as expected.');
 
     $expected = [
       $values[1][$this->langcodes[0]],
-      $values[1][$this->langcodes[0]],
-      $values[1][$this->langcodes[0]],
       $values[2][$this->langcodes[0]],
-      $values[2][$this->langcodes[0]],
-      $values[2][$this->langcodes[0]],
-      $values[0][$this->langcodes[0]],
-      $values[0][$this->langcodes[0]],
       $values[0][$this->langcodes[0]],
     ];
     $this->assertTranslations($display, '***LANGUAGE_site_default***', $expected, 'The site default language renderer behaves as expected.');
 
     $expected = [
       $values[1]['l0'],
-      $values[1]['l0'],
-      $values[1]['l0'],
       $values[2]['l0'],
-      $values[2]['l0'],
-      $values[2]['l0'],
-      $values[0]['l0'],
-      $values[0]['l0'],
       $values[0]['l0'],
     ];
     $this->assertTranslations($display, 'l0', $expected, 'The language specific renderer behaves as expected.');
