@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 
@@ -34,27 +35,56 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    * {@inheritdoc}
    */
   protected function doInvalidateTags(array $tags) {
-    try {
-      foreach ($tags as $tag) {
-        $this->connection->upsert('cachetags')
-          ->key(['tag'])
-          ->fields([
-            'tag',
-            'invalidations' => new UpsertUpdateExpression('{cachetags}.[invalidations] + 1'),
-          ])
-          ->values([
-            'tag' => $tag,
-            'invalidations' => 1,
-          ])
-          ->execute();
-      }
-    }
-    catch (\Exception $e) {
-      // Create the cache table, which will be empty. This fixes cases during
-      // core install where cache tags are invalidated before the table is
-      // created.
-      if (!$this->ensureTableExists()) {
-        throw $e;
+    $reconnected = FALSE;
+    $table_created = FALSE;
+    foreach ($tags as $tag) {
+      while (TRUE) {
+        try {
+          $this->connection->upsert('cachetags')
+            ->key(['tag'])
+            ->fields([
+              'tag',
+              'invalidations' => new UpsertUpdateExpression('{cachetags}.[invalidations] + 1'),
+            ])
+            ->values([
+              'tag' => $tag,
+              'invalidations' => 1,
+            ])
+            ->execute();
+          break;
+        }
+        catch (\TypeError $e) {
+          if ($reconnected) {
+            throw $e;
+          }
+          // A destroyed Connection cannot satisfy its object return contract.
+          // A TypeError from invalidation alone does not establish client loss.
+          try {
+            $this->connection->getClientConnection();
+          }
+          catch (\TypeError) {
+            $target = $this->connection->getTarget();
+            $key = $this->connection->getKey();
+            Database::closeConnection($target, $key);
+            $this->connection = Database::getConnection($target, $key);
+            $this->tagCache = [];
+            $reconnected = TRUE;
+            continue;
+          }
+          throw $e;
+        }
+        catch (DatabaseException $e) {
+          // Only a missing table permits the installation-time fallback.
+          // An existing table must not turn a failed write into success.
+          if ($table_created || $this->connection->schema()->tableExists('cachetags')) {
+            throw $e;
+          }
+          $table_created = TRUE;
+          if (!$this->ensureTableExists()) {
+            throw $e;
+          }
+          // Retry this tag, never replay tags already processed successfully.
+        }
       }
     }
   }
