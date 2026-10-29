@@ -10,6 +10,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Http\Exception\CacheableUnauthorizedHttpException;
+use Drupal\Core\Routing\RouteMatch;
 use Drupal\user\UserAuthenticationInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -18,6 +19,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  * HTTP Basic authentication provider.
  */
 class BasicAuth implements AuthenticationProviderInterface, AuthenticationProviderChallengeInterface {
+
+  protected const PROVIDER_ID = 'basic_auth';
 
   /**
    * The config factory.
@@ -48,6 +51,20 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   protected $entityTypeManager;
 
   /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * Constructs a HTTP basic authentication provider object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -72,7 +89,11 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   public function applies(Request $request) {
     $username = $request->headers->get('PHP_AUTH_USER');
     $password = $request->headers->get('PHP_AUTH_PW');
-    return isset($username) && isset($password);
+    if (isset($username) && isset($password)) {
+      $route = RouteMatch::createFromRequest($request)->getRouteObject();
+      return isset($route) && $route->hasOption('_auth') && in_array(static::PROVIDER_ID, $route->getOption('_auth'), TRUE);
+    }
+    return FALSE;
   }
 
   /**

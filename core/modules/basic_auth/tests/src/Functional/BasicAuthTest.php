@@ -209,6 +209,18 @@ class BasicAuthTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that non-basic auth routes are unaffected.
+   */
+  public function testNonBasicAuthRoutes(): void {
+    $account = $this->drupalCreateUser();
+    $string = $this->randomMachineName();
+    $url = Url::fromRoute('router_test.3', ['value' => $string]);
+    $this->basicAuthGet($url, $account->getAccountName(), $account->pass_raw);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains($string);
+  }
+
+  /**
    * Tests the cacheability of the Basic Auth 401 response.
    *
    * @see \Drupal\basic_auth\Authentication\Provider\BasicAuth::challengeException()
