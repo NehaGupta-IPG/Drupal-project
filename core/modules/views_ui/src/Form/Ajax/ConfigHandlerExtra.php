@@ -3,6 +3,7 @@
 namespace Drupal\views_ui\Form\Ajax;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 
@@ -102,7 +103,7 @@ class ConfigHandlerExtra extends ViewsFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $form_state->get('handler')->validateExtraOptionsForm($form['options'], $form_state);
+    $form_state->get('handler')->validateExtraOptionsForm($form['options'], SubformState::createForSubform($form['options'], $form, $form_state));
 
     if ($form_state->getErrors()) {
       // Trigger a form rerender so error messages are displayed correctly in

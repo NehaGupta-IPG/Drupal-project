@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -123,6 +124,36 @@ class FilterEntityReferenceWebTest extends UITestBase {
     $options = $this->getUiOptions();
     // We should expect the content types defined as options.
     $this->assertEquals(['article', 'page'], array_column($options, 'label'));
+  }
+
+  /**
+   * Tests SelectionPluginBase::validateConfigurationForm() get/set values.
+   *
+   * Ensures SelectionPluginBase::validateConfigurationForm() can get and set
+   *  form state values in the Views UI context.
+   */
+  public function testSelectionHandlerValidationErrorShownInViewsFilter(): void {
+    $url = 'admin/structure/views/nojs/handler-extra/test_filter_entity_reference/default/filter/field_test_target_id';
+    // Open the extra options form for the Entity Reference filter.
+    $this->drupalGet($url);
+    // Switch the handler to the test plugin that fails validation when blank.
+    $this->submitForm([
+      'options[sub_handler]' => 'entity_reference_test_validation_selection',
+    ], 'Apply');
+    $this->assertSession()->statusMessageContains('This setting is required.', MessengerInterface::TYPE_ERROR);
+
+    // Provide the required setting and apply again; it should succeed.
+    $this->drupalGet($url);
+    $this->submitForm([
+      'options[sub_handler]' => 'entity_reference_test_validation_selection',
+      'options[reference_entity_reference_test_validation_selection][test_required]' => 'set me',
+    ], 'Apply');
+    $this->assertSession()->pageTextNotContains('This setting is required.');
+
+    // Ensure the test_required value was updated.
+    $this->assertSession()->statusMessageContains('The test_required value was updated', MessengerInterface::TYPE_STATUS);
+    $this->drupalGet($url);
+    $this->assertSession()->fieldValueEquals('options[reference_entity_reference_test_validation_selection][test_required]', 'you have been set');
   }
 
   /**

@@ -310,30 +310,30 @@ class EntityReference extends ManyToOne {
    * {@inheritdoc}
    */
   public function validateExtraOptionsForm($form, FormStateInterface $form_state): void {
-    $options = $form_state->getValue('options');
+    $options = $form_state->getValues();
     $sub_handler = $options['sub_handler'];
-    $subform = $form[static::SUBFORM_PREFIX . $sub_handler];
+    $sub_handler_key = static::SUBFORM_PREFIX . $sub_handler;
+    $subform = $form[$sub_handler_key];
     $subform_state = SubformState::createForSubform($subform, $form, $form_state);
 
     // Copy handler_settings from options to settings to be compatible with
     // selection plugins.
-    $subform_options = $form_state->getValue([
-      'options',
-      static::SUBFORM_PREFIX . $sub_handler,
-    ]);
+    $subform_options = $options[$sub_handler_key];
     $subform_state->setValue([
       'settings',
+      'handler_settings',
     ], $subform_options);
     $this->getSelectionHandler($sub_handler)
       ->validateConfigurationForm($subform, $subform_state);
 
     // Store the sub handler options in sub_handler_settings.
-    $form_state->setValue(['options', 'sub_handler_settings'], $subform_options);
+    $form_state->setValue('sub_handler_settings', $subform_state->getValue(['settings', 'handler_settings']));
 
     // Remove options that are not from the selected sub_handler.
     foreach (array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
-      if (isset($options[static::SUBFORM_PREFIX . $sub_handler_option])) {
-        $form_state->unsetValue(['options', static::SUBFORM_PREFIX . $sub_handler_option]);
+      $option_key = static::SUBFORM_PREFIX . $sub_handler_option;
+      if (isset($options[$option_key])) {
+        $form_state->unsetValue($option_key);
       }
     }
 
@@ -342,6 +342,11 @@ class EntityReference extends ManyToOne {
 
   /**
    * {@inheritdoc}
+   *
+   * This change is from https://www.drupal.org/project/drupal/issues/3542769
+   * and a temporary change to enable tests to pass.
+   *
+   * @todo Revert this change once Issue #3542769 is fixed.
    */
   public function submitExtraOptionsForm($form, FormStateInterface $form_state): void {
     $sub_handler = $form_state->getValue('options')['sub_handler'];
