@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\Render\Markup;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\Any;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\serialization\Normalizer\TypedDataNormalizer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -52,6 +56,27 @@ class TypedDataNormalizerTest extends UnitTestCase {
       ->willReturn('test');
 
     $this->assertEquals('test', $this->normalizer->normalize($typed_data));
+  }
+
+  /**
+   * Tests the JSON Schema for a stringable value.
+   */
+  #[DataProvider('providerTestStringableSchema')]
+  public function testStringableSchema(bool $required, array $expected): void {
+    $typed_data = new Any(DataDefinition::createFromDataType('any')->setRequired($required));
+    $typed_data->setValue(Markup::create('<p>Text</p>'));
+
+    $this->assertSame($expected, $this->normalizer->normalize($typed_data, 'json_schema'));
+  }
+
+  /**
+   * Data provider for ::testStringableSchema().
+   */
+  public static function providerTestStringableSchema(): array {
+    return [
+      'optional' => [FALSE, ['oneOf' => [['type' => 'string'], ['type' => 'null']]]],
+      'required' => [TRUE, ['type' => 'string']],
+    ];
   }
 
 }

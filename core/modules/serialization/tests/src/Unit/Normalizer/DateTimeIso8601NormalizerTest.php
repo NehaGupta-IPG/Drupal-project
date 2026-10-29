@@ -10,6 +10,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601;
 use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -263,6 +264,8 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
       assert(in_array(JsonSchemaTestTrait::class, class_uses($test)));
       $field_item = $test->doProphesize(DateTimeItem::class);
       $data = $test->doProphesize(DateTimeIso8601::class);
+      $data->getDataDefinition()
+        ->willReturn(DataDefinition::createFromDataType('datetime_iso8601')->setRequired(TRUE));
 
       $field_storage_definition = $test->doProphesize(FieldStorageDefinitionInterface::class);
       $field_storage_definition->getSetting('datetime_type')
@@ -283,8 +286,11 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
         ->willReturn($drupal_date_time->reveal());
       return $data->reveal();
     };
+    $date = new DateTimeIso8601(DataDefinition::createFromDataType('datetime_iso8601'));
+    $date->setValue(NULL);
     return [
       'ISO 8601 date-only' => [fn (UnitTestCase $test) => $case($test)],
+      'null' => [$date],
     ];
   }
 

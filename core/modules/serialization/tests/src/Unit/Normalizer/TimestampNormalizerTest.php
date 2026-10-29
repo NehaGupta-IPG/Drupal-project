@@ -6,6 +6,7 @@ namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
 use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -148,12 +149,17 @@ class TimestampNormalizerTest extends UnitTestCase {
         ->willReturn('1983-07-12T09:05:00-05:00');
 
       $data = $test->doProphesize(Timestamp::class);
+      $data->getDataDefinition()
+        ->willReturn(DataDefinition::createFromDataType('timestamp')->setRequired(TRUE));
       $data->getDateTime()
         ->willReturn($drupal_date_time->reveal());
       return $data->reveal();
     };
+    $timestamp = new Timestamp(DataDefinition::createFromDataType('timestamp'));
+    $timestamp->setValue(NULL);
     return [
       'RFC 3339' => [fn (UnitTestCase $test) => $case($test)],
+      'null' => [$timestamp],
     ];
   }
 

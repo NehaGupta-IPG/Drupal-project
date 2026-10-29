@@ -7,6 +7,7 @@ namespace Drupal\Tests\serialization\Unit\Normalizer;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601;
 use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -209,8 +210,11 @@ class DateTimeNormalizerTest extends UnitTestCase {
         ->willReturn($drupal_date_time->reveal());
       return $data->reveal();
     };
+    $date = new DateTimeIso8601(DataDefinition::createFromDataType('datetime_iso8601'));
+    $date->setValue(NULL);
     return [
       'RFC 3339' => [fn (UnitTestCase $test): DateTimeInterface => $case($test)],
+      'null' => [$date],
     ];
   }
 
