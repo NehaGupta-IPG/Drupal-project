@@ -120,6 +120,7 @@ class BaseFieldOverrideLanguageOverrideTest extends KernelTestBase {
     EntityTestHelper::createBundle($second_bundle);
     $base_field_definition = $this->entityFieldManager
       ->getBaseFieldDefinitions($this->testEntityTypeId)[$this->testFieldName];
+    $this->assertInstanceOf(BaseFieldDefinition::class, $base_field_definition);
 
     // Create all configuration before warming the field definition caches.
     foreach ([$this->testBundle, $second_bundle] as $bundle) {
