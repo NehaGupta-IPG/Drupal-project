@@ -141,7 +141,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
         '#markup' => $this->t('Password reset instructions will be sent to your registered email address.'),
         '#suffix' => '</p>',
       ];
-      $form['name']['#default_value'] = $this->getRequest()->query->get('name');
+      $form['name']['#default_value'] = $this->getRequest()->query->all('name');
     }
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = ['#type' => 'submit', '#value' => $this->t('Submit')];
