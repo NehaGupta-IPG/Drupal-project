@@ -102,7 +102,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->assertSession()->elementExists('xpath', '//link[contains(@href, "/core/modules/system/css/components/align.module.css")]');
     $this->assertSession()->pageTextContains($admin_message);
     $this->assertSession()->linkExists('Go online.');
-    $this->assertSession()->linkByHrefExists(Url::fromRoute('system.site_maintenance_mode')->toString());
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('system.site_maintenance_mode', ['destination' => '/user'])->toString());
 
     // Verify that the change to maintenance mode is logged.
     $this->drupalGet(Url::fromRoute('dblog.overview'));

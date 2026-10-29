@@ -75,7 +75,10 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
 
           if ($show_message) {
             if ($this->account->hasPermission('administer site configuration')) {
-              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
+              $parameters = [
+                'destination' => $this->urlGenerator->generateFromRoute('<current>'),
+              ];
+              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode', $parameters)]), 'status', FALSE);
             }
             else {
               $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
