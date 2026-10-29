@@ -39,6 +39,8 @@ class SvgSpriteExtractor extends IconExtractorWithFinder {
       return [];
     }
 
+    ksort($files);
+
     $icons = [];
     foreach ($files as $file) {
       $icon_ids = $this->extractIdsFromXml($file['absolute_path'] ?? '');

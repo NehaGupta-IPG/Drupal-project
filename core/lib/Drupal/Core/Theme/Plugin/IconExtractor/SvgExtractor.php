@@ -55,6 +55,8 @@ class SvgExtractor extends IconExtractorWithFinder {
       return [];
     }
 
+    ksort($files);
+
     $icons = [];
     foreach ($files as $file) {
       if (!isset($file['absolute_path']) || empty($file['absolute_path'])) {
