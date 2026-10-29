@@ -83,11 +83,13 @@ class Section implements ThirdPartySettingsInterface {
    *   A renderable array representing the content of the section.
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
-    if ($this->getLayoutId() === 'layout_builder_blank') {
-      return [];
-    }
     $regions = [];
     foreach ($this->getComponents() as $component) {
+      // Components without a region, such as those added to a blank section,
+      // cannot be placed in the layout.
+      if ($component->getRegion() === NULL) {
+        continue;
+      }
       if ($output = $component->toRenderArray($contexts, $in_preview)) {
         $regions[$component->getRegion()][$component->getUuid()] = $output;
       }
