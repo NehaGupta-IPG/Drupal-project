@@ -7,6 +7,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Form\BundleEntityDeleteForm;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -254,6 +255,81 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
   #[ActionMethod(adminLabel: new TranslatableMarkup('Set field mapping'), pluralize: FALSE)]
   public function setFieldMap(array $map) {
     return $this->set('field_map', $map);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return void
+   *   This method does not return a value.
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    $this->prepareSourceFieldConfiguration();
+    parent::preSave($storage);
+  }
+
+  /**
+   * Sets the source field name before the config is saved.
+   */
+  protected function prepareSourceFieldConfiguration(): void {
+    if ($this->isSyncing() || !$this->source) {
+      return;
+    }
+
+    $source = $this->getSource();
+    $configuration = $source->getConfiguration();
+    if (!empty($configuration['source_field'])) {
+      return;
+    }
+
+    $configuration['source_field'] = $source->createSourceField($this)->getName();
+    $source->setConfiguration($configuration);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
+    parent::postSave($storage, $update);
+
+    if ($this->isSyncing() || !$this->source) {
+      return;
+    }
+
+    // Ensure the source field exists for this media type.
+    $source = $this->getSource();
+    $source_field = $source->getSourceFieldDefinition($this);
+
+    if (!$source_field) {
+      $source_field = $source->createSourceField($this);
+
+      /** @var \Drupal\field\FieldStorageConfigInterface $source_field_storage */
+      $source_field_storage = $source_field->getFieldStorageDefinition();
+      if ($source_field_storage->isNew()) {
+        $source_field_storage->save();
+      }
+
+      $source_field->save();
+
+      $display_repository = \Drupal::service('entity_display.repository');
+
+      if ($source_field->isDisplayConfigurable('form')) {
+        $form_display = $display_repository->getFormDisplay('media', $this->id());
+        $source->prepareFormDisplay($this, $form_display);
+        $form_display->save();
+      }
+
+      if ($source_field->isDisplayConfigurable('view')) {
+        $view_display = $display_repository->getViewDisplay('media', $this->id());
+
+        foreach (array_keys($view_display->getComponents()) as $name) {
+          $view_display->removeComponent($name);
+        }
+
+        $source->prepareViewDisplay($this, $view_display);
+        $view_display->save();
+      }
+    }
   }
 
 }

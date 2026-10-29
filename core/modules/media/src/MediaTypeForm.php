@@ -350,38 +350,6 @@ class MediaTypeForm extends EntityForm {
     /** @var \Drupal\media\MediaTypeInterface $media_type */
     $media_type = $this->entity;
 
-    // If the media source is using a source field, ensure it's
-    // properly created.
-    $source = $media_type->getSource();
-    $source_field = $source->getSourceFieldDefinition($media_type);
-    if (!$source_field) {
-      $source_field = $source->createSourceField($media_type);
-      /** @var \Drupal\field\FieldStorageConfigInterface $storage */
-      $storage = $source_field->getFieldStorageDefinition();
-      if ($storage->isNew()) {
-        $storage->save();
-      }
-      $source_field->save();
-
-      // Add the new field to the default form and view displays for this
-      // media type.
-      if ($source_field->isDisplayConfigurable('form')) {
-        $display = $this->entityDisplayRepository->getFormDisplay('media', $media_type->id());
-        $source->prepareFormDisplay($media_type, $display);
-        $display->save();
-      }
-      if ($source_field->isDisplayConfigurable('view')) {
-        $display = $this->entityDisplayRepository->getViewDisplay('media', $media_type->id());
-
-        // Remove all default components.
-        foreach (array_keys($display->getComponents()) as $name) {
-          $display->removeComponent($name);
-        }
-        $source->prepareViewDisplay($media_type, $display);
-        $display->save();
-      }
-    }
-
     $t_args = ['%name' => $media_type->label()];
     if ($status === SAVED_UPDATED) {
       $this->messenger()->addStatus($this->t('The media type %name has been updated.', $t_args));

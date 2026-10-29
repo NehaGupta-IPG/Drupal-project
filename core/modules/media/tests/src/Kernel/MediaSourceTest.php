@@ -505,16 +505,18 @@ class MediaSourceTest extends MediaKernelTestBase {
     $this->assertEquals('Test source', $field->label(), 'Incorrect label is used.');
     $this->assertSame('test_type', $field->getTargetBundle(), 'Field is not targeting correct bundle.');
 
-    // Fields should be automatically saved only when creating the media type
-    // using the media type creation form. Make sure that they are not saved
-    // when creating a media type programmatically.
-    // Drupal\Tests\media\FunctionalJavascript\MediaTypeCreationTest is testing
-    // form part of the functionality.
+    // Source fields should also be provisioned when media types are created
+    // programmatically.
     $type->save();
+    $type = MediaType::load('test_type');
+    $this->assertSame([
+      'source_field' => 'field_media_test_1',
+      'test_config_value' => 'This is default value.',
+    ], $type->get('source_configuration'));
     $storage = FieldStorageConfig::load('media.field_media_test_1');
-    $this->assertNull($storage, 'Field storage was not saved.');
+    $this->assertNotNull($storage, 'Field storage was not saved.');
     $field = FieldConfig::load('media.test_type.field_media_test_1');
-    $this->assertNull($field, 'Field storage was not saved.');
+    $this->assertNotNull($field, 'Field definition was not saved.');
 
     // Test the plugin with a different default source field type.
     $type = MediaType::create([
@@ -547,17 +549,8 @@ class MediaSourceTest extends MediaKernelTestBase {
       'source' => 'test_source_with_a_really_long_name',
     ]);
     $type->save();
-
-    /** @var \Drupal\field\Entity\FieldConfig $field */
-    $field = $type->getSource()->createSourceField($type);
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
-    $field_storage = $field->getFieldStorageDefinition();
-    $field_storage->save();
-    // Field configuration depends on the field storage, which must be saved first.
-    $field->save();
-
-    // Test long field name is truncated.
-    $this->assertSame('field_media_test_source_with_a_r', $field_storage->getName(), 'Incorrect field name is used.');
+    $type = MediaType::load('test_type_fail');
+    $this->assertSame('field_media_test_source_with_a_r', $type->getSource()->getSourceFieldDefinition($type)->getName(), 'Incorrect field name is used.');
 
     $type = MediaType::create([
       'id' => 'test_type_fail_2',
@@ -565,17 +558,8 @@ class MediaSourceTest extends MediaKernelTestBase {
       'source' => 'test_source_with_a_really_long_name',
     ]);
     $type->save();
-
-    /** @var \Drupal\field\Entity\FieldConfig $field */
-    $field = $type->getSource()->createSourceField($type);
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
-    $field_storage = $field->getFieldStorageDefinition();
-    $field_storage->save();
-    // Field configuration depends on the field storage, which must be saved first.
-    $field->save();
-
-    // Test long field name is truncated.
-    $this->assertSame('field_media_test_source_with_a_1', $field_storage->getName(), 'Incorrect field name is used.');
+    $type = MediaType::load('test_type_fail_2');
+    $this->assertSame('field_media_test_source_with_a_1', $type->getSource()->getSourceFieldDefinition($type)->getName(), 'Incorrect field name is used.');
 
     // Test that new source fields respect the configured field prefix, no
     // prefix at all if that's what's configured.

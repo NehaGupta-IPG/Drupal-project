@@ -108,16 +108,9 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
         'source' => 'file',
       ]);
       $media_type->save();
-      // Create the source field.
-      $source_field = $media_type->getSource()->createSourceField($media_type);
-      $source_field->getFieldStorageDefinition()->save();
-      $source_field->save();
-      $media_type
-        ->set('source_configuration', [
-          'source_field' => $source_field->getName(),
-        ])
-        ->save();
     }
+
+    $source_field_name = $this->getCamelidsSourceFieldName();
 
     // Create a file to upload.
     $file = File::create([
@@ -129,7 +122,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
     // Create a "Llama" media item.
     $media = Media::create([
       'bundle' => 'camelids',
-      'field_media_file' => [
+      $source_field_name => [
         'target_id' => $file->id(),
       ],
     ]);
@@ -148,6 +141,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
+    $source_field_name = $this->getCamelidsSourceFieldName();
     $file = File::load(1);
     $thumbnail = File::load(2);
     $author = User::load($this->entity->getOwnerId());
@@ -184,7 +178,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'value' => 'Llama',
         ],
       ],
-      'field_media_file' => [
+      $source_field_name => [
         [
           'description' => NULL,
           'display' => NULL,
@@ -262,6 +256,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPostEntity() {
+    $source_field_name = $this->getCamelidsSourceFieldName();
     return [
       'bundle' => [
         [
@@ -273,7 +268,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'value' => 'Drama llama',
         ],
       ],
-      'field_media_file' => [
+      $source_field_name => [
         [
           'description' => NULL,
           'display' => NULL,
@@ -287,7 +282,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key($this->getNormalizedPostEntity(), ['field_media_file' => TRUE]);
+    return array_diff_key($this->getNormalizedPostEntity(), [$this->getCamelidsSourceFieldName() => TRUE]);
   }
 
   /**
@@ -367,7 +362,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
     $this->initAuthentication();
 
     // POST to create a File entity.
-    $url = Url::fromUri('base:file/upload/media/camelids/field_media_file');
+    $url = Url::fromUri('base:file/upload/media/camelids/' . $this->getCamelidsSourceFieldName());
     $url->setOption('query', ['_format' => static::$format]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS] = [
@@ -399,6 +394,14 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
     $role = Role::load(static::$auth ? RoleInterface::AUTHENTICATED_ID : RoleInterface::ANONYMOUS_ID);
     $role->revokePermission('create camelids media');
     $role->save();
+  }
+
+  /**
+   * Returns the Camelids source field name.
+   */
+  protected function getCamelidsSourceFieldName(): string {
+    $media_type = MediaType::load('camelids');
+    return $media_type->getSource()->getSourceFieldDefinition($media_type)->getName();
   }
 
   /**

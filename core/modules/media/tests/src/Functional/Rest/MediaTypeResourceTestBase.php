@@ -65,9 +65,7 @@ abstract class MediaTypeResourceTestBase extends ConfigEntityResourceTestBase {
       'source' => 'file',
       'queue_thumbnail_downloads' => FALSE,
       'new_revision' => FALSE,
-      'source_configuration' => [
-        'source_field' => '',
-      ],
+      'source_configuration' => $this->entity->get('source_configuration'),
       'status' => TRUE,
       'uuid' => $this->entity->uuid(),
     ];
