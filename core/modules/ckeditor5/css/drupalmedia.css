@@ -13,6 +13,10 @@
   min-width: 50px;
 }
 
+.ck figure {
+  margin-inline: 0;
+}
+
 .ck .drupal-media [data-drupal-media-preview] {
   pointer-events: none;
 }
