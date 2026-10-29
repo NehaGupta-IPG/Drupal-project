@@ -95,12 +95,12 @@ class NumericField extends FieldPluginBase {
     ];
 
     $plural_array = explode(PoItem::DELIMITER, $this->options['format_plural_string']);
+    $labels = locale_get_plural_form_labels($this->view->storage->get('langcode'));
     $plurals = $this->getNumberOfPlurals($this->view->storage->get('langcode'));
     for ($i = 0; $i < $plurals; $i++) {
       $form['format_plural_values'][$i] = [
         '#type' => 'textfield',
-        // @todo Should use better labels https://www.drupal.org/node/2499639
-        '#title' => ($i == 0 ? $this->t('Singular form') : $this->formatPlural($i, 'First plural form', '@count. plural form')),
+        '#title' => $labels[$i],
         '#default_value' => $plural_array[$i] ?? '',
         '#description' => $this->t('Text to use for this variant, @count will be replaced with the value.'),
         '#states' => [

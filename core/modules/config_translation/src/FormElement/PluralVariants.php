@@ -18,6 +18,7 @@ class PluralVariants extends FormElementBase {
    */
   protected function getSourceElement(LanguageInterface $source_language, $source_config) {
     $plurals = $this->getNumberOfPlurals($source_language->getId());
+    $labels = locale_get_plural_form_labels($source_language->getId());
     $values = explode(PoItem::DELIMITER, $source_config);
     $element = [
       '#type' => 'fieldset',
@@ -32,8 +33,7 @@ class PluralVariants extends FormElementBase {
     for ($i = 0; $i < $plurals; $i++) {
       $element[$i] = [
         '#type' => 'item',
-        // @todo Should use better labels https://www.drupal.org/node/2499639
-        '#title' => $i == 0 ? $this->t('Singular form') : $this->formatPlural($i, 'First plural form', '@count. plural form'),
+        '#title' => $labels[$i],
         '#markup' => new FormattableMarkup('<span lang="@langcode">@value</span>', [
           '@langcode' => $source_language->getId(),
           '@value' => $values[$i] ?? $this->t('(Empty)'),
@@ -48,6 +48,7 @@ class PluralVariants extends FormElementBase {
    */
   protected function getTranslationElement(LanguageInterface $translation_language, $source_config, $translation_config) {
     $plurals = $this->getNumberOfPlurals($translation_language->getId());
+    $labels = locale_get_plural_form_labels($translation_language->getId());
     $values = explode(PoItem::DELIMITER, $translation_config);
     $element = [
       '#type' => 'fieldset',
@@ -62,8 +63,7 @@ class PluralVariants extends FormElementBase {
     for ($i = 0; $i < $plurals; $i++) {
       $element[$i] = [
         '#type' => 'textfield',
-        // @todo Should use better labels https://www.drupal.org/node/2499639
-        '#title' => $i == 0 ? $this->t('Singular form') : $this->formatPlural($i, 'First plural form', '@count. plural form'),
+        '#title' => $labels[$i],
         '#default_value' => $values[$i] ?? '',
         '#attributes' => ['lang' => $translation_language->getId()],
       ];

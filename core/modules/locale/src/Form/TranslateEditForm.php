@@ -56,8 +56,8 @@ class TranslateEditForm extends TranslateFormBase {
 
     if (isset($langcode)) {
       $strings = $this->translateFilterLoadStrings();
-
       $plurals = $this->getNumberOfPlurals($langcode);
+      $labels = locale_get_plural_form_labels($langcode);
 
       foreach ($strings as $string) {
         // Cast into source string, will do for our purposes.
@@ -127,8 +127,7 @@ class TranslateEditForm extends TranslateFormBase {
           for ($i = 0; $i < $plurals; $i++) {
             $form['strings'][$string->lid]['translations'][$i] = [
               '#type' => 'textarea',
-              // @todo Should use better labels https://www.drupal.org/node/2499639
-              '#title' => ($i == 0 ? $this->t('Singular form') : $this->formatPlural($i, 'First plural form', '@count. plural form')),
+              '#title' => $labels[$i],
               '#rows' => $rows,
               '#default_value' => $translation_array[$i] ?? '',
               '#attributes' => ['lang' => $langcode],
