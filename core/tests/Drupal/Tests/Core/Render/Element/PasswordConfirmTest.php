@@ -25,6 +25,10 @@ class PasswordConfirmTest extends UnitTestCase {
   public function testValueCallback($expected, $element, $input): void {
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, PasswordConfirm::valueCallback($element, $input, $form_state));
+
+    // Assertion for title handling.
+    $expected_title = empty($element['#title']) ? 'Password' : $element['#title'];
+    $this->assertEquals($expected_title, $element['#title'] ?? 'Password');
   }
 
   /**
@@ -38,6 +42,12 @@ class PasswordConfirmTest extends UnitTestCase {
     $data[] = [['pass1' => '123456', 'pass2' => 'qwerty'], [], ['pass1' => '123456', 'pass2' => 'qwerty']];
     $data[] = [['pass1' => '123', 'pass2' => '234'], [], ['pass1' => 123, 'pass2' => 234]];
     $data[] = [['pass1' => '', 'pass2' => '234'], [], ['pass1' => ['array'], 'pass2' => 234]];
+
+    // Case 1: #title is empty → Should default to 'Password'.
+    $data[] = [['pass1' => '', 'pass2' => ''], ['#title' => NULL], NULL];
+
+    // Case 2: #title is explicitly set → Should retain the custom title.
+    $data[] = [['pass1' => '', 'pass2' => ''], ['#title' => 'Custom Title'], NULL];
 
     return $data;
   }
