@@ -42,7 +42,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   when FALSE an existing item causes an error.
  *
  * A list of payloads can be passed to apply several changes with one action;
- * the view is validated and saved once, after all of them were applied.
+ * the view is validated and saved once, after all of them were applied. Every
+ * handler action also has a plural alias, for example 'setFieldsInDisplay' for
+ * 'setFieldInDisplay' and 'setDisplayOptions' for 'setDisplayOption'.
  *
  * Examples, as used in the 'config.actions' section of a recipe:
  * @code
@@ -98,18 +100,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   entity_types: ['view'],
   deriver: SetDisplayOptionDeriver::class,
 )]
-class SetDisplayOption implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
+final class SetDisplayOption implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param string|null $option
-   *   The display option this action is fixed to, or NULL to read it from the
-   *   'option' key of the payload.
-   * @param string|null $itemKey
-   *   The payload key holding the item name for list options, or NULL to read
-   *   the item from the 'item' key of the payload.
-   */
   public function __construct(
     protected readonly ConfigManagerInterface $configManager,
     protected readonly ?string $option = NULL,
@@ -133,6 +125,10 @@ class SetDisplayOption implements ConfigActionPluginInterface, ContainerFactoryP
    */
   public function apply(string $configName, mixed $value): void {
     assert(is_array($value));
+    // It is possible to set multiple options at once, so the config action
+    // supports multiple payloads. There are also pluralized derivers like
+    // setDisplayOptions, setFieldsInDisplay, setFiltersInDisplay, etc. in
+    // addition to the setDisplayOption, setFieldInDisplay, etc.
     if (!array_is_list($value)) {
       $value = [$value];
     }

@@ -300,6 +300,77 @@ class SetDisplayOptionConfigActionTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests the pluralized generic action with several payloads.
+   */
+  public function testSetDisplayOptions() : void {
+    $config_action_settings = [
+      ['option' => 'title', 'settings' => 'A new title'],
+      ['option' => 'css_class', 'settings' => 'my-class'],
+    ];
+    $this->container->get('plugin.manager.config_action')->applyAction('setDisplayOptions', 'views.view.entity_test_fields', $config_action_settings);
+    $view = Views::getView('entity_test_fields');
+    $view->setDisplay();
+    $this->assertSame('A new title', $view->displayHandlers->get('default')->getOption('title'));
+    $this->assertSame('my-class', $view->displayHandlers->get('default')->getOption('css_class'));
+  }
+
+  /**
+   * Tests the pluralized field action with several payloads.
+   */
+  public function testSetFieldsInDisplay() : void {
+    $settings = [
+      'table' => 'entity_test',
+      'entity_type' => 'entity_test',
+      'plugin_id' => 'field',
+    ];
+    $config_action_settings = [
+      [
+        'field_name' => 'user_id',
+        'settings' => ['id' => 'user_id', 'field' => 'user_id', 'entity_field' => 'user_id'] + $settings,
+      ],
+      [
+        'field_name' => 'type',
+        'position' => ['name', 'before'],
+        'settings' => ['id' => 'type', 'field' => 'type', 'entity_field' => 'type'] + $settings,
+      ],
+    ];
+    $this->container->get('plugin.manager.config_action')->applyAction('setFieldsInDisplay', 'views.view.entity_test_fields', $config_action_settings);
+    $view = Views::getView('entity_test_fields');
+    $view->setDisplay();
+    $fields = array_keys($view->displayHandlers->get('default')->getOption('fields'));
+    $this->assertContains('user_id', $fields);
+    $this->assertGreaterThan(array_search('type', $fields), array_search('name', $fields));
+  }
+
+  /**
+   * Tests the pluralized filter action with several payloads.
+   */
+  public function testSetFiltersInDisplay() : void {
+    $settings = [
+      'table' => 'entity_test',
+      'entity_type' => 'entity_test',
+      'plugin_id' => 'string',
+      'operator' => 'contains',
+    ];
+    $config_action_settings = [
+      [
+        'filter_name' => 'name',
+        'settings' => ['id' => 'name', 'field' => 'name', 'entity_field' => 'name', 'value' => 'foo'] + $settings,
+      ],
+      [
+        'filter_name' => 'type',
+        'settings' => ['id' => 'type', 'field' => 'type', 'entity_field' => 'type', 'value' => 'bar'] + $settings,
+      ],
+    ];
+    $this->container->get('plugin.manager.config_action')->applyAction('setFiltersInDisplay', 'views.view.entity_test_fields', $config_action_settings);
+    $view = Views::getView('entity_test_fields');
+    $view->setDisplay();
+    $filters = $view->displayHandlers->get('default')->getOption('filters');
+    $this->assertSame('foo', $filters['name']['value']);
+    $this->assertSame('bar', $filters['type']['value']);
+  }
+
+  /**
    * Tests every derived single value action.
    *
    * @param string $action

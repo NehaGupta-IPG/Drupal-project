@@ -54,12 +54,20 @@ final class SetDisplayOptionDeriver extends DeriverBase {
     // An empty derivative ID keeps the generic action with its original ID.
     $this->derivatives[''] = $base_plugin_definition;
 
+    // The plural form of the generic action, as the payload may be a list.
+    $this->derivatives['setDisplayOptions'] = $base_plugin_definition;
+
     foreach (Views::getHandlerTypes() as $type => $info) {
-      $this->derivatives['set' . (new UnicodeString($type))->camel()->title()->toString() . 'InDisplay'] = [
+      $definition = [
         'admin_label' => $this->t('Set @type in a Views display', ['@type' => $info['lstitle']]),
         'option' => $info['plural'],
         'item_key' => $type . '_name',
       ] + $base_plugin_definition;
+      $this->derivatives['set' . (new UnicodeString($type))->camel()->title()->toString() . 'InDisplay'] = $definition;
+      // Plural alias, for example 'setFieldsInDisplay'. Some types have the same
+      // singular and plural name, in which case the alias already exists.
+      $plural_id = 'set' . (new UnicodeString($info['plural']))->camel()->title()->toString() . 'InDisplay';
+      $this->derivatives[$plural_id] ??= $definition;
     }
 
     foreach (self::SINGLE_VALUE_OPTIONS as $option) {
