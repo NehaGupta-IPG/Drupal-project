@@ -111,7 +111,7 @@ class Checkboxes extends FormElementBase {
     if (!empty($element['#check_all'])) {
       // The "Select all" control only works with JavaScript, so its markup
       // is added client-side by core/drupal.checkboxes-check-all. This
-      // placeholder just marks where it should be inserted:
+      // placeholder marks where it should be inserted.
       $element['all_wrapper'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['form-checkboxes__check-all']],
