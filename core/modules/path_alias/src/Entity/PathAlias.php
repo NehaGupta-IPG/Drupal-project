@@ -4,6 +4,8 @@ namespace Drupal\path_alias\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -46,8 +48,9 @@ use Drupal\path_alias\PathAliasStorageSchema;
     'UniquePathAlias' => [],
   ],
 )]
-class PathAlias extends ContentEntityBase implements PathAliasInterface {
+class PathAlias extends ContentEntityBase implements PathAliasInterface, EntityChangedInterface {
 
+  use EntityChangedTrait;
   use EntityPublishedTrait;
 
   /**
@@ -80,6 +83,10 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
           'message' => new TranslatableMarkup('The alias path has to start with a slash.'),
         ],
       ]);
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the path alias was last edited.'));
 
     $fields['langcode']->setDefaultValue(LanguageInterface::LANGCODE_NOT_SPECIFIED);
 

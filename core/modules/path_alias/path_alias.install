@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Update functions for the path_alias module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Add created field.
+ */
+function path_alias_update_8001(): void {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $storage_definition = BaseFieldDefinition::create('changed')
+    ->setLabel(t('Changed'))
+    ->setDescription(t('The time that the path alias was last edited.'));
+
+  $definition_update_manager->installFieldStorageDefinition('changed', 'path_alias', 'path_alias', $storage_definition);
+}

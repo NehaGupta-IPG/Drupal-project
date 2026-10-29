@@ -53,7 +53,9 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
       'path' => '/<front>',
       'alias' => '/frontpage1',
     ]);
+    $path_alias->setChangedTime(123456789);
     $path_alias->save();
+
     return $path_alias;
   }
 
@@ -85,6 +87,12 @@ abstract class PathAliasResourceTestBase extends EntityResourceTestBase {
       'alias' => [
         [
           'value' => '/frontpage1',
+        ],
+      ],
+      'changed' => [
+        [
+          'value' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'format' => \DateTime::RFC3339,
         ],
       ],
       'status' => [
