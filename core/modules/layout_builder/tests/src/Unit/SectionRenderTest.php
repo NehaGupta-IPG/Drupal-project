@@ -249,7 +249,13 @@ class SectionRenderTest extends UnitTestCase {
     $this->blockManager->createInstance(Argument::cetera())->shouldNotBeCalled();
 
     $section = [
-      new SectionComponent('some_uuid', NULL, ['id' => 'block_plugin_id']),
+      SectionComponent::fromArray([
+        'uuid' => 'some_uuid',
+        'region' => NULL,
+        'configuration' => ['id' => 'block_plugin_id'],
+        'additional' => [],
+        'weight' => 0,
+      ]),
     ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertSame([], $result);
