@@ -459,6 +459,12 @@
     return contentPreviewPlaceholderLabel.outerHTML;
   };
 
+  Drupal.AjaxCommands.prototype.lbScrollTop = (ajax, response) => {
+    $(response.selector).animate({
+      scrollTop: 0
+    }, 500);
+  };
+
   // Remove all contextual links outside the layout.
   $(window).on('drupalContextualLinkAdded', (event, data) => {
     const element = data.$el;
