@@ -11,6 +11,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\user\UserInterface;
 use Drupal\user\UserNameValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Site\SettingsEditor;
 
 /**
  * Provides the site configuration form.
@@ -169,6 +170,19 @@ class SiteConfigureForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $form['trusted_host_patterns'] = [
+      '#type' => 'fieldgroup',
+      '#title' => $this->t('Trusted hosting patterns'),
+    ];
+    $form['trusted_host_patterns']['trusted_host_patterns'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Trusted website domains'),
+      '#placeholder' => $this->t("example.com\nmy-domain.com\nlocalhost"),
+      '#description' => $this->t("To enable Drupal's trusted hosts system add wanted domains one item per line. Don't use the caret (^), dollar sign ($), backslash (\) characters."),
+      '#required' => FALSE,
+      '#weight' => -30,
+    ];
+
     $form['regional_settings'] = [
       '#type' => 'fieldset',
       '#attributes' => ['class' => ['fieldgroup']],
@@ -233,6 +247,21 @@ class SiteConfigureForm extends ConfigFormBase {
     if ($violations->count() > 0) {
       $form_state->setErrorByName('account][name', $violations[0]->getMessage());
     }
+
+    // If the textarea is empty don't validate the input string.
+    $trusted_host_patterns_input = $form_state->getValue('trusted_host_patterns');
+    if (!empty($trusted_host_patterns_input)) {
+      // Creates an array of domain strings.
+      $exploded_trusted_host_patterns = explode("\r\n", $trusted_host_patterns_input);
+      foreach ($exploded_trusted_host_patterns as $exploded_trusted_host_patterns_items) {
+        // It may be best to use the namespace below with the validate() method.
+        // \Symfony\Component\Validator\Constraints\HostnameValidator
+        // If the domain is invalid it will return an error.
+        if (filter_var($exploded_trusted_host_patterns_items, \FILTER_VALIDATE_DOMAIN, \FILTER_FLAG_HOSTNAME) === FALSE) {
+          $form_state->setErrorByName('trusted_host_patterns', $this->t("The @trusted_host_pattern domain is not recognized as a correct format", ['@trusted_host_pattern' => $exploded_trusted_host_patterns_items]));
+        }
+      }
+    }
   }
 
   /**
@@ -268,6 +297,42 @@ class SiteConfigureForm extends ConfigFormBase {
       if ($email_update_status_emails) {
         // Reset the configuration so it is updated with the new module.
         $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
+      }
+    }
+
+    // If the textarea is empty don't validate the input string.
+    $trusted_host_patterns_input = $form_state->getValue('trusted_host_patterns');
+    if (!empty($trusted_host_patterns_input)) {
+      // Trusted host patterns array is used to write data to settings.php.
+      $trusted_host_patterns_array = [];
+      // Creates an array of trusted host patterns from input strings.
+      $exploded_trusted_host_patterns = explode("\r\n", $trusted_host_patterns_input);
+      foreach ($exploded_trusted_host_patterns as $exploded_trusted_host_patterns_items) {
+        // It may be best to use the namespace below with the validate() method.
+        // \Symfony\Component\Validator\Constraints\HostnameValidator.
+        if (filter_var($exploded_trusted_host_patterns_items, \FILTER_VALIDATE_DOMAIN, \FILTER_FLAG_HOSTNAME) === FALSE) {
+          $form_state->setErrorByName('trusted_host_patterns', $this->t("The @trusted_host_pattern domain is not recognized as a correct format", ['@trusted_host_pattern' => $exploded_trusted_host_patterns_items]));
+          // Reset trusted host pattern array to empty this stops
+          // the array contents being written into the settings.php file.
+          array_diff($trusted_host_patterns_array, $trusted_host_patterns_array);
+          break;
+        }
+        // Replace all full stops with a forward slash and full stop.
+        $trusted_host_pattern_item = str_replace(".", "\.", $exploded_trusted_host_patterns_items);
+        // Add trusted_host_patterns to array.
+        $trusted_host_patterns_array[] = '^' . $trusted_host_pattern_item . '$';
+      }
+
+      // If trusted host patterns array is not empty then write to settings.php.
+      if (!empty($trusted_host_patterns_array)) {
+        $settings['settings']['trusted_host_patterns'] = (object) [
+          'value' => $trusted_host_patterns_array,
+          'required' => TRUE,
+        ];
+        $settings_path = $this->sitePath . '/settings.php';
+        chmod($settings_path, 0744);
+        SettingsEditor::rewrite($settings_path, $settings);
+        chmod($settings_path, 0444);
       }
     }
 
