@@ -76,16 +76,17 @@ class PagerManager implements PagerManagerInterface {
    * {@inheritdoc}
    */
   public function getUpdatedParameters(array $query, $element, $index) {
-    // Build the 'page' query parameter. This is built based on the current
-    // page of each pager element (or NULL if the pager is not set), with the
-    // exception of the requested page index for the current element.
-    $element_pages = [];
-    $max = $this->getMaxPagerElementId();
+    // For a single link within a pager, update its link whilst
+    // remembering the current index of other pagers.
+    $pagers_indexes = $this->pagerParams->getPagerQuery();
+
+    // Fill missing array elements to preserve gaps in element IDs.
+    $max = max(array_merge(array_keys($pagers_indexes), [$element]));
     for ($i = 0; $i <= $max; $i++) {
-      $currentPage = ($pager = $this->getPager($i)) ? $pager->getCurrentPage() : NULL;
-      $element_pages[] = ($i == $element) ? $index : $currentPage;
+      $pagers_indexes[$i] = isset($pagers_indexes[$i]) && $pagers_indexes[$i] !== '' ? (int) $pagers_indexes[$i] : NULL;
     }
-    $query['page'] = implode(',', $element_pages);
+    $pagers_indexes[$element] = (int) $index;
+    $query['page'] = preg_replace('/,+$/', '', implode(',', $pagers_indexes));
 
     // Merge the query parameters passed to this function with the parameters
     // from the current request. In case of collision, the parameters passed
