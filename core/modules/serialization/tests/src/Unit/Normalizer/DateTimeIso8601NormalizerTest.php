@@ -257,6 +257,27 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the JSON Schema for optional and required data.
+   */
+  #[DataProvider('providerTestJsonSchemaNullable')]
+  public function testJsonSchemaNullable(bool $required, array $expected): void {
+    $date = new DateTimeIso8601(DataDefinition::createFromDataType('datetime_iso8601')->setRequired($required));
+
+    $this->assertSame($expected, $this->normalizer->normalize($date, 'json_schema'));
+  }
+
+  /**
+   * Data provider for ::testJsonSchemaNullable().
+   */
+  public static function providerTestJsonSchemaNullable(): array {
+    $schema = ['type' => 'string', 'format' => 'date'];
+    return [
+      'optional' => [FALSE, ['oneOf' => [$schema, ['type' => 'null']]]],
+      'required' => [TRUE, $schema],
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function jsonSchemaDataProvider(): array {

@@ -137,6 +137,27 @@ class TimestampNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the JSON Schema for optional and required data.
+   */
+  #[DataProvider('providerTestJsonSchemaNullable')]
+  public function testJsonSchemaNullable(bool $required, array $expected): void {
+    $timestamp = new Timestamp(DataDefinition::createFromDataType('timestamp')->setRequired($required));
+
+    $this->assertSame($expected, $this->normalizer->normalize($timestamp, 'json_schema'));
+  }
+
+  /**
+   * Data provider for ::testJsonSchemaNullable().
+   */
+  public static function providerTestJsonSchemaNullable(): array {
+    $schema = ['type' => 'string', 'format' => 'date-time'];
+    return [
+      'optional' => [FALSE, ['oneOf' => [$schema, ['type' => 'null']]]],
+      'required' => [TRUE, $schema],
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function jsonSchemaDataProvider(): array {
