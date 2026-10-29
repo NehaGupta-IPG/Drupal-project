@@ -422,6 +422,30 @@ class UrlHelperTest extends TestCase {
           'fragment' => "/://#",
         ],
       ],
+      'Absolute URL with URL as fragment' => [
+        'http://example.com/my/path#http://example.com',
+        [
+          'fragment' => 'http://example.com',
+          'path' => 'http://example.com/my/path',
+          'query' => [],
+        ],
+      ],
+      'Relative URL with URL as fragment' => [
+        '/my/path#http://example.com',
+        [
+          'fragment' => 'http://example.com',
+          'path' => '/my/path',
+          'query' => [],
+        ],
+      ],
+      'URL as fragment' => [
+        '#http://example.com',
+        [
+          'fragment' => 'http://example.com',
+          'path' => '',
+          'query' => [],
+        ],
+      ],
     ];
   }
 
