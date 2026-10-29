@@ -206,6 +206,15 @@ function _batch_progress_page(): array {
 
   $url = $batch['url']->toString(TRUE)->getGeneratedUrl();
 
+  $error_message['string'] = [
+    '#type' => 'inline_template',
+    '#template' => "{{ current_set }} <br /> {{ batch }}",
+    '#context' => [
+      'current_set' => $current_set['error_message'],
+      'batch' => $batch['error_message'],
+    ],
+  ];
+
   $build = [
     '#theme' => 'progress_bar',
     '#percent' => $percentage,
@@ -230,7 +239,7 @@ function _batch_progress_page(): array {
       // enabled.
       'drupalSettings' => [
         'batch' => [
-          'errorMessage' => $current_set['error_message'] . '<br />' . $batch['error_message'],
+          'errorMessage' => \Drupal::service('renderer')->renderInIsolation($error_message),
           'initMessage' => $current_set['init_message'],
           'uri' => $url,
         ],
