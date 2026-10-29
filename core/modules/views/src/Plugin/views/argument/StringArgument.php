@@ -52,6 +52,7 @@ class StringArgument extends ArgumentPluginBase {
     $options['path_case'] = ['default' => 'none'];
     $options['transform_dash'] = ['default' => FALSE];
     $options['break_phrase'] = ['default' => FALSE];
+    $options['value_operator'] = ['default' => '='];
 
     if (!empty($this->definition['many to one'])) {
       $options['add_table'] = ['default' => FALSE];
@@ -61,6 +62,71 @@ class StringArgument extends ArgumentPluginBase {
     return $options;
   }
 
+  /**
+   * Value operators options.
+   */
+  public function valueOperators() {
+    $operators = [
+      '=' => [
+        'title' => $this->t('Is equal to'),
+        'operator' => '=',
+      ],
+      'contains' => [
+        'title' => $this->t('Contains'),
+        'operator' => 'like',
+        'method' => 'opContains',
+      ],
+      'starts' => [
+        'title' => $this->t('Starts with'),
+        'operator' => 'like',
+        'method' => 'opStartsWith',
+      ],
+      'ends' => [
+        'title' => $this->t('Ends with'),
+        'operator' => 'like',
+        'method' => 'opEndsWith',
+      ],
+    ];
+
+    return $operators;
+  }
+
+  /**
+   * Build strings from the valueOperators() for 'select' options.
+   */
+  public function valueOperatorOptions($which = 'title') {
+    $options = [];
+    foreach ($this->valueOperators() as $id => $info) {
+      $options[$id] = $info[$which];
+    }
+
+    return $options;
+  }
+
+  /**
+   * Prepare argument for contains operation.
+   */
+  public function opContains($argument) {
+    return '%' . $this->query->getConnection()->escapeLike($argument) . '%';
+  }
+
+  /**
+   * Prepare argument for starts with operation.
+   */
+  public function opStartsWith($argument) {
+    return $this->query->getConnection()->escapeLike($argument) . '%';
+  }
+
+  /**
+   * Prepare argument for ends with operation.
+   */
+  public function opEndsWith($argument) {
+    return '%' . $this->query->getConnection()->escapeLike($argument);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -146,6 +212,15 @@ class StringArgument extends ArgumentPluginBase {
       '#description' => $this->t('If selected, users can enter multiple values in the form of 1+2+3 (for OR) or 1,2,3 (for AND).'),
       '#default_value' => !empty($this->options['break_phrase']),
       '#group' => 'options][more',
+    ];
+
+    // Operator options.
+    $form['value_operator'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Value operator'),
+      '#description' => $this->t('Operator to apply to argument, e.g. strict equals, string contains, etc'),
+      '#default_value' => $this->options['value_operator'],
+      '#options' => $this->valueOperatorOptions(),
     ];
   }
 
@@ -250,7 +325,16 @@ class StringArgument extends ArgumentPluginBase {
       $argument = $this->value;
     }
     else {
-      $operator = '=';
+      if (!empty($this->options['value_operator'])) {
+        $info = $this->valueOperators()[$this->options['value_operator']];
+        $operator = $info['operator'];
+        if (!empty($info['method'])) {
+          $argument = $this->{$info['method']}($argument);
+        }
+      }
+      else {
+        $operator = '=';
+      }
     }
 
     if ($formula) {
