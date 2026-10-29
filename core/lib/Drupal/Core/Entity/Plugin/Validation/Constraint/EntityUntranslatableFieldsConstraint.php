@@ -18,7 +18,7 @@ class EntityUntranslatableFieldsConstraint extends SymfonyConstraint {
 
   public function __construct(
     public $defaultRevisionMessage = 'Non-translatable fields can only be changed when updating the current revision.',
-    public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language.',
+    public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language. Non-translatable field: %field',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
