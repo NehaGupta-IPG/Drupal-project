@@ -433,7 +433,7 @@ Accessibility
 - Kent Richards 'kentr' (kentr) https://www.drupal.org/u/kentr
 
 Documentation
-- ?
+- Joachim Noreiko 'joachim' https://www.drupal.org/u/joachim
 
 Dependency Coordination
 - Dave Long 'longwave' (longwave) https://www.drupal.org/u/longwave
