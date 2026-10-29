@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
+use Drupal\Core\Extension\Install\LastRemovedInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
@@ -1401,6 +1402,7 @@ class SystemRequirementsHooks {
     // Ensure that no module has a current schema version that is lower than the
     // one that was last removed.
     if ($phase == 'update') {
+      require_once DRUPAL_ROOT . '/core/includes/install.inc';
       $module_handler = \Drupal::moduleHandler();
       /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
       $update_registry = \Drupal::service('update.update_hook_registry');
@@ -1410,19 +1412,20 @@ class SystemRequirementsHooks {
       // Simply inlining the old hook mechanism is better than making
       // ModuleInstaller::invoke() public.
       foreach ($module_handler->getModuleList() as $module => $extension) {
-        $function = $module . '_update_last_removed';
-        if (function_exists($function)) {
-          $last_removed = $function();
-          if ($last_removed && $last_removed > $update_registry->getInstalledVersion($module)) {
-
-            /** @var \Drupal\Core\Extension\Extension $module_info */
-            $module_info = $module_extension_list->get($module);
-            $module_list[$module] = [
-              'name' => $module_info->info['name'],
-              'last_removed' => $last_removed,
-              'installed_version' => $update_registry->getInstalledVersion($module),
-            ];
-          }
+        $class_name = install_get_fixed_class_name($extension, 'Install/LastRemoved');
+        if (class_exists($class_name) && is_subclass_of($class_name, LastRemovedInterface::class)) {
+          $install_class = \Drupal::classResolver($class_name);
+          /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $install_class */
+          $last_removed = $install_class->getLastRemoved();
+        }
+        if ($last_removed ?? FALSE && $last_removed > $update_registry->getInstalledVersion($module)) {
+          /** @var \Drupal\Core\Extension\Extension $module_info */
+          $module_info = $module_extension_list->get($module);
+          $module_list[$module] = [
+            'name' => $module_info->info['name'],
+            'last_removed' => $last_removed,
+            'installed_version' => $update_registry->getInstalledVersion($module),
+          ];
         }
       }
 
