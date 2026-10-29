@@ -727,7 +727,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    */
   public static function fieldSettingsAjaxProcessElement(&$element, $main_form) {
     // Elements are marked as TRUE ('#ajax' => TRUE,), so not empty.
-    if (!empty($element['#ajax'])) {
+    if (($element['#ajax'] ?? NULL) === TRUE) {
       $element['#ajax'] = [
         'trigger_as' => ['name' => 'handler_settings_submit'],
         'wrapper' => 'field-combined',

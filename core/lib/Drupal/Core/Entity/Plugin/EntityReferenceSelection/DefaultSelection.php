@@ -3,9 +3,13 @@
 namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -17,9 +21,11 @@ use Drupal\Core\Entity\Plugin\Derivative\DefaultSelectionDeriver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -152,20 +158,25 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     $configuration = $this->getConfiguration();
     $entity_type_id = $configuration['target_type'];
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+    $bundles = $this->entityTypeBundleInfo->getBundleLabels($entity_type_id);
     $selected_bundles = [];
 
-    if ($entity_type->hasKey('bundle')) {
-      $bundle_options = [];
-      foreach ($bundles as $bundle_name => $bundle_info) {
-        $bundle_options[$bundle_name] = $bundle_info['label'];
-      }
+    if (!$entity_type->hasKey('bundle')) {
+      // Bundleless entity types need no bundle selection.
+      $form['target_bundles'] = [
+        '#type' => 'value',
+        '#value' => [],
+      ];
+    }
+    else {
+      $bundle_options = $bundles;
       natsort($bundle_options);
       $selected_bundles = array_intersect_key(
         $bundle_options,
         array_filter((array) $configuration['target_bundles'])
       );
 
+      // Existing bundles can be selected.
       $form['target_bundles'] = [
         '#type' => 'checkboxes',
         '#title' => $entity_type->getBundleLabel(),
@@ -182,6 +193,75 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#limit_validation_errors' => [],
       ];
 
+      if (!$bundle_options) {
+        // Not all bundled entity types use a configuration entity for bundles.
+        // Without one offering an add form or collection page, this handler
+        // cannot be configured, so set an error.
+        $bundle_entity_type_id = $entity_type->getBundleEntityType();
+        $bundle_entity_type = $bundle_entity_type_id
+          ? $this->entityTypeManager->getDefinition($bundle_entity_type_id)
+          : NULL;
+        if (!$bundle_entity_type || (!$bundle_entity_type->hasLinkTemplate('add-form') && !$bundle_entity_type->hasLinkTemplate('collection'))) {
+          $form['target_bundles']['#required_error'] = $this->t('No @bundle_label is available. Choose a different reference method or type.', [
+            '@bundle_label' => $entity_type->getBundleLabel(),
+          ]);
+        }
+
+        if ($bundle_entity_type) {
+          $bundle_entity_type_label = $bundle_entity_type->getSingularLabel();
+          $add_link = '';
+
+          // Build the return URL without Ajax request parameters.
+          $query = UrlHelper::filterQueryParameters(\Drupal::request()->query->all(), [
+            'ajax_form', '_wrapper_format', '_drupal_ajax', 'ajax_page_state', 'js',
+          ]);
+          $destination = Url::fromRoute('<current>', [], ['query' => $query])->toString();
+
+          // Prefer the add form; use the collection only if it is not defined.
+          $rel = $bundle_entity_type->hasLinkTemplate('add-form')
+            ? 'add-form'
+            : 'collection';
+          if ($path = $bundle_entity_type->getLinkTemplate($rel)) {
+            $url = Url::fromUserInput($path, ['query' => ['destination' => $destination]]);
+            $access = $url->access($this->currentUser, TRUE);
+            CacheableMetadata::createFromRenderArray($form['target_bundles'])
+              ->addCacheableDependency($access)
+              ->applyTo($form['target_bundles']);
+            if ($access->isAllowed()) {
+              $link_text = $rel === 'add-form'
+                ? $this->t('Add a new @entity_type.', ['@entity_type' => $bundle_entity_type_label])
+                : $this->t('Manage @bundles', ['@bundles' => $bundle_entity_type->getPluralLabel()]);
+              if ($rel === 'add-form') {
+                // Open another modal on top so the user can create a bundle.
+                $form['add_bundle'] = [
+                  '#type' => 'button',
+                  '#submit_button' => FALSE,
+                  '#value' => $link_text,
+                  '#name' => 'add_reference_bundle',
+                  '#limit_validation_errors' => [],
+                  '#dialog_submit' => [[static::class, 'bundleCreated']],
+                  '#url' => $url,
+                  '#attributes' => ['class' => ['link', 'js-show']],
+                  '#ajax' => [
+                    'callback' => 'form_ajax_response_builder:openDialog',
+                  ],
+                ];
+                // Keep the normal add link for browsers without JavaScript.
+                $url->setOption('attributes', ['class' => ['js-hide']]);
+              }
+              $add_link = Link::fromTextAndUrl($link_text, $url)->toString();
+            }
+          }
+          $form['target_bundles']['#description'] = $this->t('There is no @entity_type yet. @add_link', [
+            '@entity_type' => $bundle_entity_type_label,
+            '@add_link' => $add_link,
+          ]);
+        }
+        else {
+          $form['target_bundles']['#description'] = $form['target_bundles']['#required_error'];
+        }
+      }
+
       $form['target_bundles_update'] = [
         '#type' => 'submit',
         '#value' => $this->t('Update form'),
@@ -191,12 +271,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         ],
         '#submit' => [[EntityReferenceItem::class, 'settingsAjaxSubmit']],
         '#element_validate' => [[static::class, 'validateTargetBundlesUpdate']],
-      ];
-    }
-    else {
-      $form['target_bundles'] = [
-        '#type' => 'value',
-        '#value' => [],
       ];
     }
     $form['target_bundles']['#element_validate'][] = [static::class, 'validateTargetBundles'];
@@ -511,6 +585,27 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     // Restore the tags and metadata.
     $query->alterTags = $old_tags;
     $query->alterMetaData = $old_metadata;
+  }
+
+  /**
+   * Selects the bundle created through the configuration form's add button.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $dialog_state
+   *   The successfully submitted bundle form state.
+   * @param array $element
+   *   The button that opened the bundle dialog.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The calling reference configuration form state.
+   */
+  public static function bundleCreated(FormStateInterface $dialog_state, array $element, FormStateInterface $form_state): void {
+    $form_object = $dialog_state->getFormObject();
+    if ($form_object instanceof EntityFormInterface) {
+      $bundle = $form_object->getEntity()->id();
+      $parents = $element['#parents'];
+      array_pop($parents);
+      $parents[] = 'target_bundles';
+      NestedArray::setValue($form_state->getUserInput(), $parents, [$bundle => $bundle]);
+    }
   }
 
 }

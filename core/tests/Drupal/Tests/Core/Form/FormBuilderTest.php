@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests Drupal\Core\Form\FormBuilder.
@@ -300,6 +301,47 @@ class FormBuilderTest extends FormTestBase {
     $form = $this->formBuilder->getForm($form_id);
     $this->assertFormElement($expected_form, $form, 'test');
     $this->assertSame('test-form', $form['#id']);
+  }
+
+  /**
+   * Tests that caller defaults preserve the form's own properties and arguments.
+   */
+  public function testCallingFormDefaults(): void {
+    $this->request->setMethod('POST');
+    $this->request->request->set('form_parent', 'calling-form');
+    $this->formCache->method('getCache')->willReturnCallback(static function ($id, FormStateInterface $state): array {
+      $state->set('form_defaults', ['#action' => '/caller-default', '#title' => 'Default title']);
+      return ['#build_id' => $id];
+    });
+    $form_object = $this->createStub(FormInterface::class);
+    $form_object->method('getFormId')->willReturn('dialog_form');
+    $form_object->method('buildForm')->willReturnCallback(static function (array $form, FormStateInterface $state, string $argument): array {
+      return ['#title' => 'Form title', 'message' => ['#markup' => $argument]];
+    });
+    $state = new FormState();
+    $state->addBuildInfo('args', ['Routed argument']);
+    $form = $this->formBuilder->buildForm($form_object, $state);
+    // On a later rebuild, form_parent may no longer be present in the input.
+    // The form must still have its caller's defaults and its own arguments.
+    $state->setUserInput([]);
+    $rebuilt = $this->formBuilder->rebuildForm('dialog_form', $state);
+    foreach ([$form, $rebuilt] as $result) {
+      $this->assertSame('/caller-default', $result['#action']);
+      $this->assertSame('Form title', $result['#title']);
+      $this->assertSame('Routed argument', $result['message']['#markup']);
+    }
+  }
+
+  /**
+   * Rejects a child form whose calling form has expired.
+   */
+  public function testExpiredCallingForm(): void {
+    $this->request->setMethod('POST');
+    $this->request->request->set('form_parent', 'expired-form');
+    $form = $this->getMockForm('dialog_form', ['message' => ['#markup' => 'Dialog']]);
+    $this->expectException(BadRequestHttpException::class);
+    $this->expectExceptionMessage('The calling form is no longer available.');
+    $this->formBuilder->getForm($form);
   }
 
   /**

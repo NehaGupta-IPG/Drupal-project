@@ -69,7 +69,10 @@ class NodeTypeTest extends NodeTestBase {
       'title_label' => 'title for foo',
       'type' => 'foo',
     ];
-    $this->drupalGet('admin/structure/types/add');
+    // The standard alias must preserve the historical matched route name.
+    $this->assertSame('node.type_add', $this->container->get('router.no_access_checks')->match('/admin/structure/types/add')['_route']);
+    $this->drupalGet(Url::fromRoute('entity.node_type.add_form'));
+    $this->assertSession()->statusCodeEquals(200);
     $this->submitForm($edit, 'Save and manage fields');
 
     // Asserts that form submit redirects to the expected manage fields page.

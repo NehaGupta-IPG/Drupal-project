@@ -110,6 +110,9 @@ entity.node_type.collection:
   requirements:
     _permission: 'administer content types'
 
+entity.node_type.add_form:
+  alias: node.type_add
+
 node.type_add:
   path: '/admin/structure/types/add'
   defaults:
