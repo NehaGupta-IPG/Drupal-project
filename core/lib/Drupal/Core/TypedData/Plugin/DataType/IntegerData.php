@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\Serialization\Attribute\JsonSchema;
@@ -24,8 +26,8 @@ class IntegerData extends PrimitiveBase implements IntegerInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'integer'])]
-  public function getCastedValue() {
-    return (int) $this->value;
+  public function getValue(): ?int {
+    return $this->value !== NULL ? (int) $this->value : NULL;
   }
 
 }

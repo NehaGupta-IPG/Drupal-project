@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\Serialization\Attribute\JsonSchema;
@@ -24,8 +26,8 @@ class BooleanData extends PrimitiveBase implements BooleanInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'boolean'])]
-  public function getCastedValue() {
-    return (bool) $this->value;
-  }
+  public function getValue(): ?bool {
+    return $this->value !== NULL ? (bool) $this->value : NULL;
+   }
 
 }

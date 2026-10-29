@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\Serialization\Attribute\JsonSchema;
@@ -24,8 +26,8 @@ class FloatData extends PrimitiveBase implements FloatInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'number'])]
-  public function getCastedValue() {
-    return (float) $this->value;
-  }
+  public function getValue(): ?float {
+    return $this->value !== NULL ? (float) $this->value : NULL;
+   }
 
 }

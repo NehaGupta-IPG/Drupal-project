@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Core\TypedData\Plugin\DataType;
 
 use Drupal\Core\Serialization\Attribute\JsonSchema;
@@ -24,8 +26,8 @@ class StringData extends PrimitiveBase implements StringInterface {
    * {@inheritdoc}
    */
   #[JsonSchema(['type' => 'string'])]
-  public function getCastedValue() {
-    return $this->getString();
+  public function getValue(): ?string {
+    return $this->value !== NULL ? (string) $this->value : NULL;
   }
 
 }
