@@ -35,7 +35,6 @@ class LayoutBuilderDefaultValuesTest extends BrowserTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
     'node',
     'image',
   ];

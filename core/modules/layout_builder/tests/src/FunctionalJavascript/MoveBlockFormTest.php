@@ -26,7 +26,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
     'node',
     'contextual',
   ];
@@ -45,10 +44,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
     parent::setUp();
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
-
-    // @todo The Layout Builder UI relies on local tasks; fix in
-    //   https://www.drupal.org/project/drupal/issues/2917777.
-    $this->drupalPlaceBlock('local_tasks_block');
 
     $this->createContentType(['type' => 'bundle_with_section_field']);
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
@@ -115,7 +110,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     ];
     $this->assertRegionBlocksOrder(1, 'content', $expected_block_order);
     $page->pressButton('Save layout');
-    $page->clickLink('Layout');
+    $this->drupalGet('node/1/layout');
     $this->assertRegionBlocksOrder(1, 'content', $expected_block_order);
 
     // Move the body block into the first region above existing block.
@@ -134,7 +129,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     // Ensure the body block is no longer in the content region.
     $this->assertRegionBlocksOrder(1, 'content', ['.block-extra-field-blocknodebundle-with-section-fieldlinks']);
     $page->pressButton('Save layout');
-    $page->clickLink('Layout');
+    $this->drupalGet('node/1/layout');
     $this->assertRegionBlocksOrder(0, 'first', $expected_block_order);
 
     // Move into the second region that has no existing blocks.

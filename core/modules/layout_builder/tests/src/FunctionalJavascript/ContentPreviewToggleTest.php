@@ -30,7 +30,6 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
     'node',
     'contextual',
     'off_canvas_test',

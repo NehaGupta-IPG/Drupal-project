@@ -24,7 +24,6 @@ class LayoutBuilderOptInTest extends WebDriverTestBase {
   protected static $modules = [
     'node',
     'field_ui',
-    'block',
   ];
 
   /**
