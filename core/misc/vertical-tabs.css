@@ -4,6 +4,7 @@
  */
 
 .vertical-tabs {
+  display: flex;
   margin: 1em 0 1em 15em; /* LTR */
   border: 1px solid #ccc;
 }
