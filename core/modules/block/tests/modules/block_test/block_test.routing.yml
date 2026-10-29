@@ -5,3 +5,10 @@ block_test.test_multiple_forms:
     _title: 'Multiple forms'
   requirements:
     _access: 'TRUE'
+block_test.test_block:
+  path: '/BlockTestPageWithCapitalLetters'
+  defaults:
+    _controller: '\Drupal\block_test\Controller\TestMultipleFormController::testBlockPageWithCapitalLetterUrl'
+    _title: 'Page with capital letters in the URL'
+  requirements:
+    _access: 'TRUE'

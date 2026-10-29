@@ -39,4 +39,14 @@ class TestMultipleFormController extends ControllerBase {
     return $build;
   }
 
+  /**
+   * Test block visibility on a page with capital letters in the URL.
+   */
+  public function testBlockPageWithCapitalLetterUrl() {
+    $build = [
+      '#markup' => $this->t('Test Block for Page with capital letters.'),
+    ];
+    return $build;
+  }
+
 }

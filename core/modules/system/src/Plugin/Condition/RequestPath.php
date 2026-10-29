@@ -166,8 +166,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
     // Do not trim a trailing slash if that is the complete path.
     $path = $path === '/' ? $path : rtrim($path, '/');
     $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
-
-    return $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath($path, $pages));
+    return $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath(mb_strtolower($path), $pages));
   }
 
   /**
