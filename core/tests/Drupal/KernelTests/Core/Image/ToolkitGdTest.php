@@ -179,4 +179,23 @@ class ToolkitGdTest extends KernelTestBase {
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
   }
 
+  /**
+   * Tests creation of an image that will exceed the memory limit.
+   */
+  public function testInsufficientMemory(): void {
+    $image = $this->imageFactory->get();
+    $this->assertFalse($image->createNew(2000000, 2000000));
+  }
+
+  /**
+   * Tests resizing of an image that will exceed the memory available.
+   */
+  public function testInsufficientAvailableMemory(): void {
+    $image = $this->imageFactory->get('core/tests/fixtures/files/image-test.png');
+    $memory_in_use = memory_get_usage(TRUE);
+    // Leave 1Mb of memory to allow selecting tables during teardown.
+    ini_set('memory_limit', $memory_in_use + 1024 * 1024);
+    $this->assertFalse($image->resize(15000, 15000));
+  }
+
 }
