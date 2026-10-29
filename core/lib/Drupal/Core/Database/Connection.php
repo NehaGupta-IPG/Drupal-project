@@ -4,7 +4,6 @@ namespace Drupal\Core\Database;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
-use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Merge;
@@ -14,6 +13,7 @@ use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Base Database API class.
@@ -164,6 +164,13 @@ abstract class Connection {
    * The transaction manager.
    */
   protected TransactionManagerInterface $transactionManager;
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected EventDispatcherInterface $eventDispatcher;
 
   /**
    * Constructs a Connection object.
@@ -1575,10 +1582,20 @@ abstract class Connection {
    *   If the container is not initialized.
    */
   public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {
-    if (\Drupal::hasService('event_dispatcher')) {
-      return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
-    }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    $eventDispatcher = $this->eventDispatcher ?? FixedEventDispatcherFactory::getEventDispatcher();
+    return $eventDispatcher->dispatch($event, $eventName);
+  }
+
+  /**
+   * Set the event dispatcher.
+   *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   Event dispatcher.
+   *
+   * @return void
+   */
+  public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void {
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**

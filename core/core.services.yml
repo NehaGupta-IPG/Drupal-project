@@ -525,11 +525,15 @@ services:
     class: Drupal\Core\Database\Connection
     factory: Drupal\Core\Database\Database::getConnection
     arguments: [default]
+    calls:
+      - [setEventDispatcher, ['@event_dispatcher']]
   Drupal\Core\Database\Connection: '@database'
   database.replica:
     class: Drupal\Core\Database\Connection
     factory: Drupal\Core\Database\Database::getConnection
     arguments: [replica]
+    calls:
+      - [setEventDispatcher, ['@event_dispatcher']]
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
