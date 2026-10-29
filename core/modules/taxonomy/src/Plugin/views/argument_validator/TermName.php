@@ -63,6 +63,9 @@ class TermName extends Entity {
    * {@inheritdoc}
    */
   public function validateArgument($argument) {
+    if (empty($argument)) {
+      return FALSE;
+    }
     if ($this->options['transform']) {
       $argument = str_replace('-', ' ', $argument);
       $this->argument->argument = $argument;
