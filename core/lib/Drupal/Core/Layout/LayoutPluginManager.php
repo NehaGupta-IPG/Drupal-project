@@ -205,9 +205,9 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
       if ($a->getCategory() != $b->getCategory()) {
-        return strnatcasecmp($a->getCategory(), $b->getCategory());
+        return strnatcasecmp((string) $a->getCategory(), (string) $b->getCategory());
       }
-      return strnatcasecmp($a->getLabel(), $b->getLabel());
+      return strnatcasecmp((string) $a->getLabel(), (string) $b->getLabel());
     });
     return $definitions;
   }
