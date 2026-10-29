@@ -19,7 +19,7 @@ use Drupal\views\ViewExecutable;
 #[ViewsArgument(
   id: 'formula',
 )]
-class Formula extends ArgumentPluginBase {
+class Formula extends ArgumentPluginBase implements FormulaInterface {
 
   /**
    * An appropriate SQL string for the DB type and field type.
@@ -42,7 +42,7 @@ class Formula extends ArgumentPluginBase {
   /**
    * Gets the prepared formula.
    */
-  public function getFormula() {
+  public function getFormula(): string {
     return str_replace('***table***', $this->tableAlias, $this->formula);
   }
 

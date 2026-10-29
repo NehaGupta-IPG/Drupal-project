@@ -133,7 +133,7 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormula() {
+  public function getFormula(): string {
     $this->formula = $this->getDateFormat($this->argFormat);
     return parent::getFormula();
   }
