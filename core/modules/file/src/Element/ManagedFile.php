@@ -16,6 +16,7 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file\Upload\ManagedFileElementHelper;
@@ -391,6 +392,12 @@ class ManagedFile extends FormElementBase {
       $allowed_extensions = $element['#upload_validators']['FileExtension']['extensions'];
       $extension_list = implode(',', array_filter(explode(' ', $allowed_extensions)));
       $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = $extension_list;
+    }
+
+    // Add maximum upload file size setting to the page as JavaScript settings.
+    if (isset($element['#upload_validators']['FileSizeLimit']['fileLimit'])) {
+      $element['upload']['#attached']['drupalSettings']['file']['max_size'] = $element['#upload_validators']['FileSizeLimit']['fileLimit'];
+      $element['upload']['#attached']['drupalSettings']['file']['human_max_size'] = ByteSizeMarkup::create($element['#upload_validators']['FileSizeLimit']['fileLimit']);
     }
 
     // Prefix and suffix used for Ajax replacement.

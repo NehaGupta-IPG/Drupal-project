@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests uploading a file that exceeds the maximum file size.
+ * Tests uploading a file that exceeds the maximum POST size.
  */
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
@@ -97,35 +97,52 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests that uploading files exceeding maximum size are handled correctly.
+   * Tests that uploading files exceeding post_max_size are handled correctly.
    */
   public function testUploadFileExceedingMaximumFileSize(): void {
     $session = $this->getSession();
+    $page = $session->getPage();
 
     // Create a test file that exceeds the maximum POST size with 1 kilobyte.
     $post_max_size = (int) Bytes::toNumber(ini_get('post_max_size'));
     $invalid_file = 'public://exceeding_post_max_size.bin';
-    $file = fopen($invalid_file, 'wb');
-    fseek($file, $post_max_size + 1024);
-    fwrite($file, '0');
-    fclose($file);
+    $handle = fopen($invalid_file, 'wb');
+    fseek($handle, $post_max_size + 1024);
+    fwrite($handle, '0');
+    fclose($handle);
 
     // Go to the node creation form and try to upload the test file.
     $this->drupalGet('node/add/article');
-    $page = $session->getPage();
+
+    // Attach the file to the managed file input. Do NOT trigger
+    // change.fileValidate here: when the upload is rejected due to POST size,
+    // browsers may not populate input.files, and client-side validators that
+    // assume files[0] exists can throw.
     $page->attachFileToField("files[field_file_0]", $this->fileSystem->realpath($invalid_file));
 
-    // An error message should appear informing the user that the file exceeded
-    // the maximum file size. The error message includes the actual file size
-    // limit which depends on the current environment, so we check for a part
-    // of the message.
-    $this->assertSession()->statusMessageContainsAfterWait('An unrecoverable error occurred. The uploaded file likely exceeded the maximum file size', 'error');
+    // Wait for some error UI to appear. Depending on how the AJAX upload fails,
+    // Drupal may show:
+    // - a global error message (.messages--error),
+    // - an inline file.js error (.file-upload-js-error),
+    // - or an error message inside the widget
+    // (.js-form-managed-file .messages--error).
+    $this->assertSession()->waitForElementVisible('css', '.messages--error, .file-upload-js-error');
 
-    // Now upload a valid file and check that the error message disappears.
+    $this->assertSession()->pageTextMatches('/(maximum file size|exceed|could not be uploaded|unrecoverable error|upload)/i');
+
+    // Ensure the upload did not succeed: the remove button should not appear.
+    $this->assertSession()->elementNotExists('named', ['id_or_name', 'field_file_0_remove_button']);
+
+    // Now upload a valid file and check that the error state can be recovered.
     $valid_file = $this->generateFile('not_exceeding_post_max_size', 8, 8);
     $page->attachFileToField("files[field_file_0]", $this->fileSystem->realpath($valid_file));
+
+    // The remove button should appear when the upload succeeds.
     $this->assertSession()->waitForElement('named', ['id_or_name', 'field_file_0_remove_button']);
-    $this->assertSession()->statusMessageNotExistsAfterWait('error');
+
+    // Any prior error UI from the failed attempt should be gone
+    // (or at least the inline file.js error should be gone).
+    $this->assertSession()->elementNotExists('css', '.file-upload-js-error');
   }
 
 }

@@ -143,7 +143,7 @@
    */
   Drupal.file = Drupal.file || {
     /**
-     * Client-side file input validation of file extensions.
+     * Client-side file input validation of file extensions and file size.
      *
      * @name Drupal.file.validateExtension
      *
@@ -152,10 +152,17 @@
      */
     validateExtension(event) {
       event.preventDefault();
+      const file = this.files[0];
+
+      // Formats bytes to human friendly unit.
+      function humanFileSize(size) {
+        const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+        return `${(size / 1024 ** i).toFixed(2)} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
+      }
       // Remove any previous errors.
       $('.file-upload-js-error').remove();
 
-      // Add client side validation for the input[type=file].
+      // Client side file extension validation for the input[type=file].
       const extensionPattern = event.data.extensions.replace(/,\s*/g, '|');
       if (extensionPattern.length > 1 && this.value.length > 0) {
         const acceptableMatch = new RegExp(`\\.(${extensionPattern})$`, 'gi');
@@ -183,6 +190,29 @@
           // Cancel all other change event handlers.
           event.stopImmediatePropagation();
         }
+      }
+
+      // Validate filesize.
+      if (file.size > drupalSettings.file.max_size) {
+        const error = Drupal.t(
+          'The specified file %name could not be uploaded. The file size is %filesize exceeding the maximum file size of %maxsize.',
+          {
+            '%name': this.value.replace('C:\\fakepath\\', ''),
+            '%filesize': humanFileSize(file.size),
+            '%maxsize': drupalSettings.file.human_max_size,
+          },
+        );
+        $('.upload-button').hide();
+        $(this)
+          .closest('div.js-form-managed-file')
+          .prepend(
+            `<div class="messages messages--error file-upload-js-error" aria-live="polite">${error}</div>`,
+          );
+        this.value = '';
+        // Cancel all other change event handlers.
+        event.stopImmediatePropagation();
+      } else {
+        $('.upload-button').show();
       }
     },
 
