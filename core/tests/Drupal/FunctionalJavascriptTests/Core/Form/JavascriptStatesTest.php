@@ -530,10 +530,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($item_visible_value2->isVisible());
     $this->assertFalse($textfield_visible_value3->isVisible());
     $this->assertFalse($textfield_visible_value2_or_value3->isVisible());
-    // @todo These last two look to be correct, but the assertion is failing.
-    // @see https://www.drupal.org/project/drupal/issues/3367310
-    // $this->assertTrue($item_visible_no_value->isVisible());
-    // $this->assertFalse($textfield_visible_value2_and_value3->isVisible());
+    $this->assertTrue($item_visible_no_value->isVisible());
+    $this->assertFalse($textfield_visible_value2_and_value3->isVisible());
   }
 
   /**
