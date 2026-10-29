@@ -306,7 +306,6 @@ class ImageWidget extends FileWidget {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
     $style_id = $this->getSetting('preview_image_style');
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
       // If this widget uses a valid image style to display the preview of the
       // uploaded image, add that image style configuration entity as dependency
@@ -322,8 +321,8 @@ class ImageWidget extends FileWidget {
   public function onDependencyRemoval(array $dependencies) {
     $changed = parent::onDependencyRemoval($dependencies);
     $style_id = $this->getSetting('preview_image_style');
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
+      /** @var \Drupal\image\ImageStyleInterface $style */
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         /** @var \Drupal\image\ImageStyleStorageInterface $storage */
         $storage = \Drupal::entityTypeManager()->getStorage($style->getEntityTypeId());

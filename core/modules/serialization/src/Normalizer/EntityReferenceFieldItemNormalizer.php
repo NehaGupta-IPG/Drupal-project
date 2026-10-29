@@ -50,8 +50,8 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
 
     $this->normalizeRootReferenceValue($values, $field_item);
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
     if ($entity = $field_item->get('entity')->getValue()) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $values['target_type'] = $entity->getEntityTypeId();
       // Add the target entity UUID to the normalized output values.
       $values['target_uuid'] = $entity->uuid();

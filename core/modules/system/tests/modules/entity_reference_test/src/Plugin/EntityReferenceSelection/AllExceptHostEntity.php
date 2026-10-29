@@ -25,8 +25,8 @@ class AllExceptHostEntity extends DefaultSelection {
   protected function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
     $query = parent::buildEntityQuery($match, $match_operator);
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
     if ($entity = $this->configuration['entity']) {
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $target_type = $this->configuration['target_type'];
       $entity_type = $this->entityTypeManager->getDefinition($target_type);
       $query->condition($entity_type->getKey('id'), $entity->id(), '<>');

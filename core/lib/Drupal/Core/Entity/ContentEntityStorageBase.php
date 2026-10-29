@@ -947,8 +947,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   public function deleteRevision($revision_id) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
     if ($revision = $this->loadRevision($revision_id)) {
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
       // Prevent deletion if this is the default revision.
       if ($revision->isDefaultRevision()) {
         throw new EntityStorageException('Default revision can not be deleted');

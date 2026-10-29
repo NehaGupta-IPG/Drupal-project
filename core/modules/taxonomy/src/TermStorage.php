@@ -148,8 +148,10 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function loadAllParents($tid) {
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    return (!empty($tid) && $term = $this->load($tid)) ? $this->getAncestors($term) : [];
+    if (!empty($tid) && ($term = $this->load($tid)) instanceof TermInterface) {
+      return $this->getAncestors($term);
+    }
+    return [];
   }
 
   /**
@@ -182,8 +184,10 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function loadChildren($tid, $vid = NULL) {
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    return (!empty($tid) && $term = $this->load($tid)) ? $this->getChildren($term) : [];
+    if (!empty($tid) && ($term = $this->load($tid)) instanceof TermInterface) {
+      return $this->getChildren($term);
+    }
+    return [];
   }
 
   /**

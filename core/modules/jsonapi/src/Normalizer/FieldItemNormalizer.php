@@ -72,7 +72,6 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
    */
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof FieldItemInterface);
-    /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
     $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY] = new CacheableMetadata();
     // Default: The field has only internal (or no) properties but has a public
     // value.
