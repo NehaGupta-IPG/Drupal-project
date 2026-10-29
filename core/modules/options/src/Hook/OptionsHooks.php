@@ -53,6 +53,25 @@ class OptionsHooks {
   }
 
   /**
+   * Implements hook_preprocess_HOOK().
+   */
+  #[Hook('preprocess_field')]
+  public function preprocessField(array &$variables): void {
+    if (!in_array($variables['field_type'] ?? '', ['list_integer', 'list_float', 'list_string'], TRUE)) {
+      return;
+    }
+    foreach ($variables['element']['#items'] ?? [] as $delta => $item) {
+      if (!isset($variables['items'][$delta])) {
+        continue;
+      }
+      // "key" is the option key value.
+      // 'properties' is the full property array.
+      $variables['items'][$delta]['key'] = $item->value ?? NULL;
+      $variables['items'][$delta]['properties'] = $item->getValue();
+    }
+  }
+
+  /**
    * Implements hook_field_storage_config_update_forbid().
    */
   #[Hook('field_storage_config_update_forbid')]
