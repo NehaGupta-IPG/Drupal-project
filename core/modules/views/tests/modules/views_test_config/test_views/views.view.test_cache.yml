@@ -73,3 +73,27 @@ display:
     cache_metadata:
       contexts:
         - views_test_cache_context
+
+  page_3:
+    display_plugin: page
+    id: page_3
+    display_options:
+      defaults:
+        filters: false
+        cache: false
+      cache:
+        type: time
+        options:
+          results_lifespan: -1
+          results_lifespan_custom: 10
+          output_lifespan: -1
+          output_lifespan_custom: 15
+      filters:
+        test_cache_context:
+          id: test_cache_context
+          table: views_test_data
+          field: test_cache_context
+          relationship: none
+    cache_metadata:
+      contexts:
+        - views_test_cache_context
