@@ -81,6 +81,8 @@ class QuickStartTest extends BuildTestBase {
    * Tests the quick-start command.
    */
   public function testQuickStartCommand(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
     if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
@@ -112,7 +114,7 @@ class QuickStartTest extends BuildTestBase {
     $this->assertStringContainsString('Congratulations, you installed Drupal!', $process->getErrorOutput());
     // Ensure the command does not trigger any PHP deprecations.
     $this->assertStringNotContainsString('Deprecated', $process->getErrorOutput());
-    $this->assertNotFalse($port, "Web server running on port $port");
+    $this->assertNotFalse($port);
 
     // Give the server a couple of seconds to be ready.
     sleep(2);
@@ -150,6 +152,8 @@ class QuickStartTest extends BuildTestBase {
    * Tests the quick-start commands.
    */
   public function testQuickStartInstallAndServerCommands(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
     if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
@@ -191,7 +195,7 @@ class QuickStartTest extends BuildTestBase {
     });
     $this->assertEquals('', $server_process->getErrorOutput());
     $this->assertStringContainsString("127.0.0.1:$port/user/reset/1/", $server_process->getOutput());
-    $this->assertNotFalse($port, "Web server running on port $port");
+    $this->assertNotFalse($port);
 
     // Give the server a couple of seconds to be ready.
     sleep(2);
@@ -261,6 +265,54 @@ class QuickStartTest extends BuildTestBase {
     $server_process = new Process($server_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
     $server_process->run();
     $this->assertStringContainsString('No installation found. Use the \'install\' command.', $server_process->getErrorOutput());
+  }
+
+  /**
+   * Tests the server command works when not run from the Drupal root.
+   */
+  public function testServerFromNonRootDirectory(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
+    $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
+    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+      $this->markTestSkipped();
+    }
+
+    // Install a site first.
+    $install_command = [
+      $this->php,
+      'core/scripts/drupal',
+      'install',
+      'minimal',
+      "--password='secret'",
+      "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
+    ];
+    $install_process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
+    $install_process->setTimeout(500);
+    $install_process->run();
+    $this->assertSame(0, $install_process->getExitCode());
+
+    // Run the server command from a non-root directory.
+    $server_command = [
+      $this->php,
+      $this->root . '/core/scripts/drupal',
+      'server',
+      '--suppress-login',
+    ];
+    $server_process = new Process($server_command, sys_get_temp_dir(), ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
+    $server_process->start();
+    $port = FALSE;
+    $server_process->waitUntil(function ($type, $output) use (&$port) {
+      if (preg_match('/127.0.0.1:(\d+)/', $output, $match)) {
+        $port = $match[1];
+        return TRUE;
+      }
+    });
+    $this->assertEquals('', $server_process->getErrorOutput());
+    $this->assertNotFalse($port);
+
+    // Stop the web server.
+    $server_process->stop();
   }
 
   /**
