@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 /**
  * Defines the queue factory.
  */
-class QueueFactory {
+class QueueFactory implements QueueFactoryInterface {
 
   /**
    * Instantiated queues, keyed by name.
