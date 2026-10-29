@@ -129,7 +129,12 @@ class Sql extends QueryPluginBase {
    *
    * @var array
    */
-  public $tags = [];
+  public array $tags = [];
+
+  /**
+   * The query metadata which will be passed over to the dbtng query object.
+   */
+  public array $metaData = [];
 
   /**
    * Is the view marked as not distinct.
@@ -1134,6 +1139,37 @@ class Sql extends QueryPluginBase {
   }
 
   /**
+   * Adds additional metadata to the query.
+   *
+   * @param string $key
+   *   The unique identifier for this piece of metadata. Must be a string that
+   *   follows the same rules as any other PHP identifier.
+   * @param mixed $object
+   *   The additional data to add to the query. May be any valid PHP variable.
+   *
+   * @see SelectQuery::addMetadata()
+   */
+  public function addMetaData($key, $object) {
+    $this->metaData[$key] = $object;
+  }
+
+  /**
+   * Retrieves a given piece of metadata.
+   *
+   * @param string $key
+   *   The unique identifier for this piece of metadata. Must be a string that
+   *   follows the same rules as any other PHP identifier.
+   *
+   * @return mixed
+   *   The previously attached metadata object, or NULL if one doesn't exist.
+   *
+   * @see SelectQuery::getMetaData()
+   */
+  public function getMetaData($key) {
+    return $this->metaData[$key] ?? NULL;
+  }
+
+  /**
    * Generates a unique placeholder used in the db query.
    */
   public function placeholder($base = 'views') {
@@ -1459,6 +1495,10 @@ class Sql extends QueryPluginBase {
 
     // Add all query substitutions as metadata.
     $query->addMetaData('views_substitutions', \Drupal::moduleHandler()->invokeAll('views_query_substitutions', [$this->view]));
+
+    foreach ($this->metaData as $key => $value) {
+      $query->addMetadata($key, $value);
+    }
 
     return $query;
   }
