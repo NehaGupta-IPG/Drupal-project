@@ -27,6 +27,10 @@
   background: #f3f4ee;
   font-weight: bold;
 }
+.ui-dialog .ui-dialog-title {
+  white-space: normal;
+  text-overflow: initial;
+}
 .ui-dialog .ui-dialog-titlebar-close {
   border: 0;
   background: none;
