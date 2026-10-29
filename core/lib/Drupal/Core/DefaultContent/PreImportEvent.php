@@ -26,14 +26,10 @@ final class PreImportEvent extends Event {
   /**
    * Constructs a PreImportEvent object.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $finder
-   *   The content finder, which has information on the entities to create
-   *   in the necessary dependency order.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   What the importer will do when importing an entity that already exists.
    */
   public function __construct(
-    public readonly Finder $finder,
     public readonly Existing $existing,
   ) {}
 
@@ -44,17 +40,9 @@ final class PreImportEvent extends Event {
    *   The UUID of an entity that should not be imported.
    * @param string|\Stringable|null $reason
    *   (optional) A reason why the entity is being skipped. Defaults to NULL.
-   *
-   * @throws \InvalidArgumentException
-   *   If the given UUID is not one of the ones being imported.
    */
   public function skip(string $uuid, string|\Stringable|null $reason = NULL): void {
-    if (array_key_exists($uuid, $this->finder->data)) {
-      $this->skip[$uuid] = $reason;
-    }
-    else {
-      throw new \InvalidArgumentException("Content entity '$uuid' cannot be skipped, because it is not one of the entities being imported.");
-    }
+    $this->skip[$uuid] = $reason;
   }
 
   /**

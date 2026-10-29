@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  * @internal
  *   This API is experimental.
  */
-final class Finder {
+final class Finder implements \IteratorAggregate {
 
   /**
    * The content entity data to import.
@@ -87,6 +87,16 @@ final class Finder {
       }
     }
     $this->data = $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \ArrayObject<string, array<mixed>>
+   *   A new ArrayObject iterator.
+   */
+  public function getIterator(): \ArrayObject {
+    return new \ArrayObject($this->data);
   }
 
 }

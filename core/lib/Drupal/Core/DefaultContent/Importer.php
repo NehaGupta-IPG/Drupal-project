@@ -53,9 +53,10 @@ final class Importer implements LoggerAwareInterface {
   /**
    * Imports content entities from disk.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $content
-   *   The content finder, which has information on the entities to create
-   *   in the necessary dependency order.
+   * @param iterable $content
+   *   An iterable of decoded entity data arrays (each with a '_meta' key), in
+   *   dependency order. A \Drupal\Core\DefaultContent\Finder instance satisfies
+   *   this contract and additionally triggers the PreImportEvent.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   (optional) What to do if one of the entities being imported already
    *   exists, by UUID:
@@ -71,12 +72,12 @@ final class Importer implements LoggerAwareInterface {
    *   - If any of the entities being imported already exists, by UUID, and
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
    */
-  public function importContent(Finder $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
-    if (count($content->data) === 0) {
+  public function importContent(iterable $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
+    if (iterator_count($content) === 0) {
       return;
     }
 
-    $event = new PreImportEvent($content, $existing);
+    $event = new PreImportEvent($existing);
     $skip = $this->eventDispatcher->dispatch($event)->getSkipList();
 
     if ($account !== NULL) {
@@ -88,7 +89,7 @@ final class Importer implements LoggerAwareInterface {
 
     try {
       /** @var array{_meta: array<mixed>} $decoded */
-      foreach ($content->data as $decoded) {
+      foreach ($content as $decoded) {
         ['uuid' => $uuid, 'entity_type' => $entity_type_id, 'path' => $path] = $decoded['_meta'];
         assert(is_string($uuid));
         assert(is_string($entity_type_id));
