@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Graph;
 
+use Drupal\Component\Graph\CyclicGraphException;
 use Drupal\Component\Graph\Graph;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests Drupal\Component\Graph\Graph.
  */
 #[CoversClass(Graph::class)]
+#[CoversClass(CyclicGraphException::class)]
 #[Group('Graph')]
 class GraphTest extends TestCase {
 
@@ -82,6 +85,56 @@ class GraphTest extends TestCase {
       [8, 9],
     ];
     $this->assertWeights($graph, $expected_weights);
+  }
+
+  /**
+   * Tests acyclic graph verification.
+   */
+  public function testVerifyGraphIsAcyclic(): void {
+    $graph = $this->normalizeGraph([
+      1 => [2],
+      2 => [3],
+      3 => [],
+    ]);
+    $graph_object = new Graph($graph);
+
+    $this->assertSame($graph_object, $graph_object->verifyGraphIsAcyclic());
+  }
+
+  /**
+   * Tests cyclic graph verification.
+   */
+  public function testVerifyGraphIsAcyclicThrowsException(): void {
+    $graph = $this->normalizeGraph([
+      1 => [2],
+      2 => [3],
+      3 => [1],
+    ]);
+    $graph_object = new Graph($graph);
+
+    try {
+      $graph_object->verifyGraphIsAcyclic();
+      $this->fail('Expected a cyclic graph exception.');
+    }
+    catch (CyclicGraphException $e) {
+      $this->assertSame([1, 2, 3, 1], $e->getCycle());
+      $this->assertSame('The graph contains a cycle: 1 -> 2 -> 3 -> 1.', $e->getMessage());
+    }
+  }
+
+  /**
+   * Tests that sorting a cyclic graph is deprecated.
+   */
+  #[IgnoreDeprecations]
+  public function testSearchAndSortWithoutAcyclicVerificationIsDeprecated(): void {
+    $graph = $this->normalizeGraph([
+      1 => [2],
+      2 => [1],
+    ]);
+    $graph_object = new Graph($graph);
+
+    $this->expectUserDeprecationMessage('Calling Drupal\Component\Graph\Graph::searchAndSort() on a cyclic graph without first calling Drupal\Component\Graph\Graph::verifyGraphIsAcyclic() is deprecated in drupal:11.4.0 and will throw Drupal\Component\Graph\CyclicGraphException in drupal:13.0.0. Call Drupal\Component\Graph\Graph::verifyGraphIsAcyclic() before sorting and handle cyclic graph input. See https://www.drupal.org/node/3595546');
+    $graph_object->searchAndSort();
   }
 
   /**

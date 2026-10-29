@@ -1,0 +1,12 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: dddddddd-dddd-4ddd-dddd-dddddddddddd
+  bundle: page
+  default_langcode: en
+  depends:
+    dddddddd-dddd-4ddd-dddd-dddddddddddd: node
+default:
+  title:
+    -
+      value: 'Entity D (depends on itself)'

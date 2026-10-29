@@ -8,6 +8,7 @@ use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\ImportException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -80,6 +81,54 @@ class FinderTest extends UnitTestCase {
     $this->expectException(ImportException::class);
     $this->expectExceptionMessageMatches("#/no-uuid\.yml does not have a UUID\.$#");
     new Finder(__DIR__ . '/../../../../fixtures/default_content_broken');
+  }
+
+  /**
+   * Tests that circular dependencies raise an exception.
+   *
+   * @param string $fixture
+   *   The fixture directory name, relative to the fixtures directory.
+   * @param string[] $expected_files
+   *   Entity file names, relative to the fixture directory, expected in the
+   *   exception message.
+   */
+  #[DataProvider('providerCircularDependency')]
+  public function testExceptionOnCircularDependency(string $fixture, array $expected_files): void {
+    $dir = __DIR__ . '/../../../../fixtures/' . $fixture;
+
+    try {
+      new Finder($dir);
+      $this->fail('Expected an ImportException for a circular dependency.');
+    }
+    catch (ImportException $e) {
+      $message = $e->getMessage();
+      $this->assertStringStartsWith('The following default content entities form a circular dependency: ', $message);
+      foreach ($expected_files as $file) {
+        $this->assertStringContainsString($dir . '/' . $file, $message);
+      }
+    }
+  }
+
+  /**
+   * Data provider for ::testExceptionOnCircularDependency().
+   */
+  public static function providerCircularDependency(): array {
+    return [
+      'three-node cycle' => [
+        'default_content_circular',
+        [
+          'node/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.yml',
+          'node/bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb.yml',
+          'node/cccccccc-cccc-4ccc-cccc-cccccccccccc.yml',
+        ],
+      ],
+      'self-referencing entity' => [
+        'default_content_circular_self',
+        [
+          'node/dddddddd-dddd-4ddd-dddd-dddddddddddd.yml',
+        ],
+      ],
+    ];
   }
 
 }

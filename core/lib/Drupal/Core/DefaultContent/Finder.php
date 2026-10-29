@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\DefaultContent;
 
+use Drupal\Component\Graph\CyclicGraphException;
 use Drupal\Component\Graph\Graph;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Serialization\Yaml;
@@ -77,6 +78,17 @@ final class Finder {
     // Sort the dependency graph. The entities that are dependencies of other
     // entities should come first.
     $graph_object = new Graph($graph);
+    try {
+      $graph_object->verifyGraphIsAcyclic();
+    }
+    catch (CyclicGraphException $e) {
+      $in_cycle = [];
+      foreach (array_unique($e->getCycle()) as $uuid) {
+        $in_cycle[] = $files[$uuid]['_meta']['path'] ?? $uuid;
+      }
+      sort($in_cycle);
+      throw new ImportException('The following default content entities form a circular dependency: ' . implode(', ', $in_cycle) . '.', 0, $e);
+    }
     $sorted = $graph_object->searchAndSort();
     uasort($sorted, SortArray::sortByWeightElement(...));
 

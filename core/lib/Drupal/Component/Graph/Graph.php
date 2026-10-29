@@ -34,6 +34,13 @@ class Graph {
   protected $graph;
 
   /**
+   * Whether the graph has been explicitly checked for cycles.
+   *
+   * @var bool
+   */
+  protected $graphVerifiedAcyclic = FALSE;
+
+  /**
    * Instantiates the directed acyclic graph object.
    *
    * @param array $graph
@@ -45,6 +52,22 @@ class Graph {
    */
   public function __construct($graph) {
     $this->graph = $graph;
+  }
+
+  /**
+   * Verifies that the graph is acyclic.
+   *
+   * @return $this
+   *
+   * @throws \Drupal\Component\Graph\CyclicGraphException
+   *   Thrown when the graph contains a cycle.
+   */
+  public function verifyGraphIsAcyclic() {
+    if ($cycle = $this->findCycle()) {
+      throw new CyclicGraphException($cycle);
+    }
+    $this->graphVerifiedAcyclic = TRUE;
+    return $this;
   }
 
   /**
@@ -62,6 +85,10 @@ class Graph {
    *     identifier.
    */
   public function searchAndSort() {
+    if (!$this->graphVerifiedAcyclic && $this->findCycle()) {
+      @trigger_error('Calling ' . __METHOD__ . '() on a cyclic graph without first calling ' . self::class . '::verifyGraphIsAcyclic() is deprecated in drupal:11.4.0 and will throw ' . CyclicGraphException::class . ' in drupal:13.0.0. Call ' . self::class . '::verifyGraphIsAcyclic() before sorting and handle cyclic graph input. See https://www.drupal.org/node/3595546', E_USER_DEPRECATED);
+    }
+
     $state = [
       // The order of last visit of the depth first search. This is the reverse
       // of the topological order if the graph is acyclic.
@@ -88,6 +115,66 @@ class Graph {
     }
 
     return $this->graph;
+  }
+
+  /**
+   * Finds a cycle in the graph.
+   *
+   * @return array
+   *   The first detected cycle path, or an empty array if the graph is acyclic.
+   */
+  protected function findCycle() {
+    $state = [];
+    $stack = [];
+    foreach (array_keys($this->graph) as $vertex) {
+      if (!isset($state[$vertex])) {
+        if ($cycle = $this->findCycleFromVertex($vertex, $state, $stack)) {
+          return $cycle;
+        }
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Searches for a cycle from a vertex.
+   *
+   * @param string|int $vertex
+   *   The vertex to inspect.
+   * @param array $state
+   *   The traversal state, keyed by vertex.
+   * @param array $stack
+   *   The current traversal stack.
+   *
+   * @return array
+   *   The first detected cycle path, or an empty array if none is found.
+   */
+  protected function findCycleFromVertex($vertex, array &$state, array &$stack) {
+    $state[$vertex] = 'visiting';
+    $stack[] = $vertex;
+
+    foreach ($this->graph[$vertex]['edges'] ?? [] as $end => $v) {
+      // Edges to unknown vertices are ignored by ::depthFirstSearch(), so they
+      // cannot form a cycle in the sortable graph.
+      if (!array_key_exists($end, $this->graph)) {
+        continue;
+      }
+      if (($state[$end] ?? NULL) === 'visiting') {
+        $cycle_start = array_search($end, $stack, TRUE);
+        $cycle = array_slice($stack, $cycle_start);
+        $cycle[] = $end;
+        return $cycle;
+      }
+      if (!isset($state[$end])) {
+        if ($cycle = $this->findCycleFromVertex($end, $state, $stack)) {
+          return $cycle;
+        }
+      }
+    }
+
+    array_pop($stack);
+    $state[$vertex] = 'visited';
+    return [];
   }
 
   /**
