@@ -56,6 +56,17 @@ class NodeEntityHooks {
       ->condition('uid', $account->id());
     $revisions = array_keys($query->execute());
     foreach ($revisions as $revision) {
+      $node_revision = $storage_controller->loadRevision($revision);
+      if (!$node_revision) {
+        continue;
+      }
+      // A node owned by this account may have been created or saved while
+      // the nodes above were being deleted. Its default revision cannot be
+      // deleted on its own, so delete the whole node like the others.
+      if ($node_revision->isDefaultRevision()) {
+        $storage_controller->delete([$node_revision]);
+        continue;
+      }
       $storage_controller->deleteRevision($revision);
     }
   }

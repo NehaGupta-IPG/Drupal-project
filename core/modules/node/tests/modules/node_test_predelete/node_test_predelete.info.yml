@@ -1,0 +1,5 @@
+name: 'Node predelete test'
+type: module
+description: 'Creates a node for the same owner whenever a node is deleted.'
+package: Testing
+version: VERSION
