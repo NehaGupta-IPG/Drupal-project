@@ -355,7 +355,9 @@ class StringDatabaseStorage implements StringStorageInterface {
     // Start building the query with source table and check whether we need to
     // join the target table too.
     $query = $this->connection->select('locales_source', 's', $this->options)
-      ->fields('s');
+      ->fields('s')
+      ->orderBy('s.context')
+      ->orderBy('s.source');
 
     // Figure out how to join and translate some options into conditions.
     if (isset($conditions['translated'])) {
