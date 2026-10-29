@@ -171,6 +171,31 @@
     return [].map.call(form.querySelectorAll('[name][id]'), (el) => el.id);
   }
 
+  // Override the beforeSend method to disable the submit button until
+  // the AJAX request is completed. This is done to avoid the race
+  // condition that is being caused by change event listener that is
+  // attached to every form element inside field storage config edit
+  // form to update the field config form based on changes made to the
+  // storage settings.
+  const originalAjaxBeforeSend = Drupal.Ajax.prototype.beforeSend;
+  const formId = $(document).find('form').attr('id');
+  // eslint-disable-next-line func-names
+  Drupal.Ajax.prototype.beforeSend = function () {
+    // Disable the submit button on AJAX request initiation.
+    $(`.${formId} [data-drupal-selector="edit-submit"]`).prop('disabled', true);
+    // eslint-disable-next-line prefer-rest-params
+    return originalAjaxBeforeSend.apply(this, arguments);
+  };
+
+  // Re-enable the submit button after AJAX request is completed.
+  // eslint-disable-next-line
+  $(document).on('ajaxComplete', () => {
+    $(`.${formId} [data-drupal-selector="edit-submit"]`).prop(
+      'disabled',
+      false,
+    );
+  });
+
   /**
    * Triggers the 'formUpdated' event on form elements when they are modified.
    *
