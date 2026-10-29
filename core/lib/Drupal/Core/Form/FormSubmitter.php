@@ -64,6 +64,9 @@ class FormSubmitter implements FormSubmitterInterface {
       $form_state->setResponse($redirect);
     }
 
+    // Set ignore destination.
+    $this->redirectResponseSubscriber->setIgnoreDestination($form_state->getIgnoreDestination());
+
     // If there is a response was set, return it instead of continuing.
     if (($response = $form_state->getResponse()) && $response instanceof Response) {
       return $response;
