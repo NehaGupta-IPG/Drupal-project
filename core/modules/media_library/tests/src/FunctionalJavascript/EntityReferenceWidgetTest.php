@@ -483,7 +483,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   }
 
   /**
-   * Tests saving a required media library field.
+   * Tests rendering and saving a required media library field.
    */
   public function testRequiredMediaField(): void {
     $assert_session = $this->assertSession();
@@ -494,6 +494,10 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $field_config->setRequired(TRUE)->save();
 
     $this->drupalGet('node/add/basic_page');
+
+    // Verify that element contains a "(required)" text.
+    $elements = $this->getNodeElementsByXpath('//fieldset[@id="field_unlimited_media-media-library-wrapper"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and @data-drupal-required and contains(text(), " (required)")]');
+    $this->assertCount(1, $elements);
 
     $page->fillField('Title', 'My page');
     $page->pressButton('Save');

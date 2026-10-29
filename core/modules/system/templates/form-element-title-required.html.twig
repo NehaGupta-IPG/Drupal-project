@@ -1,0 +1,12 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display the required indicator in labels.
+ *
+ * Available variables:
+ * - element: The element.
+ * @ingroup themeable
+ */
+#}
+
+{% trans %}{{ element.('#title') }}<span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>{% endtrans %}

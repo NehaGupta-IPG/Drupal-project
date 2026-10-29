@@ -725,13 +725,18 @@
         // Avoids duplicate required markers on initialization.
         if (!$label.hasClass('js-form-required').length) {
           $label.addClass('js-form-required form-required');
+          if (!$label.find('[data-drupal-required]').length) {
+            $label.html(Drupal.theme('nameWithRequiredMarker', $label.html()));
+          }
         }
       } else {
         $(e.target)
           .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
-          .removeClass('js-form-required form-required');
+          .removeClass('js-form-required form-required')
+          .find('[data-drupal-required]')
+          .remove();
       }
     }
   });
@@ -766,4 +771,20 @@
       }
     }
   });
+
+  /**
+   * An accessible name with "(required)" added to it.
+   *
+   * @param {string} nameHtml
+   *   The HTML markup of the current accessible name.
+   * @return {string}
+   *   The HTML markup for the modified accessible name.
+   */
+  Drupal.theme.nameWithRequiredMarker = (nameHtml) =>
+    Drupal.t(
+      '@title <span aria-hidden="true" class="hidden" data-drupal-required> (required)</span>',
+      {
+        '@title': nameHtml,
+      },
+    );
 })(jQuery, Drupal);

@@ -20,6 +20,9 @@ class Label extends RenderElementBase {
   public function getInfo() {
     return [
       '#theme' => 'form_element_label',
+      '#pre_render' => [
+        [FormElementBase::class, 'preRenderRequiredElementTitle'],
+      ],
     ];
   }
 

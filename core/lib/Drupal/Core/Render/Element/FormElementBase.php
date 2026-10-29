@@ -224,4 +224,40 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
     return $element;
   }
 
+  /**
+   * Render API callback: Appends "(required)" to element '#title'.
+   *
+   * This function is assigned as a #pre_render callback to all input elements
+   * in \Drupal\Core\Form\FormBuilder::handleInputElement() and in other
+   * render elements' ::getInfo() as needed.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   element.
+   *
+   * @return array
+   *   The modified element with all group members.
+   */
+  public static function preRenderRequiredElementTitle($element): array {
+    // Add " (required)" to '#title' of required elements.
+    // Drupal currently allows empty '#title' values to hide labels.
+    // We don't want to blindly add text to these.
+    // We also don't add " (required)" with HTML to 'title' attributes.
+    // Only checkboxes and radios support 'attribute' for '#title_display',
+    // and CompositeFormElementTrait::preRenderCompositeFormElement()
+    // adds "(Required)" to the 'title' attributes for these cases.
+    // @todo Adjust condition after https://www.drupal.org/i/933004.
+    if (!empty($element['#required']) && !empty($element['#title']) && $element['#title_display'] !== 'attribute') {
+      $required_text = [
+        '#title' => $element['#title'],
+        '#theme' => [
+          'form_element_title_required',
+        ],
+      ];
+      $element['#title'] = \Drupal::service('renderer')->render($required_text);
+    }
+
+    return $element;
+  }
+
 }
