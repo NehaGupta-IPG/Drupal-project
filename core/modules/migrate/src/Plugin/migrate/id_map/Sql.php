@@ -330,15 +330,26 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * Create the map and message tables if they don't already exist.
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws \Drupal\migrate\MigrateException
    */
   protected function ensureTables() {
     if (!$this->getDatabase()->schema()->tableExists($this->mapTableName)) {
+      $source_ids = $this->migration->getSourcePlugin()->getIds();
+      if (!$source_ids) {
+        throw new MigrateException('No source IDs provided');
+      }
+
+      $dest_ids = $this->migration->getDestinationPlugin()->getIds();
+      if (!$dest_ids) {
+        throw new MigrateException('No destination IDs provided');
+      }
+
       // Generate appropriate schema info for the map and message tables,
       // and map from the source field names to the map/msg field names.
       $count = 1;
       $source_id_schema = [];
       $indexes = [];
-      foreach ($this->migration->getSourcePlugin()->getIds() as $id_definition) {
+      foreach ($source_ids as $id_definition) {
         $map_key = 'sourceid' . $count++;
         $indexes['source'][] = $map_key;
         $source_id_schema[$map_key] = $this->getFieldSchema($id_definition);
@@ -356,7 +367,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
       // Add destination identifiers to map table.
       // @todo How do we discover the destination schema?
       $count = 1;
-      foreach ($this->migration->getDestinationPlugin()->getIds() as $id_definition) {
+      foreach ($dest_ids as $id_definition) {
         // Allow dest identifier fields to be NULL (for IGNORED/FAILED cases).
         $map_key = 'destid' . $count++;
         $fields[$map_key] = $this->getFieldSchema($id_definition);

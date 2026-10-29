@@ -18,7 +18,11 @@ class NullDestination extends DestinationBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    return [];
+    return [
+      'id' => [
+        'type' => 'string',
+      ],
+    ];
   }
 
   /**

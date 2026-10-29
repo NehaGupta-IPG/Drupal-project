@@ -102,9 +102,6 @@ class SqlTest extends MigrateTestBase {
    */
   public static function providerTestEnsureTables(): array {
     return [
-      'no ids' => [
-        [],
-      ],
       'one id' => [
         [
           'alpha' => [
@@ -132,6 +129,30 @@ class SqlTest extends MigrateTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests exception is thrown in ensureTables if no source IDs are given.
+   */
+  public function testNoSourceIds() {
+    $this->migrationDefinition['source']['ids'] = [];
+    $migration = $this->container
+      ->get('plugin.manager.migration')
+      ->createStubMigration($this->migrationDefinition);
+
+    $map = new TestSqlIdMap($this->database, [], 'test', [], $migration, $this->eventDispatcher, $this->migrationPluginManager);
+    $this->expectException(MigrateException::class);
+    $this->expectExceptionMessage('No source IDs provided');
+
+    try {
+      $map->ensureTables();
+    }
+    catch (MigrateException $e) {
+      // Checks that the exception prevented the table creation.
+      $exists = $this->database->schema()->tableExists('migrate_map_test');
+      $this->assertFalse($exists);
+      throw $e;
+    }
   }
 
   /**
