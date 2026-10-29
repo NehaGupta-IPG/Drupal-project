@@ -131,7 +131,8 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
         }
         $filename = 'css_' . $this->generateHash($css_asset) . '.css';
         $uri = 'assets://css/' . $filename;
-        $css_assets[$order]['data'] = $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($query);
+        global $base_path;
+        $css_assets[$order]['data'] = substr($this->fileUrlGenerator->generate($uri)->toString(), strlen($base_path)) . '?' . UrlHelper::buildQuery($query);
       }
       unset($css_assets[$order]['items']);
     }
