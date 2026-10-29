@@ -154,7 +154,11 @@ class EntityRevision extends EntityContentBase {
       // will unset the current revision ID and the entity is then updated
       // with the source revision ID and saved as that.
       $entity_id = $row->getDestinationProperty($this->getKey('id'));
-      $entity = $this->storage->load($entity_id);
+      // If something failed during processing, guard the load and fall through
+      // to failing the load.
+      if (!empty($entity_id)) {
+        $entity = $this->storage->load($entity_id);
+      }
 
       // If we fail to load the original entity something is wrong and we need
       // to return immediately.
