@@ -740,6 +740,33 @@ class ViewExecutable {
       $this->initDisplay();
 
       $this->exposed_input = $this->request->query->all();
+      // Allow AJAX requests on exposed filters.
+      if ($this->request->isMethod('post') && $this->request->request->get('_triggering_element_name')) {
+        $post_form_data = $this->request->request->all();
+        $exposed_field_names = [];
+        // Go through each handler and check if they are exposed.
+        foreach ($this->display_handler->handlers as $type => $value) {
+          /** @var \Drupal\views\Plugin\views\ViewsHandlerInterface $handler */
+          foreach ($this->$type as $handler) {
+            if ($handler->canExpose() && $handler->isExposed()) {
+              // Pick up POST data for all the exposed handlers.
+              if (!empty($handler->options['expose']['use_operator']) && !empty($handler->options['expose']['operator_id'])) {
+                $exposed_field_names[] = $handler->options['expose']['operator_id'];
+              }
+              if (!empty($handler->options['expose']['identifier'])) {
+                if ($handler->isAGroup()) {
+                  $exposed_field_names[] = $handler->options['group_info']['identifier'];
+                }
+                else {
+                  $exposed_field_names[] = $handler->options['expose']['identifier'];
+                }
+              }
+            }
+          }
+        }
+        $this->exposed_input += array_intersect_key($post_form_data, array_flip($exposed_field_names));
+      }
+
       // Unset items that are definitely not our input:
       foreach (['page', 'q'] as $key) {
         if (isset($this->exposed_input[$key])) {
