@@ -42,4 +42,19 @@ class Query extends BaseQuery {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function finish() {
+    // A Select renders plain fields before expressions, so a field left in
+    // $this->sqlFields would displace the key expressions that the result is
+    // keyed by. Both entity keys are in the GROUP BY, so the ORDER BY that
+    // ::addSort() added still works.
+    if ($this->sqlQuery->getMetaData('active_workspace_id')) {
+      $this->sqlFields = [];
+    }
+
+    return parent::finish();
+  }
+
 }
