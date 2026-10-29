@@ -207,6 +207,47 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
   }
 
   /**
+   * Tests that a display disabled View block won't appear in the blocks list.
+   */
+  public function testDisplayDisabledView(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'configure any layout',
+      'administer node display',
+    ]));
+
+    // From the manage display page, go to manage the layout.
+    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $assert_session->linkExists('Manage layout');
+    $this->clickLink('Manage layout');
+    // Add a new block.
+    $this->clickLink('Add block');
+    // Verify that view block is present.
+    $assert_session->linkExists('Test Block View: Exposed form block');
+
+    // Load the test view and initialize its displays.
+    $view = $this->container->get('entity_type.manager')->getStorage('view')->load('test_block_view');
+    $view->getExecutable()->setDisplay();
+    // Disable the display
+    $view->getExecutable()->displayHandlers->get('block_3')->setOption('enabled', FALSE);
+    $view->save();
+    $enabled = $view->getExecutable()->displayHandlers->get('block_3')->isEnabled();
+    $this->assertFalse($enabled, 'Display ' . 'block_3' . ' is now disabled');
+
+    // From the manage display page, go to manage the layout.
+    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
+    $assert_session->linkExists('Manage layout');
+    $this->clickLink('Manage layout');
+    // Add a new block.
+    $this->clickLink('Add block');
+    // Verify that view block is not present.
+    $assert_session->linkNotExists('Test Block View: Exposed form block');
+  }
+
+  /**
    * Tests the usage of placeholders for empty blocks.
    *
    * @see \Drupal\Core\Render\PreviewFallbackInterface::getPreviewFallbackString()

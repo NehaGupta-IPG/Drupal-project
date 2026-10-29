@@ -112,6 +112,8 @@ class ViewsBlock implements ContainerDeriverInterface {
                 $view->getConfigDependencyName(),
               ],
             ],
+            '_block_ui_hidden' => (isset($display->display['display_options']['enabled']) &&
+              !$display->display['display_options']['enabled']),
           ];
 
           // Look for arguments and expose them as context.

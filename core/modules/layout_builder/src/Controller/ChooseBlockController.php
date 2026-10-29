@@ -224,23 +224,26 @@ class ChooseBlockController implements ContainerInjectionInterface {
   protected function getBlockLinks(SectionStorageInterface $section_storage, int $delta, $region, array $blocks) {
     $links = [];
     foreach ($blocks as $block_id => $block) {
-      $attributes = $this->getAjaxAttributes();
-      $attributes['class'][] = 'js-layout-builder-block-link';
-      $link = [
-        'title' => $block['admin_label'],
-        'url' => Url::fromRoute('layout_builder.add_block',
-          [
-            'section_storage_type' => $section_storage->getStorageType(),
-            'section_storage' => $section_storage->getStorageId(),
-            'delta' => $delta,
-            'region' => $region,
-            'plugin_id' => $block_id,
-          ]
-        ),
-        'attributes' => $attributes,
-      ];
+      if (!isset($block['_block_ui_hidden']) || $block['_block_ui_hidden'] == FALSE
+        || isset($block['provider']) && $block['provider'] == 'layout_builder') {
+        $attributes = $this->getAjaxAttributes();
+        $attributes['class'][] = 'js-layout-builder-block-link';
+        $link = [
+          'title' => $block['admin_label'],
+          'url' => Url::fromRoute('layout_builder.add_block',
+            [
+              'section_storage_type' => $section_storage->getStorageType(),
+              'section_storage' => $section_storage->getStorageId(),
+              'delta' => $delta,
+              'region' => $region,
+              'plugin_id' => $block_id,
+            ]
+          ),
+          'attributes' => $attributes,
+        ];
 
-      $links[] = $link;
+        $links[] = $link;
+      }
     }
     return [
       '#theme' => 'links',
