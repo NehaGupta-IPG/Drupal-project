@@ -164,15 +164,17 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
       [
         'component' => 'not_a_thing',
         'provider' => 'nope',
+        'settings' => ['foo' => 'bar'],
       ],
     );
   }
 
   /**
-   * Ensures that the `component` and `provider` keys are required.
+   * Ensures that the `component`, `provider` and `settings` keys are required.
    */
   #[TestWith(['component'])]
   #[TestWith(['provider'])]
+  #[TestWith(['settings'])]
   public function testMissingKeysError(string $missing_key): void {
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
@@ -180,11 +182,12 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
     $value = [
       'component' => 'nope',
       'provider' => 'system',
+      'settings' => ['foo' => 'bar'],
     ];
     unset($value[$missing_key]);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
+    $this->expectExceptionMessage("The setComponentThirdPartySetting action requires an array with 'component', 'provider' and 'settings'.");
     $manager->applyAction(
       'setComponentThirdPartySetting',
       'core.entity_view_display.user.user.default',
@@ -193,10 +196,11 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * Ensures empty component or provider values are rejected.
+   * Ensures empty component, provider or settings values are rejected.
    */
   #[TestWith(['component'])]
   #[TestWith(['provider'])]
+  #[TestWith(['settings'])]
   public function testEmptyKeysError(string $empty_key): void {
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
@@ -204,11 +208,12 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
     $value = [
       'component' => 'nope',
       'provider' => 'system',
+      'settings' => ['foo' => 'bar'],
     ];
     $value[$empty_key] = '';
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("The setComponentThirdPartySetting action requires an array with 'component' and 'provider'.");
+    $this->expectExceptionMessage("The setComponentThirdPartySetting action requires an array with 'component', 'provider' and 'settings'.");
     $manager->applyAction(
       'setComponentThirdPartySetting',
       'core.entity_form_display.user.user.default',
