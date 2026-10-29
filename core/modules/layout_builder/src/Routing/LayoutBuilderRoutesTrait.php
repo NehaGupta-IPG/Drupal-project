@@ -97,6 +97,15 @@ trait LayoutBuilderRoutesTrait {
         ->setRequirements($requirements)
         ->setOptions($disable_options);
       $collection->add("$route_name_prefix.disable", $route);
+
+      $revert_all_defaults = $disable_defaults;
+      $revert_all_defaults['_form'] = '\Drupal\layout_builder\Form\RevertAllConfirmForm';
+      $revert_all_options = $disable_options;
+      $revertAllRoute = (new Route("$path/revert-all"))
+        ->setDefaults($revert_all_defaults)
+        ->setRequirements($requirements)
+        ->setOptions($revert_all_options);
+      $collection->add("$route_name_prefix.confirm_revert_all", $revertAllRoute);
     }
   }
 

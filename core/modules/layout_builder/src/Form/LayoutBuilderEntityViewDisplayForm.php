@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\field_ui\Form\EntityViewDisplayEditForm;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\layout_builder\LayoutDisplayHelperTrait;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\SectionStorageInterface;
 
@@ -17,6 +18,8 @@ use Drupal\layout_builder\SectionStorageInterface;
  *   Form classes are internal.
  */
 class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
+
+  use LayoutDisplayHelperTrait;
 
   /**
    * The entity being used by this form.
@@ -105,10 +108,20 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
       }
       // Prevent turning off overrides while any exist.
       if ($this->hasOverrides($this->entity)) {
-        $form['layout']['enabled']['#disabled'] = TRUE;
-        $form['layout']['enabled']['#description'] = $this->t('You must revert all customized layouts of this display before you can disable this option.');
-        $form['layout']['allow_custom']['#disabled'] = TRUE;
-        $form['layout']['allow_custom']['#description'] = $this->t('You must revert all customized layouts of this display before you can disable this option.');
+        $form['layout']['revert_warning'] = [
+          '#markup' => $this->t('Layout Builder is enabled for this view mode, and some content items have their layouts customized. Before Layout Builder can be disabled, you must revert these overrides.')
+        ];
+        $form['layout']['enabled']['#access'] = FALSE;
+        $form['layout']['allow_custom']['#access'] = FALSE;
+        $form['layout']['revert_all'] = [
+          '#type' => 'submit',
+          '#value' => $this->t('Revert layout overrides'),
+          '#button_type' => 'danger',
+          '#attributes' => [
+            'class' => ['button', 'button--danger'],
+          ],
+          '#submit' => ['::confirmRevertAll'],
+        ];
         unset($form['layout']['allow_custom']['#states']);
         unset($form['#entity_builders']['layout_builder']);
       }
@@ -169,14 +182,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
     if (!$display->isOverridable()) {
       return FALSE;
     }
-
-    $entity_type = $this->entityTypeManager->getDefinition($display->getTargetEntityTypeId());
-    $query = $this->entityTypeManager->getStorage($display->getTargetEntityTypeId())->getQuery()
-      ->accessCheck(FALSE)
-      ->exists(OverridesSectionStorage::FIELD_NAME);
-    if ($bundle_key = $entity_type->getKey('bundle')) {
-      $query->condition($bundle_key, $display->getTargetBundle());
-    }
+    $query = $this->getOverrideQuery($display);
     return (bool) $query->count()->execute();
   }
 
@@ -236,6 +242,18 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
     }
 
     return parent::buildExtraFieldRow($field_id, $extra_field);
+  }
+
+  /**
+   * Send a user to the confirmation route with route params to get back here.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public function confirmRevertAll(array &$form, FormStateInterface $form_state) {
+    $form_state->setRedirectUrl($this->sectionStorage->getLayoutBuilderUrl('confirm_revert_all'));
   }
 
 }

@@ -348,6 +348,25 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           ],
         ]
       ),
+      'layout_builder.defaults.with_bundle_key.confirm_revert_all' => new Route(
+        '/admin/entity/whatever/display/{view_mode_name}/layout/revert-all',
+        [
+          'entity_type_id' => 'with_bundle_key',
+          'bundle_key' => 'my_bundle_type',
+          'section_storage_type' => 'defaults',
+          'section_storage' => '',
+          '_form' => '\Drupal\layout_builder\Form\RevertAllConfirmForm',
+        ],
+        [
+          '_field_ui_view_mode_access' => 'administer with_bundle_key display',
+          '_layout_builder_access' => 'view',
+        ],
+        [
+          'parameters' => [
+            'section_storage' => ['layout_builder_tempstore' => TRUE],
+          ],
+        ]
+      ),
       'layout_builder.defaults.with_bundle_parameter.view' => new Route(
         '/admin/entity/{bundle}/display/{view_mode_name}/layout',
         [
@@ -396,6 +415,24 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           'section_storage_type' => 'defaults',
           'section_storage' => '',
           '_form' => '\Drupal\layout_builder\Form\LayoutBuilderDisableForm',
+        ],
+        [
+          '_field_ui_view_mode_access' => 'administer with_bundle_parameter display',
+          '_layout_builder_access' => 'view',
+        ],
+        [
+          'parameters' => [
+            'section_storage' => ['layout_builder_tempstore' => TRUE],
+          ],
+        ]
+      ),
+      'layout_builder.defaults.with_bundle_parameter.confirm_revert_all' => new Route(
+        '/admin/entity/{bundle}/display/{view_mode_name}/layout/revert-all',
+        [
+          'entity_type_id' => 'with_bundle_parameter',
+          'section_storage_type' => 'defaults',
+          'section_storage' => '',
+          '_form' => '\Drupal\layout_builder\Form\RevertAllConfirmForm',
         ],
         [
           '_field_ui_view_mode_access' => 'administer with_bundle_parameter display',
