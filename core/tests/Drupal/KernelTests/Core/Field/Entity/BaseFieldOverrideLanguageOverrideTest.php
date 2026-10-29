@@ -113,6 +113,46 @@ class BaseFieldOverrideLanguageOverrideTest extends KernelTestBase {
   }
 
   /**
+   * Tests base field overrides after switching languages without clearing caches.
+   */
+  public function testBaseFieldOverridesAreCachedPerLanguage(): void {
+    $second_bundle = 'second_bundle';
+    EntityTestHelper::createBundle($second_bundle);
+    $base_field_definition = $this->entityFieldManager
+      ->getBaseFieldDefinitions($this->testEntityTypeId)[$this->testFieldName];
+
+    // Create all configuration before warming the field definition caches.
+    foreach ([$this->testBundle, $second_bundle] as $bundle) {
+      $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field_definition, $bundle);
+      $override->setLabel("$bundle English")->save();
+      $this->languageManager
+        ->getLanguageConfigOverride('af', $override->getConfigDependencyName())
+        ->set('label', "$bundle Afrikaans")
+        ->save();
+    }
+    $this->entityFieldManager->clearCachedFieldDefinitions();
+    $this->assertTestFieldLabel("$this->testBundle English");
+
+    // Rebuild definitions in another language using the same field manager.
+    // Reading another bundle must also preserve the first bundle's translation
+    // when all bundles are rebuilt together.
+    $this->config('language.negotiation')->set('selected_langcode', 'af')->save();
+    $this->languageManager->reset();
+    $this->assertSame('af', $this->languageManager->getCurrentLanguage()->getId());
+    $fields = $this->entityFieldManager->getFieldDefinitions($this->testEntityTypeId, $second_bundle);
+    $this->assertSame("$second_bundle Afrikaans", $fields[$this->testFieldName]->getLabel());
+    $this->assertTestFieldLabel("$this->testBundle Afrikaans");
+
+    // Switching back must still return the original English definitions.
+    $this->config('language.negotiation')->set('selected_langcode', 'en')->save();
+    $this->languageManager->reset();
+    $this->assertSame('en', $this->languageManager->getCurrentLanguage()->getId());
+    $fields = $this->entityFieldManager->getFieldDefinitions($this->testEntityTypeId, $second_bundle);
+    $this->assertSame("$second_bundle English", $fields[$this->testFieldName]->getLabel());
+    $this->assertTestFieldLabel("$this->testBundle English");
+  }
+
+  /**
    * Asserts that the field label of the test field matches the expected value.
    *
    * @param string $expected
