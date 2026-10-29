@@ -31,12 +31,7 @@ class OptionsButtonsWidgetPostUpdateTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  /**
-   * The field name used in the test.
-   *
-   * @var string
-   */
-  protected $fieldName = 'test_options';
+  protected string $fieldName = 'test_options';
 
   /**
    * {@inheritdoc}
