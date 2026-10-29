@@ -655,8 +655,14 @@ class ModuleHandler implements ModuleHandlerInterface {
           // 'core' is a special protected module name. This is used by the test
           // system to allow kernel tests to implement hooks.
           if (isset($this->moduleList[$module]) || $module === 'core') {
-            $listeners[] = $this->callableResolver->getCallableFromDefinition($identifier);
-            $modules[] = $module;
+            try {
+              $listeners[] = $this->callableResolver->getCallableFromDefinition($identifier);
+              $modules[] = $module;
+            }
+            catch (\Exception) {
+              // Ignore callbacks that can't be resolved, code might have been
+              // changed or possibly a module is being installed.
+            }
           }
         }
 
