@@ -155,7 +155,7 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $buttons = $new_window ? $page : $page->find('css', '.ui-dialog .ui-dialog-buttonpane');
     $buttons->pressButton('Apply');
     if ($new_window) {
-      $assert->addressEquals($base_url . '/view/content/edit/page_1');
+      $assert->addressEquals('admin/structure/views/view/content/edit/page_1');
     }
     else {
       $assert->assertWaitOnAjaxRequest();
