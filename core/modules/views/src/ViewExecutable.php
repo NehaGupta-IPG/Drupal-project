@@ -748,7 +748,7 @@ class ViewExecutable {
       }
 
       // If we have no input at all, check for remembered input via session.
-      if (empty($this->exposed_input)) {
+      if (empty($this->exposed_input) && $this->isFilterRememberEnabled()) {
         $session = $this->request->getSession();
         // If filters are not overridden, store the 'remember' settings on the
         // default display. If they are, store them on this display. This way,
@@ -762,6 +762,33 @@ class ViewExecutable {
     }
 
     return $this->exposed_input;
+  }
+
+  /**
+   * Check the view for remember configuration for current user role.
+   *
+   * @return bool
+   *   Returns TRUE if the "Remember" setting is enabled for any
+   *   of the user's roles, FALSE otherwise.
+   */
+  public function isFilterRememberEnabled() {
+    // Loop through the exposed input filters.
+    foreach ($this->exposed_input as $filter_name => $input) {
+      // Check if the filter exists in the display handler's filter options.
+      if (isset($this->display_handler->getOption('filters')[$filter_name])) {
+        // Retrieve the configuration for the current filter.
+        $filter_config = $this->display_handler->getOption('filters')[$filter_name];
+        // Check if the "Remember" setting is enabled.
+        if ($filter_config['expose']['remember']) {
+          foreach ($filter_config['expose']['remember_roles'] as $role => $remember_roles) {
+            if ($remember_roles != 0 && $this->getUser()->hasRole($role)) {
+              return TRUE;
+            }
+          }
+        }
+      }
+    }
+    return FALSE;
   }
 
   /**
