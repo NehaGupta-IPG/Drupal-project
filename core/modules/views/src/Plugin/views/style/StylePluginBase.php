@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\style;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Plugin\views\wizard\WizardInterface;
@@ -594,13 +595,13 @@ abstract class StylePluginBase extends PluginBase {
           // we can control any special formatting of the grouping field through
           // the admin or theme layer or anywhere else we'd like.
           if (isset($this->view->field[$field])) {
-            $group_content = $this->getField($index, $field);
+            $group_content = (string) $this->getField($index, $field);
             if ($this->view->field[$field]->options['label']) {
               $delimiter = $this->view->field[$field]->options['element_label_colon'] ? ': ' : ' ';
               $group_content = $this->view->field[$field]->options['label'] . $delimiter . $group_content;
             }
             if ($rendered) {
-              $grouping = (string) $group_content;
+              $grouping = $group_content;
               if ($rendered_strip) {
                 $group_content = $grouping = strip_tags(htmlspecialchars_decode($group_content));
               }
@@ -617,7 +618,7 @@ abstract class StylePluginBase extends PluginBase {
 
           // Create the group if it does not exist yet.
           if (empty($set[$grouping])) {
-            $set[$grouping]['group'] = $group_content;
+            $set[$grouping]['group'] = Markup::create($group_content);
             $set[$grouping]['level'] = $level;
             $set[$grouping]['rows'] = [];
           }
