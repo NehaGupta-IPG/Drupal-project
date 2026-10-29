@@ -445,6 +445,7 @@ class CommentNonNodeTest extends BrowserTestBase {
       'target_entity_type_id' => 'entity_test',
     ]);
     $bundle->save();
+    $this->addDefaultCommentField('entity_test', 'entity_test', 'foobar');
 
     // Add a new comment field.
     $storage_edit = [
