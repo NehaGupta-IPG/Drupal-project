@@ -110,13 +110,10 @@
      */
     function showSuggestions(suggestions) {
       const tagged = autocomplete.splitValues(request.term);
-      const il = tagged.length;
-      for (let i = 0; i < il; i++) {
-        if (suggestions.includes(tagged[i])) {
-          suggestions.splice(suggestions.indexOf(tagged[i]), 1);
-        }
-      }
-      response(suggestions);
+      const filteredSuggestions = suggestions.filter(
+        (el) => !tagged.includes(el.value),
+      );
+      response(filteredSuggestions);
     }
 
     // Get the desired term and construct the autocomplete URL for it.
