@@ -484,6 +484,8 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    * @throws \Drupal\package_manager\Exception\ApplyFailedException
    *   Thrown if there is an error calling Composer Stager, which may indicate
    *   a failed commit operation.
+   * @throws \Drupal\package_manager\Exception\StageException
+   *   Thrown if there is an error before the commit operation was started.
    */
   public function apply(?int $timeout = 600): void {
     // In direct-write mode, changes are made directly to the running code base,

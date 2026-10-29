@@ -14,10 +14,10 @@ trait FixtureManipulatorTrait {
   /**
    * Gets the stage fixture manipulator service.
    *
-   * @return \Drupal\fixture_manipulator\StageFixtureManipulator|object|null
+   * @return \Drupal\fixture_manipulator\StageFixtureManipulator|null
    *   The stage fixture manipulator service.
    */
-  protected function getStageFixtureManipulator() {
+  protected function getStageFixtureManipulator(): ?StageFixtureManipulator {
     return $this->container->get(StageFixtureManipulator::class);
   }
 

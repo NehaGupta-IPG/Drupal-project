@@ -61,7 +61,7 @@ final class StageFixtureManipulator extends FixtureManipulator implements Beginn
   /**
    * {@inheritdoc}
    */
-  public function commitChanges(string $dir, bool $validate_composer = FALSE): self {
+  public function commitChanges(string $dir, bool $validate_composer = FALSE): static {
     throw new \BadMethodCallException('::commitChanges() should not be called directly in StageFixtureManipulator().');
   }
 
@@ -78,7 +78,7 @@ final class StageFixtureManipulator extends FixtureManipulator implements Beginn
    * Handles test tear down to ensure all changes were committed.
    */
   public static function handleTearDown(): void {
-    if (!empty(\Drupal::state()->get(self::STATE_KEY))) {
+    if (!empty(\Drupal::state()->get(static::STATE_KEY))) {
       throw new \LogicException('The StageFixtureManipulator has arguments that were not cleared. This likely means that the PostCreateEvent was never fired.');
     }
   }
@@ -89,21 +89,21 @@ final class StageFixtureManipulator extends FixtureManipulator implements Beginn
   protected function queueManipulation(string $method, array $arguments): void {
     $stored_arguments = $this->getQueuedManipulationItems();
     $stored_arguments[$method][] = $arguments;
-    $this->state->set(self::STATE_KEY, $stored_arguments);
+    $this->state->set(static::STATE_KEY, $stored_arguments);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function clearQueuedManipulationItems(): void {
-    $this->state->delete(self::STATE_KEY);
+    $this->state->delete(static::STATE_KEY);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getQueuedManipulationItems(): array {
-    return $this->state->get(self::STATE_KEY, []);
+    return $this->state->get(static::STATE_KEY, []);
   }
 
 }

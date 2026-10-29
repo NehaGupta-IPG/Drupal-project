@@ -91,7 +91,7 @@ class FixtureManipulator {
    *   An array extra files to create in the package. The keys are the file
    *   paths under package and values are the file contents.
    */
-  public function addPackage(array $package, bool $is_dev_requirement = FALSE, bool $allow_plugins = FALSE, ?array $extra_files = NULL): self {
+  public function addPackage(array $package, bool $is_dev_requirement = FALSE, bool $allow_plugins = FALSE, ?array $extra_files = NULL): static {
     if (!$this->committingChanges) {
       // To pass Composer validation all packages must have a version specified.
       if (!isset($package['version'])) {
@@ -159,7 +159,7 @@ class FixtureManipulator {
    * @param bool $allow_plugins
    *   Whether to use the '--no-plugins' option.
    */
-  public function requirePackage(string $package, string $version, bool $is_dev_requirement = FALSE, bool $allow_plugins = FALSE): self {
+  public function requirePackage(string $package, string $version, bool $is_dev_requirement = FALSE, bool $allow_plugins = FALSE): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('requirePackage', func_get_args());
       return $this;
@@ -192,7 +192,7 @@ class FixtureManipulator {
    *
    * @see \Composer\Command\ConfigCommand
    */
-  public function modifyPackageConfig(string $package_name, string $version, array $config, bool $is_dev_requirement = FALSE): self {
+  public function modifyPackageConfig(string $package_name, string $version, array $config, bool $is_dev_requirement = FALSE): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('modifyPackageConfig', func_get_args());
       return $this;
@@ -218,7 +218,7 @@ class FixtureManipulator {
    *
    * @return $this
    */
-  public function setVersion(string $package_name, string $version, bool $is_dev_requirement = FALSE): self {
+  public function setVersion(string $package_name, string $version, bool $is_dev_requirement = FALSE): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('setVersion', func_get_args());
       return $this;
@@ -234,7 +234,7 @@ class FixtureManipulator {
    * @param bool $is_dev_requirement
    *   Whether the package is a developer requirement.
    */
-  public function removePackage(string $name, bool $is_dev_requirement = FALSE): self {
+  public function removePackage(string $name, bool $is_dev_requirement = FALSE): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('removePackage', func_get_args());
       return $this;
@@ -263,7 +263,7 @@ class FixtureManipulator {
    *   (optional) The file name. If none is specified the project name will be
    *   used.
    */
-  public function addProjectAtPath(string $path, ?string $project_name = NULL, ?string $file_name = NULL): self {
+  public function addProjectAtPath(string $path, ?string $project_name = NULL, ?string $file_name = NULL): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('addProjectAtPath', func_get_args());
       return $this;
@@ -290,7 +290,7 @@ class FixtureManipulator {
    * @param string $version
    *   Target version.
    */
-  public function setCorePackageVersion(string $version): self {
+  public function setCorePackageVersion(string $version): static {
     $this->setVersion('drupal/core', $version);
     $this->setVersion('drupal/core-recommended', $version);
     $this->setVersion('drupal/core-dev', $version);
@@ -307,7 +307,7 @@ class FixtureManipulator {
    *
    * @see \Composer\Command\ConfigCommand
    */
-  public function addConfig(array $additional_config, bool $update_lock = FALSE): self {
+  public function addConfig(array $additional_config, bool $update_lock = FALSE): static {
     if (empty($additional_config)) {
       throw new \InvalidArgumentException('No config to add.');
     }
@@ -346,7 +346,7 @@ class FixtureManipulator {
    * @param string $dir
    *   The directory to commit the changes to.
    */
-  public function commitChanges(string $dir): self {
+  public function commitChanges(string $dir): static {
     $this->doCommitChanges($dir);
     $this->committed = TRUE;
     return $this;
@@ -378,7 +378,7 @@ class FixtureManipulator {
     $this->committingChanges = FALSE;
   }
 
-  public function updateLock(): self {
+  public function updateLock(): static {
     $this->runComposerCommand(['update', '--lock']);
     return $this;
   }
@@ -395,7 +395,7 @@ class FixtureManipulator {
   /**
    * Creates an empty .git folder after being provided a path.
    */
-  public function addDotGitFolder(string $path): self {
+  public function addDotGitFolder(string $path): static {
     if (!$this->committingChanges) {
       $this->queueManipulation('addDotGitFolder', func_get_args());
       return $this;
@@ -601,7 +601,7 @@ class FixtureManipulator {
    */
   private function addRepository(array $package): string {
     $name = $package['name'];
-    $path_repo_base = \Drupal::state()->get(self::PATH_REPO_STATE_KEY);
+    $path_repo_base = \Drupal::state()->get(static::PATH_REPO_STATE_KEY);
     $repo_path = "$path_repo_base/" . str_replace('/', '--', $name);
 
     // Determine if the given $package is a new package or a fork of an existing
@@ -655,10 +655,10 @@ class FixtureManipulator {
    */
   public function setUpRepos($composer_refresh = FALSE): void {
     $fs = new SymfonyFileSystem();
-    $path_repo_base = \Drupal::state()->get(self::PATH_REPO_STATE_KEY);
+    $path_repo_base = \Drupal::state()->get(static::PATH_REPO_STATE_KEY);
     if (empty($path_repo_base)) {
       $path_repo_base = FileSystem::getOsTemporaryDirectory() . '/base-repo-' . microtime(TRUE) . rand(0, 10000);
-      \Drupal::state()->set(self::PATH_REPO_STATE_KEY, $path_repo_base);
+      \Drupal::state()->set(static::PATH_REPO_STATE_KEY, $path_repo_base);
       // Copy the existing repos that were used to make the fixtures into the
       // new folder.
       $fs->mirror(__DIR__ . '/../../../fixtures/path_repos', $path_repo_base);
