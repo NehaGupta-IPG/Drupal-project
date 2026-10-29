@@ -1,0 +1,7 @@
+name: 'Block test config update'
+type: module
+description: 'Provides plugin and functionality for testing block config updates'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:block
