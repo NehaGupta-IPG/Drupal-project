@@ -66,7 +66,7 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return ['user.roles:authenticated'];
+    return ['user', 'user.roles:authenticated'];
   }
 
 }
