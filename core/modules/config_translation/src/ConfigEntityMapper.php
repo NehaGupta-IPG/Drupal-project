@@ -160,6 +160,28 @@ class ConfigEntityMapper extends ConfigNamesMapper implements ConfigEntityMapper
   /**
    * {@inheritdoc}
    */
+  public function getBaseEditRouteName() {
+    // Field config entities doesn't have 'edit-form' template.
+    // @see \Drupal\field\Entity\FieldConfig::linkTemplates()
+    // @see config_translation_config_translation_info()
+    return $this->entityType == 'field_config' ? $this->getBaseRouteName() : $this->entityManager->getDefinition($this->entityType)->getLinkTemplate('edit-form');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseEditRoute() {
+    if ($this->routeCollection) {
+      return $this->routeCollection->get($this->getBaseEditRouteName());
+    }
+    else {
+      return $this->routeProvider->getRouteByName($this->getBaseEditRouteName());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setType(string $entity_type_id): bool {
     if (isset($this->entityType)) {
       return FALSE;
