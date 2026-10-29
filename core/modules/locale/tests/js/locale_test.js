@@ -52,3 +52,25 @@ Drupal.formatPlural(1, "Context Double Quoted plural", "Context Double Quoted @c
 Drupal.formatPlural(1, "Context !key Args plural", "Context !key Args @count plural", {'!key': 'value'}, {context: "Context string"});
 
 Drupal.formatPlural(1, "No count argument plural - singular", "No count argument plural - plural");
+
+// Template literal strings.
+Drupal.t(`Template literal t`);
+Drupal.t(`Multi lines
+template literal t`);
+
+Drupal.t(`Context unquoted template literal t`, {}, {context: "Context string unquoted"});
+Drupal.t(`Context single quoted template literal t`, {}, {'context': "Context string single quoted"});
+Drupal.t(`Context double quoted template literal t`, {}, {"context": "Context string double quoted"});
+
+Drupal.formatPlural(1, `Template literal plural`, `Template literal @count plural`);
+Drupal.formatPlural(
+  1,
+  `Multi lines
+template literal plural`,
+  `Multi lines
+template literal @count plural`
+);
+
+Drupal.formatPlural(1, `Context unquoted template literal plural`, `Context unquoted @count template literal plural`, {}, {context: "Context string unquoted"});
+Drupal.formatPlural(1, `Context single quoted template literal plural`, `Context single quoted @count template literal plural`, {}, {'context': "Context string single quoted"});
+Drupal.formatPlural(1, `Context double quoted template literal plural`, `Context double quoted @count template literal plural`, {}, {"context": "Context string double quoted"});

@@ -109,6 +109,25 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
       }
 
       $this->assertSameSize($test_strings, $source_strings, 'Found correct number of source strings.');
+
+      // List of all strings that are template literal in the file.
+      $test_template_literal_strings = [
+        'Template literal t' => '',
+        "Multi lines\ntemplate literal t" => '',
+        'Context unquoted template literal t' => 'Context string unquoted',
+        'Context single quoted template literal t' => 'Context string single quoted',
+        'Context double quoted template literal t' => 'Context string double quoted',
+        "Template literal plural{$etx}Template literal @count plural" => '',
+        "Multi lines\ntemplate literal plural{$etx}Multi lines\ntemplate literal @count plural" => '',
+        "Context unquoted template literal plural{$etx}Context unquoted @count template literal plural" => 'Context string unquoted',
+        "Context single quoted template literal plural{$etx}Context single quoted @count template literal plural" => 'Context string single quoted',
+        "Context double quoted template literal plural{$etx}Context double quoted @count template literal plural" => 'Context string double quoted',
+      ];
+
+      // Assert that all strings were not found properly.
+      foreach ($test_template_literal_strings as $str => $context) {
+        $this->assertFalse(isset($source_strings[$str]), "Found unexpected string: $str");
+      }
     }
   }
 

@@ -1751,7 +1751,7 @@
           },
           error(depsNotFound) {
             const message = Drupal.t(
-              `The following files could not be loaded: @dependencies`,
+              'The following files could not be loaded: @dependencies',
               { '@dependencies': depsNotFound.join(', ') },
             );
             reject(message);
@@ -1843,7 +1843,7 @@
           },
           error(depsNotFound) {
             const message = Drupal.t(
-              `The following files could not be loaded: @dependencies`,
+              'The following files could not be loaded: @dependencies',
               { '@dependencies': depsNotFound.join(', ') },
             );
             reject(message);
