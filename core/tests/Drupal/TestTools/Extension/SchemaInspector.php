@@ -34,6 +34,7 @@ class SchemaInspector {
    */
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     require_once \DRUPAL_ROOT . '/core/includes/install.inc';
+    $schema = NULL;
     $module_path = \Drupal::service('extension.list.module')
       ->getPath($module);
     $pathname = "$module_path/$module.info.yml";
