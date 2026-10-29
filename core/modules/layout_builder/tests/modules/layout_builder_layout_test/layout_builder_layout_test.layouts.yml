@@ -1,0 +1,12 @@
+layout_builder_test_layout:
+  label: 'Test layout'
+  path: layouts/test-layout
+  template: layout--test-layout
+  class: '\Drupal\layout_builder_layout_test\Plugin\Layout\TestLayout'
+  category: 'Test'
+  default_region: main
+  icon_map:
+    - [main]
+  regions:
+    main:
+      label: Main

@@ -104,6 +104,16 @@ class Section implements ThirdPartySettingsInterface {
   }
 
   /**
+   * Checks if a layout definition exists.
+   *
+   * @return bool
+   *   Whether the layout definition exists.
+   */
+  public function hasLayout() {
+    return $this->layoutPluginManager()->hasDefinition($this->getLayoutId());
+  }
+
+  /**
    * Gets the layout plugin for this section.
    *
    * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
@@ -143,7 +153,11 @@ class Section implements ThirdPartySettingsInterface {
    *   This method should only be used by code responsible for storing the data.
    */
   public function getLayoutSettings() {
-    return $this->getLayout()->getConfiguration();
+    if ($this->hasLayout()) {
+      return $this->getLayout()->getConfiguration();
+    }
+
+    return $this->layoutSettings;
   }
 
   /**

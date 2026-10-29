@@ -1,0 +1,5 @@
+name: 'Layout Builder layout test'
+type: module
+description: 'Test module that provides a layout for testing.'
+package: Testing
+version: VERSION

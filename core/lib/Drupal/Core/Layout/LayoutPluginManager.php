@@ -35,7 +35,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     parent::__construct('Plugin/Layout', $namespaces, $module_handler, LayoutInterface::class, Layout::class, 'Drupal\Core\Layout\Annotation\Layout');
 
     $type = $this->getType();
-    $this->setCacheBackend($cache_backend, $type);
+    $this->setCacheBackend($cache_backend, $type, ['config:core.extension']);
     $this->alterInfo($type);
   }
 
