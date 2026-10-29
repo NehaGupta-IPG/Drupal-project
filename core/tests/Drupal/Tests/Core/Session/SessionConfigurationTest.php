@@ -247,6 +247,54 @@ class SessionConfigurationTest extends UnitTestCase {
   }
 
   /**
+   * Tests whether the session.name with cookie_name and name_suffix is set correctly.
+   *
+   * @covers ::getOptions
+   *
+   * @dataProvider providerTestEnforcedSessionNameWithDomainAndNameSuffix
+   */
+  public function testEnforcedSessionNameViaCookieDomainAndNameSuffix($uri, $expected_name): void {
+    $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com', 'name_suffix' => 'dummy_name_suffix']);
+
+    $request = Request::create($uri);
+    $options = $config->getOptions($request);
+
+    $this->assertEquals($expected_name, $options['name']);
+  }
+
+  /**
+   * Data provider for the cookie name test.
+   *
+   * @return array
+   *   Test data
+   */
+  public static function providerTestEnforcedSessionNameWithDomainAndNameSuffix() {
+    $data = [
+      ['http://example.com/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://www.example.com/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://subdomain.example.com/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://example.com:8080/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['https://example.com/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+      ['http://example.com/path/core/install.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://localhost/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://127.0.0.1/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://127.0.0.1:8888/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['https://127.0.0.1/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+      ['https://127.0.0.1:8443/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+      ['http://1.1.1.1/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['https://1.1.1.1/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+      ['http://[::1]/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['http://[::1]:8888/path/index.php', 'SESS', '.example.com', 'dummy_name_suffix'],
+      ['https://[::1]/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+      ['https://[::1]:8443/path/index.php', 'SSESS', '.example.com', 'dummy_name_suffix'],
+    ];
+
+    return array_map(function ($record) {
+      return [$record[0], $record[1] . substr(hash('sha256', $record[2] . $record[3]), 0, 32)];
+    }, $data);
+  }
+
+  /**
    * Tests constructor's default settings.
    *
    * @legacy-covers ::__construct

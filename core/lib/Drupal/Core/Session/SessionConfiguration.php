@@ -95,7 +95,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
     }
     elseif (isset($this->options['cookie_domain'])) {
       // If the user specifies the cookie domain, also use it for session name.
-      $session_name = $this->options['cookie_domain'];
+      $session_name = $this->options['cookie_domain'] . $this->options['name_suffix'];
     }
     else {
       // Otherwise use $base_url as session name, without the protocol
