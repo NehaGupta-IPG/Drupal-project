@@ -33,6 +33,8 @@ class UpdateSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $config = $this->config('update.settings');
+    $notification_emails = $config->get('notification.emails');
     $form['update_check_frequency'] = [
       '#type' => 'radios',
       '#title' => $this->t('Check for updates'),
@@ -56,6 +58,7 @@ class UpdateSettingsForm extends ConfigFormBase {
     $form['update_notify_emails'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Email addresses to notify when updates are available'),
+      '#default_value' => is_array($notification_emails) ? implode("\n", $notification_emails) : $notification_emails,
       '#rows' => 4,
       '#config_target' => new ConfigTarget(
         'update.settings',
