@@ -737,7 +737,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     $label_counter = [];
     $all_labels = [];
     // Count the number of fields per label per field storage.
-    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
+    foreach ($this->getFieldMap()[$entity_type][$field_name]['bundles'] ?? [] as $bundle) {
       $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
         return $field_definition instanceof FieldConfigInterface;
       });
