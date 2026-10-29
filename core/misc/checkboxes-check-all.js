@@ -1,6 +1,6 @@
 /**
  * @file
- * Add possibility to check all child items element.
+ * Adds a 'Select all' checkbox to an item list.
  */
 (function (Drupal, once) {
   /**
