@@ -128,6 +128,69 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
   }
 
   /**
+   * Merges the values of another CacheableMetadata object with this one.
+   *
+   * Compared to regular merge does not remove duplicates in tags and contexts.
+   *
+   * @param \Drupal\Core\Cache\CacheableMetadata $other
+   *   The other CacheableMetadata object.
+   *
+   * @return static
+   *   A new CacheableMetadata object, with the merged data.
+   */
+  public function mergeFast(CacheableMetadata $other) {
+    $result = clone $this;
+
+    // This is called many times per request, so avoid merging unless absolutely
+    // necessary.
+    if (empty($this->cacheContexts)) {
+      $result->cacheContexts = $other->cacheContexts;
+    }
+    elseif (empty($other->cacheContexts)) {
+      $result->cacheContexts = $this->cacheContexts;
+    }
+    else {
+      $result->cacheContexts = Cache::mergeContextsFast($this->cacheContexts, $other->cacheContexts);
+    }
+
+    if (empty($this->cacheTags)) {
+      $result->cacheTags = $other->cacheTags;
+    }
+    elseif (empty($other->cacheTags)) {
+      $result->cacheTags = $this->cacheTags;
+    }
+    else {
+      $result->cacheTags = Cache::mergeTagsFast($this->cacheTags, $other->cacheTags);
+    }
+
+    if ($this->cacheMaxAge === Cache::PERMANENT) {
+      $result->cacheMaxAge = $other->cacheMaxAge;
+    }
+    elseif ($other->cacheMaxAge === Cache::PERMANENT) {
+      $result->cacheMaxAge = $this->cacheMaxAge;
+    }
+    else {
+      $result->cacheMaxAge = Cache::mergeMaxAges($this->cacheMaxAge, $other->cacheMaxAge);
+    }
+    return $result;
+  }
+
+  /**
+   * Removes duplicates in tags and contexts.
+   *
+   * This is needed after using static::mergeFast
+   * Fast merging doesn't remove duplicates.
+   * So after collecting all the metadata duplicates should be removed.
+   *
+   * @return $this
+   */
+  public function removeDuplicates() {
+    $this->cacheTags = array_unique($this->cacheTags);
+    $this->cacheContexts = array_unique($this->cacheContexts);
+    return $this;
+  }
+
+  /**
    * Applies the values of this CacheableMetadata object to a render array.
    *
    * @param array &$build

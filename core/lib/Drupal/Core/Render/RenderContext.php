@@ -26,7 +26,14 @@ class RenderContext extends \SplStack {
     $frame = $this->pop();
     // Update the frame, but also update the current element, to ensure it
     // contains up-to-date information in case it gets render cached.
-    $updated_frame = BubbleableMetadata::createFromRenderArray($element)->merge($frame);
+    if (isset($element['#cache']['keys'])) {
+      $updated_frame = BubbleableMetadata::createFromRenderArray($element)->merge($frame);
+    }
+    else {
+      // If element has no keys, we don't expect it to be cached
+      // so we shouldn't care about duplicates and can use mergeFast.
+      $updated_frame = BubbleableMetadata::createFromRenderArray($element)->mergeFast($frame);
+    }
     $updated_frame->applyTo($element);
     $this->push($updated_frame);
   }
@@ -44,13 +51,17 @@ class RenderContext extends \SplStack {
     // must not reset it here to allow users of ::executeInRenderContext() to
     // access the stack directly.
     if ($this->count() === 1) {
+      // No more bubbling expected, so make sure duplicates are removed.
+      $current = $this->pop();
+      $current->removeDuplicates();
+      $this->push($current);
       return;
     }
 
     // Merge the current and the parent stack frame.
     $current = $this->pop();
     $parent = $this->pop();
-    $this->push($current->merge($parent));
+    $this->push($current->mergeFast($parent));
   }
 
 }

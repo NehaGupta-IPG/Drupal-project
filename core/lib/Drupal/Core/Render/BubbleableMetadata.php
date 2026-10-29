@@ -44,6 +44,26 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
     return $result;
   }
 
+  public function mergeFast(CacheableMetadata $other) {
+    $result = parent::mergeFast($other);
+
+    // This is called many times per request, so avoid merging unless absolutely
+    // necessary.
+    if ($other instanceof BubbleableMetadata) {
+      if (empty($this->attachments)) {
+        $result->attachments = $other->attachments;
+      }
+      elseif (empty($other->attachments)) {
+        $result->attachments = $this->attachments;
+      }
+      else {
+        $result->attachments = static::mergeAttachments($this->attachments, $other->attachments);
+      }
+    }
+
+    return $result;
+  }
+
   /**
    * Applies the values of this bubbleable metadata object to a render array.
    *

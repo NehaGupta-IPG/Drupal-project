@@ -33,6 +33,26 @@ class Cache {
   }
 
   /**
+   * Merges lists of cache contexts but does not remove duplicates.
+   *
+   * Faster version of \Drupal\Core\Cache\Cache::mergeContexts, that does not remove
+   * duplicates. Can be used when cache contexts should be collected from a
+   * large list of elements, but not yet to be used to set the cache
+   * by \Drupal\Core\Cache\CacheBackendInterface::set()
+   *
+   * @param list<string> ...$cache_contexts
+   *   Cache contexts to merge.
+   *
+   * @return list<string>
+   *   The merged list of cache contexts.
+   */
+  public static function mergeContextsFast(array ...$cache_contexts) {
+    $cache_contexts = array_values(array_merge(...$cache_contexts));
+    assert(\Drupal::service('cache_contexts_manager')->assertValidTokens($cache_contexts), sprintf('Failed to assert that "%s" are valid cache contexts.', implode(', ', $cache_contexts)));
+    return $cache_contexts;
+  }
+
+  /**
    * Merges lists of cache tags and removes duplicates.
    *
    * The cache tags list is returned in a format that is valid for
@@ -52,6 +72,26 @@ class Cache {
   #[\NoDiscard]
   public static function mergeTags(array ...$cache_tags) {
     $cache_tags = array_values(array_unique(array_merge(...$cache_tags)));
+    assert(Inspector::assertAllStrings($cache_tags), 'Cache tags must be valid strings');
+    return $cache_tags;
+  }
+
+  /**
+   * Merges lists of cache tags but does not remove duplicates.
+   *
+   * Faster version of \Drupal\Core\Cache\Cache::mergeTags, that does not remove
+   * duplicates. Can be used when cache tags should be collected from a
+   * large list of elements, but not yet to be used to set the cache
+   * by \Drupal\Core\Cache\CacheBackendInterface::set()
+   *
+   * @param list<string> ...$cache_tags
+   *   Cache tags to merge.
+   *
+   * @return list<string>
+   *   The merged list of cache tags.
+   */
+  public static function mergeTagsFast(array ...$cache_tags) {
+    $cache_tags = array_values(array_merge(...$cache_tags));
     assert(Inspector::assertAllStrings($cache_tags), 'Cache tags must be valid strings');
     return $cache_tags;
   }
