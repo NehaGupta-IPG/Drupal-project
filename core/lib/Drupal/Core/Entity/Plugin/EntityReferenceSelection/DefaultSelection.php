@@ -146,6 +146,27 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   /**
    * {@inheritdoc}
    */
+  public function calculateDependencies(): array {
+    $dependencies = parent::calculateDependencies();
+
+    if (!empty($this->getConfiguration()['target_bundles'])) {
+      $entity_type_id = $this->getConfiguration()['target_type'];
+      $bundle_entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+      if ($bundle_entity_type_id = $bundle_entity_type->getBundleEntityType()) {
+        $storage = $this->entityTypeManager->getStorage($bundle_entity_type_id);
+
+        foreach ($storage->loadMultiple($this->getConfiguration()['target_bundles']) as $bundle) {
+          $dependencies[$bundle->getConfigDependencyKey()][] = $bundle->getConfigDependencyName();
+        }
+      }
+    }
+
+    return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 

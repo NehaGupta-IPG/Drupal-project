@@ -171,6 +171,23 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies(): array {
+    $dependencies = parent::calculateDependencies();
+
+    $view_name = $this->getConfiguration()['view']['view_name'];
+    if ($view_name) {
+      $view = $this->entityTypeManager->getStorage('view')->load($view_name);
+
+      $dependencies += $view->getDependencies();
+      $dependencies[$view->getConfigDependencyKey()][] = $view->getConfigDependencyName();
+    }
+
+    return $dependencies;
+  }
+
+  /**
    * Initializes a view.
    *
    * @param string|null $match
