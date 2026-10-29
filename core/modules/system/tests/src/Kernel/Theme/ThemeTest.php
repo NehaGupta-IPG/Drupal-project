@@ -57,16 +57,19 @@ class ThemeTest extends KernelTestBase {
     // theme_test_false is an implemented theme hook so \Drupal::theme() service
     // should return a string or an object that implements MarkupInterface,
     // even though the theme function itself can return anything.
-    $types = ['null' => NULL, 'false' => FALSE, 'integer' => 1, 'string' => 'foo', 'empty_string' => ''];
+    $types = ['integer' => 1, 'string' => 'foo'];
     foreach ($types as $type => $example) {
       $output = \Drupal::theme()->render('theme_test_foo', ['foo' => $example]);
-      $this->assertTrue($output instanceof MarkupInterface || is_string($output), "\Drupal::theme() returns an object that implements MarkupInterface or a string for data type $type.");
-      if ($output instanceof MarkupInterface) {
-        $this->assertSame((string) $example, $output->__toString());
-      }
-      elseif (is_string($output)) {
-        $this->assertSame('', $output, 'A string will be return when the theme returns an empty string.');
-      }
+      $this->assertInstanceOf(MarkupInterface::class, $output, "\\Drupal::theme()->render() should return an object that implements MarkupInterface for data type '$type'.");
+      $this->assertEquals($example, $output);
+    }
+
+    // Check that a string is returned when the theme returns an empty string.
+    $types = ['null' => NULL, 'false' => FALSE, 'empty_string' => ''];
+    foreach ($types as $type => $example) {
+      $output = \Drupal::theme()->render('theme_test_foo', ['foo' => $example]);
+      $this->assertIsString($output, "\\Drupal::theme()->render() should return a string for data type '$type'.");
+      $this->assertSame('', $output, "\\Drupal::theme()->render() should return an empty string for data type '$type'.");
     }
 
     // suggestion_not_implemented is not an implemented theme hook so
