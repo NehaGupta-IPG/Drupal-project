@@ -2,11 +2,13 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Core\Authentication\AuthenticationCollectorInterface;
 use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
 use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -18,13 +20,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Trigger authentication during the request.
  */
 class AuthenticationSubscriber implements EventSubscriberInterface {
-
-  /**
-   * Authentication provider.
-   *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderInterface
-   */
-  protected $authenticationProvider;
 
   /**
    * Authentication provider filter.
@@ -41,25 +36,30 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   protected $challengeProvider;
 
   /**
-   * Account proxy.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $accountProxy;
-
-  /**
    * Constructs an authentication subscriber.
    *
-   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authentication_provider
+   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authenticationProvider
    *   An authentication provider.
-   * @param \Drupal\Core\Session\AccountProxyInterface $account_proxy
+   * @param \Drupal\Core\Session\AccountProxyInterface $accountProxy
    *   Account proxy.
+   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $authenticationCollector
+   *   Authentication collector.
    */
-  public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy) {
-    $this->authenticationProvider = $authentication_provider;
-    $this->filter = ($authentication_provider instanceof AuthenticationProviderFilterInterface) ? $authentication_provider : NULL;
-    $this->challengeProvider = ($authentication_provider instanceof AuthenticationProviderChallengeInterface) ? $authentication_provider : NULL;
-    $this->accountProxy = $account_proxy;
+  public function __construct(
+    protected AuthenticationProviderInterface $authenticationProvider,
+    protected AccountProxyInterface $accountProxy,
+    protected ?AuthenticationCollectorInterface $authenticationCollector = NULL,
+  ) {
+    // For backward compatibility, fetch from container if not provided.
+    if ($this->authenticationCollector === NULL) {
+
+      @trigger_error('Calling ' . __METHOD__ . ' without the $authenticationCollector argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3594314', E_USER_DEPRECATED);
+
+      $this->authenticationCollector = \Drupal::service('authentication_collector');
+    }
+
+    $this->filter = ($authenticationProvider instanceof AuthenticationProviderFilterInterface) ? $authenticationProvider : NULL;
+    $this->challengeProvider = ($authenticationProvider instanceof AuthenticationProviderChallengeInterface) ? $authenticationProvider : NULL;
   }
 
   /**
@@ -93,7 +93,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     if (isset($this->filter) && $event->isMainRequest()) {
       $request = $event->getRequest();
       if ($this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        throw new AccessDeniedHttpException('The used authentication method is not allowed on this route.');
+        $message = sprintf('The authentication method %s is not allowed on this route.', $this->getAuthenticationProviderName($request));
+        throw new AccessDeniedHttpException($message);
       }
     }
   }
@@ -132,7 +133,8 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
       $request = $event->getRequest();
       $exception = $event->getThrowable();
       if ($exception instanceof AccessDeniedHttpException && $this->authenticationProvider->applies($request) && !$this->filter->appliesToRoutedRequest($request, TRUE)) {
-        $event->setThrowable(new AccessDeniedHttpException('The used authentication method is not allowed on this route.', $exception));
+        $message = sprintf('The authentication method %s is not allowed on this route.', $this->getAuthenticationProviderName($request));
+        $event->setThrowable(new AccessDeniedHttpException($message, $exception));
       }
     }
   }
@@ -152,6 +154,27 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     $events[KernelEvents::EXCEPTION][] = ['onExceptionSendChallenge', 75];
     $events[KernelEvents::EXCEPTION][] = ['onExceptionAccessDenied', 80];
     return $events;
+  }
+
+  /**
+   * Gets the name of the authentication provider that applies to the request.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return string
+   *   The authentication provider name if it can be determined,
+   *   'unknown' otherwise.
+   */
+  protected function getAuthenticationProviderName(Request $request): string {
+    // Loop through all registered authentication providers to find the one
+    // that applies to this request.
+    foreach ($this->authenticationCollector->getSortedProviders() as $provider_id => $provider) {
+      if ($provider->applies($request)) {
+        return $provider_id;
+      }
+    }
+    return 'unknown';
   }
 
 }

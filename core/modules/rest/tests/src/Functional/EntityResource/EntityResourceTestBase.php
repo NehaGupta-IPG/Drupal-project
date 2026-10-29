@@ -538,14 +538,14 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 403 when attempting to use disallowed authentication provider.
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(403, 'The used authentication method is not allowed on this route.', $response);
+    $this->assertResourceErrorResponse(403, 'The authentication method rest_test_auth is not allowed on this route.', $response);
 
     unset($request_options[RequestOptions::HEADERS]['REST-test-auth']);
     $request_options[RequestOptions::HEADERS]['REST-test-auth-global'] = '1';
 
     // DX: 403 when attempting to use disallowed global authentication provider.
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(403, 'The used authentication method is not allowed on this route.', $response);
+    $this->assertResourceErrorResponse(403, 'The authentication method rest_test_auth_global is not allowed on this route.', $response);
 
     unset($request_options[RequestOptions::HEADERS]['REST-test-auth-global']);
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions('GET'));

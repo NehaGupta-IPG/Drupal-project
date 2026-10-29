@@ -1696,7 +1696,7 @@ services:
   Drupal\Core\Authentication\AuthenticationCollectorInterface: '@authentication_collector'
   authentication_subscriber:
     class: Drupal\Core\EventSubscriber\AuthenticationSubscriber
-    arguments: ['@authentication', '@current_user']
+    arguments: ['@authentication', '@current_user', '@authentication_collector']
   account_switcher:
     class: Drupal\Core\Session\AccountSwitcher
     arguments: ['@current_user', '@session_handler.write_safe']
