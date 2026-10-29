@@ -376,8 +376,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
    * {@inheritdoc}
    */
   public function getPathToken($uri) {
-    // Return the first 8 characters.
-    return substr(Crypt::hmacBase64($this->id() . ':' . $this->addExtension($uri), $this->getPrivateKey() . $this->getHashSalt()), 0, 8);
+    return Crypt::hmacBase64($this->id() . ':' . $this->addExtension($uri), $this->getPrivateKey() . $this->getHashSalt());
   }
 
   /**
