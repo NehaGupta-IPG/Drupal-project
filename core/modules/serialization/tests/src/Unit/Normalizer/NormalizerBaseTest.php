@@ -61,6 +61,63 @@ class NormalizerBaseTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests the supportsDenormalization method.
+   *
+   * @param bool $expected_return
+   *   The expected boolean return value from supportDenormalization.
+   * @param string|int|float $type
+   *   An interface, class or value to check for denormalization support.
+   * @param string|string[] $format
+   *   (optional) An interface, class or value the denormalization is supported
+   *   for.
+   *
+   * @dataProvider providerTestSupportsDenormalization
+   */
+  public function testSupportsDenormalization($expected_return, $type, $format = NULL) {
+    /** @var \Drupal\Tests\serialization\Unit\Normalizer\TestNormalizerBase $normalizer_base */
+    $normalizer_base = $this->getMockForAbstractClass(TestNormalizerBase::class);
+
+    if (isset($format)) {
+      $normalizer_base->setSupportedInterfaceOrClass($format);
+    }
+
+    $this->assertSame($expected_return, $normalizer_base->supportsDenormalization(NULL, $type));
+  }
+
+  /**
+   * Data provider for testSupportsDenormalization.
+   *
+   * @return array[]
+   *   An array of provider data for testSupportsDenormalization.
+   */
+  public function providerTestSupportsDenormalization() {
+    $formats = [
+      1.10,
+      '123',
+      '1.13',
+      'Ns\Of\MissingClass',
+      'stdClass',
+      NormalizerBase::class,
+    ];
+
+    return [
+      [FALSE, '1.10', $formats],
+      [TRUE, 1.10, $formats],
+      [FALSE, 123, $formats],
+      [TRUE, '123', $formats],
+      [FALSE, 1.13, $formats],
+      [TRUE, '1.13', $formats],
+      // A non-existent class must fail.
+      [FALSE, 'Ns\Of\MissingClass', $formats],
+      // Check the same class.
+      [TRUE, \stdClass::class, $formats],
+      // Check the instance.
+      [TRUE, new \stdClass(), $formats],
+      // Check the subclass.
+      [TRUE, TestNormalizerBase::class, $formats],
+    ];
+  }
 }
 
 /**
