@@ -31,7 +31,7 @@ class BlockPreprocess {
    *     element. Properties used: #block, #configuration, #children,
    *     and #plugin_id.
    */
-  public function preprocessBlock(&$variables): void {
+  public function preprocessBlock(array &$variables): void {
     $variables['configuration'] = $variables['elements']['#configuration'];
     $variables['plugin_id'] = $variables['elements']['#plugin_id'];
     $variables['base_plugin_id'] = $variables['elements']['#base_plugin_id'];
