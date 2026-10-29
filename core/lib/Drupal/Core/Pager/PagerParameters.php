@@ -47,7 +47,8 @@ class PagerParameters implements PagerParametersInterface {
    */
   public function findPage($pager_id = 0) {
     $pages = $this->getPagerQuery();
-    return (int) ($pages[$pager_id] ?? 0);
+    $page = (int) ($pages[$pager_id] ?? 0);
+    return \max(0, $page);
   }
 
   /**
