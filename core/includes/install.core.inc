@@ -45,6 +45,7 @@ use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleProjectRepository;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -1427,8 +1428,10 @@ function install_download_translation(&$install_state) {
   }
 
   $profile = $install_state['parameters']['profile'] ?? NULL;
-  $profile_path = $install_state['profiles'][$profile]?->getPath();
-  $profile_version = $install_state['profiles'][$profile]?->info['version'] ?? NULL;
+  // Installing from existing configuration may have no profile at all.
+  $profile_extension = $profile ? $install_state['profiles'][$profile] ?? NULL : NULL;
+  $profile_path = $profile_extension?->getPath();
+  $profile_version = $profile_extension?->info['version'] ?? NULL;
   // If we're using a custom profile and we know its version, try to download
   // that translation too. If we can't, proceed without it.
   if (isset($profile, $profile_path, $profile_version) && !str_starts_with($profile_path, 'core/')) {
@@ -1983,18 +1986,6 @@ function install_check_translations($langcode, $server_pattern, string $project 
   $languages = LanguageManager::getStandardLanguageList();
   $language = isset($languages[$langcode]) ? $languages[$langcode][0] : $langcode;
 
-  // Check if any of the desired translation files are available or if the
-  // translation server can be reached. In other words, check if we are online
-  // and have an internet connection.
-  if ($translation_available = install_check_localization_server($translation_url)) {
-    $online = TRUE;
-  }
-  if (!$translation_available) {
-    if (install_check_localization_server($server_url)) {
-      $online = TRUE;
-    }
-  }
-
   // If the translations directory does not exist, throw an error.
   if (!$translations_directory_exists) {
     $requirements['translations directory exists'] = [
@@ -2041,6 +2032,24 @@ function install_check_translations($langcode, $server_pattern, string $project 
         'title'       => t('Translations directory'),
         'value'       => t('The translations directory is writable.'),
       ];
+    }
+  }
+
+  // The locale module is not installed yet when the installer downloads the
+  // translation for its own language, so there is no configuration to honor.
+  if (\Drupal::moduleHandler()->moduleExists('locale') && \Drupal::config('locale.settings')->get('translation.use_source') !== TranslationUpdateMode::RemoteAndLocal->value) {
+    return $requirements;
+  }
+
+  // Check if any of the desired translation files are available or if the
+  // translation server can be reached. In other words, check if we are online
+  // and have an internet connection.
+  if ($translation_available = install_check_localization_server($translation_url)) {
+    $online = TRUE;
+  }
+  if (!$translation_available) {
+    if (install_check_localization_server($server_url)) {
+      $online = TRUE;
     }
   }
 
