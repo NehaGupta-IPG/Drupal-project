@@ -74,13 +74,44 @@ class Result extends AreaPluginBase {
       return [];
     }
     $output = '';
+    $replacements = $this->getReplacements();
     $format = $this->options['content'];
+
+    // Send the output.
+    if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
+      $output .= str_replace(array_keys($replacements), $replacements, $format);
+      // Return as render array.
+      return [
+        '#markup' => $output,
+      ];
+    }
+
+    return [];
+  }
+
+  /**
+   * Get the total number of results.
+   *
+   * @return int|null
+   *   Total number of results.
+   */
+  protected function getTotal(): ?int {
+    return $this->view->total_rows ?? count($this->view->result);
+  }
+
+  /**
+   * Calculate the replacement tokens.
+   *
+   * @return array
+   *   The token replacements.
+   */
+  protected function getReplacements(): array {
     // Calculate the page totals.
     $current_page = (int) $this->view->getCurrentPage() + 1;
     $per_page = (int) $this->view->getItemsPerPage();
     // @todo Maybe use a possible is views empty functionality.
     // Not every view has total_rows set, use view->result instead.
-    $total = $this->view->total_rows ?? count($this->view->result);
+    $total = $this->getTotal();
     $label = Html::escape($this->view->storage->label());
     // If there is no result the "start" and "current_record_count" should be
     // equal to 0. To have the same calculation logic, we use a "start offset"
@@ -111,16 +142,8 @@ class Result extends AreaPluginBase {
     $replacements['@current_page'] = (string) $current_page;
     $replacements['@current_record_count'] = (string) $current_record_count;
     $replacements['@page_count'] = (string) $page_count;
-    // Send the output.
-    if (!empty($total) || !empty($this->options['empty'])) {
-      $output .= str_replace(array_keys($replacements), $replacements, $format);
-      // Return as render array.
-      return [
-        '#markup' => $output,
-      ];
-    }
 
-    return [];
+    return $replacements;
   }
 
 }
