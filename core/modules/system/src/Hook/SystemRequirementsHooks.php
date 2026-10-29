@@ -1413,6 +1413,7 @@ class SystemRequirementsHooks {
       // ModuleInstaller::invoke() public.
       foreach ($module_handler->getModuleList() as $module => $extension) {
         $class_name = install_get_fixed_class_name($extension, 'Install/LastRemoved');
+        $last_removed = NULL;
         if (class_exists($class_name) && is_subclass_of($class_name, LastRemovedInterface::class)) {
           $install_class = \Drupal::classResolver($class_name);
           /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $install_class */
