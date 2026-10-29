@@ -2,12 +2,20 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
  * The base extender class for Select queries.
  */
 class SelectExtender implements SelectInterface {
+
+  use RefinableCacheableDependencyTrait {
+    getCacheContexts as traitGetCacheContexts;
+    getCacheMaxAge as traitGetCacheMaxAge;
+    getCacheTags as traitGetCacheTags;
+  }
 
   /**
    * The Select query object we are extending/decorating.
@@ -551,6 +559,27 @@ class SelectExtender implements SelectInterface {
    */
   public function orConditionGroup() {
     return $this->conditionGroupFactory('OR');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts($this->traitGetCacheContexts(), $this->query->getCacheContexts());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges($this->traitGetCacheMaxAge(), $this->query->getCacheMaxAge());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return Cache::mergeTags($this->traitGetCacheTags(), $this->query->getCacheTags());
   }
 
 }

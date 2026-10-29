@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -9,7 +10,7 @@ use Drupal\Core\Database\Connection;
  *
  * @ingroup database
  */
-interface SelectInterface extends ConditionInterface, AlterableInterface, ExtendableInterface, PlaceholderInterface {
+interface SelectInterface extends ConditionInterface, AlterableInterface, ExtendableInterface, PlaceholderInterface, RefinableCacheableDependencyInterface {
 
   /* Alter accessors to expose the query data to alter hooks. */
 

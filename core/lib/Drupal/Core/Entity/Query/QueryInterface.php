@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
 
 // cspell:ignore merhaba siema
@@ -14,7 +15,7 @@ use Drupal\Core\Database\Query\AlterableInterface;
  *
  * @ingroup database
  */
-interface QueryInterface extends AlterableInterface {
+interface QueryInterface extends AlterableInterface, RefinableCacheableDependencyInterface {
 
   /**
    * Gets the ID of the entity type for this query.

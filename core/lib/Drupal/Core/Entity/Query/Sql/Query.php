@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -407,6 +408,27 @@ class Query extends QueryBase implements QueryInterface {
     $sql = $clone->connection->quoteIdentifiers($sql);
 
     return strtr($sql, $quoted);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts(parent::getCacheContexts(), $this->sqlQuery->getCacheContexts());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges(parent::getCacheMaxAge(), $this->sqlQuery->getCacheMaxAge());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return Cache::mergeTags(parent::getCacheTags(), $this->sqlQuery->getCacheTags());
   }
 
 }

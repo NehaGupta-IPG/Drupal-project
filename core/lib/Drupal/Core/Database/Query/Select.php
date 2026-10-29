@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -12,6 +13,7 @@ use Drupal\Core\Database\Connection;
 class Select extends Query implements SelectInterface {
 
   use QueryConditionTrait;
+  use RefinableCacheableDependencyTrait;
 
   /**
    * The fields to SELECT.
