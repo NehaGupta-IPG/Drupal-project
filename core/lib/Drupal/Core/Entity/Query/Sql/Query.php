@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity\Query\Sql;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Query\QueryBase;
@@ -55,6 +56,20 @@ class Query extends QueryBase implements QueryInterface {
   protected $connection;
 
   /**
+   * The target of the connection object.
+   *
+   * @var string
+   */
+  protected $connectionTarget;
+
+  /**
+   * The key of the connection object.
+   *
+   * @var string
+   */
+  protected $connectionKey;
+
+  /**
    * Constructs a query object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -70,6 +85,8 @@ class Query extends QueryBase implements QueryInterface {
   public function __construct(EntityTypeInterface $entity_type, $conjunction, Connection $connection, array $namespaces) {
     parent::__construct($entity_type, $conjunction, $namespaces);
     $this->connection = $connection;
+    $this->connectionKey = $this->connection->getKey();
+    $this->connectionTarget = $this->connection->getTarget();
   }
 
   /**
@@ -407,6 +424,22 @@ class Query extends QueryBase implements QueryInterface {
     $sql = $clone->connection->quoteIdentifiers($sql);
 
     return strtr($sql, $quoted);
+  }
+
+  /**
+   * Implements the magic __sleep function to disconnect from the database.
+   */
+  public function __sleep(): array {
+    $keys = get_object_vars($this);
+    unset($keys['connection']);
+    return array_keys($keys);
+  }
+
+  /**
+   * Implements the magic __wakeup function to reconnect to the database.
+   */
+  public function __wakeup(): void {
+    $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
   }
 
 }
