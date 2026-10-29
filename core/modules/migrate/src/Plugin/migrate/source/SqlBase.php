@@ -341,7 +341,13 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
 
     // Download data in batches for performance.
     if (($this->batchSize > 0)) {
-      $this->query->range($this->batch * $this->batchSize, $this->batchSize);
+      // If the map is joinable or we are using highwater, then the rows we have
+      // processed in previous batches have already been removed from the query.
+      $start = match (TRUE) {
+        $this->mapJoinable() || $this->getHighWaterProperty() => 0,
+        default => $this->batch * $this->batchSize,
+      };
+      $this->query->range($start, $this->batchSize);
     }
     $statement = $this->query->execute();
     $statement->setFetchMode(FetchAs::Associative);
@@ -426,14 +432,6 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
     }
 
     if (!$this->getIds()) {
-      return FALSE;
-    }
-    // With batching, we want a later batch to return the same rows that would
-    // have been returned at the same point within a monolithic query. If we
-    // join to the map table, the first batch is writing to the map table and
-    // thus affecting the results of subsequent batches. To be safe, we avoid
-    // joining to the map table when batching.
-    if ($this->batchSize > 0) {
       return FALSE;
     }
     $id_map = $this->migration->getIdMap();
