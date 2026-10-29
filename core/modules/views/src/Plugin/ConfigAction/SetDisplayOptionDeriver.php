@@ -64,8 +64,8 @@ final class SetDisplayOptionDeriver extends DeriverBase {
         'item_key' => $type . '_name',
       ] + $base_plugin_definition;
       $this->derivatives['set' . (new UnicodeString($type))->camel()->title()->toString() . 'InDisplay'] = $definition;
-      // Plural alias, for example 'setFieldsInDisplay'. Some types have the same
-      // singular and plural name, in which case the alias already exists.
+      // Plural alias, for example 'setFieldsInDisplay'. Some types have the
+      // same singular and plural name, in which case the alias already exists.
       $plural_id = 'set' . (new UnicodeString($info['plural']))->camel()->title()->toString() . 'InDisplay';
       $this->derivatives[$plural_id] ??= $definition;
     }
