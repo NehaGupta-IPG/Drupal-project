@@ -33,6 +33,9 @@ views.settings:
             preview_information:
               type: boolean
               label: 'Show information and statistics about the view during live preview'
+            live_preview_limit:
+              type: integer
+              label: 'Limit live preview items to display'
             sql_query:
               type: mapping
               label: 'Query settings'

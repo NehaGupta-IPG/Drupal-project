@@ -90,6 +90,13 @@ class BasicSettingsForm extends ConfigFormBase {
       ],
     ];
 
+    $form['live_preview']['options']['ui_show_live_preview_limit'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Limit live preview items to display'),
+      '#min' => 1,
+      '#config_target' => 'views.settings:ui.show.live_preview_limit'
+    ];
+
     $form['live_preview']['options']['ui_show_sql_query_enabled'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show the SQL query'),

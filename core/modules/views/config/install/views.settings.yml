@@ -6,6 +6,7 @@ ui:
     default_display: false
     performance_statistics: false
     preview_information: true
+    live_preview_limit: 50
     sql_query:
       enabled: false
       where: above
