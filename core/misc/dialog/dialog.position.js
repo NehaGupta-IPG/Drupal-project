@@ -98,14 +98,6 @@
             0.01 * parseInt(optionValue, 10) * windowHeight,
             10,
           );
-          // Don't force the dialog to be bigger vertically than needed.
-          if (
-            option === 'height' &&
-            Math.round(event.data.$element.parent().outerHeight()) <
-              adjustedValue
-          ) {
-            adjustedValue = 'auto';
-          }
           adjustedOptions[option] = adjustedValue;
         }
       }
