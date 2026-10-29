@@ -128,6 +128,7 @@ class OEmbedFormatter extends FormatterBase {
     return [
       'max_width' => 0,
       'max_height' => 0,
+      'maintain_aspect_ratio' => FALSE,
       'loading' => [
         'attribute' => 'lazy',
       ],
@@ -141,6 +142,7 @@ class OEmbedFormatter extends FormatterBase {
     $element = [];
     $max_width = $this->getSetting('max_width');
     $max_height = $this->getSetting('max_height');
+    $maintain_aspect_ratio = $this->getSetting('maintain_aspect_ratio');
 
     foreach ($items as $delta => $item) {
       $main_property = $item->getFieldDefinition()->getFieldStorageDefinition()->getMainPropertyName();
@@ -208,7 +210,6 @@ class OEmbedFormatter extends FormatterBase {
             // External service is not supposed to send something larger
             // than the max width or max height, so those values should be used.
             'width' => $resource->getWidth() ?: $max_width,
-            'height' => $resource->getHeight() ?: $max_height,
             'class' => ['media-oembed-content'],
             'loading' => $this->getSetting('loading')['attribute'],
           ],
@@ -218,6 +219,16 @@ class OEmbedFormatter extends FormatterBase {
             ],
           ],
         ];
+
+        // Only add explicit heights when aspect ratio is not required,
+        // otherwise delegate on CSS.
+        if ($maintain_aspect_ratio) {
+          $element[$delta]['#attributes']['style'] = "--media-oembed-aspect-ratio: {$resource->getWidth()} / {$resource->getHeight()};";
+          $element[$delta]['#attributes']['class'][] = 'media-oembed-content--responsive';
+        }
+        else {
+          $element[$delta]['#attributes']['height'] = $resource->getHeight() ?: $max_height;
+        }
 
         // An empty title attribute will disable title inheritance, so only
         // add it if the resource has a title.
@@ -239,6 +250,12 @@ class OEmbedFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state) + [
+      'maintain_aspect_ratio' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Maintain aspect ratio'),
+        '#default_value' => $this->getSetting('maintain_aspect_ratio'),
+        '#description' => $this->t('With some providers we may need to calculate the embedded height depending on the aspect ratio of the original resource.'),
+      ],
       'max_width' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum width'),
@@ -256,6 +273,11 @@ class OEmbedFormatter extends FormatterBase {
         '#maxlength' => 5,
         '#field_suffix' => $this->t('pixels'),
         '#min' => 0,
+        '#states' => [
+          'visible' => [
+            'input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][maintain_aspect_ratio]"]' => ['checked' => FALSE],
+          ],
+        ],
       ],
       'loading' => [
         '#type' => 'details',
@@ -275,6 +297,7 @@ class OEmbedFormatter extends FormatterBase {
         ],
       ],
     ];
+    $form['#element_validate'][] = [static::class, 'validateForm'];
     $form['loading']['attribute']['lazy']['#description'] = $this->t('Delays loading the resource until that section of the page is visible in the browser. When in doubt, lazy loading is recommended.');
     $form['loading']['attribute']['eager']['#description'] = $this->t('Force browsers to download a resource as soon as possible. This is the browser default for legacy reasons. Only use this option when the resource is always expected to render.');
 
@@ -286,19 +309,17 @@ class OEmbedFormatter extends FormatterBase {
    */
   public function settingsSummary() {
     $summary = parent::settingsSummary();
-    if ($this->getSetting('max_width') && $this->getSetting('max_height')) {
+    if ($this->getSetting('maintain_aspect_ratio') && $this->getSetting('max_width')) {
+      $summary[] = $this->t('Maximum width: %max_width pixels. Aspect ratio will be respected on providers that support it', [
+        '%max_width' => $this->getSetting('max_width'),
+      ]);
+    }
+    elseif ($this->getSetting('maintain_aspect_ratio') && !$this->getSetting('max_width')) {
+      $summary[] = $this->t('No maximum width, aspect ratio will be respected on providers that support it');
+    }
+    elseif ($this->getSetting('max_width') && $this->getSetting('max_height')) {
       $summary[] = $this->t('Maximum size: %max_width x %max_height pixels', [
         '%max_width' => $this->getSetting('max_width'),
-        '%max_height' => $this->getSetting('max_height'),
-      ]);
-    }
-    elseif ($this->getSetting('max_width')) {
-      $summary[] = $this->t('Maximum width: %max_width pixels', [
-        '%max_width' => $this->getSetting('max_width'),
-      ]);
-    }
-    elseif ($this->getSetting('max_height')) {
-      $summary[] = $this->t('Maximum height: %max_height pixels', [
         '%max_height' => $this->getSetting('max_height'),
       ]);
     }
