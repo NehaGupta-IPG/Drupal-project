@@ -16,7 +16,9 @@ class DeleteForm extends ContentEntityDeleteForm {
    */
   public function getCancelUrl() {
     // Point to the entity of which this comment is a reply.
-    return $this->entity->get('entity_id')->entity->toUrl();
+    $target_entity = $this->entity->get('entity_id')->entity;
+
+    return $target_entity ? $target_entity->toUrl() : $this->entity->toUrl();
   }
 
   /**

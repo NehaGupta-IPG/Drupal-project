@@ -99,7 +99,7 @@ class CommentForm extends ContentEntityForm {
     $comment = $this->entity;
     $entity = $this->entityTypeManager->getStorage($comment->getCommentedEntityTypeId())->load($comment->getCommentedEntityId());
     $field_name = $comment->getFieldName();
-    $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()];
+    $field_definition = $entity ? $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()] : NULL;
     $config = $this->config('user.settings');
 
     // In several places within this function, we vary $form on:
@@ -110,24 +110,28 @@ class CommentForm extends ContentEntityForm {
     $form['#cache']['contexts'][] = 'user.permissions';
     $form['#cache']['contexts'][] = 'user.roles:authenticated';
     $this->renderer->addCacheableDependency($form, $config);
-    $this->renderer->addCacheableDependency($form, $field_definition->getConfig($entity->bundle()));
+    if ($field_definition) {
+      $this->renderer->addCacheableDependency($form, $field_definition->getConfig($entity->bundle()));
+    }
 
     // Use #comment-form as unique jump target, regardless of entity type.
     $form['#id'] = Html::getUniqueId('comment_form');
     $form['#theme'] = [
-      'comment_form__' . $entity->getEntityTypeId() . '__' . $entity->bundle() . '__' . $field_name,
-      'comment_form',
-    ];
+        $entity
+          ? 'comment_form__' . $entity->getEntityTypeId() . '__' . $entity->bundle() . '__' . $field_name
+          : 'comment_form__' . $comment->getCommentedEntityTypeId() . '__' . $field_name,
+        'comment_form',
+      ];
 
-    $anonymous_contact = AnonymousContact::tryFrom($field_definition->getSetting('anonymous'));
+    $anonymous_contact = $field_definition ? AnonymousContact::tryFrom($field_definition->getSetting('anonymous')) : CommentInterface::ANONYMOUS_MAY_CONTACT;
     $is_admin = $comment->id() && $this->currentUser->hasPermission('administer comments');
 
     // If not replying to a comment, use our dedicated page callback for new
     // Comments on entities.
     if (!$comment->id() && !$comment->hasParentComment()) {
       $form['#action'] = Url::fromRoute('comment.reply', [
-        'entity_type' => $entity->getEntityTypeId(),
-        'entity' => $entity->id(),
+        'entity_type' => $comment->getCommentedEntityTypeId(),
+        'entity' => $comment->getCommentedEntityId(),
         'field_name' => $field_name,
       ])->toString();
     }
@@ -259,8 +263,8 @@ class CommentForm extends ContentEntityForm {
     /** @var \Drupal\comment\CommentInterface $comment */
     $comment = $this->entity;
     $entity = $comment->getCommentedEntity();
-    $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()];
-    $preview_mode = CommentPreviewMode::tryFrom($field_definition->getSetting('preview'));
+    $field_definition = $entity ? $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()] : NULL;
+    $preview_mode = $field_definition ? CommentPreviewMode::tryFrom($field_definition->getSetting('preview')) : DRUPAL_DISABLED;
 
     // No delete action on the comment form.
     unset($element['delete']);
@@ -421,7 +425,7 @@ class CommentForm extends ContentEntityForm {
     $entity = $comment->getCommentedEntity();
     $is_new = $this->entity->isNew();
     $field_name = $comment->getFieldName();
-    $uri = $entity->toUrl();
+    $uri = $entity ? $entity->toUrl() : $comment->toUrl();
     $logger = $this->logger('comment');
 
     if ($this->currentUser->hasPermission('post comments') && ($this->currentUser->hasPermission('administer comments') || $entity->{$field_name}->status == CommentingStatus::Open->value)) {
@@ -435,16 +439,18 @@ class CommentForm extends ContentEntityForm {
       ]);
       // Add an appropriate message upon submitting the comment form.
       $this->messenger()->addStatus($this->getStatusMessage($comment, $is_new));
-      $query = [];
-      // Find the current display page for this comment.
-      $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$field_name];
-      $page = $this->entityTypeManager->getStorage('comment')->getDisplayOrdinal($comment, $field_definition->getSetting('default_mode'), $field_definition->getSetting('per_page'));
-      if ($page > 0) {
-        $query['page'] = $page;
+      if ($entity) {
+        $query = [];
+        // Find the current display page for this comment.
+        $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$field_name];
+        $page = $this->entityTypeManager->getStorage('comment')->getDisplayOrdinal($comment, $field_definition->getSetting('default_mode'), $field_definition->getSetting('per_page'));
+        if ($page > 0) {
+          $query['page'] = $page;
+        }
+        // Redirect to the newly posted comment.
+        $uri->setOption('query', $query);
+        $uri->setOption('fragment', 'comment-' . $comment->id());
       }
-      // Redirect to the newly posted comment.
-      $uri->setOption('query', $query);
-      $uri->setOption('fragment', 'comment-' . $comment->id());
     }
     else {
       $logger->warning('Comment: unauthorized comment submitted or comment submitted to a closed post %subject.', ['%subject' => $comment->getSubject()]);
