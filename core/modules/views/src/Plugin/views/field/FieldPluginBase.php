@@ -1537,17 +1537,20 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $path = $url['path'];
 
     if (isset($url['query'])) {
-      // Remove query parameters that were assigned a query string replacement
-      // token for which there is no value available.
+      $raw_url = UrlHelper::parse($alter['path']);
       foreach ($url['query'] as $param => $val) {
-        if ($val == '%' . $param) {
-          unset($url['query'][$param]);
-        }
-        // Replace any empty query params from URL parsing with NULL. So the
-        // query will get built correctly with only the param key.
-        // @see \Drupal\Component\Utility\UrlHelper::buildQuery().
         if ($val === '') {
-          $url['query'][$param] = NULL;
+          // Remove query parameters that were assigned a query string
+          // replacement token for which there is no value available.
+          if (isset($raw_url['query'][$param]) && $raw_url['query'][$param] === '{{ arguments.' . $param . ' }}') {
+            unset($url['query'][$param]);
+          }
+          // Replace any actual empty query param from URL parsing with NULL. So
+          // the query will get built correctly with only the param key.
+          // @see \Drupal\Component\Utility\UrlHelper::buildQuery().
+          else {
+            $url['query'][$param] = NULL;
+          }
         }
       }
 

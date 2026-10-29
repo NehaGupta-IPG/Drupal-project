@@ -390,6 +390,13 @@ class FieldPluginBaseTest extends UnitTestCase {
     $data[] = ['www.example.com', ['external' => TRUE], '<a href="http://www.example.com">value</a>'];
     $data[] = ['', ['external' => TRUE], 'value'];
 
+    // Test with empty query parameters.
+    $data[] = ['test-path', ['query' => ['foo' => '']], '<a href="/test-path?foo">value</a>'];
+    // Test with query parameters that have tokens.
+    $data[] = ['test-path', ['query' => ['foo' => '{{ arguments.foo }}']], '<a href="/test-path">value</a>'];
+    // Test with mixed query parameters.
+    $data[] = ['test-path', ['query' => ['foo' => '', 'bar' => '{{ arguments.bar }}']], '<a href="/test-path?foo">value</a>'];
+
     return $data;
   }
 
