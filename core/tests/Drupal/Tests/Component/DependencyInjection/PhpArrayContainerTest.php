@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\DependencyInjection;
 
+use Drupal\Component\DependencyInjection\PhpArrayContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\Component\DependencyInjection\PhpArrayContainer
- * @group DependencyInjection
+ * Tests Drupal\Component\DependencyInjection\PhpArrayContainer.
  */
+#[CoversClass(PhpArrayContainer::class)]
+#[Group('DependencyInjection')]
 class PhpArrayContainerTest extends ContainerTest {
 
   /**
@@ -45,7 +49,7 @@ class PhpArrayContainerTest extends ContainerTest {
   /**
    * Helper function to return a machine-optimized '@notation'.
    */
-  protected function getCollection($collection, $resolve = TRUE) {
+  protected function getCollection($collection, $resolve = TRUE): array {
     return $collection;
   }
 

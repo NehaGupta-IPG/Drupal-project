@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\ProxyBuilder;
 
 use Drupal\Component\ProxyBuilder\ProxyBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\ProxyBuilder\ProxyBuilder
- * @group proxy_builder
+ * Tests Drupal\Component\ProxyBuilder\ProxyBuilder.
  */
+#[CoversClass(ProxyBuilder::class)]
+#[Group('proxy_builder')]
 class ProxyBuilderTest extends TestCase {
 
   /**
@@ -30,7 +33,7 @@ class ProxyBuilderTest extends TestCase {
   }
 
   /**
-   * @covers ::buildProxyClassName
+   * Tests build proxy class name.
    */
   public function testBuildProxyClassName(): void {
     $class_name = $this->proxyBuilder->buildProxyClassName('Drupal\Tests\Component\ProxyBuilder\TestServiceNoMethod');
@@ -38,7 +41,7 @@ class ProxyBuilderTest extends TestCase {
   }
 
   /**
-   * @covers ::buildProxyClassName
+   * Tests build proxy class name for module.
    */
   public function testBuildProxyClassNameForModule(): void {
     $class_name = $this->proxyBuilder->buildProxyClassName('Drupal\views_ui\ParamConverter\ViewUIConverter');
@@ -46,7 +49,7 @@ class ProxyBuilderTest extends TestCase {
   }
 
   /**
-   * @covers ::buildProxyNamespace
+   * Tests build proxy namespace.
    */
   public function testBuildProxyNamespace(): void {
     $class_name = $this->proxyBuilder->buildProxyNamespace('Drupal\Tests\Component\ProxyBuilder\TestServiceNoMethod');
@@ -56,9 +59,9 @@ class ProxyBuilderTest extends TestCase {
   /**
    * Tests the basic methods like the constructor and the lazyLoadItself method.
    *
-   * @covers ::build
-   * @covers ::buildConstructorMethod
-   * @covers ::buildLazyLoadItselfMethod
+   * @legacy-covers ::build
+   * @legacy-covers ::buildConstructorMethod
+   * @legacy-covers ::buildLazyLoadItselfMethod
    */
   public function testBuildNoMethod(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceNoMethod';
@@ -68,8 +71,8 @@ class ProxyBuilderTest extends TestCase {
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildSimpleMethod(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceSimpleMethod';
@@ -91,9 +94,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildMethodWithParameter(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceMethodWithParameter';
@@ -115,9 +118,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildComplexMethod(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceComplexMethod';
@@ -142,7 +145,7 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildServiceMethodReturnsVoid(): void {
     $class = TestServiceMethodReturnsVoid::class;
@@ -166,8 +169,8 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildReturnReference(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceReturnReference';
@@ -191,9 +194,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildWithInterface(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceWithInterface';
@@ -217,7 +220,7 @@ EOS;
   }
 
   /**
-   * @covers ::build
+   * Tests build with nested interface.
    */
   public function testBuildWithNestedInterface(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceWithChildInterfaces';
@@ -230,9 +233,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildWithProtectedAndPrivateMethod(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceWithProtectedMethods';
@@ -255,9 +258,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildWithPublicStaticMethod(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceWithPublicStaticMethod';
@@ -281,9 +284,9 @@ EOS;
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildWithNullableSelfTypeHint(): void {
     $class = 'Drupal\Tests\Component\ProxyBuilder\TestServiceNullableTypeHintSelf';
@@ -319,7 +322,7 @@ EOS;
    * @return string
    *   The code of the entire proxy.
    */
-  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = '') {
+  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = ''): string {
     $namespace = ProxyBuilder::buildProxyNamespace($class);
     $reflection = new \ReflectionClass($class);
     $proxy_class = $reflection->getShortName();
@@ -392,7 +395,7 @@ namespace {{ namespace }} {
 
 EOS;
 
-    $expected_methods_body = implode("\n", array_map(function ($value) {
+    $expected_methods_body = implode("\n", array_map(function ($value): string {
       if ($value === '') {
         return $value;
       }
@@ -410,26 +413,40 @@ EOS;
 
 }
 
+/**
+ * Test service without methods.
+ */
 class TestServiceNoMethod {
 
 }
 
+/**
+ * Test service with simple method.
+ */
 class TestServiceSimpleMethod {
 
+  // @phpstan-ignore missingType.return
   public function method() {
 
   }
 
 }
 
+/**
+ * Test service with method without parameter.
+ */
 class TestServiceMethodWithParameter {
 
+  // @phpstan-ignore missingType.return
   public function methodWithParameter($parameter) {
 
   }
 
 }
 
+/**
+ * Test service with complex method.
+ */
 class TestServiceComplexMethod {
 
   public function complexMethod(string $parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []): array {
@@ -438,6 +455,9 @@ class TestServiceComplexMethod {
 
 }
 
+/**
+ * Test service with a nullable self parameter.
+ */
 class TestServiceNullableTypeHintSelf {
 
   public function typeHintSelf(?self $parameter): ?self {
@@ -446,6 +466,9 @@ class TestServiceNullableTypeHintSelf {
 
 }
 
+/**
+ * Test service with void returning method.
+ */
 class TestServiceMethodReturnsVoid {
 
   public function methodReturnsVoid(string $parameter): void {
@@ -454,59 +477,90 @@ class TestServiceMethodReturnsVoid {
 
 }
 
+/**
+ * Test service with method that returns reference.
+ */
 class TestServiceReturnReference {
 
+  // @phpstan-ignore missingType.return
   public function &returnReference() {
 
   }
 
 }
 
+/**
+ * Test interface.
+ */
 interface TestInterface {
 
+  // @phpstan-ignore missingType.return
   public function testMethod($parameter);
 
 }
 
+/**
+ * Test service that implements test interface.
+ */
 class TestServiceWithInterface implements TestInterface {
 
+  // @phpstan-ignore missingType.return
   public function testMethod($parameter) {
 
   }
 
 }
 
+/**
+ * Test service with protected methods.
+ */
 class TestServiceWithProtectedMethods {
 
+  // @phpstan-ignore missingType.return
   public function testMethod($parameter) {
 
   }
 
+  // @phpstan-ignore missingType.return
   protected function protectedMethod($parameter) {
 
   }
 
+  // @phpstan-ignore missingType.return
   protected function privateMethod($parameter) {
 
   }
 
 }
 
+/**
+ * Test service with public static method.
+ */
 class TestServiceWithPublicStaticMethod {
 
+  // @phpstan-ignore missingType.return
   public static function testMethod($parameter) {
   }
 
 }
 
+/**
+ * Test base interface.
+ */
 interface TestBaseInterface {
 
 }
 
+/**
+ * Test child interface.
+ */
 interface TestChildInterface extends TestBaseInterface {
 
 }
 
+/**
+ * Test service that implements test child interface.
+ */
 class TestServiceWithChildInterfaces implements TestChildInterface {
 
 }

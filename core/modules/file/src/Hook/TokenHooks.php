@@ -7,7 +7,6 @@ namespace Drupal\file\Hook;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -21,10 +20,9 @@ class TokenHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    private readonly Token $token,
-    private readonly LanguageManagerInterface $languageManager,
-    private readonly DateFormatterInterface $dateFormatter,
-    private readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly Token $token,
+    protected readonly DateFormatterInterface $dateFormatter,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
   /**
@@ -32,14 +30,7 @@ class TokenHooks {
    */
   #[Hook('tokens')]
   public function tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
-    $url_options = ['absolute' => TRUE];
-    if (isset($options['langcode'])) {
-      $url_options['language'] = $this->languageManager->getLanguage($options['langcode']);
-      $langcode = $options['langcode'];
-    }
-    else {
-      $langcode = NULL;
-    }
+    $langcode = $options['langcode'] ?? NULL;
     $replacements = [];
     if ($type == 'file' && !empty($data['file'])) {
       $dateFormatStorage = $this->entityTypeManager->getStorage('date_format');
@@ -56,7 +47,7 @@ class TokenHooks {
             $replacements[$original] = $file->uuid();
             break;
 
-          // Essential file data
+          // Essential file data.
           case 'name':
             $replacements[$original] = $file->getFilename();
             break;
@@ -97,10 +88,13 @@ class TokenHooks {
             break;
 
           case 'owner':
-            $owner = $file->getOwner();
-            $bubbleable_metadata->addCacheableDependency($owner);
-            $name = $owner->label();
-            $replacements[$original] = $name;
+            // Only replace the token when the file has a valid owner. When the
+            // owner is missing the token is left unreplaced, consistent with
+            // the chained [file:owner:*] tokens handled below.
+            if ($owner = $file->getOwner()) {
+              $bubbleable_metadata->addCacheableDependency($owner);
+              $replacements[$original] = $owner->label();
+            }
             break;
         }
       }

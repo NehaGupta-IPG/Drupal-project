@@ -11,12 +11,14 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Kernel tests for taxonomy pending revisions.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class PendingRevisionTest extends KernelTestBase {
 
   /**
@@ -28,6 +30,7 @@ class PendingRevisionTest extends KernelTestBase {
     'user',
     'text',
     'field',
+    'filter',
     'system',
   ];
 
@@ -121,6 +124,9 @@ class PendingRevisionTest extends KernelTestBase {
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
   }
 
+  /**
+   * Retrieves the taxonomy index from the database.
+   */
   protected function getTaxonomyIndex() {
     return \Drupal::database()->select('taxonomy_index')
       ->fields('taxonomy_index')

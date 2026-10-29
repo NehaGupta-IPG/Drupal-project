@@ -52,6 +52,7 @@ display:
         type: table
         options:
           grouping: {  }
+          class: ''
           row_class: ''
           default_row_class: true
           override: true
@@ -232,6 +233,8 @@ display:
             placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            min_label: ''
+            max_label: ''
           is_grouped: false
           group_info:
             label: ''
@@ -277,6 +280,8 @@ display:
             placeholder: 'created placeholder'
             min_placeholder: 'min placeholder'
             max_placeholder: 'max placeholder'
+            min_label: ''
+            max_label: ''
           is_grouped: false
           group_info:
             label: ''

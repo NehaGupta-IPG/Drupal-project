@@ -75,9 +75,13 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
    */
   const ASSET_LIST = [
     {
-      pack: 'backbone',
-      library: 'internal.backbone',
-      files: ['backbone.js', 'backbone-min.js', 'backbone-min.js.map'],
+      pack: 'htmx.org',
+      folder: 'htmx',
+      library: 'htmx',
+      files: [
+        { from: 'dist/htmx.min.js', to: 'htmx.min.js' },
+        { from: 'dist/htmx.js', to: 'htmx.js' },
+      ],
     },
     {
       pack: 'jquery',
@@ -86,10 +90,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         { from: 'dist/jquery.min.js', to: 'jquery.min.js' },
         { from: 'dist/jquery.min.map', to: 'jquery.min.map' },
       ],
-    },
-    {
-      pack: 'js-cookie',
-      files: [{ from: 'dist/js.cookie.min.js', to: 'js.cookie.min.js' }],
     },
     {
       pack: 'normalize.css',
@@ -113,11 +113,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         { from: 'dist/index.umd.min.js', to: 'index.umd.min.js' },
         { from: 'dist/index.umd.min.js.map', to: 'index.umd.min.js.map' },
       ],
-    },
-    {
-      pack: 'underscore',
-      library: 'internal.underscore',
-      files: ['underscore-min.js', 'underscore-min.js.map'],
     },
     {
       pack: 'loadjs',

@@ -2,9 +2,10 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -147,7 +148,10 @@ class Schema extends DatabaseSchema {
         'blob_fields' => [],
         'sequences' => [],
       ];
-      $this->connection->addSavepoint();
+
+      if ($this->connection->inTransaction()) {
+        $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+      }
 
       try {
         // The bytea columns and sequences for a table can be found in
@@ -164,17 +168,21 @@ WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND pg_attribute.attrelid = :key::regclass
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
           ':key' => $quoted_key,
         ]);
       }
       catch (\Exception $e) {
-        $this->connection->rollbackSavepoint();
+        if (isset($savepoint)) {
+          $savepoint->rollback();
+        }
         throw $e;
       }
-      $this->connection->releaseSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->commitOrRelease();
+      }
 
       // If the table information does not yet exist in the PostgreSQL
       // metadata, then return the default table information here, so that it
@@ -260,7 +268,9 @@ EOD;
     $schema = $prefixInfo['schema'];
     $table_name = $prefixInfo['table'];
 
-    $this->connection->addSavepoint();
+    if ($this->connection->inTransaction()) {
+      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+    }
 
     try {
       $checks = $this->connection->query("SELECT conname FROM pg_class cl INNER JOIN pg_constraint co ON co.conrelid = cl.oid INNER JOIN pg_attribute attr ON attr.attrelid = cl.oid AND attr.attnum = ANY (co.conkey) INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE co.contype = :constraint_type AND ns.nspname = :schema AND cl.relname = :table AND attr.attname = :column", [
@@ -271,11 +281,15 @@ EOD;
       ]);
     }
     catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->rollback();
+      }
       throw $e;
     }
 
-    $this->connection->releaseSavepoint();
+    if (isset($savepoint)) {
+      $savepoint->commitOrRelease();
+    }
 
     $field_information = $checks->fetchCol();
 
@@ -293,11 +307,12 @@ EOD;
 
     $sql_keys = [];
     if (!empty($table['primary key']) && is_array($table['primary key'])) {
-      $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
+      $this->validatePrimaryKeySchema($table['primary key'], $table['fields']);
       $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($table['primary key']) . ')';
     }
     if (isset($table['unique keys']) && is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
+        $this->validateUniqueKeySchema($key);
         // Use the createPrimaryKeySql(), which already discards any prefix
         // lengths passed as part of the key column specifiers. (Postgres
         // doesn't support setting a prefix length for PRIMARY or UNIQUE
@@ -357,6 +372,14 @@ EOD;
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (!empty($spec['unsigned'])) {
@@ -514,7 +537,10 @@ EOD;
   public function tableExists($table, $add_prefix = TRUE) {
     $prefixInfo = $this->getPrefixInfo($table, $add_prefix);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [':schema' => $prefixInfo['schema'], ':table' => $prefixInfo['table']])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [
+      ':schema' => $prefixInfo['schema'],
+      ':table' => $prefixInfo['table'],
+    ])->fetchField();
   }
 
   /**
@@ -570,7 +596,10 @@ EOD;
     $table_name = $this->connection->getPrefix() . $table;
     // Index names and constraint names are global in PostgreSQL, so we need to
     // rename them when renaming the table.
-    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [':schema' => $this->defaultSchema, ':table' => $table_name]);
+    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [
+      ':schema' => $this->defaultSchema,
+      ':table' => $table_name,
+    ]);
 
     foreach ($indexes as $index) {
       // Get the index type by suffix, e.g. idx/key/pkey.
@@ -580,7 +609,7 @@ EOD;
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (str_contains($index->indexname, 'drupal_')) {
+      if (str_starts_with($index->indexname, 'drupal_')) {
         preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
@@ -650,9 +679,15 @@ EOD;
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($new_keys['primary key']) && in_array($field, $new_keys['primary key'], TRUE);
+    $is_primary_key = !empty($new_keys['primary key']);
     if ($is_primary_key) {
-      $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field => $spec]);
+      $this->validatePrimaryKeySchema($new_keys['primary key'], [$field => $spec]);
+    }
+
+    if (!empty($new_keys['unique keys'])) {
+      foreach ($new_keys['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $fix_null = FALSE;
@@ -719,7 +754,10 @@ EOD;
   public function fieldExists($table, $column) {
     $prefixInfo = $this->getPrefixInfo($table);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'], ':column' => $column])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [
+      ':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'],
+      ':column' => $column,
+    ])->fetchField();
   }
 
   /**
@@ -781,7 +819,7 @@ EOD;
     if ($this->constraintExists($table, 'pkey')) {
       throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
-
+    $this->validatePrimaryKeySchema($fields);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
@@ -819,7 +857,7 @@ EOD;
     if ($this->constraintExists($table, $name . '__key')) {
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
-
+    $this->validateUniqueKeySchema($fields);
     // Use the createPrimaryKeySql(), which already discards any prefix lengths
     // passed as part of the key column specifiers. (Postgres doesn't support
     // setting a prefix length for PRIMARY or UNIQUE indices.)
@@ -912,8 +950,13 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($new_keys['primary key']) && in_array($field_new, $new_keys['primary key'], TRUE)) {
-      $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field_new => $spec]);
+    if (!empty($new_keys['primary key'])) {
+      $this->validatePrimaryKeySchema($new_keys['primary key'], [$field_new => $spec]);
+    }
+    if (!empty($new_keys['unique keys'])) {
+      foreach ($new_keys['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $spec = $this->processField($spec);
@@ -921,7 +964,7 @@ EOD;
     // Type 'serial' is known to PostgreSQL, but only during table creation,
     // not when altering. Because of that, we create it here as an 'int'. After
     // we create it we manually re-apply the sequence.
-    $field_def = match($spec['pgsql_type']) {
+    $field_def = match ($spec['pgsql_type']) {
       'serial' => 'int',
       'bigserial' => 'bigint',
       default => $spec['pgsql_type'],
@@ -1056,23 +1099,38 @@ EOD;
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $info = $this->getPrefixInfo($table);
     // Don't use {} around pg_class, pg_attribute tables.
     if (isset($column)) {
-      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [$info['table'], $column])->fetchField();
+      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [
+        $info['table'],
+        $column,
+      ])->fetchField() ?? FALSE;
     }
     else {
-      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', ['pg_class', $info['table']])->fetchField();
+      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', [
+        'pg_class',
+        $info['table'],
+      ])->fetchField() ?? FALSE;
     }
   }
 
   /**
    * Calculates a base-64 encoded PostgreSQL-safe sha-256 hash.
    *
-   * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
+   * The hash is modified to according to PostgreSQL Lexical Structure. See
+   * https://www.postgresql.org/docs/current/sql-syntax-lexical.html.
    *
    * @param string $data
    *   String to be hashed.
@@ -1105,7 +1163,7 @@ EOD;
   }
 
   /**
-   * Retrieves a sequence name that is owned by the table and column..
+   * Retrieves a sequence name that is owned by the table and column.
    *
    * @param string $table
    *   A table name that is not prefixed or quoted.

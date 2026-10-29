@@ -12,6 +12,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the Content Translation UI.
@@ -48,7 +49,12 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
    *
    * @var string[]
    */
-  protected $defaultCacheContexts = ['languages:language_interface', 'theme', 'url.query_args:_wrapper_format', 'user.permissions'];
+  protected $defaultCacheContexts = [
+    'languages:language_interface',
+    'theme',
+    'url.query_args:_wrapper_format',
+    'user.permissions',
+  ];
 
   /**
    * Tests the basic translation UI.
@@ -353,6 +359,18 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     $metadata = $this->manager->getTranslationMetadata($entity->getTranslation($langcode));
     $this->assertEquals($values[$langcode]['uid'], $metadata->getAuthor()->id(), 'Translation author correctly kept.');
     $this->assertEquals($values[$langcode]['created'], $metadata->getCreatedTime(), 'Translation date correctly kept.');
+
+    // Verify that long usernames can be saved as the translation author.
+    $user = $this->drupalCreateUser([], $this->randomMachineName(UserInterface::USERNAME_MAX_LENGTH));
+    $edit = [
+      // Format the username as it is entered in autocomplete fields.
+      'content_translation[uid]' => $user->getAccountName() . ' (' . $user->id() . ')',
+      'content_translation[created]' => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
+    ];
+    $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
+    $reloaded_entity = $storage->load($this->entityId);
+    $metadata = $this->manager->getTranslationMetadata($reloaded_entity->getTranslation($langcode));
+    $this->assertEquals($user->id(), $metadata->getAuthor()->id(), 'Translation author correctly set.');
   }
 
   /**
@@ -392,7 +410,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns an edit array containing the values to be posted.
    */
-  protected function getEditValues($values, $langcode, $new = FALSE) {
+  protected function getEditValues(array $values, $langcode, $new = FALSE) {
     $edit = $values[$langcode];
     $langcode = $new ? LanguageInterface::LANGCODE_NOT_SPECIFIED : $langcode;
     foreach ($values[$langcode] as $property => $value) {
@@ -587,7 +605,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Tests the changed time after API and FORM save without changes.
    */
-  public function doTestChangedTimeAfterSaveWithoutChanges() {
+  public function doTestChangedTimeAfterSaveWithoutChanges(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
     $entity = $storage->load($this->entityId);

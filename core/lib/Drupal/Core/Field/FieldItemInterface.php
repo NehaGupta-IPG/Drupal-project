@@ -249,6 +249,10 @@ interface FieldItemInterface extends ComplexDataInterface {
   /**
    * Defines the storage-level settings for this plugin.
    *
+   * Setting names defined by this method must not duplicate the setting names
+   * returned by this plugin's implementation of defaultFieldSettings(), as
+   * both lists of settings are merged.
+   *
    * @return array
    *   A list of default settings, keyed by the setting name.
    */
@@ -256,6 +260,10 @@ interface FieldItemInterface extends ComplexDataInterface {
 
   /**
    * Defines the field-level settings for this plugin.
+   *
+   * Setting names defined by this method must not duplicate the setting names
+   * returned by this plugin's implementation of defaultStorageSettings(), as
+   * both lists of settings are merged.
    *
    * @return array
    *   A list of default settings, keyed by the setting name.
@@ -440,7 +448,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *     'config' => ['user.role.anonymous', 'user.role.authenticated'],
    *     'content' => ['node:article:f0a189e6-55fb-47fb-8005-5bef81c44d6d'],
    *     'module' => ['node', 'user'],
-   *     'theme' => ['claro'],
+   *     'theme' => ['my_theme'],
    *   ];
    *   @endcode
    *
@@ -473,7 +481,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *     'config' => ['user.role.anonymous', 'user.role.authenticated'],
    *     'content' => ['node:article:f0a189e6-55fb-47fb-8005-5bef81c44d6d'],
    *     'module' => ['node', 'user'],
-   *     'theme' => ['claro'],
+   *     'theme' => ['my_theme'],
    *   ];
    *   @endcode
    *

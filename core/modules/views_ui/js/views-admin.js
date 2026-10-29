@@ -260,12 +260,10 @@
       const $context = $(context);
       let $form = $context;
       // The add handler form may have an id of views-ui-add-handler-form--n.
-      if (
-        !(
-          context instanceof HTMLElement &&
-          context.matches('form[id^="views-ui-add-handler-form"]')
-        )
-      ) {
+      if (!(
+        context instanceof HTMLElement &&
+        context.matches('form[id^="views-ui-add-handler-form"]')
+      )) {
         $form = $context.find('form[id^="views-ui-add-handler-form"]');
       }
       if (once('views-ui-add-handler-form', $form).length) {
@@ -385,7 +383,9 @@
           'Add',
         )}</a><ul class="action-list" style="display:none;"></ul></li>`,
       );
-      const $displayButtons = $menu.nextAll('input.add-display').detach();
+      const $displayButtons = $menu
+        .nextAll('input.add-display, button.add-display')
+        .detach();
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
@@ -454,12 +454,10 @@
       const $context = $(context);
       let $form = $context;
       // The add handler form may have an id of views-ui-add-handler-form--n.
-      if (
-        !(
-          context instanceof HTMLElement &&
-          context.matches('form[id^="views-ui-add-handler-form"]')
-        )
-      ) {
+      if (!(
+        context instanceof HTMLElement &&
+        context.matches('form[id^="views-ui-add-handler-form"]')
+      )) {
         $form = $context.find('form[id^="views-ui-add-handler-form"]');
       }
       // Make sure we don't add more than one event handler to the same form.
@@ -1249,7 +1247,6 @@
         context,
       ).forEach((dropdown) => {
         // Closures! :(
-        const $context = $(context);
         const submit = context.querySelector('[id^=edit-submit]');
         const oldValue = submit ? submit.value : '';
 
@@ -1273,8 +1270,10 @@
             } else {
               submit.value = Drupal.t('Apply (this display)');
             }
-            const $dialog = $context.closest('.ui-dialog-content');
-            $dialog.trigger('dialogButtonsChange');
+            if (context !== document) {
+              const dialog = context.closest('.ui-dialog-content');
+              dialog?.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+            }
           })
           .trigger('change');
       });

@@ -6,15 +6,19 @@ namespace Drupal\Tests\filter\Unit;
 
 use Drupal\filter\Plugin\Filter\FilterImageLazyLoad;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\filter\Plugin\Filter\FilterImageLazyLoad
- * @group editor
+ * Tests Drupal\filter\Plugin\Filter\FilterImageLazyLoad.
  */
+#[CoversClass(FilterImageLazyLoad::class)]
+#[Group('editor')]
 final class FilterImageLazyLoadTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\filter\Plugin\Filter\FilterImageLazyLoad
+   * The lazy load image filter.
    */
   protected FilterImageLazyLoad $filter;
 
@@ -27,15 +31,14 @@ final class FilterImageLazyLoadTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::process
-   *
-   * @dataProvider providerHtml
+   * Tests process.
    *
    * @param string $html
    *   Input HTML.
    * @param string $expected
    *   The expected output string.
    */
+  #[DataProvider('providerHtml')]
   public function testProcess(string $html, string $expected): void {
     $this->assertSame($expected, $this->filter->process($html, 'en')->getProcessedText());
   }

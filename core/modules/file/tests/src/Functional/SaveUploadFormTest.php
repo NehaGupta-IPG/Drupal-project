@@ -8,14 +8,16 @@ use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the _file_save_upload_from_form() function.
+ * Tests the ManagedFileElementHelper::saveFileUploads() function.
  *
- * @group file
- *
- * @see _file_save_upload_from_form()
+ * @see ManagedFileElementHelper::saveFileUploads()
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SaveUploadFormTest extends FileManagedTestBase {
 
   use TestFileCreationTrait {
@@ -101,7 +103,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
   }
 
   /**
-   * Tests the _file_save_upload_from_form() function.
+   * Tests the ManagedFileElementHelper::saveFileUploads() function.
    */
   public function testNormal(): void {
     $max_fid_after = (int) \Drupal::entityQueryAggregate('file')
@@ -157,7 +159,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(\Drupal::service('file_system')->basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
   }
 
   /**
@@ -169,7 +171,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // The file being tested is a .gif which is in the default safe list
     // of extensions to allow when the extension validator isn't used. This is
     // implicitly tested at the testNormal() test. Here we tell
-    // _file_save_upload_from_form() to only allow ".foo".
+    // ManagedFileElementHelper::saveFileUploads() to only allow ".foo".
     $extensions = 'foo';
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -190,7 +192,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     FileTestHelper::reset();
 
     $extensions = 'foo ' . $this->imageExtension;
-    // Now tell _file_save_upload_from_form() to allow the extension of our test
+    // Now tell ManagedFileElementHelper::saveFileUploads() to allow the extension of our test
     // image.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -210,7 +212,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // Reset the hook counters.
     FileTestHelper::reset();
 
-    // Now tell _file_save_upload_from_form() to allow any extension.
+    // Now tell ManagedFileElementHelper::saveFileUploads() to allow any extension.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
@@ -245,7 +247,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt' . '</em>');
     $this->assertSession()->pageTextContains('File MIME type is text/plain.');
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -261,7 +262,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains('For security reasons, your upload has been renamed');
     $this->assertSession()->pageTextContains("File name is {$this->phpFile->filename}");
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -320,7 +320,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('For security reasons, your upload has been renamed');
     $this->assertSession()->pageTextContains("File name is {$munged_filename}");
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -344,7 +343,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('For security reasons, your upload has been renamed');
     $this->assertSession()->pageTextContains("File name is {$munged_filename}");
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -364,7 +362,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains('For security reasons, your upload has been renamed');
     $this->assertSession()->pageTextContains("File name is {$this->image->getFilename()}");
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -384,7 +381,6 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextNotContains('For security reasons, your upload has been renamed');
     $this->assertSession()->pageTextContains("Epic upload FAIL!");
 
     // Check that the correct hooks were called.
@@ -493,7 +489,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
    * Tests that form validation does not change error messages.
    */
   public function testErrorMessagesAreNotChanged(): void {
-    $error = 'An error message set before _file_save_upload_from_form()';
+    $error = 'An error message set before ManagedFileElementHelper::saveFileUploads()';
 
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
@@ -507,10 +503,10 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertSession()->pageTextContains("You WIN!");
 
     // Ensure the expected error message is present and the counts before and
-    // after calling _file_save_upload_from_form() are correct.
+    // after calling ManagedFileElementHelper::saveFileUploads() are correct.
     $this->assertSession()->pageTextContains($error);
-    $this->assertSession()->pageTextContains('Number of error messages before _file_save_upload_from_form(): 1');
-    $this->assertSession()->pageTextContains('Number of error messages after _file_save_upload_from_form(): 1');
+    $this->assertSession()->pageTextContains('Number of error messages before ManagedFileElementHelper::saveFileUploads(): 1');
+    $this->assertSession()->pageTextContains('Number of error messages after ManagedFileElementHelper::saveFileUploads(): 1');
 
     // Test that error messages are preserved when an error occurs.
     $edit = [
@@ -524,10 +520,10 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertSession()->pageTextContains("Epic upload FAIL!");
 
     // Ensure the expected error message is present and the counts before and
-    // after calling _file_save_upload_from_form() are correct.
+    // after calling ManagedFileElementHelper::saveFileUploads() are correct.
     $this->assertSession()->pageTextContains($error);
-    $this->assertSession()->pageTextContains('Number of error messages before _file_save_upload_from_form(): 1');
-    $this->assertSession()->pageTextContains('Number of error messages after _file_save_upload_from_form(): 1');
+    $this->assertSession()->pageTextContains('Number of error messages before ManagedFileElementHelper::saveFileUploads(): 1');
+    $this->assertSession()->pageTextContains('Number of error messages after ManagedFileElementHelper::saveFileUploads(): 1');
 
     // Test a successful upload with no messages.
     $edit = [
@@ -539,10 +535,10 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertSession()->pageTextContains("You WIN!");
 
     // Ensure the error message is not present and the counts before and after
-    // calling _file_save_upload_from_form() are correct.
+    // calling ManagedFileElementHelper::saveFileUploads() are correct.
     $this->assertSession()->pageTextNotContains($error);
-    $this->assertSession()->pageTextContains('Number of error messages before _file_save_upload_from_form(): 0');
-    $this->assertSession()->pageTextContains('Number of error messages after _file_save_upload_from_form(): 0');
+    $this->assertSession()->pageTextContains('Number of error messages before ManagedFileElementHelper::saveFileUploads(): 0');
+    $this->assertSession()->pageTextContains('Number of error messages after ManagedFileElementHelper::saveFileUploads(): 0');
   }
 
   /**

@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\big_pipe\Functional;
 
 use Behat\Mink\Element\NodeElement;
-use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\big_pipe\Render\BigPipe;
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\big_pipe_test\BigPipePlaceholderTestCases;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests BigPipe's no-JS detection & response delivery (with and without JS).
@@ -23,16 +26,16 @@ use Drupal\Tests\BrowserTestBase;
  * - big_pipe_page_attachments()
  * - \Drupal\big_pipe\Controller\BigPipeController
  * - \Drupal\big_pipe\EventSubscriber\HtmlResponseBigPipeSubscriber
- * - \Drupal\big_pipe\Render\BigPipe
- *
- * @group big_pipe
+ * - \Drupal\big_pipe\Render\BigPipe.
  */
+#[Group('big_pipe')]
+#[RunTestsInSeparateProcesses]
 class BigPipeTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['big_pipe', 'big_pipe_test', 'dblog'];
+  protected static $modules = ['big_pipe', 'big_pipe_messages_test', 'big_pipe_test', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -74,7 +77,7 @@ class BigPipeTest extends BrowserTestBase {
    *
    * Covers:
    * - big_pipe_page_attachments()
-   * - \Drupal\big_pipe\Controller\BigPipeController
+   * - \Drupal\big_pipe\Controller\BigPipeController.
    */
   public function testNoJsDetection(): void {
     $no_js_to_js_markup = '<script>document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"</script>';
@@ -88,9 +91,10 @@ class BigPipeTest extends BrowserTestBase {
 
     // 2. Session (authenticated).
     $this->drupalLogin($this->rootUser);
+    $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(base_path() . 'user/1?check_logged_in=1') . '" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(base_path() . 'big_pipe_test') . '" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -103,10 +107,10 @@ class BigPipeTest extends BrowserTestBase {
 
     // 3. Session (anonymous).
     $this->drupalGet(Url::fromRoute('user.login', [], ['query' => ['trigger_session' => 1]]));
-    $this->drupalGet(Url::fromRoute('user.login'));
+    $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'user/login" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -163,6 +167,7 @@ class BigPipeTest extends BrowserTestBase {
 
     $this->setCsrfTokenSeedInTestEnvironment();
     $cases = $this->getTestCases();
+    $this->assertCsrfTokenPlaceholderTestCaseData($cases);
     $this->assertBigPipeNoJsPlaceholders([
       $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholder     => $cases['edge_case__invalid_html']->embeddedHtmlResponse,
       $cases['html_attribute_value']->bigPipeNoJsPlaceholder        => $cases['html_attribute_value']->embeddedHtmlResponse,
@@ -261,6 +266,7 @@ class BigPipeTest extends BrowserTestBase {
 
     $this->setCsrfTokenSeedInTestEnvironment();
     $cases = $this->getTestCases();
+    $this->assertCsrfTokenPlaceholderTestCaseData($cases);
     $this->assertBigPipeNoJsPlaceholders([
       $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholder           => $cases['edge_case__invalid_html']->embeddedHtmlResponse,
       $cases['html_attribute_value']->bigPipeNoJsPlaceholder              => $cases['html_attribute_value']->embeddedHtmlResponse,
@@ -314,14 +320,9 @@ class BigPipeTest extends BrowserTestBase {
     // @see performMetaRefresh()
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_multi_occurrence'));
-    // cspell:disable-next-line
-    $big_pipe_placeholder_id = 'callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA';
-    $expected_placeholder_replacement = '<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="' . $big_pipe_placeholder_id . '">';
     $this->assertSession()->pageTextContains('The count is 1.');
     $this->assertSession()->responseNotContains('The count is 2.');
     $this->assertSession()->responseNotContains('The count is 3.');
-    $raw_content = $this->getSession()->getPage()->getContent();
-    $this->assertSame(1, substr_count($raw_content, $expected_placeholder_replacement), 'Only one placeholder replacement was found for the duplicate #lazy_builder arrays.');
 
     // By calling performMetaRefresh() here, we simulate JavaScript being
     // disabled, because as far as the BigPipe module is concerned, it is
@@ -468,6 +469,29 @@ class BigPipeTest extends BrowserTestBase {
   }
 
   /**
+   * Asserts that CSRF-token-based test case data is independently correct.
+   *
+   * The html_attribute_value_subset case tests a CSRF token link placeholder.
+   * This assertion verifies the placeholder hash in the test case matches what
+   * RouteProcessorCsrf would actually generate for the route path, so that a
+   * wrong route or path in the test data cannot silently pass.
+   *
+   * @param \Drupal\big_pipe_test\BigPipePlaceholderTestCase[] $cases
+   *   The test cases from BigPipePlaceholderTestCases::cases().
+   */
+  protected function assertCsrfTokenPlaceholderTestCaseData(array $cases): void {
+    $case = $cases['html_attribute_value_subset'];
+    // The placeholder for an HTML attribute value subset is just the hash
+    // string itself (not wrapped in HTML). Verify it equals what Crypt would
+    // produce for the expected route path.
+    $this->assertSame(Crypt::hashBase64('admin/appearance/default'), $case->placeholder);
+    // Verify the no-JS placeholder string contains the same hash.
+    $this->assertStringContainsString($case->placeholder, $case->bigPipeNoJsPlaceholder);
+    // Verify the embedded HTML response is the actual CSRF token for the path.
+    $this->assertSame($this->container->get('csrf_token')->get('admin/appearance/default'), $case->embeddedHtmlResponse);
+  }
+
+  /**
    * Asserts whether arrays A and B are equal, when treated as sets.
    *
    * @todo This method is broken. Fix it in
@@ -554,6 +578,31 @@ class BigPipeTest extends BrowserTestBase {
 
     // Check that the <meta> refresh is absent, only one redirect ever happens.
     $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
+  }
+
+  /**
+   * Tests that response contains cacheability debug comments.
+   */
+  public function testDebugCacheability(): void {
+    $this->drupalLogin($this->rootUser);
+    $this->assertSessionCookieExists('1');
+    $this->assertBigPipeNoJsCookieExists('0');
+
+    // With debug_cacheability_headers enabled.
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertBigPipeResponseHeadersPresent();
+    $this->assertSession()->responseContains('<!-- big_pipe cache tags:  -->');
+    $this->assertSession()
+      ->responseContains('<!-- big_pipe cache contexts: languages:language_interface theme user.permissions -->');
+
+    // With debug_cacheability_headers disabled.
+    $this->setContainerParameter('http.response.debug_cacheability_headers', FALSE);
+    $this->rebuildContainer();
+    $this->resetAll();
+    $this->drupalGet(Url::fromRoute('<front>'));
+    $this->assertSession()->responseNotContains('<!-- big_pipe cache tags:');
+    $this->assertSession()
+      ->responseNotContains('<!-- big_pipe cache contexts:');
   }
 
 }

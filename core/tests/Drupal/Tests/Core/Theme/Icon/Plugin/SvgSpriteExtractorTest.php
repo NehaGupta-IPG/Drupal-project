@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
 // cspell:ignore corge
-use Drupal\Tests\UnitTestCase;
+
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\IconFinder;
 use Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor;
 use Drupal\Tests\Core\Theme\Icon\IconTestTrait;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor
- *
- * @group icon
+ * Tests Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor.
  */
+#[CoversClass(SvgSpriteExtractor::class)]
+#[Group('icon')]
 class SvgSpriteExtractorTest extends UnitTestCase {
 
   use IconTestTrait;
@@ -27,24 +32,20 @@ class SvgSpriteExtractorTest extends UnitTestCase {
 
   /**
    * The SvgSpriteExtractor instance.
-   *
-   * @var \Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor
    */
   private SvgSpriteExtractor $svgSpriteExtractorPlugin;
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&Stub $iconFinder;
 
   /**
    * {@inheritdoc}
    */
   public function setUp():void {
     parent::setUp();
-    $this->iconFinder = $this->createMock(IconFinder::class);
+    $this->iconFinder = $this->createStub(IconFinder::class);
     $this->svgSpriteExtractorPlugin = new SvgSpriteExtractor(
       [
         'id' => $this->pluginId,
@@ -135,7 +136,10 @@ class SvgSpriteExtractorTest extends UnitTestCase {
         ],
       ],
       [
-        ['/path/source/foo.svg', '<svg><symbol id="!script"></symbol><symbol id="not valid"></symbol><symbol id="_foo-bar_"></symbol></svg>'],
+        [
+          '/path/source/foo.svg',
+          '<svg><symbol id="!script"></symbol><symbol id="not valid"></symbol><symbol id="_foo-bar_"></symbol></svg>',
+        ],
       ],
       ['_foo-bar_'],
     ];
@@ -150,9 +154,8 @@ class SvgSpriteExtractorTest extends UnitTestCase {
    *   The content returned by fileGetContents() based on absolute_path.
    * @param array<string> $expected
    *   The icon ids expected.
-   *
-   * @dataProvider providerDiscoverIconsSvgSprite
    */
+  #[DataProvider('providerDiscoverIconsSvgSprite')]
   public function testDiscoverIconsSvgSprite(array $files = [], array $contents_map = [], array $expected = []): void {
     $this->iconFinder->method('getFilesFromSources')->willReturn($files);
     $this->iconFinder->method('getFileContents')

@@ -2,10 +2,43 @@
   "$id": "https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$defs": {
+    "propDefinition": {
+      "$comment": "Prop names are exposed as Twig variables in the component template. Twig identifiers must start with a letter or underscore and cannot contain dashes, so prop names must match ^[a-zA-Z_][a-zA-Z0-9_]*$. Same pattern as slotDefinition.",
+      "allOf": [
+        { "$ref": "http://json-schema.org/draft-04/schema#" },
+        {
+          "properties": {
+            "properties": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_][a-zA-Z0-9_]*$": {}
+              }
+            }
+          }
+        }
+      ],
+      "meta:enum": {
+        "type": "object",
+        "minItems": 1,
+        "uniqueItems": true,
+        "patternProperties": {
+          "additionalProperties": false,
+          "^[a-zA-Z0-9_-]*$": {
+            "type": "string"
+          }
+        }
+      },
+      "x-translation-context": {
+        "type": "string",
+        "title": "Translation Context"
+      }
+    },
     "slotDefinition": {
       "type": "object",
+      "$comment": "Slot names are exposed as Twig block names in the component template. Twig identifiers must start with a letter or underscore and cannot contain dashes, so slot names must match ^[a-zA-Z_][a-zA-Z0-9_]*$. Same pattern as propDefinition",
+      "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9_-]$": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
           "type": "object",
           "properties": {
             "title": {
@@ -21,6 +54,49 @@
               "items": {
                 "type": "string"
               }
+            },
+            "expected": {
+              "type": "array",
+              "title": "Expected components",
+              "description": "List of components / component tags that are expected to be put into this slot.",
+              "items": {
+                "type": "string",
+                "title": "Expected component item",
+                "description": "A component ID or tag."
+              }
+            },
+            "minItems": {
+              "type": "integer",
+              "minimum": 0,
+              "title": "Minimum number of items",
+              "description": "The minimum number of items a slot should accommodate"
+            },
+            "maxItems": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Maximum number of items",
+              "description": "The maximum number of items a slot should accommodate"
+            }
+          }
+        }
+      }
+    },
+    "variantDefinition": {
+      "type": "object",
+      "$comment": "Variant names may contain dashes because they are used as string values (CSS modifiers, equality checks) and are never converted into Twig variable or block names.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["title"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description"
             }
           }
         }
@@ -186,11 +262,27 @@
         "obsolete"
       ]
     },
+    "noUi": {
+      "type": "boolean",
+      "title": "Exclude from UI",
+      "description": "Use this property to exclude a component from the UI."
+    },
     "props": {
-      "$ref": "http://json-schema.org/draft-04/schema#"
+      "$ref": "#/$defs/propDefinition"
     },
     "slots": {
       "$ref": "#/$defs/slotDefinition"
+    },
+    "variants": {
+      "$ref": "#/$defs/variantDefinition"
+    },
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "description": "A list of tags to apply to this component",
+      "items": {
+        "type": "string"
+      }
     },
     "libraryOverrides": {
       "$ref": "#/$defs/libraryDefinition"

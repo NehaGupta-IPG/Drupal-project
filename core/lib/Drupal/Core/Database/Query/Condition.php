@@ -222,16 +222,16 @@ class Condition implements ConditionInterface, \Countable {
           }
           $arguments += $condition['field']->arguments();
           // If the operator and value were not passed in to the
-          // @see ConditionInterface::condition() method (and thus have the
-          // default value as defined over there) it is assumed to be a valid
-          // condition on its own: ignore the operator and value parts.
+          // ConditionInterface::condition() method (and thus have the default
+          // value as defined over there) it is assumed to be a valid condition
+          // on its own: ignore the operator and value parts.
           $ignore_operator = $condition['operator'] === '=' && $condition['value'] === NULL;
         }
         elseif (!isset($condition['operator'])) {
           // Left hand part is a literal string added with the
-          // @see ConditionInterface::where() method. Put brackets around
-          // the snippet and collect the arguments from the value part.
-          // Also ignore the operator and value parts.
+          // ConditionInterface::where() method. Put brackets around the snippet
+          // and collect the arguments from the value part. Also ignore the
+          // operator and value parts.
           $field_fragment = '(' . $condition['field'] . ')';
           $arguments += $condition['value'];
           $ignore_operator = TRUE;
@@ -272,6 +272,7 @@ class Condition implements ConditionInterface, \Countable {
         }
         // Add defaults.
         $operator += [
+          'field_suffix' => '',
           'prefix' => '',
           'postfix' => '',
           'delimiter' => '',
@@ -316,7 +317,11 @@ class Condition implements ConditionInterface, \Countable {
         }
 
         // Concatenate the left hand part, operator and right hand part.
-        $condition_fragments[] = trim(implode(' ', [$field_fragment, $operator_fragment, $value_fragment]));
+        $condition_fragments[] = trim(implode(' ', [
+          $field_fragment . $operator['field_suffix'],
+          $operator_fragment,
+          $value_fragment,
+        ]));
       }
 
       // Concatenate all conditions using the conjunction and brackets around

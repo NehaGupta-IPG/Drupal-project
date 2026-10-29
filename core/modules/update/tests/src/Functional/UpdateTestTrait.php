@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Functional;
 
 /**
- * Provides a trait to set system info and XML mappings.
+ * Provides a trait to set extension info and XML mappings.
  *
- * @see update_test_system_info_alter
+ * @see \Drupal\update_test\Hook\UpdateTestHooks::extensionInfoAlter()
  * @see \Drupal\update_test\Controller\UpdateTestController::updateTest
  * @see \Drupal\Core\Extension\ExtensionList::doList()
  * @see \Drupal\Core\Extension\InfoParserInterface
- * @see update_test_system_info_alter
  */
 trait UpdateTestTrait {
 
@@ -40,22 +39,22 @@ trait UpdateTestTrait {
     if (in_array('#all', array_keys($installed_extensions), TRUE)) {
       throw new \Exception("#all (default value) shouldn't be set here instead use ::mockDefaultExtensionsInfo().");
     }
-    $system_info = $this->config('update_test.settings')->get('system_info');
-    $system_info = $installed_extensions + $system_info;
-    $this->config('update_test.settings')->set('system_info', $system_info)->save();
+    $extension_info = $this->config('update_test.settings')->get('extension_info');
+    $extension_info = $installed_extensions + $extension_info;
+    $this->config('update_test.settings')->set('extension_info', $extension_info)->save();
   }
 
   /**
    * Sets default information about installed extensions.
    *
-   * @param string[] $default_info
+   * @param array<string, string|int> $default_info
    *   The *.info.yml key-value pairs to be mocked across all
    *   extensions. Hence, these can be seen as default/fallback values.
    */
   protected function mockDefaultExtensionsInfo(array $default_info): void {
-    $system_info = $this->config('update_test.settings')->get('system_info');
-    $system_info = ['#all' => $default_info] + $system_info;
-    $this->config('update_test.settings')->set('system_info', $system_info)->save();
+    $extension_info = $this->config('update_test.settings')->get('extension_info');
+    $extension_info = ['#all' => $default_info] + $extension_info;
+    $this->config('update_test.settings')->set('extension_info', $extension_info)->save();
   }
 
   /**

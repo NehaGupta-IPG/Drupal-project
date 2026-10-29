@@ -140,7 +140,13 @@ function hook_field_storage_config_update_forbid(FieldStorageConfigInterface $fi
     $allowed_values = $field_storage->getSetting('allowed_values');
     $prior_allowed_values = $prior_field_storage->getSetting('allowed_values');
     $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
-    if (_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
+    $result = \Drupal::entityQuery($field_storage->getTargetEntityTypeId())
+      ->condition($field_storage->getName() . '.value', $lost_keys, 'IN')
+      ->count()
+      ->accessCheck(FALSE)
+      ->range(0, 1)
+      ->execute();
+    if ($result) {
       throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed.");
     }
   }
@@ -409,10 +415,10 @@ function hook_field_info_max_weight($entity_type, $bundle, $context, $context_mo
 /**
  * Acts when a field storage definition is being purged.
  *
- * In field_purge_field_storage(), after the storage definition has been removed
- * from the system, the entity storage has purged stored field data, and the
- * field definitions cache has been cleared, this hook is invoked on all modules
- * to allow them to respond to the field storage being purged.
+ * In FieldPurger::purgeFieldStorageDefinition(), after the storage definition
+ * has been removed from the system, the entity storage has purged stored field
+ * data, and the field definitions cache has been cleared, this hook is invoked
+ * on all modules to allow them to respond to the field storage being purged.
  *
  * @param \Drupal\field\Entity\FieldStorageConfig $field_storage
  *   The field storage being purged.
@@ -441,6 +447,10 @@ function hook_field_purge_field(FieldConfig $field) {
 }
 
 /**
+ * @} End of "addtogroup field_purge".
+ */
+
+/**
  * Allows modules to alter the field type category information.
  *
  * This hook provides a way for modules to modify or add to the existing
@@ -464,10 +474,6 @@ function hook_field_type_category_info_alter(array &$categories) {
   // Modify the properties of an existing category.
   $categories['text']['description'] = 'Modified Text';
 }
-
-/**
- * @} End of "addtogroup field_purge".
- */
 
 /**
  * @} End of "addtogroup hooks".

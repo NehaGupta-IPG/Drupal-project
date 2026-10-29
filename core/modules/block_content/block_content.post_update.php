@@ -16,5 +16,7 @@ function block_content_removed_post_updates(): array {
     'block_content_post_update_block_library_view_permission' => '11.0.0',
     'block_content_post_update_sort_permissions' => '11.0.0',
     'block_content_post_update_revision_type' => '11.0.0',
+    'block_content_post_update_remove_block_content_status_info_keys' => '12.0.0',
+    'block_content_post_update_remove_block_content_listing_empty' => '12.0.0',
   ];
 }

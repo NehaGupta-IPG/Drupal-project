@@ -5,9 +5,6 @@ namespace Drupal\Core\Database;
 /**
  * A wrapper class for creating and managing database transactions.
  *
- * To begin a transaction, simply start it. When the object goes out of scope
- * and is destroyed it will automatically commit.
- *
  * In the vast majority of cases, you should not instantiate this class
  * directly. Instead, call ->startTransaction(), from the appropriate connection
  * object.
@@ -24,18 +21,27 @@ class Transaction {
     // Transactions rely on objects being destroyed in order to be committed.
     // PHP makes no guarantee about the order in which objects are destroyed so
     // ensure all transactions are committed on shutdown.
+    // @todo remove in drupal:13.0.0.
+    // @phpstan-ignore staticMethod.deprecated
     Database::commitAllOnShutdown();
   }
 
   /**
    * Destructs the object.
    *
-   * Depending on the nesting level of the object, this leads to a COMMIT (for
-   * a root item) or to a RELEASE SAVEPOINT (for a savepoint item) executed on
-   * the database.
+   * If the transaction is still active at this stage, and depending on the
+   * state of the transaction stack, this leads to a COMMIT (for a root item)
+   * or to a RELEASE SAVEPOINT (for a savepoint item) executed on the database.
    */
   public function __destruct() {
-    $this->connection->transactionManager()->unpile($this->name, $this->id);
+    $this->connection->transactionManager()->purge($this->name, $this->id);
+  }
+
+  /**
+   * Prevent transactions from being unserialized.
+   */
+  public function __wakeup(): void {
+    throw new \BadMethodCallException('Cannot unserialize ' . get_class($this));
   }
 
   /**
@@ -46,16 +52,22 @@ class Transaction {
   }
 
   /**
-   * Rolls back the current transaction.
+   * Returns the transaction to the parent nesting level.
    *
-   * This is just a wrapper method to rollback whatever transaction stack we are
-   * currently in, which is managed by the TransactionManager. Note that logging
-   * needs to happen after a transaction has been rolled back or the log
-   * messages will be rolled back too.
+   * Depending on the state of the transaction stack, this leads to a COMMIT
+   * operation (for a root item), or to a RELEASE SAVEPOINT operation (for a
+   * savepoint item) executed on the database.
+   */
+  public function commitOrRelease(): void {
+    $this->connection->transactionManager()->unpile($this->name, $this->id);
+  }
+
+  /**
+   * Rolls back the transaction.
    *
-   * Depending on the nesting level of the object, this leads to a ROLLBACK (for
-   * a root item) or to a ROLLBACK TO SAVEPOINT (for a savepoint item) executed
-   * on the database.
+   * Depending on the state of the transaction stack, this leads to a ROLLBACK
+   * operation (for a root item), or to a ROLLBACK TO SAVEPOINT + a RELEASE
+   * SAVEPOINT operations (for a savepoint item) executed on the database.
    */
   public function rollBack() {
     $this->connection->transactionManager()->rollback($this->name, $this->id);

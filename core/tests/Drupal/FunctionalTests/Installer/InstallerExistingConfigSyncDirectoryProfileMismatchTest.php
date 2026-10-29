@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -50,7 +53,7 @@ class InstallerExistingConfigSyncDirectoryProfileMismatchTest extends InstallerC
    * Tests that profile mismatch fails to install.
    */
   public function testConfigSync(): void {
-    $this->htmlOutput(NULL);
+    $this->htmlOutput();
     $this->assertSession()->titleEquals('Configuration validation | Drupal');
     $this->assertSession()->pageTextContains('The configuration synchronization failed validation.');
     $this->assertSession()->pageTextContains('The selected installation profile minimal does not match the profile stored in configuration testing_config_install_multilingual.');

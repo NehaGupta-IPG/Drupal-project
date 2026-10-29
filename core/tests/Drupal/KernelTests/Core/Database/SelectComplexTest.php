@@ -9,12 +9,14 @@ use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query builder with more complex queries.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectComplexTest extends DatabaseTestBase {
 
   /**
@@ -172,7 +174,7 @@ class SelectComplexTest extends DatabaseTestBase {
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
     $query->range(0, 2);
-    $query->range(NULL, NULL);
+    $query->range();
     $query_result = $query->countQuery()->execute()->fetchField();
 
     $this->assertEquals(4, $query_result, 'Returned the correct number of rows.');

@@ -4,21 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
+use Drupal\Core\DrupalKernel;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the installer with an existing settings file but no install profile.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingSettingsNoProfileTest extends InstallerTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * {@inheritdoc}
@@ -68,7 +75,7 @@ class InstallerExistingSettingsNoProfileTest extends InstallerTestBase {
   public function testInstaller(): void {
     $this->assertSession()->addressEquals('user/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertEquals('testing', \Drupal::installProfile());
+    $this->assertEquals('testing_locale', \Drupal::installProfile());
   }
 
 }

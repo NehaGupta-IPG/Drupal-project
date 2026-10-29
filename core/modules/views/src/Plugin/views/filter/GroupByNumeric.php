@@ -4,8 +4,6 @@ namespace Drupal\views\Plugin\views\filter;
 
 use Drupal\views\Attribute\ViewsFilter;
 
-// cspell:ignore groupby
-
 /**
  * Simple filter to handle greater than/less than filters.
  *
@@ -38,7 +36,10 @@ class GroupByNumeric extends NumericFilter {
       $this->query->addHavingExpression($this->options['group'], "$field <= $placeholder_max", [$placeholder_max => $this->value['max']]);
     }
     else {
-      $this->query->addHavingExpression($this->options['group'], "$field < $placeholder_min OR $field > $placeholder_max", [$placeholder_min => $this->value['min'], $placeholder_max => $this->value['max']]);
+      $this->query->addHavingExpression($this->options['group'], "$field < $placeholder_min OR $field > $placeholder_max", [
+        $placeholder_min => $this->value['min'],
+        $placeholder_max => $this->value['max'],
+      ]);
     }
   }
 

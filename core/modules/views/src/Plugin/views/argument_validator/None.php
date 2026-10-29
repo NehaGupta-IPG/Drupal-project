@@ -16,6 +16,9 @@ use Drupal\views\Attribute\ViewsArgumentValidator;
 )]
 class None extends ArgumentValidatorPluginBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateArgument($argument) {
     if (!empty($this->argument->options['must_not_be'])) {
       return !isset($argument);
@@ -25,7 +28,7 @@ class None extends ArgumentValidatorPluginBase {
       return FALSE;
     }
 
-    if (!empty($this->argument->definition['numeric']) && !isset($this->argument->options['break_phrase'])) {
+    if (!empty($this->argument->definition['numeric']) && !isset($this->argument->options['break_phrase']) && !is_numeric($argument)) {
       return FALSE;
     }
 

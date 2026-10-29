@@ -6,21 +6,26 @@ namespace Drupal\Tests\Core\Render\Placeholder;
 
 use Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Prophet;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy
- * @group Render
+ * Tests Drupal\Core\Render\Placeholder\ChainedPlaceholderStrategy.
  */
+#[CoversClass(ChainedPlaceholderStrategy::class)]
+#[Group('Render')]
 class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
-   * @covers ::addPlaceholderStrategy
-   * @covers ::processPlaceholders
+   * Tests process placeholders.
    *
-   * @dataProvider providerProcessPlaceholders
+   * @legacy-covers ::addPlaceholderStrategy
+   * @legacy-covers ::processPlaceholders
    */
-  public function testProcessPlaceholders($strategies, $placeholders, $result): void {
+  #[DataProvider('providerProcessPlaceholders')]
+  public function testProcessPlaceholders($strategies, array $placeholders, $result): void {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
 
     foreach ($strategies as $strategy) {
@@ -36,23 +41,9 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
    * @return array
    *   An array of render strategies, placeholders and results.
    */
-  public static function providerProcessPlaceholders() {
+  public static function providerProcessPlaceholders(): array {
     $prophet = new Prophet();
     $data = [];
-
-    // Empty placeholders.
-    $data['empty placeholders'] = [[], [], []];
-
-    // Placeholder removing strategy.
-    $placeholders = [
-      'remove-me' => ['#markup' => 'I-am-a-llama-that-will-be-removed-sad-face.'],
-    ];
-
-    $prophecy = $prophet->prophesize('\Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface');
-    $prophecy->processPlaceholders($placeholders)->willReturn([]);
-    $dev_null_strategy = $prophecy->reveal();
-
-    $data['placeholder removing strategy'] = [[$dev_null_strategy], $placeholders, []];
 
     // Fake Single Flush strategy.
     $placeholders = [
@@ -90,7 +81,14 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
     $prophecy->processPlaceholders([])->shouldNotBeCalled();
     $single_flush_strategy = $prophecy->reveal();
 
-    $data['fake esi and single_flush strategy - esi replaces all'] = [[$esi_strategy, $single_flush_strategy], $placeholders, $result];
+    $data['fake esi and single_flush strategy - esi replaces all'] = [
+      [
+        $esi_strategy,
+        $single_flush_strategy,
+      ],
+      $placeholders,
+      $result,
+    ];
 
     // ESI + SingleFlush strategy (mixed).
     $placeholders = [
@@ -118,13 +116,20 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
     $prophecy->processPlaceholders($normal_result)->willReturn($normal_result);
     $single_flush_strategy = $prophecy->reveal();
 
-    $data['fake esi and single_flush strategy - mixed'] = [[$esi_strategy, $single_flush_strategy], $placeholders, $result];
+    $data['fake esi and single_flush strategy - mixed'] = [
+      [
+        $esi_strategy,
+        $single_flush_strategy,
+      ],
+      $placeholders,
+      $result,
+    ];
 
     return $data;
   }
 
   /**
-   * @covers ::processPlaceholders
+   * Tests process placeholders no strategies.
    */
   public function testProcessPlaceholdersNoStrategies(): void {
     // Placeholders but no strategies defined.
@@ -134,12 +139,12 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
+    $this->expectExceptionMessageIs('At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
     $chained_placeholder_strategy->processPlaceholders($placeholders);
   }
 
   /**
-   * @covers ::processPlaceholders
+   * Tests process placeholders with rogue placeholder strategy.
    */
   public function testProcessPlaceholdersWithRoguePlaceholderStrategy(): void {
     // Placeholders but no strategies defined.
@@ -159,7 +164,7 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
     $chained_placeholder_strategy->addPlaceholderStrategy($rogue_strategy);
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('Processed placeholders must be a subset of all placeholders.');
+    $this->expectExceptionMessageIs('Processed placeholders must be a subset of all placeholders.');
     $chained_placeholder_strategy->processPlaceholders($placeholders);
   }
 

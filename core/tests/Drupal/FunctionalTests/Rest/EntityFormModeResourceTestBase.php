@@ -7,6 +7,9 @@ namespace Drupal\FunctionalTests\Rest;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 
+/**
+ * Resource test base for the entity_form_mode entity.
+ */
 abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
@@ -29,7 +32,7 @@ abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBa
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer display modes']);
   }
 
@@ -40,7 +43,7 @@ abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBa
     $entity_form_mode = EntityFormMode::create([
       'id' => 'user.test',
       'label' => 'Test',
-      'description' => '',
+      'description' => NULL,
       'targetEntityType' => 'user',
     ]);
     $entity_form_mode->save();
@@ -60,7 +63,7 @@ abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBa
       ],
       'id' => 'user.test',
       'label' => 'Test',
-      'description' => '',
+      'description' => NULL,
       'langcode' => 'en',
       'status' => TRUE,
       'targetEntityType' => 'user',

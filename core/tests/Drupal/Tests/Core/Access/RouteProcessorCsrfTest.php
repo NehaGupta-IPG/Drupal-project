@@ -6,28 +6,29 @@ namespace Drupal\Tests\Core\Access;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Access\RouteProcessorCsrf;
+use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Access\RouteProcessorCsrf;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\RouteProcessorCsrf
- * @group Access
+ * Tests Drupal\Core\Access\RouteProcessorCsrf.
  */
+#[CoversClass(RouteProcessorCsrf::class)]
+#[Group('Access')]
 class RouteProcessorCsrfTest extends UnitTestCase {
 
   /**
-   * The mock CSRF token generator.
+   * The mocked request stack.
    */
-  protected CsrfTokenGenerator&MockObject $csrfToken;
-
-  /**
-   * The mock request stack.
-   */
-  protected RequestStack&MockObject $requestStack;
+  protected RequestStack&Stub $requestStack;
 
   /**
    * The route processor.
@@ -40,32 +41,36 @@ class RouteProcessorCsrfTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-      ->disableOriginalConstructor()
-      ->getMock();
-
-    $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
-    $request->expects($this->any())
+    $request = $this->createStub(Request::class);
+    $request
       ->method('getRequestFormat')
       ->willReturn('html');
 
-    $this->requestStack->expects($this->any())
+    $this->requestStack = $this->createStub(RequestStack::class);
+    $this->requestStack
       ->method('getCurrentRequest')
       ->willReturn($request);
 
-    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
+    $this->processor = new RouteProcessorCsrf($this->createStub(CsrfTokenGenerator::class), $this->requestStack);
+
+    // Add a cache_contexts_manager so BubbleableMetadata::addCacheContexts()
+    // can validate the bubbled 'session' context.
+    $cache_contexts_manager = $this->createStub(CacheContextsManager::class);
+    $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
+    $container = new ContainerBuilder();
+    $container->set('cache_contexts_manager', $cache_contexts_manager);
+    \Drupal::setContainer($container);
   }
 
   /**
    * Tests the processOutbound() method with no _csrf_token route requirement.
    */
   public function testProcessOutboundNoRequirement(): void {
-    $this->csrfToken->expects($this->never())
+    // Override the token generator so we can set expectations.
+    $csrfToken = $this->createMock(CsrfTokenGenerator::class);
+    $csrfToken->expects($this->never())
       ->method('get');
+    $this->processor = new RouteProcessorCsrf($csrfToken, $this->requestStack);
 
     $route = new Route('/test-path');
     $parameters = [];
@@ -148,19 +153,20 @@ class RouteProcessorCsrfTest extends UnitTestCase {
     $request->expects($this->once())
       ->method('getRequestFormat')
       ->willReturn('json');
-    $this->requestStack = $this->createMock('Symfony\Component\HttpFoundation\RequestStack');
-    $this->requestStack->expects($this->once())
+    $requestStack = $this->createMock(RequestStack::class);
+    $requestStack->expects($this->once())
       ->method('getCurrentRequest')
       ->willReturn($request);
 
     // Mock that the CSRF token service should be called once with 'test-path'
     // and return a test token.
-    $this->csrfToken->expects($this->any())
+    $csrfToken = $this->createMock(CsrfTokenGenerator::class);
+    $csrfToken->expects($this->atLeastOnce())
       ->method('get')
       ->with('test-path')
       ->willReturn('real_token_value');
 
-    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
+    $this->processor = new RouteProcessorCsrf($csrfToken, $requestStack);
 
     $route = new Route('/test-path', [], ['_csrf_token' => 'TRUE']);
     $parameters = [];
@@ -168,8 +174,12 @@ class RouteProcessorCsrfTest extends UnitTestCase {
     // regardless of whether cache metadata is present.
     $this->processor->processOutbound('test', $route, $parameters);
     $this->assertEquals('real_token_value', $parameters['token']);
-    $this->processor->processOutbound('test', $route, $parameters, new BubbleableMetadata());
+    $bubbleable_metadata = new BubbleableMetadata();
+    $this->processor->processOutbound('test', $route, $parameters, $bubbleable_metadata);
     $this->assertEquals('real_token_value', $parameters['token']);
+    // The session cache context must be bubbled so responses carrying the
+    // URL aren't cached across users sharing other contexts (e.g. role).
+    $this->assertEquals(['session'], $bubbleable_metadata->getCacheContexts());
   }
 
 }

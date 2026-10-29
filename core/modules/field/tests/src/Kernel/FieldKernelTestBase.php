@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -23,6 +22,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
     'user',
     'system',
     'field',
+    'filter',
     'text',
     'entity_test',
     'field_test',
@@ -45,7 +45,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
   protected $fieldTestData;
 
   /**
-   * @var string
+   * The entity ID.
    */
   protected string $entityId;
 
@@ -88,7 +88,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
    *   (optional) The entity type on which the field should be created.
    *   Defaults to the default bundle of the entity type.
    */
-  protected function createFieldWithStorage($suffix = '', $entity_type = 'entity_test', $bundle = NULL) {
+  protected function createFieldWithStorage(string $suffix = '', $entity_type = 'entity_test', $bundle = NULL) {
     if (empty($bundle)) {
       $bundle = $entity_type;
     }
@@ -212,7 +212,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
     $values = $field->getValue();
     $this->assertCount($expected_values_count, $values, 'Expected number of values were saved.');
     foreach ($expected_values as $key => $value) {
-      $this->assertEquals($value, $values[$key][$column], new FormattableMarkup('Value @value was saved correctly.', ['@value' => $value]));
+      $this->assertEquals($value, $values[$key][$column], "Value $value was saved correctly.");
     }
   }
 

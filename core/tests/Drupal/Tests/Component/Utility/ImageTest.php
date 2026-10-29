@@ -5,20 +5,26 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Image;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Utility\Image
- * @group Image
+ * Tests Drupal\Component\Utility\Image.
  */
+#[CoversClass(Image::class)]
+#[Group('Image')]
 class ImageTest extends TestCase {
+
+  use ForwardCompatibilityTrait;
 
   /**
    * Tests all control flow branches in image_dimensions_scale().
-   *
-   * @dataProvider providerTestScaleDimensions
    */
-  public function testScaleDimensions($input, $output): void {
+  #[DataProvider('providerTestScaleDimensions')]
+  public function testScaleDimensions(array $input, array $output): void {
     // Process the test dataset.
     $return_value = Image::scaleDimensions($input['dimensions'], $input['width'], $input['height'], $input['upscale']);
 
@@ -44,7 +50,7 @@ class ImageTest extends TestCase {
    *
    * @see testScaleDimensions()
    */
-  public static function providerTestScaleDimensions() {
+  public static function providerTestScaleDimensions(): array {
     // Define input / output datasets to test different branch conditions.
     $tests = [];
 
@@ -158,19 +164,18 @@ class ImageTest extends TestCase {
   }
 
   /**
-   * @covers ::getKeywordOffset
+   * @legacy-covers ::getKeywordOffset
    */
   public function testInvalidGetKeywordOffset(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid anchor \'foo\' provided to getKeywordOffset()');
+    $this->expectExceptionMessageIs('Invalid anchor \'foo\' provided to getKeywordOffset()');
     Image::getKeywordOffset('foo', 0, 0);
   }
 
   /**
-   * @covers ::getKeywordOffset
-   *
-   * @dataProvider providerTestGetKeywordOffset
+   * Tests get keyword offset.
    */
+  #[DataProvider('providerTestGetKeywordOffset')]
   public function testGetKeywordOffset(array $input, int $expected): void {
     $this->assertSame($expected, Image::getKeywordOffset($input['anchor'], $input['current'], $input['new']));
   }

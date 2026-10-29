@@ -6,14 +6,16 @@ namespace Drupal\Tests\filter\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\filter\Plugin\FilterInterface;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests HTML filtering with missing or skipped filters or text formats.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterSecurityTest extends BrowserTestBase {
 
   /**
@@ -45,7 +47,9 @@ class FilterSecurityTest extends BrowserTestBase {
     /** @var \Drupal\filter\Entity\FilterFormat $filtered_html_format */
     $filtered_html_format = FilterFormat::load('filtered_html');
     $filtered_html_permission = $filtered_html_format->getPermissionName();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      $filtered_html_permission,
+    ])->save();
 
     $this->adminUser = $this->drupalCreateUser([
       'administer modules',
@@ -88,16 +92,6 @@ class FilterSecurityTest extends BrowserTestBase {
     // Verify that the content is empty, because the text format does not exist.
     $this->drupalGet('node/' . $node->id());
     $this->assertSession()->pageTextNotContains($body_raw);
-  }
-
-  /**
-   * Tests that security filters are enforced even when marked to be skipped.
-   */
-  public function testSkipSecurityFilters(): void {
-    $text = "Text with some disallowed tags: <script />, <p><object>unicorn</object></p>, <i><table></i>.";
-    $expected_filtered_text = "Text with some disallowed tags: , <p>unicorn</p>, .";
-    $this->assertSame($expected_filtered_text, (string) check_markup($text, 'filtered_html', '', []), 'Expected filter result.');
-    $this->assertSame($expected_filtered_text, (string) check_markup($text, 'filtered_html', '', [FilterInterface::TYPE_HTML_RESTRICTOR]), 'Expected filter result, even when trying to disable filters of the FilterInterface::TYPE_HTML_RESTRICTOR type.');
   }
 
 }

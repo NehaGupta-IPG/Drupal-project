@@ -6,12 +6,21 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\SandboxDatabaseUpdatesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\StagedDBUpdateValidator
- * @group package_manager
+ * Tests Staged DBUpdate Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(SandboxDatabaseUpdatesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
   /**
@@ -22,7 +31,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
     $this->container->get('theme_installer')->install(['stark']);
     $this->assertFalse($this->container->get('module_handler')->moduleExists('views'));
-    $this->assertFalse($this->container->get('theme_handler')->themeExists('olivero'));
+    $this->assertFalse($this->container->get('theme_handler')->themeExists('test_theme'));
 
     // Ensure that all the extensions we're testing with have database update
     // files in the active directory.
@@ -30,13 +39,13 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
     // System and Stark are installed, so they are used to test what happens
     // when database updates are detected in installed extensions. Views and
-    // Olivero are not installed, so they are used to test what happens when
+    // test_theme are not installed, so they are used to test what happens when
     // non-installed extensions have database updates.
     $extensions = [
       'core/modules/system',
       'core/themes/stark',
       'core/modules/views',
-      'core/themes/olivero',
+      'core/modules/system/tests/themes/test_theme',
     ];
     foreach ($extensions as $extension_path) {
       $extension_path = $active_dir . '/' . $extension_path;
@@ -114,12 +123,12 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         [],
       ],
       'schema update in non-installed theme' => [
-        'core/themes/olivero',
+        'core/modules/system/tests/themes/test_theme',
         'install',
         [],
       ],
       'post-update in non-installed theme' => [
-        'core/themes/olivero',
+        'core/modules/system/tests/themes/test_theme',
         'post_update.php',
         [],
       ],
@@ -137,9 +146,8 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
    *   either `install` or `post_update.php`.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerStagedDatabaseUpdate
    */
+  #[DataProvider('providerStagedDatabaseUpdate')]
   public function testStagedDatabaseUpdate(string $extension_dir, string $file_extension, array $expected_results): void {
     $extension_name = basename($extension_dir);
     $relative_file_path = $extension_dir . '/' . $extension_name . '.' . $file_extension;
@@ -150,7 +158,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
     // detect any changes.
     $this->assertStatusCheckResults([], $stage);
 
-    $staged_update_file = $stage->getStageDirectory() . '/' . $relative_file_path;
+    $staged_update_file = $stage->getSandboxDirectory() . '/' . $relative_file_path;
     $this->assertFileIsWritable($staged_update_file);
 
     // Now add a "real" update function -- either a schema update or a
