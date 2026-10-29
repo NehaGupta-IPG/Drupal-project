@@ -4,6 +4,7 @@ namespace Drupal\taxonomy;
 
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Defines a Controller class for taxonomy terms.
@@ -217,14 +218,40 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
         $query = $this->database->select($this->getDataTable(), 't');
         $query->join('taxonomy_term__parent', 'p', '[t].[tid] = [p].[entity_id]');
         $query->addExpression('[parent_target_id]', 'parent');
-        $result = $query
-          ->addTag('taxonomy_term_access')
-          ->fields('t')
-          ->condition('t.vid', $vid)
-          ->condition('t.default_langcode', 1)
-          ->orderBy('t.weight')
-          ->orderBy('t.name')
-          ->execute();
+        $query->addTag('taxonomy_term_access');
+        $query->fields('t');
+        $query->condition('t.vid', $vid);
+        $query->orderBy('t.weight');
+        $query->orderBy('t.name');
+
+        $is_multilingual = $this->languageManager->isMultilingual();
+        if ($is_multilingual) {
+          $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+
+          // Eliminate doubles by joining the table with the rows having the
+          // current language. This will cause rows without a translation in the
+          // current language having NULL values in the joined columns.
+          $query->leftJoin($this->getDataTable(), 'tl', '[t].[tid] = [tl].[tid] AND [tl].[langcode] = :langcode', [':langcode' => $langcode]);
+
+          // We can then select only the rows having the current language.
+          $or = $query->orConditionGroup();
+          $or->condition('t.langcode', $langcode);
+
+          // Or the rows having the join langcode NULL
+          // and the default_langcode set.
+          $and = $query->andConditionGroup();
+          $and->isNull('tl.langcode');
+          $and->condition('t.default_langcode', 1);
+          $or->condition($and);
+
+          $query->condition($or);
+        }
+        else {
+          $query->condition('t.default_langcode', 1);
+        }
+
+        $result = $query->execute();
+
         foreach ($result as $term) {
           $this->treeChildren[$vid][$term->parent][] = $term->tid;
           $this->treeParents[$vid][$term->tid][] = $term->parent;

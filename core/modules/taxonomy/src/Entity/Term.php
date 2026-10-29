@@ -208,6 +208,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
+      ->setTranslatable(TRUE)
       ->setDescription(t('The weight of this term in relation to other terms.'))
       ->setDefaultValue(0);
 

@@ -147,6 +147,46 @@ class TermTranslationTest extends TaxonomyTestBase {
   }
 
   /**
+   * Tests that weight field is translated and returns content as expected.
+   */
+  public function testTranslatedTermWeight(): void {
+    $this->drupalLogin($this->rootUser);
+
+    $i = 0;
+    foreach ($this->terms as $term) {
+      $term->setWeight($i)->save();
+      $i++;
+    }
+
+    /**
+     * Expected en tree:
+     * term[0] | weight: 0
+     * term[1] | weight: 1
+     * term[2] | weight: 2
+     */
+    $this->drupalGet("/admin/structure/taxonomy/manage/{$this->vocabulary->id()}/overview");
+    foreach ($this->terms as $term) {
+      $this->assertSession()->fieldValueEquals("terms[tid:{$term->id()}:0][weight]", $term->getWeight());
+    }
+
+    /**
+     * Expected hu tree:
+     * term[0] | weight: 2
+     * term[1] | weight: 1
+     * term[2] | weight: 0
+     */
+    $i = 2;
+    foreach ($this->terms as $term) {
+      $term->getTranslation($this->translateToLangcode)->setWeight($i)->save();
+      $i--;
+    }
+    $this->drupalGet("/{$this->translateToLangcode}/admin/structure/taxonomy/manage/{$this->vocabulary->id()}/overview");
+    foreach ($this->terms as $term) {
+      $this->assertSession()->fieldValueEquals("terms[tid:{$term->id()}:0][weight]", $term->getTranslation($this->translateToLangcode)->getWeight());
+    }
+  }
+
+  /**
    * Get the final (leaf) term in the hierarchy.
    *
    * @return \Drupal\taxonomy\Entity\Term

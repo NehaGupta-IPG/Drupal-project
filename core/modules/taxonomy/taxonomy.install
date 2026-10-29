@@ -11,3 +11,22 @@
 function taxonomy_update_last_removed(): int {
   return 10100;
 }
+
+/**
+ * Update term weight field to be translatable.
+ */
+function taxonomy_update_10201(&$sandbox): void {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $definition_update_manager->getEntityType('taxonomy_term');
+
+  // We need to update the field storage definition for the weight field which
+  // we also updated on the Term Entity Class by adding setTranslatable(TRUE).
+  /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $last_installed_schema_repository */
+  $last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
+  $field_storage_definitions = $last_installed_schema_repository->getLastInstalledFieldStorageDefinitions('taxonomy_term');
+  $field_storage_definitions['weight']->setTranslatable(TRUE);
+
+  // And now we can launch the process for updating the entity type and the
+  // database schema, including data migration.
+  $definition_update_manager->updateFieldableEntityType($entity_type, $field_storage_definitions, $sandbox);
+}
