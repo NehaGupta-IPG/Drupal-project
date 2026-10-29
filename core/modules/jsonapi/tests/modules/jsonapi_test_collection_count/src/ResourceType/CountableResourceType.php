@@ -14,7 +14,7 @@ class CountableResourceType extends ResourceType {
   /**
    * {@inheritdoc}
    */
-  public function includeCount() {
+  public function includeCount(): bool {
     return TRUE;
   }
 

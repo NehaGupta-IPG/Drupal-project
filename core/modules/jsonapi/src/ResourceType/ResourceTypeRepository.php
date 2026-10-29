@@ -113,12 +113,14 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     $raw_fields = $this->getAllFieldNames($entity_type, $bundle);
     $internalize_resource_type = $entity_type->isInternal();
     $fields = static::getFields($raw_fields, $entity_type, $bundle);
+    $collection_size_member_name = NULL;
     if (!$internalize_resource_type) {
       $event = ResourceTypeBuildEvent::createFromEntityTypeAndBundle($entity_type, $bundle, $fields);
       $this->eventDispatcher->dispatch($event, ResourceTypeBuildEvents::BUILD);
       $internalize_resource_type = $event->resourceTypeShouldBeDisabled();
       $fields = $event->getFields();
       $type_name = $event->getResourceTypeName();
+      $collection_size_member_name = $event->getCollectionSizeMemberName();
     }
     return new ResourceType(
       $entity_type->id(),
@@ -129,7 +131,8 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       static::isMutableResourceType($entity_type, $bundle),
       static::isVersionableResourceType($entity_type),
       $fields,
-      $type_name
+      $type_name,
+      $collection_size_member_name
     );
   }
 

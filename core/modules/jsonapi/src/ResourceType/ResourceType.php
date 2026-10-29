@@ -103,6 +103,16 @@ class ResourceType {
   protected $fieldMapping;
 
   /**
+   * The name of a `meta` member that holds a collection size.
+   *
+   * Note: in case of `null` the `meta.${collectionSizeMemberName}` will not
+   * be present.
+   *
+   * @var string|null
+   */
+  protected ?string $collectionSizeMemberName;
+
+  /**
    * Gets the entity type ID.
    *
    * @return string
@@ -256,14 +266,24 @@ class ResourceType {
   }
 
   /**
-   * Determine whether to include a collection count.
+   * Returns the name of a `meta` member that holds a collection size.
    *
-   * @return bool
-   *   Whether to include a collection count.
+   * @return string|null
+   *   The name of a `meta` member that holds a collection size or `null`
+   *   if the member should not be present.
    */
-  public function includeCount() {
-    // By default, do not return counts in collection queries.
-    return FALSE;
+  public function getCollectionSizeMemberName(): ?string {
+    if (method_exists($this, 'includeCount')) {
+      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', static::class), E_USER_DEPRECATED);
+
+      // If `includeCount()` returns `true`, the method is overridden and
+      // we must use the former name for the collection size member.
+      if ($this->includeCount()) {
+        return 'count';
+      }
+    }
+
+    return $this->collectionSizeMemberName;
   }
 
   /**
@@ -347,8 +367,13 @@ class ResourceType {
    *   (optional) The resource type fields, keyed by internal field name.
    * @param null|string $type_name
    *   The resource type name.
+   * @param string|null $collection_size_member_name
+   *   (optional) The name of a `meta` member that holds a collection size.
+   *   Use `null` to not include the `meta.${collectionSizeMemberName}` member.
    */
-  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL) {
+  public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL, ?string $collection_size_member_name = NULL) {
+    assert($collection_size_member_name === NULL || trim($collection_size_member_name) !== '');
+
     $this->entityTypeId = $entity_type_id;
     $this->bundle = $bundle;
     $this->deserializationTargetClass = $deserialization_target_class;
@@ -357,6 +382,7 @@ class ResourceType {
     $this->isMutable = $is_mutable;
     $this->isVersionable = $is_versionable;
     $this->fields = $fields;
+    $this->collectionSizeMemberName = $collection_size_member_name;
 
     $this->typeName = $type_name;
     if ($type_name === NULL) {
@@ -441,6 +467,28 @@ class ResourceType {
    */
   public function getPath() {
     return '/' . implode('/', explode(self::TYPE_NAME_URI_PATH_SEPARATOR, $this->typeName));
+  }
+
+  /**
+   * When includeCount is called trigger a deprecation notice.
+   *
+   * @param string $name
+   *   Name of the called method.
+   * @param array $args
+   *   Array of passed arguments.
+   *
+   * @return mixed
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.
+   *
+   * @see https://www.drupal.org/node/3246951
+   */
+  public function __call(string $name, array $args): mixed {
+    if ($name === 'includeCount') {
+      @trigger_error(sprintf('The %s::includeCount() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', static::class), E_USER_DEPRECATED);
+      return FALSE;
+    }
+    throw new \BadMethodCallException("Method $name does not exist");
   }
 
 }

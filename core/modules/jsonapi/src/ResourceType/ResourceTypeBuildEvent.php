@@ -36,6 +36,18 @@ class ResourceTypeBuildEvent extends Event {
   protected $disabled = FALSE;
 
   /**
+   * The name of a `meta` member that holds a collection size.
+   *
+   * Note: in case of `null` the `meta.${collectionSizeMemberName}` will not
+   * be present.
+   *
+   * @var string|null
+   *
+   * @see \Drupal\jsonapi\ResourceType\ResourceType::getCollectionSizeMemberName()
+   */
+  protected $collectionSizeMemberName;
+
+  /**
    * ResourceTypeBuildEvent constructor.
    *
    * This constructor is protected by design. Use
@@ -164,6 +176,28 @@ class ResourceTypeBuildEvent extends Event {
         return;
       }
     }
+  }
+
+  /**
+   * Sets the name of a `meta` member that holds a collection size.
+   *
+   * @param string|null $name
+   *   The name of a `meta` member that holds a collection size.
+   *   Excludes the member in case of `null`.
+   */
+  public function setCollectionSizeMemberName(?string $name = NULL): void {
+    $this->collectionSizeMemberName = $name;
+  }
+
+  /**
+   * Returns the name of a `meta` member that holds a collection size.
+   *
+   * @return string|null
+   *   The name of a `meta` member that holds a collection size or `null`
+   *   if the member should not be present.
+   */
+  public function getCollectionSizeMemberName(): ?string {
+    return $this->collectionSizeMemberName;
   }
 
 }

@@ -25,8 +25,20 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
         ['aliasResourceTypeFields'],
         ['disableResourceTypeFields'],
         ['renameResourceType'],
+        ['setCollectionSizeMemberName'],
       ],
     ];
+  }
+
+  /**
+   * Includes/excludes a collection size member.
+   *
+   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   *   The build event.
+   */
+  public function setCollectionSizeMemberName(ResourceTypeBuildEvent $event): void {
+    $collection_size_member_names = \Drupal::state()->get('jsonapi_test_resource_type_builder.collection_size_member_names', []);
+    $event->setCollectionSizeMemberName($collection_size_member_names[$event->getResourceTypeName()] ?? NULL);
   }
 
   /**

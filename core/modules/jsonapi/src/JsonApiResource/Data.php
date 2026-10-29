@@ -43,6 +43,10 @@ abstract class Data implements \IteratorAggregate, \Countable {
    * Holds the total count of entities.
    *
    * @var int
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement.
+   *
+   * @see https://www.drupal.org/node/3246951
    */
   protected $count;
 
@@ -89,6 +93,8 @@ abstract class Data implements \IteratorAggregate, \Countable {
    * {@inheritdoc}
    */
   public function getTotalCount() {
+    @trigger_error(sprintf('The "%s::getTotalCount()" method is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', self::class), E_USER_DEPRECATED);
+
     return $this->count;
   }
 
@@ -96,6 +102,8 @@ abstract class Data implements \IteratorAggregate, \Countable {
    * {@inheritdoc}
    */
   public function setTotalCount($count) {
+    @trigger_error(sprintf('The "%s::setTotalCount()" method is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ResourceTypeBuildEvent::setCollectionSizeMemberName(\'count\') as a replacement. See https://www.drupal.org/node/3246951', self::class), E_USER_DEPRECATED);
+
     $this->count = $count;
   }
 

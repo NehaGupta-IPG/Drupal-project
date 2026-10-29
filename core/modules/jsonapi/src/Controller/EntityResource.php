@@ -360,21 +360,21 @@ class EntityResource {
     $primary_data->setHasNextPage($has_next_page);
 
     // Calculate all the results and pass into a JSON:API Data object.
-    $count_query_cacheability = new CacheableMetadata();
-    if ($resource_type->includeCount()) {
-      $count_query = $this->getCollectionCountQuery($resource_type, $params, $count_query_cacheability);
-      $total_results = $this->executeQueryInRenderContext(
-        $count_query,
-        $count_query_cacheability
+    $meta = [];
+    $collection_size_query_cacheability = new CacheableMetadata();
+    // The collection size member is enabled so we have to provide the value.
+    if ($collection_size_member_name = $resource_type->getCollectionSizeMemberName()) {
+      // Provide exactly an integer and not a numeric string.
+      $meta[$collection_size_member_name] = (int) $this->executeQueryInRenderContext(
+        $this->getCollectionCountQuery($resource_type, $params, $collection_size_query_cacheability),
+        $collection_size_query_cacheability
       );
-
-      $primary_data->setTotalCount($total_results);
     }
 
-    $response = $this->respondWithCollection($primary_data, $this->getIncludes($request, $primary_data), $request, $resource_type, $params[OffsetPage::KEY_NAME]);
+    $response = $this->respondWithCollection($primary_data, $this->getIncludes($request, $primary_data), $request, $resource_type, $params[OffsetPage::KEY_NAME], $meta);
 
     $response->addCacheableDependency($query_cacheability);
-    $response->addCacheableDependency($count_query_cacheability);
+    $response->addCacheableDependency($collection_size_query_cacheability);
     $response->addCacheableDependency((new CacheableMetadata())
       ->addCacheContexts([
         'url.query_args:filter',
@@ -997,18 +997,19 @@ class EntityResource {
    *   The base JSON:API resource type for the request to be served.
    * @param \Drupal\jsonapi\Query\OffsetPage $page_param
    *   The pagination parameter for the requested collection.
+   * @param array $meta
+   *   (optional) The top-level metadata.
    *
    * @return \Drupal\jsonapi\ResourceResponse
    *   The response.
    */
-  protected function respondWithCollection(ResourceObjectData $primary_data, Data $includes, Request $request, ResourceType $resource_type, OffsetPage $page_param) {
+  protected function respondWithCollection(ResourceObjectData $primary_data, Data $includes, Request $request, ResourceType $resource_type, OffsetPage $page_param, array $meta = []) {
     assert(Inspector::assertAllObjects([$includes], IncludedData::class, NullIncludedData::class));
     $link_context = [
       'has_next_page' => $primary_data->hasNextPage(),
     ];
-    $meta = [];
-    if ($resource_type->includeCount()) {
-      $link_context['total_count'] = $meta['count'] = $primary_data->getTotalCount();
+    if (($collection_size_member_name = $resource_type->getCollectionSizeMemberName()) && isset($meta[$collection_size_member_name])) {
+      $link_context['total_count'] = $meta[$collection_size_member_name];
     }
     $collection_links = self::getPagerLinks($request, $page_param, $link_context);
     $response = $this->buildWrappedResponse($primary_data, $request, $includes, 200, [], $collection_links, $meta);
