@@ -95,6 +95,12 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
           }
         }
       }
+      if ($css_group['type'] === 'inline-file') {
+        // We don't do any aggregation and hence also no caching for
+        // inline-file CSS assets.
+        $uri = $css_group['items'][0]['data'];
+        $css_assets[$order]['data'] = $uri;
+      }
       if ($css_group['type'] === 'external') {
         // We don't do any aggregation and hence also no caching for external
         // CSS assets.
