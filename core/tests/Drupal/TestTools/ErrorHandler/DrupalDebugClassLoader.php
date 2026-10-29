@@ -58,6 +58,10 @@ class DrupalDebugClassLoader extends DebugClassLoader {
       : $class;
 
     foreach ($returnTypes as $method => $returnTypeData) {
+      // Symfony uses NULL to mark template return types.
+      if ($returnTypeData === NULL) {
+        continue;
+      }
       [$normalizedType, , $declaringClass] = $returnTypeData;
 
       // Skip if no cross-extension boundary: empty declaring class (magic
