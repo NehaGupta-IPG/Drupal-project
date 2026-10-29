@@ -114,4 +114,16 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     return $contexts;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    $dependencies = parent::calculateDependencies();
+    if (!empty($this->configuration['theme'])) {
+      $dependencies['theme'][] = $this->configuration['theme'];
+    }
+
+    return $dependencies;
+  }
+
 }

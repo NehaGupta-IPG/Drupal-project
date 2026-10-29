@@ -49,4 +49,27 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertFalse($condition_negated->execute());
   }
 
+  /**
+   * Tests calculating dependencies.
+   */
+  public function testCalculateDependencies(): void {
+    \Drupal::service('theme_installer')->install(['test_theme']);
+    $manager = \Drupal::service('plugin.manager.condition');
+
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition */
+    $condition = $manager->createInstance('current_theme');
+
+    // Verify that no theme dependency is returned when the theme is empty.
+    $condition->setConfiguration(['theme' => '']);
+    $dependencies = $condition->calculateDependencies();
+    $this->assertArrayNotHasKey('theme', $dependencies);
+
+    // Verify that the configured theme is correctly added to the dependencies.
+    $condition->setConfiguration(['theme' => 'test_theme']);
+    $dependencies = $condition->calculateDependencies();
+
+    $this->assertArrayHasKey('theme', $dependencies);
+    $this->assertContains('test_theme', $dependencies['theme']);
+  }
+
 }
