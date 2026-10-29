@@ -30,6 +30,11 @@ abstract class GenericModuleTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $strictConfigSchema = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     $module = $this->getModule();
     static::$modules = array_merge(static::$modules, [$module]);

@@ -26,6 +26,11 @@ class SchemaConfigListenerTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $strictConfigSchema = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
 }

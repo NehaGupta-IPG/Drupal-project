@@ -21,6 +21,11 @@ class StandardTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $strictConfigSchema = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
   protected $profile = 'standard';
 
 }

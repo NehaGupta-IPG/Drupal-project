@@ -68,15 +68,6 @@ trait TestSetupTrait {
   protected $privateFilesDirectory;
 
   /**
-   * Set to TRUE to strict check all configuration saved.
-   *
-   * @var bool
-   *
-   * @see \Drupal\Core\Config\Testing\ConfigSchemaChecker
-   */
-  protected $strictConfigSchema = TRUE;
-
-  /**
    * The DrupalKernel instance used in the test.
    *
    * @var \Drupal\Core\DrupalKernel
