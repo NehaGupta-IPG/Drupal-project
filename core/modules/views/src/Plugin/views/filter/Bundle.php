@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\filter;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -95,6 +96,9 @@ class Bundle extends InOperator {
         $options[$type] = $info['label'];
       }
 
+      // Remove unavailable options.
+      $options = array_diff_key($options, $this->unavailableOptions());
+
       asort($options);
       $this->valueOptions = $options;
     }
@@ -103,9 +107,75 @@ class Bundle extends InOperator {
   }
 
   /**
+   * Get unavailable options depending on the access.
+   *
+   * @return array
+   *   The unavailable options.
+   */
+  protected function unavailableOptions(): array {
+    $types = $this->bundleInfoService->getBundleInfo($this->entityTypeId);
+    $bundle_type = $this->entityType->getBundleEntityType();
+    $should_filter = $bundle_type !== NULL && ($this->isExposed() || !empty($this->options['bundle_access']));
+    $bundle_storage = $should_filter ? $this->entityTypeManager->getStorage($bundle_type) : NULL;
+    $options = [];
+
+    foreach ($types as $type => $info) {
+      if ($should_filter) {
+        $bundle_entity = $bundle_storage->load($type);
+        if (!$bundle_entity || !$bundle_entity->access('view label')) {
+          $options[$type] = $info['label'];
+        }
+      }
+    }
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+    $options['bundle_access'] = ['default' => FALSE];
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+    $form['bundle_access'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Check access'),
+      '#description' => $this->t('If checked, filter and content will take care of bundle access.'),
+      // Safety.
+      '#default_value' => !empty($this->options['bundle_access']),
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function query() {
+    // Ensure we filter on allowed options.
+    // In case of 'not in' operation, not allowed options have to be explicitly
+    // added.
+    if ('not in' === $this->operator) {
+      $unavailableOptionsKey = array_keys($this->unavailableOptions());
+      $unavailableOptions = array_combine($unavailableOptionsKey, $unavailableOptionsKey);
+      $this->value = array_merge($this->value, $unavailableOptions);
+    }
+    // In case of 'in' operation, not allowed options have to be removed.
+    else {
+      // Keep only values of $this->value which are keys in $this->getValueOptions().
+      $options = $this->getValueOptions();
+      $this->value = array_filter($this->value, function($value) use ($options) {
+        return array_key_exists($value, $options);
+      });
+
+    }
+
     // Make sure that the entity base table is in the query.
     $this->ensureMyTable();
     parent::query();
