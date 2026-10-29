@@ -61,12 +61,14 @@ class Radios extends FormElementBase {
     if (count($element['#options']) > 0) {
       $weight = 0;
       $child_attributes = $element['#attributes'];
-      // Prevent child elements from inheriting an aria-describedby attribute.
-      // The individual children won't have descriptions and the attribute will
-      // be invalid.
-      if (isset($child_attributes['aria-describedby'])) {
-        unset($child_attributes['aria-describedby']);
-      }
+      // Prevent child elements from inheriting aria attributes meant for the
+      // parent. The individual children won't have descriptions or error
+      // associations and these attributes would be invalid.
+      unset(
+        $child_attributes['aria-describedby'],
+        $child_attributes['aria-errormessage'],
+        $child_attributes['aria-invalid'],
+      );
       foreach ($element['#options'] as $key => $choice) {
         // Maintain order of options as defined in #options, in case the element
         // defines custom option sub-elements, but does not define all option

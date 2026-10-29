@@ -117,8 +117,15 @@ class FormPreprocess {
     // Pass elements disabled status to template.
     $variables['disabled'] = !empty($element['#attributes']['disabled']) ? $element['#attributes']['disabled'] : NULL;
 
-    // Suppress error messages.
+    // Pass error messages and error ID to the template.
     $variables['errors'] = NULL;
+    $variables['error_id'] = NULL;
+    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+      $variables['errors'] = $element['#errors'];
+      if (!empty($element['#id'])) {
+        $variables['error_id'] = $element['#id'] . '--error-message';
+      }
+    }
 
     // If #title is not set, we don't display any label.
     if (!isset($element['#title'])) {
@@ -331,8 +338,15 @@ class FormPreprocess {
       $variables['attributes']['aria-describedby'] = $description_id;
     }
 
-    // Suppress error messages.
+    // Pass error messages and error ID to the template.
     $variables['errors'] = NULL;
+    $variables['error_id'] = NULL;
+    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
+      $variables['errors'] = $element['#errors'];
+      if (!empty($element['#id'])) {
+        $variables['error_id'] = $element['#id'] . '--error-message';
+      }
+    }
   }
 
   /**
@@ -368,8 +382,15 @@ class FormPreprocess {
     $variables['value'] = (isset($element['#value'])) ? $element['#value'] : '';
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
 
-    // Suppress error messages.
+    // Pass error messages and error ID to the template.
     $variables['errors'] = NULL;
+    $variables['error_id'] = NULL;
+    if (!empty($element['#errors'])) {
+      $variables['errors'] = $element['#errors'];
+      if (!empty($element['#id'])) {
+        $variables['error_id'] = $element['#id'] . '--error-message';
+      }
+    }
   }
 
   /**

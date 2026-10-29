@@ -216,6 +216,7 @@ class FormTest extends BrowserTestBase {
     $edit = [];
     $this->drupalGet('form-test/validate-required');
     $this->submitForm($edit, 'Submit');
+    $session = $this->assertSession();
 
     // The only error messages that should appear are the relevant 'required'
     // messages for each field.
@@ -230,38 +231,54 @@ class FormTest extends BrowserTestBase {
       else {
         $expected[] = $form[$key]['#title'] . ' field is required.';
       }
+      // Ensure errors are wrapped with an ID that can be referenced by aria-errormessages
+      $error_id = $form[$key]['#id'] . '--error-message';
+      $session->elementExists('css', '.messages--error #' . $error_id);
+      // Make sure form element references error. For composite elements
+      // (checkboxes, radios), aria-errormessage is on the fieldset wrapper,
+      // not on individual child inputs.
+      $type = match ($form[$key]['#type']) {
+        'textfield' => 'input',
+        'checkboxes', 'radios' => 'fieldset',
+        'select' => 'select',
+      };
+      $session->elementExists('css', $type . '[aria-errormessage=' . $error_id . ']');
     }
 
     // Check the page for error messages.
     $errors = $this->getNodeElementsByXpath('//div[contains(@class, "error")]//li');
     foreach ($errors as $error) {
+      $this->assertContains($error->getText(), array_map(fn($n) => (string) $n, $expected));
       $expected_key = array_search($error->getText(), $expected);
-      // If the error message is not one of the expected messages, fail.
-      if ($expected_key === FALSE) {
-        $this->fail("Unexpected error message: " . $error[0]);
-      }
-      // Remove the expected message from the list once it is found.
-      else {
-        unset($expected[$expected_key]);
-      }
+      unset($expected[$expected_key]);
     }
 
     // Fail if any expected messages were not found.
-    foreach ($expected as $not_found) {
-      $this->fail("Found error message: " . $not_found);
-    }
+    $this->assertEmpty($expected, 'Found unexpected error messages');
 
     // Verify that input elements are still empty.
-    $this->assertSession()->fieldValueEquals('textfield', '');
-    $this->assertSession()->checkboxNotChecked('edit-checkboxes-foo');
-    $this->assertSession()->checkboxNotChecked('edit-checkboxes-bar');
-    $this->assertTrue($this->assertSession()->optionExists('edit-select', '')->isSelected());
-    $this->assertSession()->checkboxNotChecked('edit-radios-foo');
-    $this->assertSession()->checkboxNotChecked('edit-radios-bar');
-    $this->assertSession()->checkboxNotChecked('edit-radios-optional-foo');
-    $this->assertSession()->checkboxNotChecked('edit-radios-optional-bar');
-    $this->assertSession()->checkboxNotChecked('edit-radios-optional-default-value-false-foo');
-    $this->assertSession()->checkboxNotChecked('edit-radios-optional-default-value-false-bar');
+    $session->fieldValueEquals('textfield', '');
+    $session->checkboxNotChecked('edit-checkboxes-foo');
+    $session->checkboxNotChecked('edit-checkboxes-bar');
+    $this->assertTrue($session->optionExists('edit-select', '')->isSelected());
+    $session->checkboxNotChecked('edit-radios-foo');
+    $session->checkboxNotChecked('edit-radios-bar');
+    $session->checkboxNotChecked('edit-radios-optional-foo');
+    $session->checkboxNotChecked('edit-radios-optional-bar');
+    $session->checkboxNotChecked('edit-radios-optional-default-value-false-foo');
+    $session->checkboxNotChecked('edit-radios-optional-default-value-false-bar');
+
+    // Verify that aria-errormessage and aria-describedby are set on the
+    // textfield element (simple input).
+    $this->assertSession()->elementExists('xpath', '//input[@name="textfield" and @aria-errormessage="edit-textfield--error-message"]');
+    $this->assertSession()->elementExists('xpath', '//input[@name="textfield" and contains(@aria-describedby, "edit-textfield--error-message")]');
+
+    // Verify that individual radio and checkbox child elements do NOT inherit
+    // aria-errormessage or aria-invalid from the parent composite element.
+    $this->assertSession()->elementsCount('xpath', '//input[@type="radio" and @aria-errormessage]', 0);
+    $this->assertSession()->elementsCount('xpath', '//input[@type="radio" and @aria-invalid]', 0);
+    $this->assertSession()->elementsCount('xpath', '//input[@type="checkbox" and @aria-errormessage]', 0);
+    $this->assertSession()->elementsCount('xpath', '//input[@type="checkbox" and @aria-invalid]', 0);
 
     // Submit again with required fields set and verify that there are no
     // error messages.
@@ -402,6 +419,22 @@ class FormTest extends BrowserTestBase {
     // Check the page for the aria-invalid attribute on the textfield.
     $this->assertSession()->elementExists('xpath', '//input[contains(@aria-invalid, "true")]');
 
+    // Check that aria-errormessage points to the error message container.
+    $this->assertSession()->elementExists('xpath', '//input[@aria-errormessage="edit-textfield--error-message"]');
+
+    // Check that aria-describedby also references the error message container
+    // for broader assistive technology support.
+    $this->assertSession()->elementExists('xpath', '//input[contains(@aria-describedby, "edit-textfield--error-message")]');
+
+    // Verify that the error ID is not duplicated in aria-describedby.
+    $input = $this->assertSession()->elementExists('xpath', '//input[@aria-errormessage="edit-textfield--error-message"]');
+    $describedby = $input->getAttribute('aria-describedby');
+    $this->assertSame(1, substr_count($describedby, 'edit-textfield--error-message'), 'aria-describedby should reference the error ID exactly once.');
+
+    // Verify that the error message container in the status messages has the
+    // matching ID.
+    $this->assertSession()->elementExists('xpath', '//div[@id="edit-textfield--error-message"]');
+
     // Submit again with required fields set and verify that there are no
     // error messages.
     $edit = [
@@ -410,6 +443,9 @@ class FormTest extends BrowserTestBase {
     $this->submitForm($edit, 'Submit');
     // Verify that no error input form element class is present.
     $this->assertSession()->elementNotExists('xpath', '//input[contains(@class, "error")]');
+    // Verify that aria error attributes are not present on valid submission.
+    $this->assertSession()->elementNotExists('xpath', '//input[@aria-errormessage]');
+    $this->assertSession()->elementNotExists('xpath', '//input[@aria-invalid]');
     $this->assertSession()->pageTextContains("The form_test_validate_required_form_no_title form was submitted successfully.");
   }
 

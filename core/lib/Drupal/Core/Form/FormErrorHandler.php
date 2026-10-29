@@ -5,6 +5,7 @@ namespace Drupal\Core\Form;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\RendererInterface;
 
 /**
  * Handles form errors.
@@ -12,6 +13,23 @@ use Drupal\Core\Render\Element;
 class FormErrorHandler implements FormErrorHandlerInterface {
 
   use MessengerTrait;
+
+  /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Constructs a FormErrorHandler instance.
+   *
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   */
+  public function __construct(RendererInterface $renderer) {
+    $this->renderer = $renderer;
+  }
 
   /**
    * {@inheritdoc}
@@ -39,10 +57,27 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    */
   protected function displayErrorMessages(array $form, FormStateInterface $form_state) {
     $errors = $form_state->getErrors();
-
-    // Loop through all form errors and set an error message.
-    foreach ($errors as $error) {
-      $this->messenger()->addMessage($error, 'error');
+    // Loop through all form errors and sets an ID & error messages.
+    foreach ($errors as $name => $error) {
+      $form_element = FormElementHelper::getElementByName($name, $form);
+      $error_id = $form_element['#error_id'] ?? (isset($form_element['#id']) ? $form_element['#id'] . '--error-message' : NULL);
+      if ($error_id) {
+        // Render the error messages as HTML.
+        $message = [
+          '#type' => 'container',
+          '#attributes' => [
+            'id' => $error_id,
+          ],
+          'message' => [
+            '#markup' => $error,
+          ],
+        ];
+        $message = $this->renderer->renderInIsolation($message);
+        $this->messenger()->addMessage($message, 'error');
+      }
+      else {
+        $this->messenger()->addMessage($error, 'error');
+      }
     }
   }
 
@@ -164,6 +199,21 @@ class FormErrorHandler implements FormErrorHandlerInterface {
 
     // Store the errors for this element on the element directly.
     $elements['#errors'] = $form_state->getError($elements);
+
+    // Add aria-errormessage and aria-describedby attributes to the
+    // form element.
+    if (($elements['#errors']) !== NULL) {
+      $error_id = $elements['#error_id'] ?? ($elements['#id'] . '--error-message');
+      $elements['#attributes']['aria-errormessage'] = $error_id;
+      $elements['#attributes']['aria-invalid'] = TRUE;
+      // Also add to aria-describedby for broader assistive technology support,
+      // since aria-errormessage is not yet supported by all AT/browser
+      // combinations (e.g. VoiceOver+Safari, TalkBack).
+      $existing = $elements['#attributes']['aria-describedby'] ?? '';
+      if (!str_contains($existing, $error_id)) {
+        $elements['#attributes']['aria-describedby'] = trim($existing . ' ' . $error_id);
+      }
+    }
   }
 
 }

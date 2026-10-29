@@ -145,9 +145,14 @@ class ElementTest extends BrowserTestBase {
   protected function testChildAttributes(): void {
     $this->drupalGet('form-test/checkboxes-radios');
 
-    // Verify that the child elements don't have aria-describedby attributes.
+    // Verify that the child elements don't have aria-describedby,
+    // aria-errormessage, or aria-invalid attributes inherited from the parent.
     $this->assertSession()->elementsCount('xpath', "//input[@type='checkbox' and @aria-describedby]", 0);
     $this->assertSession()->elementsCount('xpath', "//input[@type='radio' and @aria-describedby]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='checkbox' and @aria-errormessage]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='radio' and @aria-errormessage]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='checkbox' and @aria-invalid]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='radio' and @aria-invalid]", 0);
   }
 
   /**

@@ -561,6 +561,7 @@ services:
   Drupal\Core\Form\FormSubmitterInterface: '@form_submitter'
   form_error_handler:
     class: Drupal\Core\Form\FormErrorHandler
+    arguments: ['@renderer']
   Drupal\Core\Form\FormErrorHandlerInterface: '@form_error_handler'
   form_cache:
     class: Drupal\Core\Form\FormCache

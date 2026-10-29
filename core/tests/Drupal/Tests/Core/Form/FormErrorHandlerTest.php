@@ -8,7 +8,9 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
+use Prophecy\Argument;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -30,6 +32,13 @@ class FormErrorHandlerTest extends UnitTestCase {
   protected MessengerInterface $messenger;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface|\Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -40,7 +49,8 @@ class FormErrorHandlerTest extends UnitTestCase {
     $container->set('messenger', $this->messenger);
     \Drupal::setContainer($container);
 
-    $this->formErrorHandler = new FormErrorHandler();
+    $this->renderer = $this->prophesize(RendererInterface::class);
+    $this->formErrorHandler = new FormErrorHandler($this->renderer->reveal());
   }
 
   /**
@@ -79,6 +89,9 @@ class FormErrorHandlerTest extends UnitTestCase {
         }),
         'error',
       );
+
+    $this->renderer->renderInIsolation(Argument::any())
+      ->will(fn(array $args) => $args[0]['message']['#markup']);
 
     $form = [
       '#parents' => [],
@@ -217,6 +230,20 @@ class FormErrorHandlerTest extends UnitTestCase {
     $form_state->setErrorByName('fieldset][nested_test2', 'invalid2');
     $this->formErrorHandler->handleFormErrors($form, $form_state);
     $this->assertSame('invalid', $form['test']['#errors']);
+
+    // Verify that aria-errormessage and aria-invalid are set on errored
+    // elements.
+    $this->assertSame('edit-test--error-message', $form['test']['#attributes']['aria-errormessage']);
+    $this->assertTrue($form['test']['#attributes']['aria-invalid']);
+
+    // Verify that aria-describedby also references the error message for
+    // broader assistive technology support.
+    $this->assertStringContainsString('edit-test--error-message', $form['test']['#attributes']['aria-describedby']);
+
+    // Verify that nested element errors also get aria attributes.
+    $this->assertSame('edit-nested_test--error-message', $form['fieldset']['nested_test']['#attributes']['aria-errormessage']);
+    $this->assertStringContainsString('edit-nested_test--error-message', $form['fieldset']['nested_test']['#attributes']['aria-describedby']);
+
     $this->assertSame([
       'grouping_test' => 'invalid',
       'grouping_test2' => 'invalid',
