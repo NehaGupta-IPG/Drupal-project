@@ -1881,8 +1881,22 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           if ($field_name == $updated_field_name) {
             $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
 
+            // Add any columns that do not yet exist on this table. This
+            // happens when a field becomes revisionable on an entity type
+            // that is already revisionable: its columns must exist on the
+            // revision table before any index referencing them is added.
+            foreach ($schema[$table_name]['fields'] as $column_name => $specifier) {
+              if (!$schema_handler->fieldExists($table_name, $column_name)) {
+                $schema_handler->addField($table_name, $column_name, $specifier);
+              }
+            }
+
             // Handle NOT NULL constraints.
             foreach ($schema[$table_name]['fields'] as $column_name => $specifier) {
+              if (!isset($original_schema[$table_name]['fields'][$column_name])) {
+                // Column was just added above with its final definition.
+                continue;
+              }
               $not_null = !empty($specifier['not null']);
               $original_not_null = !empty($original_schema[$table_name]['fields'][$column_name]['not null']);
               if ($not_null !== $original_not_null) {
