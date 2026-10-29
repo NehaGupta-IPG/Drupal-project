@@ -55,6 +55,7 @@ use Symfony\Component\Mime\Email;
 #[Mail(
   id: 'symfony_mailer',
   label: new TranslatableMarkup('Symfony mailer (Experimental)'),
+  description: new TranslatableMarkup('Sends the message, using Symfony mailer.'),
 )]
 class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
 
