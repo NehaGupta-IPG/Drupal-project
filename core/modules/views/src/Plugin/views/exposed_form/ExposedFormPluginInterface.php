@@ -146,6 +146,13 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    */
   public function exposedFormSubmit(&$form, FormStateInterface $form_state, &$exclude);
 
+  /**
+   * Determines whether input in this form is required or not.
+   *
+   * @return bool
+   */
+  public function isInputRequired(): bool;
+
 }
 
 /**

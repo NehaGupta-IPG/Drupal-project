@@ -391,4 +391,11 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isInputRequired(): bool {
+    return FALSE;
+  }
+
 }

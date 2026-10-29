@@ -394,6 +394,11 @@ class ExposedFormTest extends ViewTestBase {
     $display['display_options']['exposed_form']['options']['text_input_required_format'] = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
     $view->save();
 
+    // Test isInputRequired().
+    $this->executeView($view);
+    $exposed_form = $view->display_handler->getPlugin('exposed_form');
+    $this->assertTrue($exposed_form->isInputRequired());
+
     // Ensure that the "on demand text" is displayed when no exposed filters are
     // applied.
     $this->drupalGet('test_exposed_form_buttons');
