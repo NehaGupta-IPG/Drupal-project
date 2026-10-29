@@ -493,9 +493,9 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
   /**
    * Tests changing the indexes of a dedicated table field that has data.
    */
-  #[TestWith(['entity_test'])]
-  #[TestWith(['entity_test_rev'])]
-  public function testUpdateIndexesWithData(string $entity_type_id): void {
+  #[TestWith(['entity_test', 1])]
+  #[TestWith(['entity_test_rev', 2])]
+  public function testUpdateIndexesWithData(string $entity_type_id, int $table_count): void {
     $this->installEntitySchema('entity_test_rev');
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_update_indexes',
@@ -518,9 +518,13 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     if ($storage->getEntityType()->isRevisionable()) {
       $tables[] = $table_mapping->getDedicatedRevisionTableName($field_storage);
     }
+    $this->assertCount($table_count, $tables);
     $schema = \Drupal::database()->schema();
+    foreach ($tables as $table) {
+      $this->assertFalse($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
 
-    $field_storage->setIndexes(['value' => ['value'], 'value_2' => ['value']])->save();
+    $field_storage->setIndexes(['value' => ['value'], 'value_2' => ['value', 'entity_id']])->save();
     foreach ($tables as $table) {
       $this->assertTrue($schema->indexExists($table, 'field_update_indexes_value_2'));
     }
