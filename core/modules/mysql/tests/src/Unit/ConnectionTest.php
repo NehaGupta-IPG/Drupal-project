@@ -10,7 +10,9 @@ use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+
+// cspell:ignore djarin grogu kuiil bokatan moff
 
 /**
  * Tests MySQL database connections.
@@ -22,17 +24,20 @@ class ConnectionTest extends UnitTestCase {
   /**
    * A mocked MySql connection.
    */
-  private Connection&MockObject $connection;
+  private Connection&Stub $connection;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = $this->getMockBuilder(Connection::class)
-      ->setConstructorArgs([$this->createStub(Mysql::class), []])
+    $this->connection = $this->getStubBuilder(Connection::class)
+      ->setConstructorArgs([
+        $this->createStub(Mysql::class),
+        ['driver' => 'mysql', 'database' => 'test'],
+      ])
       ->onlyMethods(['getServerVersion'])
-      ->getMock();
+      ->getStub();
   }
 
   /**
@@ -43,12 +48,20 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerVersionAndIsMariaDb')]
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {
-    $this->connection->expects($this->atLeastOnce())
+    $connection = $this->getMockBuilder(Connection::class)
+      ->setConstructorArgs([
+        $this->createStub(Mysql::class),
+        ['driver' => 'mysql', 'database' => 'foo'],
+      ])
+      ->onlyMethods(['getServerVersion'])
+      ->getMock();
+
+    $connection->expects($this->atLeastOnce())
       ->method('getServerVersion')
       ->willReturn($server_version);
 
-    $is_mariadb = $this->connection->isMariaDb();
-    $version = $this->connection->version();
+    $is_mariadb = $connection->isMariaDb();
+    $version = $connection->version();
 
     $this->assertSame($expected_is_mariadb, $is_mariadb);
     $this->assertSame($expected_version, $version);
@@ -120,6 +133,109 @@ class ConnectionTest extends UnitTestCase {
         '5.7.28-31',
       ],
     ];
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $mysql_connection = new Connection(
+      $this->createStub(Mysql::class),
+      [
+        'driver' => 'mysql',
+        'database' => 'kaboom',
+        'foo' => 'bar',
+        'din' => [
+          'djarin',
+          'grogu',
+        ],
+      ],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
+
+    // ConnectionParameters is a value object, and should not be modifiable
+    // with array access.
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    try {
+      $mysql_connection->getConnectionOptions()['database'] = 'qux';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertMatchesRegularExpression('/^Drupal\\\\Core\\\\Database\\\\ConnectionParametersBase.* is a value objects, writing to \'database\' is forbidden/', $e->getMessage());
+    }
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    try {
+      unset($mysql_connection->getConnectionOptions()['database']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertMatchesRegularExpression('/^Drupal\\\\Core\\\\Database\\\\ConnectionParametersBase.* is a value objects, unsetting \'database\' is forbidden/', $e->getMessage());
+    }
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+
+    // ConnectionParameters is a value object, reading/writing to non-existing
+    // variables should fail.
+    try {
+      $this->assertEquals('warp', $mysql_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      $mysql_connection->getConnectionOptions()['time'] = 'warp';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      unset($mysql_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+  }
+
+  /**
+   * Confirms cloning of ConnectionParameters.
+   */
+  public function testConnectionParametersCloning(): void {
+    $mysql_connection = new Connection(
+      $this->createStub(Mysql::class),
+      [
+        'driver' => 'mysql',
+        'database' => 'kaboom',
+        'foo' => 'bar',
+        'din' => [
+          'djarin',
+          'grogu',
+        ],
+      ],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
+
+    $newParameters = $mysql_connection->getConnectionOptions()->with([
+      'database' => 'bokatan',
+      'foo' => 'moff',
+      'qux' => ['boba'],
+    ]);
+    $this->assertEquals('mysql', $newParameters->driver);
+    $this->assertEquals('bokatan', $newParameters->database);
+    $this->assertEquals('moff', $newParameters->foo);
+    $this->assertEquals(['djarin', 'grogu'], $newParameters->din);
+    $this->assertEquals(['boba'], $newParameters->qux);
   }
 
 }

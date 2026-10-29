@@ -23,6 +23,9 @@ use Drupal\Core\Pager\PagerManagerInterface;
  * of it to support special handling required by that database.
  * The most common database abstraction layer in PHP is PDO.
  *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type ConnectionInfoBaseArray from \Drupal\Core\Database\Database
+ *
  * @see http://php.net/manual/book.pdo.php
  */
 abstract class Connection {
@@ -87,9 +90,10 @@ abstract class Connection {
   /**
    * The connection information for this connection object.
    *
-   * @var array
+   * @todo remove the array type once all drivers have moved to OO
+   *   ConnectionParameters.
    */
-  protected $connectionOptions = [];
+  protected ConnectionParametersInterface|array $connectionOptions;
 
   /**
    * The schema object for this connection.
@@ -170,25 +174,26 @@ abstract class Connection {
    *
    * @param object $connection
    *   An object of the client class representing a database connection.
-   * @param array $connection_options
-   *   An array of options for the connection. May include the following:
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoBaseArray $connection_options
+   *   The database connection settings. May include the following:
    *   - prefix
    *   - namespace
    *   - Other driver-specific options.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
-  public function __construct(object $connection, array $connection_options) {
+  public function __construct(object $connection, ConnectionParametersInterface|array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
-    // Manage the table prefix.
-    $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
-
-    // Work out the database driver namespace if none is provided. This normally
-    // written to setting.php by installer or set by
-    // \Drupal\Core\Database\Database::parseConnectionInfo().
-    if (empty($connection_options['namespace'])) {
-      $connection_options['namespace'] = (new \ReflectionObject($this))->getNamespaceName();
+    if (is_array($connection_options)) {
+      /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options */
+      // @phpstan-ignore argument.type
+      $connection_options = ConnectionParametersFactory::createFromOptionsArray($connection_options);
     }
+
+    // Manage the table prefix.
+    $this->setPrefix($connection_options->prefix);
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
@@ -197,13 +202,32 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param array $connection_options
-   *   The database connection settings array.
+   * @param ConnectionInfoBaseArray $connection_options
+   *   The database connection settings.
    *
    * @return object
    *   A client connection object.
    */
   abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
+
+  /**
+   * Opens a client connection.
+   *
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connectionParameters
+   *   The database connection settings.
+   *
+   * @return object
+   *   A client connection object.
+   *
+   * @todo in drupal:13.0.0, remove the PHPCS toggles and uncomment the new
+   *   method. Drivers that migrate to use ConnectionParameters for
+   *   establishing the database connection must implement it.
+   *
+   * @see \Drupal\sqlite\Driver\Database\sqlite\Connection::openWithParameters()
+   */
+  // phpcs:disable
+  // abstract public static function openWithParameters(ConnectionParametersInterface $connectionParameters): object;
+  // phpcs:enable
 
   /**
    * Ensures that the client connection can be garbage collected.
@@ -1370,45 +1394,15 @@ abstract class Connection {
    *   \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo().
    *
    * @see \Drupal\Core\Database\Database::convertDbUrlToConnectionInfo()
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ConnectionParametersFactory::createFromUrl() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   public static function createConnectionOptionsFromUrl($url) {
-    $url_components = parse_url($url);
-    if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
-      throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
-    }
-
-    $url_components += [
-      'user' => '',
-      'pass' => '',
-      'fragment' => '',
-    ];
-
-    // Remove leading slash from the URL path.
-    if ($url_components['path'][0] === '/') {
-      $url_components['path'] = substr($url_components['path'], 1);
-    }
-
-    // Use reflection to get the namespace of the class being called.
-    $reflector = new \ReflectionClass(static::class);
-
-    $database = [
-      'driver' => $url_components['scheme'],
-      'username' => $url_components['user'],
-      'password' => $url_components['pass'],
-      'host' => $url_components['host'],
-      'database' => $url_components['path'],
-      'namespace' => $reflector->getNamespaceName(),
-    ];
-
-    if (isset($url_components['port'])) {
-      $database['port'] = $url_components['port'];
-    }
-
-    if (!empty($url_components['fragment'])) {
-      $database['prefix'] = $url_components['fragment'];
-    }
-
-    return $database;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromUrl($url)->toArray();
   }
 
   /**
@@ -1431,41 +1425,15 @@ abstract class Connection {
    *   \Drupal\Core\Database\Database::getConnectionInfoAsUrl().
    *
    * @see \Drupal\Core\Database\Database::getConnectionInfoAsUrl()
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ConnectionParametersFactory::asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
-    if (!isset($connection_options['driver'], $connection_options['database'])) {
-      throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
-    }
-
-    $user = '';
-    if (isset($connection_options['username'])) {
-      $user = $connection_options['username'];
-      if (isset($connection_options['password'])) {
-        $user .= ':' . $connection_options['password'];
-      }
-      $user .= '@';
-    }
-
-    $host = empty($connection_options['host']) ? 'localhost' : $connection_options['host'];
-
-    $db_url = $connection_options['driver'] . '://' . $user . $host;
-
-    if (isset($connection_options['port'])) {
-      $db_url .= ':' . $connection_options['port'];
-    }
-
-    $db_url .= '/' . $connection_options['database'];
-
-    // Add the module when the driver is provided by a module.
-    if (isset($connection_options['module'])) {
-      $db_url .= '?module=' . $connection_options['module'];
-    }
-
-    if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
-      $db_url .= '#' . $connection_options['prefix'];
-    }
-
-    return $db_url;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromOptionsArray($connection_options)->asUrl();
   }
 
   /**

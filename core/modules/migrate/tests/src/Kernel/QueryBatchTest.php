@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\TestTools\Random;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests query batching.
  */
 #[Group('migrate')]
-#[CoversClass(\Drupal\migrate_query_batch_test\Plugin\migrate\source\QueryBatchTest::class)]
 #[RunTestsInSeparateProcesses]
 class QueryBatchTest extends KernelTestBase {
 
@@ -237,9 +236,11 @@ class QueryBatchTest extends KernelTestBase {
     // Create an in-memory SQLite database. Plugins can interact with it like
     // any other database, and it will cease to exist when the connection is
     // closed.
-    $connection_options = ['database' => ':memory:'];
-    $pdo = Connection::open($connection_options);
-    $connection = new Connection($pdo, $connection_options);
+    Database::addConnectionInfo('migrate-query-batch', 'default', [
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+    ]);
+    $connection = Database::getConnection('default', 'migrate-query-batch');
 
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {

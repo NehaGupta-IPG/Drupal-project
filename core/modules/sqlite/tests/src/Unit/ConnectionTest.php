@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sqlite\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore sanday westray
+
 /**
  * Tests Drupal\sqlite\Driver\Database\sqlite\Connection.
+ *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 #[CoversClass(Connection::class)]
 #[Group('Database')]
@@ -24,14 +30,18 @@ class ConnectionTest extends UnitTestCase {
    * @param string $url
    *   SQLite URL.
    * @param string $expected
-   *   Expected connection option.
+   *   Expected database name.
+   * @param string $expected_prefix
+   *   Expected database table prefix.
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
-  public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), []);
-    $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
-    $this->assertEquals('sqlite', $database['driver']);
-    $this->assertEquals($expected, $database['database']);
+  public function testCreateConnectionOptionsFromUrl(string $url, string $expected, string $expected_prefix): void {
+    $parameters = ConnectionParametersFactory::createFromUrl($url);
+    $this->assertInstanceOf(ConnectionParameters::class, $parameters);
+    $this->assertEquals('sqlite', $parameters->driver);
+    $this->assertEquals('sqlite', $parameters->module);
+    $this->assertEquals($expected, $parameters->database);
+    $this->assertEquals($expected_prefix, $parameters->prefix);
   }
 
   /**
@@ -40,14 +50,127 @@ class ConnectionTest extends UnitTestCase {
    * @return string[][]
    *   Associative array of arrays with the following elements:
    *   - SQLite database URL
-   *   - Expected database connection option
+   *   - Expected database name
+   *   - Expected database table prefix
    */
   public static function providerCreateConnectionOptionsFromUrl(): array {
     return [
-      'sqlite relative path' => ['sqlite://localhost/tmp/test', 'tmp/test'],
-      'sqlite absolute path' => ['sqlite://localhost//tmp/test', '/tmp/test'],
-      'in memory sqlite path' => ['sqlite://localhost/:memory:', ':memory:'],
+      'sqlite relative path' => ['sqlite://localhost/tmp/test', 'tmp/test', ''],
+      'sqlite absolute path' => ['sqlite://localhost//tmp/test', '/tmp/test', ''],
+      'in memory sqlite path' => ['sqlite://localhost/:memory:', ':memory:', ''],
+      'sqlite relative path with module' => ['sqlite://localhost/tmp/test?module=sqlite', 'tmp/test', ''],
+      'sqlite absolute path with module' => ['sqlite://localhost//tmp/test?module=sqlite', '/tmp/test', ''],
+      'in memory sqlite path with module' => ['sqlite://localhost/:memory:?module=sqlite', ':memory:', ''],
+      'sqlite relative path with prefix' => ['sqlite://localhost/tmp/test#bar', 'tmp/test', 'bar'],
+      'sqlite absolute path with prefix' => ['sqlite://localhost//tmp/test#bar', '/tmp/test', 'bar'],
+      'in memory sqlite path with prefix' => ['sqlite://localhost/:memory:#bar', ':memory:', 'bar'],
+      'sqlite relative path with module and prefix' => [
+        'sqlite://localhost/tmp/test?module=sqlite#foo',
+        'tmp/test',
+        'foo',
+      ],
+      'sqlite absolute path with module and prefix' => [
+        'sqlite://localhost//tmp/test?module=sqlite#foo',
+        '/tmp/test',
+        'foo',
+      ],
+      'in memory sqlite path with module and prefix' => [
+        'sqlite://localhost/:memory:?module=sqlite#foo',
+        ':memory:',
+        'foo',
+      ],
     ];
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()->driver);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()->database);
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()['database']);
+
+    // ConnectionParameters is a value object, and should not be modifiable
+    // with array access.
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+    try {
+      $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertEquals('Drupal\\sqlite\\Driver\\Database\\sqlite\\ConnectionParameters is a value objects, writing to \'foo\' is forbidden', $e->getMessage());
+    }
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+    try {
+      unset($sqlite_connection->getConnectionOptions()['foo']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\LogicException $e) {
+      $this->assertEquals('Drupal\\sqlite\\Driver\\Database\\sqlite\\ConnectionParameters is a value objects, unsetting \'foo\' is forbidden', $e->getMessage());
+    }
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+
+    // ConnectionParameters is a value object, reading/writing to non-existing
+    // variables should fail.
+    try {
+      $this->assertEquals('warp', $sqlite_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      $sqlite_connection->getConnectionOptions()['time'] = 'warp';
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+    try {
+      unset($sqlite_connection->getConnectionOptions()['time']);
+      $this->fail('Expected exception was not thrown');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertEquals('Property \'time\' does not exist', $e->getMessage());
+    }
+  }
+
+  /**
+   * Checks with* methods of ConnectionParameters.
+   */
+  public function testConnectionParametersWithMethods(): void {
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+      'prefix' => 'baz',
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $this->assertEquals('sqlite', $connectionParameters->driver);
+    $this->assertEquals(':memory:', $connectionParameters->database);
+    $this->assertEquals('baz', $connectionParameters->prefix);
+
+    $testParameters = $connectionParameters
+      ->with([
+        'database' => 'sanday',
+        'prefix' => 'westray',
+      ]);
+    $this->assertInstanceOf(ConnectionParameters::class, $testParameters);
+    $this->assertEquals('sqlite', $testParameters->driver);
+    $this->assertEquals('sanday', $testParameters->database);
+    $this->assertEquals('westray', $testParameters->prefix);
   }
 
 }

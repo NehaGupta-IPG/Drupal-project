@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -112,9 +114,15 @@ abstract class MigrateTestCase extends UnitTestCase {
    */
   protected function getDatabase(array $database_contents, array $connection_options = []) {
     if (extension_loaded('pdo_sqlite')) {
-      $connection_options['database'] = ':memory:';
-      $pdo = Connection::open($connection_options);
-      $connection = new Connection($pdo, $connection_options);
+      $connection_parameters = ConnectionParametersFactory::createFromOptionsArray([
+        'driver' => $connection_options['driver'] ?? 'sqlite',
+        'namespace' => $connection_options['namespace'] ?? '',
+        'autoload' => $connection_options['autoload'] ?? '',
+        'database' => ':memory:',
+      ]);
+      $pdo = Connection::openWithParameters($connection_parameters);
+      $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
+      $connection = new Connection($pdo, $connection_parameters);
     }
     else {
       $this->markTestSkipped('The pdo_sqlite extension is not available.');
