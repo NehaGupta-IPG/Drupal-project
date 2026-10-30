@@ -616,6 +616,16 @@ $settings['update_free_access'] = FALSE;
 # $settings['session_write_interval'] = 180;
 
 /**
+ * Session cookie prefix:
+ *
+ * Drupal creates a session cookie name consisting of a static prefix and a
+ * site-specific name. When hosting multiple sites under a single domain, it
+ * may be desirable to add a unique prefix for sites to easily filter these in
+ * reverse proxies or utilities.
+ */
+# $settings['session_cookie_prefix'] = '';
+
+/**
  * String overrides:
  *
  * To override specific strings on your site with or without enabling the Locale
