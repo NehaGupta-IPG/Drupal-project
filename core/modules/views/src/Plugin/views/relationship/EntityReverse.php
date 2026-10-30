@@ -54,36 +54,43 @@ class EntityReverse extends RelationshipPluginBase {
    */
   public function query() {
     $this->ensureMyTable();
-    // First, relate our base table to the current base table to the
-    // field, using the base table's id field to the field's column.
-    $views_data = Views::viewsData()->get($this->table);
-    $left_field = $views_data['table']['base']['field'];
     $id = !empty($this->definition['join_id']) ? $this->definition['join_id'] : 'standard';
+    if ($this->definition['field table'] !== $this->definition['base']) {
+      // First, relate our base table to the current base table to the
+      // field, using the base table's id field to the field's column.
+      $views_data = Views::viewsData()->get($this->table);
+      $left_field = $views_data['table']['base']['field'];
 
-    $first = [
-      'left_table' => $this->tableAlias,
-      'left_field' => $left_field,
-      'table' => $this->definition['field table'],
-      'field' => $this->definition['field field'],
-      'adjusted' => TRUE,
-    ];
-    if (!empty($this->options['required'])) {
-      $first['type'] = 'INNER';
+      $first = [
+        'left_table' => $this->tableAlias,
+        'left_field' => $left_field,
+        'table' => $this->definition['field table'],
+        'field' => $this->definition['field field'],
+        'adjusted' => TRUE,
+      ];
+      if (!empty($this->options['required'])) {
+        $first['type'] = 'INNER';
+      }
+
+      if (!empty($this->definition['join_extra'])) {
+        $first['extra'] = $this->definition['join_extra'];
+      }
+
+      $first_join = $this->joinManager->createInstance('standard', $first);
+
+      $this->first_alias = $this->query->addTable($this->definition['field table'], $this->relationship, $first_join);
+      $entity_id = 'entity_id';
     }
-
-    if (!empty($this->definition['join_extra'])) {
-      $first['extra'] = $this->definition['join_extra'];
+    else {
+      $this->first_alias = $this->tableAlias;
+      $entity_id = $this->definition['field field'];
     }
-
-    $first_join = $this->joinManager->createInstance('standard', $first);
-
-    $this->first_alias = $this->query->addTable($this->definition['field table'], $this->relationship, $first_join);
 
     // Second, relate the field table to the entity specified using
     // the entity id on the field table and the entity's id field.
     $second = [
       'left_table' => $this->first_alias,
-      'left_field' => 'entity_id',
+      'left_field' => $entity_id,
       'table' => $this->definition['base'],
       'field' => $this->definition['base field'],
       'adjusted' => TRUE,
