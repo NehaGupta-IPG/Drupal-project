@@ -15,6 +15,9 @@ props:
   type: object
 
   properties:
+    attributes:
+      title: Attributes
+      type: Drupal\Core\Template\Attribute
     action:
       type: string
       title: Action
