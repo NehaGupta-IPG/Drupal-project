@@ -270,6 +270,16 @@
       firstCharacterDenyList: '',
       // Custom options, indicate IME usage status.
       isComposing: false,
+      // Use Drupal translation system to allow these strings to be translated.
+      messages: {
+        noResults: Drupal.t('No search results.'),
+        results: (amount) =>
+          Drupal.formatPlural(
+            amount,
+            '@count result is available, use up and down arrow keys to navigate.',
+            '@count results are available, use up and down arrow keys to navigate.',
+          ),
+      },
     },
     ajax: {
       dataType: 'json',
