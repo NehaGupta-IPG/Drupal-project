@@ -81,7 +81,7 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    *   called. For example, $this->once(), $this->exactly(6). Defaults to
    *   $this->never().
    */
-  protected function setupPluginCollection(?InvocationOrder $create_count = NULL) {
+  protected function setupPluginCollection(?InvocationOrder $create_count = NULL): void {
     $this->setUpMockPluginManager();
 
     $this->pluginInstances = [];
@@ -140,7 +140,7 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    *   The example plugin definitions.
    */
   protected function getPluginDefinitions() {
-    $definitions = [
+    return [
       'apple' => [
         'id' => 'apple',
         'label' => 'Apple',
@@ -166,7 +166,6 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
         'provider' => 'plugin_test',
       ],
     ];
-    return $definitions;
   }
 
 }

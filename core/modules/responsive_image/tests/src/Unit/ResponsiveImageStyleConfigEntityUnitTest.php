@@ -117,13 +117,13 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
 
     $this->breakpointManager
       ->method('getGroupProviders')
-      ->willReturn(['olivero' => 'theme', 'toolbar' => 'module']);
+      ->willReturn(['bar' => 'theme', 'foo' => 'module']);
 
     \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
 
     $dependencies = $entity->calculateDependencies()->getDependencies();
-    $this->assertEquals(['toolbar'], $dependencies['module']);
-    $this->assertEquals(['olivero'], $dependencies['theme']);
+    $this->assertEquals(['foo'], $dependencies['module']);
+    $this->assertEquals(['bar'], $dependencies['theme']);
     $this->assertEquals(['image.style.fallback', 'image.style.large', 'image.style.medium', 'image.style.small'], $dependencies['config']);
   }
 

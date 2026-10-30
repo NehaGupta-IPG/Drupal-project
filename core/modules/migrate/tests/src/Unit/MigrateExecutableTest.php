@@ -331,7 +331,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     $this->migration->method('getProcessPlugins')->willReturn($plugins);
 
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Pipeline failed at plugin_id plugin for destination destination_id: transform_return_string received instead of an array,');
+    $this->expectExceptionMessageIs('Pipeline failed at plugin_id plugin for destination destination_id: transform_return_string received instead of an array,');
     $this->executable->processRow($row);
   }
 
@@ -607,16 +607,15 @@ class MigrateExecutableTest extends MigrateTestCase {
         ? array_combine($source_id_keys, array_values($source_values))
         : NULL;
     });
-    $id_map->getRowByDestination(Argument::type('array'))->will(function () {
+    $id_map->getRowByDestination(Argument::type('array'))->will(function (): array {
       $destination_ids = func_get_args()[0][0];
-      $return = array_reduce(self::$idMapRecords, function (array $carry, array $record) use ($destination_ids): array {
+
+      return array_reduce(self::$idMapRecords, function (array $carry, array $record) use ($destination_ids): array {
         if (array_merge($record, $destination_ids) === $record) {
           $carry = $record;
         }
         return $carry;
       }, []);
-
-      return $return;
     });
     $id_map->deleteDestination(Argument::type('array'))->will(function (): void {
       $destination_ids = func_get_args()[0][0];

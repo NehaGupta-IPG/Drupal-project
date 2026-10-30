@@ -30,7 +30,7 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['user', 'jsonapi_test_user', 'node', 'rest'];
+  protected static $modules = ['user', 'jsonapi_test_user', 'node'];
 
   /**
    * {@inheritdoc}
@@ -347,7 +347,7 @@ class UserTest extends ResourceTestBase {
       RequestOptions::HEADERS => [],
       RequestOptions::BODY => Json::encode($request_body),
     ];
-    $response = $this->request('POST', Url::fromRoute('rest.login')->setRouteParameter('_format', 'json'), $request_options);
+    $response = $this->request('POST', Url::fromRoute('user.login.http')->setRouteParameter('_format', 'json'), $request_options);
     $this->assertSame(200, $response->getStatusCode());
   }
 
@@ -652,7 +652,7 @@ class UserTest extends ResourceTestBase {
     $account = $this->createAnotherEntity($cancel_method);
     $node = $this->drupalCreateNode(['uid' => $account->id()]);
 
-    $this->sendDeleteRequestForUser($account, $cancel_method);
+    $this->sendDeleteRequestForUser($account);
 
     $user_storage = $this->container->get('entity_type.manager')
       ->getStorage('user');
@@ -682,7 +682,7 @@ class UserTest extends ResourceTestBase {
     $account = $this->createAnotherEntity($cancel_method);
     $node = $this->drupalCreateNode(['uid' => $account->id()]);
 
-    $this->sendDeleteRequestForUser($account, $cancel_method);
+    $this->sendDeleteRequestForUser($account);
 
     $user_storage = $this->container->get('entity_type.manager')
       ->getStorage('user');
@@ -721,7 +721,7 @@ class UserTest extends ResourceTestBase {
       $node_ids[] = $node->id();
     }
 
-    $this->sendDeleteRequestForUser($account, $cancel_method);
+    $this->sendDeleteRequestForUser($account);
 
     $user_storage = $this->container->get('entity_type.manager')
       ->getStorage('user');
@@ -759,7 +759,7 @@ class UserTest extends ResourceTestBase {
     $account = $this->createAnotherEntity($cancel_method);
     $node = $this->drupalCreateNode(['uid' => $account->id()]);
 
-    $this->sendDeleteRequestForUser($account, $cancel_method);
+    $this->sendDeleteRequestForUser($account);
 
     $user_storage = $this->container->get('entity_type.manager')
       ->getStorage('user');
@@ -836,10 +836,8 @@ class UserTest extends ResourceTestBase {
   /**
    * @param \Drupal\user\UserInterface $account
    *   The user account.
-   * @param string $cancel_method
-   *   The cancel method.
    */
-  private function sendDeleteRequestForUser(UserInterface $account, string $cancel_method): void {
+  private function sendDeleteRequestForUser(UserInterface $account): void {
     $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';

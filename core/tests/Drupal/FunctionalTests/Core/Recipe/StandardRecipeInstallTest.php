@@ -37,7 +37,7 @@ class StandardRecipeInstallTest extends InstallerTestBase {
       'value' => TRUE,
       'required' => TRUE,
     ];
-    // Do not compress css so we can detect claro correctly. See
+    // Do not compress css so we can detect the admin theme correctly. See
     // \Drupal\Tests\RequirementsPageTrait::assertRequirementSummaries().
     $this->settings['config']['system.performance']['css']['preprocess'] = (object) [
       'value' => FALSE,
@@ -50,9 +50,23 @@ class StandardRecipeInstallTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function visitInstaller(): void {
+  protected function visitInstaller(array $query = []): void {
     // Use a URL to install from a recipe.
-    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php?profile=&recipe=core/recipes/standard');
+    parent::visitInstaller([
+      'profile' => '',
+      'recipe' => 'core/recipes/standard',
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // There is no profile and therefore no distribution to request another
+    // theme, so the installer uses the default install theme.
+    $this->assertSession()->responseContains('default_admin/css/theme/install-page.css');
+
+    parent::setUpLanguage();
   }
 
   /**
@@ -83,13 +97,6 @@ class StandardRecipeInstallTest extends InstallerTestBase {
     $this->drupalLogout();
 
     $this->doTestStandard();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // Noop. This form is skipped due the parameters set on the URL.
   }
 
   /**

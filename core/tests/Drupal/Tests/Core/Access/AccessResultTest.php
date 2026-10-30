@@ -494,6 +494,7 @@ class AccessResultTest extends UnitTestCase {
     // ::allowIfHasPermission and ::allowedIfHasPermission convenience methods.
     $account = $this->createMock('\Drupal\Core\Session\AccountInterface');
     $account
+      ->expects($this->once())
       ->method('hasPermission')
       ->with('may herd llamas')
       ->willReturn(FALSE);
@@ -901,9 +902,7 @@ class AccessResultTest extends UnitTestCase {
     }
     if ($implements_cacheable_dependency_interface) {
       $this->assertInstanceOf(CacheableDependencyInterface::class, $result);
-      if ($result instanceof CacheableDependencyInterface) {
-        $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
-      }
+      $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
     }
     else {
       $this->assertNotInstanceOf(CacheableDependencyInterface::class, $result);

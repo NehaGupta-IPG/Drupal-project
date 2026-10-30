@@ -3,6 +3,7 @@
 namespace Drupal\Core;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
@@ -12,7 +13,6 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -626,9 +626,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Set the allowed protocols.
     UrlHelper::setAllowedProtocols($this->container->getParameter('filter_protocols'));
 
-    // Override of Symfony's MIME type guesser singleton.
-    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
-
     $this->prepared = TRUE;
   }
 
@@ -1028,15 +1025,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-
+    $container_definition = $this->getContainerFromCacheIfCacheable();
     // If there is no cached container definition, build a new container from
     // scratch.
-    if (!isset($container_definition)) {
+    if ($container_definition === NULL) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
@@ -1115,6 +1107,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
     }
 
+    // Override of Symfony's MIME type guesser singleton.
+    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
+
     return $this->container;
   }
 
@@ -1164,7 +1159,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     mb_internal_encoding('utf-8');
     mb_language('uni');
 
-    // Indicate that code is operating in a test child site.
+    // Set DRUPAL_TEST_IN_CHILD_SITE if we're inside a test.
+    static::setupDrupalTestInChildSite($app_root);
+
+    // Set the Drupal custom error handler.
+    set_error_handler('_drupal_error_handler');
+    set_exception_handler('_drupal_exception_handler');
+
+    static::$isEnvironmentInitialized = TRUE;
+  }
+
+  /**
+   * Define the DRUPAL_TEST_IN_CHILD_SITE constant as appropriate.
+   *
+   * @param string $app_root
+   *   The path to the application root.
+   *
+   * @internal This method is only intended to be called by this class and
+   *   \Drupal\Core\Command\DrupalApplication. We aim to remove the need for it
+   *   without a BC layer during Drupal 12.
+   * @see https://www.drupal.org/node/2690035
+   */
+  public static function setupDrupalTestInChildSite(string $app_root): void {
+    // Indicate if code is operating in a test child site or not.
     if (!defined('DRUPAL_TEST_IN_CHILD_SITE')) {
       if ($test_prefix = drupal_valid_test_ua()) {
         $test_db = new TestDatabase($test_prefix);
@@ -1187,12 +1204,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
       }
     }
-
-    // Set the Drupal custom error handler.
-    set_error_handler('_drupal_error_handler');
-    set_exception_handler('_drupal_exception_handler');
-
-    static::$isEnvironmentInitialized = TRUE;
   }
 
   /**
@@ -1448,6 +1459,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
+
+    // Reset any existing container in order to avoid holding on to old object
+    // references, otherwise memory usage grows exponentially with each rebuild.
+    $this->container?->reset();
+
     return $container;
   }
 
@@ -1490,6 +1506,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         /** @var \DirectoryIterator $component */
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
+          is_dir($pathname . '/Command') ||
           is_dir($pathname . '/Plugin') ||
           is_dir($pathname . '/Entity') ||
           is_dir($pathname . '/Element')
@@ -1509,6 +1526,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($system = $this->getConfigStorage()->read('system.site')) {
       if ($default_language_values['id'] != $system['langcode']) {
         $default_language_values = ['id' => $system['langcode']];
+      }
+    }
+    else {
+      // If the system.site config doesn't exist, then we're in the installer,
+      // if langcode is set in install state parameters, then set that as the
+      // default language. This allows the default language to be correct on the
+      // container just before system module is installed.
+      // @todo move default language configuration to core from system module so
+      // that it can be set prior to system module install without workarounds.
+      // @see https://www.drupal.org/project/drupal/issues/3615365
+      if (isset($GLOBALS['install_state']['parameters']['langcode'])) {
+        $default_language_values['id'] = $GLOBALS['install_state']['parameters']['langcode'];
       }
     }
     $container->setParameter('language.default_values', $default_language_values);
@@ -1897,6 +1926,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getExtensions(): array|false {
     return $this->getConfigStorage()->read('core.extension');
+  }
+
+  /**
+   * Gets the cached container definition if the cache may be used.
+   *
+   * @return array|null
+   *   The cached container definition, or NULL if the cache must not be used
+   *   or holds no definition.
+   */
+  protected function getContainerFromCacheIfCacheable(): ?array {
+    // If the module list hasn't already been set in updateModules and we are
+    // not forcing a rebuild, then try and load the container from the cache.
+    if (!$this->moduleList && !$this->containerNeedsRebuild) {
+      return $this->getCachedContainerDefinition();
+    }
+    return NULL;
   }
 
 }
