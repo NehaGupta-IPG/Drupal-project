@@ -56,6 +56,9 @@
           'textarea[name="visibility[request_path][pages]"]',
         );
         if (!$pages.length || !$pages[0].value) {
+          if ($(context).find('input[name="visibility[request_path][negate]"]')[1].checked) {
+            return Drupal.t('Fully restricted');
+          }
           return Drupal.t('Not restricted');
         }
 
