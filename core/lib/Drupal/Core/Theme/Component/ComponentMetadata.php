@@ -27,6 +27,13 @@ class ComponentMetadata {
   public readonly string $path;
 
   /**
+   * The absolute path to the component directory including base_path.
+   *
+   * @var string
+   */
+  public readonly string $fullPath;
+
+  /**
    * The component documentation.
    *
    * @var string
@@ -130,6 +137,10 @@ class ComponentMetadata {
     $this->mandatorySchemas = $enforce_schemas;
     $this->path = $path;
 
+    // In testing, base_path() may not exist.
+    $base_path = function_exists('base_path') ? base_path() : '/';
+    $this->fullPath = $base_path . $path;
+
     [, $machine_name] = explode(':', $metadata_info['id'] ?? []);
     $this->machineName = $machine_name;
     $this->name = $metadata_info['name'] ?? mb_convert_case($machine_name, MB_CASE_TITLE);
@@ -222,6 +233,7 @@ class ComponentMetadata {
   public function normalize(): array {
     return [
       'path' => $this->path,
+      'fullPath' => $this->fullPath,
       'machineName' => $this->machineName,
       'status' => $this->status,
       'name' => $this->name,
