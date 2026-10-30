@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Container;
 
-use Drupal\Component\DependencyInjection\Container;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * compiled. The container in KernelTestBase tests is always an instance of
  * \Drupal\Core\DependencyInjection\ContainerBuilder.
  */
-#[CoversClass(Container::class)]
+#[CoversNothing]
 #[Group('Container')]
 #[RunTestsInSeparateProcesses]
 class ServiceDeprecationTest extends BrowserTestBase {

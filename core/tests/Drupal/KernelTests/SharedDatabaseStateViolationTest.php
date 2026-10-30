@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\TestTools\Attribute\ShareEnvironment;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests how "KernelTestBase" reports shared database state violations.
  */
-#[CoversClass(KernelTestBase::class)]
+#[CoversNothing]
 #[Group('PHPUnit')]
 #[Group('Test')]
 #[Group('KernelTests')]

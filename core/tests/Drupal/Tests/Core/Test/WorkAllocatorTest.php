@@ -6,7 +6,7 @@ namespace Drupal\Tests\Core\Test;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\TestTools\TestRunner\WorkAllocator;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
  *
  * @phpstan-import-type TestClassInfo from \Drupal\Core\Test\PhpUnitTestDiscovery
  */
-#[CoversClass(WorkAllocator::class)]
+#[CoversNothing]
 #[Group('Test')]
 class WorkAllocatorTest extends UnitTestCase {
 

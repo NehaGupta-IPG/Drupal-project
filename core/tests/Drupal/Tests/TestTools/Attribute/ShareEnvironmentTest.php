@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\TestTools\Attribute;
 
 use Drupal\TestTools\Attribute\ShareEnvironment;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @see \Drupal\PHPStan\Rules\TestClassClassMetadata
  */
-#[CoversClass(ShareEnvironment::class)]
+#[CoversNothing]
 #[Group('TestTools')]
 class ShareEnvironmentTest extends TestCase {
 
