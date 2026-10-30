@@ -288,6 +288,14 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       '#title' => $this->t("Create referenced entities if they don't already exist"),
       '#default_value' => $configuration['auto_create'],
       '#weight' => -2,
+      '#states' => [
+        'invisible' => [
+          ':input[name="field_storage[subform][settings][target_type]"]' => [
+            ['value' => 'user'],
+            ['value' => 'file'],
+          ],
+        ],
+      ],
     ];
 
     if ($entity_type->hasKey('bundle')) {
