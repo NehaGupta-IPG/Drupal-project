@@ -617,7 +617,10 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * {@inheritdoc}
    */
   public function isTranslatable() {
-    return $this->translatable;
+    // Check the site has more than one language, and translation is enabled on
+    // this specific config.
+    return $this->languageManager()->isMultilingual()
+      && $this->translatable;
   }
 
   /**

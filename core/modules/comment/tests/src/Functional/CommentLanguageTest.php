@@ -64,6 +64,13 @@ class CommentLanguageTest extends BrowserTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
+    // Create comment field on article.
+    $this->addDefaultCommentField('node', 'article');
+
+    // Confirm that the comment body field is not translatable yet.
+    $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
+    $this->assertFalse($field_storage->isTranslatable(), 'Comment body is not translatable.');
+
     // Add language.
     $edit = ['predefined_langcode' => 'fr'];
     $this->drupalGet('admin/config/regional/language/add');
@@ -94,9 +101,6 @@ class CommentLanguageTest extends BrowserTestBase {
     $edit = ['preferred_langcode' => 'fr'];
     $this->drupalGet("user/" . $admin_user->id() . "/edit");
     $this->submitForm($edit, 'Save');
-
-    // Create comment field on article.
-    $this->addDefaultCommentField('node', 'article');
 
     // Make comment body translatable.
     $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
