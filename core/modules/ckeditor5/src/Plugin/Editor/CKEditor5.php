@@ -208,6 +208,14 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
       throw new \InvalidArgumentException('This text editor is not configured to use CKEditor 5.');
     }
 
+    // Remove inactive filters from the list of filters to validate for the text format.
+    $text_format_filters = [];
+    foreach ($text_format->toArray()['filters'] as $filter_index => $filter) {
+      if ($filter['status']) {
+        $text_format_filters[$filter_index] = $filter;
+      }
+    }
+
     $typed_config_manager = \Drupal::getContainer()->get('config.typed');
     $typed_config = $typed_config_manager->createFromNameAndData(
       'ckeditor5_valid_pair__format_and_editor',
@@ -220,7 +228,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
         // - filter.format.*.filters — note that "filters" is top-level in
         //   filter.format.*, and so it is here, so all validation constraints
         //   will continue to work fine.
-        'filters' => $text_format->toArray()['filters'],
+        'filters' => $text_format_filters,
         // - editor.editor.*.image_upload — note that "image_upload" is
         //   top-level in editor.editor.*, and so it is here, so all validation
         //   constraints will continue to work fine.
