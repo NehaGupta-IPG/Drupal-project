@@ -229,7 +229,8 @@ class FormValidator implements FormValidatorInterface {
           // Flag this element as #required_but_empty to allow #element_validate
           // handlers to set a custom required error message, but without having
           // to re-implement the complex logic to figure out whether the field
-          // value is empty.
+          // value is empty. Handlers may also remove this flag to prevent
+          // errors from being added.
           $elements['#required_but_empty'] = TRUE;
         }
       }
@@ -249,10 +250,10 @@ class FormValidator implements FormValidatorInterface {
       }
 
       // Ensure that a #required form error is thrown, regardless of whether
-      // #element_validate handlers changed any properties. If $is_empty_value
+      // #element_validate handlers changed any properties. If #required_but_empty
       // is defined, then above #required validation code ran, so the other
       // variables are also known to be defined and we can test them again.
-      if (isset($is_empty_value) && ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null)) {
+      if (isset($elements['#required_but_empty']) && $elements['#required_but_empty']) {
         if (isset($elements['#required_error'])) {
           $form_state->setError($elements, $elements['#required_error']);
         }
