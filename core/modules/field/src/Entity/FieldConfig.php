@@ -316,6 +316,18 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
         }
       }
 
+      // Fallback: try loading field storage directly from config entity
+      // storage. This handles cache timing issues during Recipe installation
+      // where field storage configs have been saved to the database but
+      // EntityFieldManager's cached definitions have not been updated yet.
+      if (!$field_storage_definition) {
+        \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+        $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions($this->entity_type);
+        if (isset($field_storage_definitions[$this->field_name])) {
+          $field_storage_definition = $field_storage_definitions[$this->field_name];
+        }
+      }
+
       if (!$field_storage_definition) {
         throw new FieldException("Attempted to create, modify or delete an instance of field with name {$this->field_name} on entity type {$this->entity_type} when the field storage does not exist.");
       }
