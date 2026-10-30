@@ -64,13 +64,20 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $options = [
+      // Separate this from possible theme names:
+      '_DEFAULT_THEME_' => $this->t('<Default theme>'),
+      '_ADMINISTRATION_THEME_' => $this->t('<Administration theme>'),
+    ];
+    $options += array_map(function ($theme_info) {
+      return $theme_info->info['name'];
+    }, $this->themeHandler->listInfo());
+
     $form['theme'] = [
       '#type' => 'select',
       '#title' => $this->t('Theme'),
       '#default_value' => $this->configuration['theme'],
-      '#options' => array_map(function ($theme_info) {
-        return $theme_info->info['name'];
-      }, $this->themeHandler->listInfo()),
+      '#options' => $options,
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -91,13 +98,29 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       return TRUE;
     }
 
-    return $this->themeManager->getActiveTheme()->getName() == $this->configuration['theme'];
+    $theme = $this->configuration['theme'];
+    // Replace the generic options by their current value:
+    switch ($theme) {
+      case '_DEFAULT_THEME_':
+        // Get default theme:
+        // @todo: Use DI!
+        $theme = \Drupal::config('system.theme')->get('default');
+        break;
+      case '_ADMINISTRATION_THEME_':
+        //  Get admin theme:
+        // @todo: Use DI!
+        $theme = \Drupal::config('system.theme')->get('admin');
+        break;
+    }
+
+    return $this->themeManager->getActiveTheme()->getName() == $theme;
   }
 
   /**
    * {@inheritdoc}
    */
   public function summary() {
+    // @todo: Show proper label for the generic options:
     if ($this->isNegated()) {
       return $this->t('The current theme is not @theme', ['@theme' => $this->configuration['theme']]);
     }
