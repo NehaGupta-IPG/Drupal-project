@@ -15,6 +15,12 @@ filters:
     status: true
     weight: 11
     settings: {  }
+  entity_links:
+    id: entity_links
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
   filter_align:
     id: filter_align
     provider: filter
