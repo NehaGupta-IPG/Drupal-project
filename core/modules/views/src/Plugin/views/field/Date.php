@@ -220,6 +220,9 @@ class Date extends FieldPluginBase {
           if ($custom_format == 'r') {
             return $this->dateFormatter->format($value, $format, $custom_format, $timezone, 'en');
           }
+          if ($custom_format == 'U') {
+            return $value;
+          }
           return $this->dateFormatter->format($value, $format, $custom_format, $timezone);
 
         default:

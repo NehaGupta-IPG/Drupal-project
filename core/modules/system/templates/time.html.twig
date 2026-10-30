@@ -19,4 +19,10 @@
  * @see https://www.w3.org/TR/html5-author/the-time-element.html#attr-time-datetime
  */
 #}
+
+{% if text matches '/^\\d+$/' %}
+{{ text }}
+{% else %}
 <time{{ attributes }}>{{ text }}</time>
+{% endif %}
+
