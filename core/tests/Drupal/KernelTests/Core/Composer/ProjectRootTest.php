@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\KernelTests\Core\Composer;
+
+use Drupal\Core\Composer\ProjectRoot;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Tests for the ProjectRoot class.
+ *
+ * @internal
+ */
+#[Group('Composer')]
+#[CoversClass(ProjectRoot::class)]
+#[CoversMethod(ProjectRoot::class, 'getProjectVendorDirectory')]
+#[RunTestsInSeparateProcesses]
+class ProjectRootTest extends KernelTestBase {
+
+  /**
+   * Exercise the code in getProjectVendorDirectory().
+   *
+   * We don't have a good way to unit test vendor discovery, so we must rely on
+   * the behavior of a semi-installed Drupal site.
+   */
+  public function testGetProjectVendorDirectory(): void {
+    $root = new ProjectRoot($this->container->getParameter('app.root'));
+    $vendor_root = $root->getProjectVendorDirectory();
+    $this->assertFileExists($vendor_root);
+    foreach (['symfony', 'composer'] as $dir) {
+      $this->assertFileExists($vendor_root . '/' . $dir);
+    }
+  }
+
+}
