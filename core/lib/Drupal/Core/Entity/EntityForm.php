@@ -391,10 +391,10 @@ class EntityForm extends FormBase implements EntityFormInterface {
       // If the entity has bundles, fetch it from the route match.
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
       if ($bundle_key = $entity_type->getKey('bundle')) {
-        if (($bundle_entity_type_id = $entity_type->getBundleEntityType()) && $route_match->getRawParameter($bundle_entity_type_id)) {
+        if (($bundle_entity_type_id = $entity_type->getBundleEntityType()) && $route_match->getParameter($bundle_entity_type_id)) {
           $values[$bundle_key] = $route_match->getParameter($bundle_entity_type_id)->id();
         }
-        elseif ($route_match->getRawParameter($bundle_key)) {
+        elseif ($route_match->getParameter($bundle_key)) {
           $values[$bundle_key] = $route_match->getParameter($bundle_key);
         }
       }
