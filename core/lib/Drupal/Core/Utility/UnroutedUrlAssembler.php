@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Routing\RequestHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -138,8 +139,9 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // //example.com.
     $uri = ltrim($uri, '/');
 
-    // Add any subdirectory where Drupal is installed.
-    $current_base_path = $request->getBasePath() . '/';
+    // Add any subdirectory where Drupal is installed. A percent-encoded front
+    // controller is not a subdirectory.
+    $current_base_path = RequestHelper::getGeneratedBasePath($request);
 
     if ($options['absolute']) {
       $current_base_url = $request->getSchemeAndHttpHost() . $current_base_path;
@@ -180,14 +182,16 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
    */
   protected function addOptionDefaults(array &$options) {
     $request = $this->requestStack->getCurrentRequest();
-    $current_base_path = $request->getBasePath() . '/';
+    $current_base_path = RequestHelper::getGeneratedBasePath($request);
     $current_script_path = '';
     $base_path_with_script = $request->getBaseUrl();
 
     // If the current request was made with the script name (eg, index.php) in
     // it, then extract it, making sure the leading / is gone, and a trailing /
     // is added, to allow simple string concatenation with other parts.
-    if (!empty($base_path_with_script)) {
+    // A percent-encoded front controller is not a legitimate unclean URL, so
+    // it is not copied into generated links.
+    if (!empty($base_path_with_script) && !RequestHelper::hasEncodedFrontController($request)) {
       $script_name = $request->getScriptName();
       if (str_contains($base_path_with_script, $script_name)) {
         $current_script_path = ltrim(substr($script_name, strlen($current_base_path)), '/') . '/';

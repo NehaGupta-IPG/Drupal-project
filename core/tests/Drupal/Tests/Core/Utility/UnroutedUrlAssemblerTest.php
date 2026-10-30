@@ -255,6 +255,47 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that an encoded front controller is not copied into file URLs.
+   */
+  public function testAssembleWithEncodedFrontController(): void {
+    $this->pushFrontControllerRequest('/index%2Ephp/node/1', '/index.php', '/index.php/node/1');
+    $this->assertSame('/example', $this->unroutedUrlAssembler->assemble('base:example'));
+    $this->assertSame('/sites/default/files/test.pdf', $this->unroutedUrlAssembler->assemble('base:sites/default/files/test.pdf'));
+  }
+
+  /**
+   * Tests that literal unclean URLs still include the front controller.
+   */
+  public function testAssembleWithLiteralUncleanUrl(): void {
+    $this->pushFrontControllerRequest('/index.php/node/1', '/index.php', '/index.php/node/1');
+    $this->assertSame('/index.php/example', $this->unroutedUrlAssembler->assemble('base:example'));
+  }
+
+  /**
+   * Pushes a front-controller request onto the stack.
+   *
+   * @param string $request_uri
+   *   The request URI.
+   * @param string $script_name
+   *   The SCRIPT_NAME value.
+   * @param string $php_self
+   *   The PHP_SELF value.
+   */
+  protected function pushFrontControllerRequest(string $request_uri, string $script_name, string $php_self): void {
+    $request = new Request([], [], [], [], [], [
+      'REQUEST_URI' => $request_uri,
+      'SCRIPT_NAME' => $script_name,
+      'SCRIPT_FILENAME' => $this->root . '/index.php',
+      'PHP_SELF' => $php_self,
+      'REQUEST_METHOD' => 'GET',
+      'HTTP_HOST' => 'example.com',
+      'SERVER_NAME' => 'example.com',
+      'SERVER_PORT' => '80',
+    ]);
+    $this->requestStack->push($request);
+  }
+
+  /**
    * Setups the request stack for a given subdir.
    *
    * @param bool $subdir

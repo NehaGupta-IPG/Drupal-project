@@ -217,6 +217,49 @@ class FileUrlGeneratorTest extends FileTestBase {
   }
 
   /**
+   * Tests that generated file URLs omit the front controller.
+   *
+   * Files are served by the web server. Prefixing them with index.php, or
+   * wrapping an absolute URL as base:https://…, produces links that 404.
+   */
+  public function testGenerateOmitsFrontController(): void {
+    \Drupal::state()->set('file_test.hook_file_url_alter', NULL);
+
+    $request = Request::create($GLOBALS['base_url'] . '/index.php/node/1');
+    $request->server->set('SCRIPT_NAME', '/index.php');
+    $request->server->set('SCRIPT_FILENAME', DRUPAL_ROOT . '/index.php');
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $this->container->get('request_stack')->push($request);
+    $this->container->get('router.request_context')->fromRequest($request);
+
+    $public_directory_path = \Drupal::service('stream_wrapper_manager')
+      ->getViaScheme('public')
+      ->getDirectoryPath();
+    $url = $this->fileUrlGenerator->generate('public://path/to/file.png');
+    $this->assertStringNotContainsString('index.php', $url->toString());
+    $this->assertStringContainsString($public_directory_path . '/path/to/file.png', $url->toString());
+  }
+
+  /**
+   * Tests that an encoded front controller is not copied into file URLs.
+   */
+  public function testGenerateOmitsEncodedFrontController(): void {
+    \Drupal::state()->set('file_test.hook_file_url_alter', NULL);
+
+    $request = Request::create($GLOBALS['base_url'] . '/index%2Ephp/node/1');
+    $request->server->set('SCRIPT_NAME', '/index.php');
+    $request->server->set('SCRIPT_FILENAME', DRUPAL_ROOT . '/index.php');
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $this->container->get('request_stack')->push($request);
+    $this->container->get('router.request_context')->fromRequest($request);
+
+    $url = $this->fileUrlGenerator->generate('public://path/to/file.png');
+    $this->assertStringNotContainsString('index.php', $url->toString());
+    $this->assertStringNotContainsString('index%2Ephp', $url->toString());
+    $this->assertStringNotContainsString('index%2ephp', $url->toString());
+  }
+
+  /**
    * Data provider.
    */
   public static function providerGenerateURI(): array {

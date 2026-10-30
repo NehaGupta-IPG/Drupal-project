@@ -5,6 +5,7 @@ namespace Drupal\Core\File;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
+use Drupal\Core\Routing\RequestHelper;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Url;
@@ -170,13 +171,13 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
         return Url::fromUri($uri);
       }
       elseif (mb_substr($uri, 0, 1) == '/') {
-        return Url::fromUri('base:' . str_replace($this->requestStack->getCurrentRequest()->getBasePath(), '', $uri));
+        return Url::fromUri('base:' . str_replace($this->requestStack->getCurrentRequest()->getBasePath(), '', $uri), ['script' => '']);
       }
       else {
         // If this is not a properly formatted stream, then it is a shipped
         // file. Therefore, return the urlencoded URI.
         $options = UrlHelper::parse($uri);
-        return Url::fromUri('base:' . UrlHelper::encodePath($options['path']), $options);
+        return Url::fromUri('base:' . UrlHelper::encodePath($options['path']), $options + ['script' => '']);
       }
     }
     elseif ($scheme == 'http' || $scheme == 'https' || $scheme == 'data') {
@@ -192,8 +193,18 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
       // @todo Switch to dependency injected request_context service after
       // https://www.drupal.org/project/drupal/issues/3256884 is fixed.
       if (UrlHelper::externalIsLocal($external_url, \Drupal::service('router.request_context')->getCompleteBaseUrl())) {
-        // Attempt to return an external URL using the appropriate wrapper.
-        return Url::fromUri('base:' . $this->transformRelative(urldecode($options['path']), FALSE), $options);
+        // Files are served by the web server, not the front controller, so
+        // never include index.php in the generated URL.
+        $path_to_relativize = urldecode($options['path']);
+        $relative_url = $this->transformRelative($path_to_relativize, FALSE);
+        if ($relative_url !== $path_to_relativize && str_starts_with($relative_url, '/')) {
+          return Url::fromUri('base:' . $relative_url, $options + ['script' => '']);
+        }
+        // transformRelative() could not strip the host (for example when the
+        // request base path is a percent-encoded front controller). Keep the
+        // absolute file URL rather than wrapping it as base:https://..., which
+        // would assemble to /index.php/https://....
+        return Url::fromUri($external_url, $options);
       }
       else {
         return Url::fromUri(urldecode($options['path']), $options);
@@ -220,8 +231,14 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
     }
 
     // If this should not be a root-relative path but relative to the drupal
-    // base path, add it to the host to be removed from the URL as well.
-    $base_path = !$root_relative ? $request->getBasePath() : '';
+    // base path, add it to the host to be removed from the URL as well. A
+    // percent-encoded front controller is not a real subdirectory.
+    $base_path = '';
+    if (!$root_relative) {
+      $base_path = RequestHelper::hasEncodedFrontController($request)
+        ? rtrim(RequestHelper::getGeneratedBasePath($request), '/')
+        : $request->getBasePath();
+    }
 
     $host = preg_quote($host, '@');
     $port = preg_quote($port, '@');

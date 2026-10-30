@@ -166,4 +166,14 @@ class HtaccessTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('x-encoded-content-encoding', 'gzip');
   }
 
+  /**
+   * Tests that default.htaccess redirects encoded and literal index.php.
+   */
+  public function testIndexPhpRedirectRuleIsPresent(): void {
+    $htaccess = file_get_contents(DRUPAL_ROOT . '/.htaccess');
+    $this->assertStringContainsString('%{THE_REQUEST}', $htaccess);
+    $this->assertStringContainsString('%2[eE]php', $htaccess);
+    $this->assertStringContainsString('RewriteRule ^index\\.php(?:/(.*))?$ /$1 [R=301,L,QSA]', $htaccess);
+  }
+
 }

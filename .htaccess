@@ -119,6 +119,13 @@ AddType image/webp .webp
   # uncomment the following line:
   # RewriteBase /
 
+  # Redirect a client-requested index.php prefix (literal or percent-encoded)
+  # to the equivalent clean URL. THE_REQUEST is the original request line, so
+  # this does not match Drupal's internal rewrite to index.php.
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$ [NC]
+  RewriteCond %{THE_REQUEST} \s[^?\s]*/index(?:\.php|%2[eE]php)(?:/|\s|\?) [NC]
+  RewriteRule ^index\.php(?:/(.*))?$ /$1 [R=301,L,QSA]
+
   # Redirect common PHP files to their new locations.
   RewriteCond %{REQUEST_URI} ^(.*)?/(install\.php) [OR]
   RewriteCond %{REQUEST_URI} ^(.*)?/(rebuild\.php)
