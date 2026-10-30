@@ -240,7 +240,7 @@ class CommentForm extends ContentEntityForm {
     $form['author']['status'] = [
       '#type' => 'radios',
       '#title' => $this->t('Status'),
-      '#default_value' => $status,
+      '#default_value' => (int) $status,
       '#options' => [
         CommentInterface::PUBLISHED => $this->t('Published'),
         CommentInterface::NOT_PUBLISHED => $this->t('Not published'),

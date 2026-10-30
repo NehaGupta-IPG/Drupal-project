@@ -20,7 +20,7 @@ interface FileInterface extends ContentEntityInterface, EntityChangedInterface, 
    * removed during cron runs if cleanup is not disabled. (Permanent files will
    * not be removed during the file garbage collection process.)
    */
-  const STATUS_PERMANENT = 1;
+  const STATUS_PERMANENT = TRUE;
 
   /**
    * Returns the name of the file.

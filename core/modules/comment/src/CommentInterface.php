@@ -15,12 +15,12 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
   /**
    * Comment is awaiting approval.
    */
-  const NOT_PUBLISHED = 0;
+  const NOT_PUBLISHED = FALSE;
 
   /**
    * Comment is published.
    */
-  const PUBLISHED = 1;
+  const PUBLISHED = TRUE;
 
   /**
    * Anonymous posters cannot enter their contact information.
