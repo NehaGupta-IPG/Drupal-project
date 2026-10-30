@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * This test demonstrates that when accessing Drupal via /index.php,
  * the generated URLs incorrectly include /index.php/ prefix.
  */
-#[Group("DrupalKernel")]
+#[Group('DrupalKernel')]
 #[RunInSeparateProcesses]
 class BasePathDetectionTest extends KernelTestBase {
 
