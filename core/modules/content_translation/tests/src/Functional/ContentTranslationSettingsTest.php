@@ -36,6 +36,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   protected static $modules = [
     'language',
     'content_translation',
+    'content_translation_test',
     'node',
     'comment',
     'field_ui',
@@ -336,6 +337,15 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   public function testNonTranslatableTranslationSettingsUI(): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->fieldNotExists('settings[entity_test][entity_test][translatable]');
+  }
+
+  /**
+   * Tests that bundle fields are excluded from the translation settings form.
+   */
+  public function testBundleFieldsExcludedFromSettingsUI(): void {
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->assertSession()->fieldNotExists('settings[entity_test_mul][entity_test_mul][fields][ct_test_bundle_field]');
+    $this->assertSession()->fieldExists('settings[entity_test_mul][entity_test_mul][fields][name]');
   }
 
 }
