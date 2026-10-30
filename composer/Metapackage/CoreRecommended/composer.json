@@ -13,7 +13,7 @@
         "doctrine/deprecations": "~1.1.5",
         "doctrine/lexer": "~2.1.1",
         "egulias/email-validator": "~4.0.4",
-        "masterminds/html5": "~2.10.0",
+        "masterminds/html5": "~2.12.0",
         "mck89/peast": "~v1.17.4",
         "pear/archive_tar": "~1.6.0",
         "pear/console_getopt": "~v1.4.3",
