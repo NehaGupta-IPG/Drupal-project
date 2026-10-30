@@ -28,7 +28,9 @@ trait EntityChangesDetectionTrait {
       $entity_type->getKey('revision'),
       $entity_type->getKey('revision_translation_affected'),
     ];
-    $fields = array_merge($fields, array_values($entity_type->getRevisionMetadataKeys()));
+    // Remove possible empty elements from the array, to prevent array_flip
+    // from throwing warnings on some edge cases of custom entity types.
+    $fields = array_filter(array_merge($fields, array_values($entity_type->getRevisionMetadataKeys())));
 
     // Computed fields should be skipped by the check for translation changes.
     foreach (array_diff_key($entity->getFieldDefinitions(), array_flip($fields)) as $field_name => $field_definition) {
