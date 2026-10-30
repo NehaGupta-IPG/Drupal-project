@@ -87,6 +87,36 @@ abstract class AreaPluginBase extends HandlerBase {
         '#default_value' => $this->options['empty'] ?? 0,
       ];
     }
+
+    $form['area_id'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Machine name of the area'),
+      '#weight' => 151,
+    ];
+
+    $form['area_id']['area_id'] = [
+      '#type' => 'machine_name',
+      '#title' => $this->t('Machine name of the area'),
+      '#default_value' => $this->options['new_id'] ?? $form_state->get('id'),
+      '#required' => TRUE,
+      '#machine_name' => [
+        'exists' => [$this, 'exists'],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+    $current_area_id = $form_state->get('id');
+
+    if ($form_state->getValue(['options', 'area_id', 'area_id']) != $current_area_id) {
+      $this->options['new_id'] = $form_state->getValue(['options', 'area_id', 'area_id']);
+    }
+    else {
+      unset($this->options['new_id']);
+    }
   }
 
   /**
@@ -120,6 +150,28 @@ abstract class AreaPluginBase extends HandlerBase {
    */
   public function isEmpty() {
     return empty($this->options['empty']);
+  }
+
+  /**
+   * Determines if the handler id is already taken.
+   *
+   * @param string $area_id
+   *   The handler id.
+   *
+   * @return bool
+   *   TRUE if the id is taken, FALSE otherwise.
+   */
+  public function exists(string $area_id): bool {
+    $handlers = $this->displayHandler->getHandlers($this->areaType);
+
+    // Make sure no another handler is already using the id, or being renamed,
+    // using the same id.
+    return array_key_exists($area_id, $handlers) || !empty(
+      array_filter(
+        $handlers,
+        fn ($handler) => isset($handler->options['new_id']) && $handler->options['new_id'] == $area_id
+      )
+    );
   }
 
 }

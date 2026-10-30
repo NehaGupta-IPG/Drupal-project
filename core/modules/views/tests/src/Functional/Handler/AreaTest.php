@@ -94,6 +94,45 @@ class AreaTest extends ViewTestBase {
       if ($type !== 'empty') {
         $this->assertSession()->fieldExists('options[empty]');
       }
+
+      // Test that the editable machine id input is accessible.
+      $this->assertSession()->fieldExists('options[area_id][area_id]');
+
+      // Change the machine name.
+      $new_id = $this->randomMachineName();
+      $this->submitForm(['options[area_id][area_id]' => $new_id], 'Apply');
+
+      // Save the view, and test the new ID has been saved.
+      $this->submitForm([], 'Save');
+      $config = $this->config('views.view.test_example_area');
+      $this->assertEquals($new_id, $config->get('display.default.display_options.' . $type . '.' . $new_id . '.id'));
+
+      $view = \Drupal::entityTypeManager()
+        ->getStorage('view')
+        ->load('test_example_area');
+      $displays = $view->get('display');
+      $handlers = $displays['default']['display_options'][$type];
+
+      $this->assertNotEmpty($handlers[$new_id], 'Data found for new area ID key.');
+      $this->assertSame($new_id, $handlers[$new_id]['id'], 'New area ID matches the area ID key.');
+      $this->assertArrayNotHasKey('test_example', $handlers);
+
+      // Test form validation for invalid area ids.
+      $edit_path = 'admin/structure/views/nojs/handler/test_example_area/default/' . $type . '/' . $new_id;
+      $error_text = 'The machine-readable name must contain only lowercase letters, numbers, and underscores.';
+
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test 1'], 'Apply');
+      $this->assertSession()->pageTextContains($error_text);
+
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test_1#'], 'Apply');
+      $this->assertSession()->pageTextContains($error_text);
+
+      // Test using a non-unique area id.
+      $this->drupalGet($edit_path);
+      $this->submitForm(['options[area_id][area_id]' => 'test_example_2'], 'Apply');
+      $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
     }
   }
 
