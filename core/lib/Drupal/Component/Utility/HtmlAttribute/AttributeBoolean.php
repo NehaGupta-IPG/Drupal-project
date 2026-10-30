@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Template;
+namespace Drupal\Component\Utility\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
 
@@ -22,7 +22,7 @@ use Drupal\Component\Utility\Html;
  *  // produces <select>;
  * @endcode
  *
- * @see \Drupal\Core\Template\Attribute
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
 class AttributeBoolean extends AttributeValueBase {
 

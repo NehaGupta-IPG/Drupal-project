@@ -17,7 +17,9 @@ use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGenerator;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -83,6 +85,11 @@ abstract class RendererTestBase extends UnitTestCase {
   protected ThemeManagerInterface&Stub $themeManager;
 
   /**
+   * The style plugin manager.
+   */
+  protected StylePluginManagerInterface&Stub $stylePluginManager;
+
+  /**
    * The element info.
    */
   protected ElementInfoManagerInterface&Stub $elementInfo;
@@ -128,6 +135,7 @@ abstract class RendererTestBase extends UnitTestCase {
       ->method('getCallableFromDefinition')
       ->willReturnArgument(0);
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->stylePluginManager = $this->createStub(StylePluginManagerInterface::class);
     $this->elementInfo = $this->createStub(ElementInfoManagerInterface::class);
     $this->elementInfo
       ->method('getInfo')
@@ -186,13 +194,13 @@ abstract class RendererTestBase extends UnitTestCase {
       });
     $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig, $this->stylePluginManager);
     $this->datetimeTime = new Time($this->requestStack);
 
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
     $container->set('render_cache', $this->renderCache);
-    $container->set('renderer', $this->renderer);
+    $container->set(RendererInterface::class, $this->renderer);
     $container->set('datetime.time', $this->datetimeTime);
     \Drupal::setContainer($container);
   }

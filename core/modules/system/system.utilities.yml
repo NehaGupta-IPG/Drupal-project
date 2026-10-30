@@ -1,0 +1,18 @@
+core_resize:
+  category: "System"
+  label: "Resize"
+  description: "Resizable textareas."
+  options:
+    none:
+      label: "None"
+      value: "resize-none"
+    vertical:
+      label: "Vertical"
+      value: "resize-vertical"
+    horizontal:
+      label: "Horizontal"
+      value: "resize-horizontal"
+    both:
+      label: "Both"
+      value: "resize-both"
+  library: "core/drupal.textarea-resize"

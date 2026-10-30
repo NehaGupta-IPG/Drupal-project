@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Variable;
@@ -13,16 +14,21 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
+use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Turns a render array into an HTML string.
  */
-class Renderer implements RendererInterface {
+class Renderer implements RendererInterface, LoggerAwareInterface {
   use DoTrustedCallbackTrait;
+  use LoggerAwareTrait;
 
   /**
    * The renderer configuration array.
@@ -30,6 +36,13 @@ class Renderer implements RendererInterface {
    * @var array
    */
   protected $rendererConfig;
+
+  /**
+   * The style plugin manager.
+   *
+   * @var \Drupal\Core\Theme\Style\StylePluginManagerInterface
+   */
+  protected $stylePluginManager;
 
   /**
    * Whether we're currently in a ::renderRoot() call.
@@ -72,6 +85,8 @@ class Renderer implements RendererInterface {
    *   The request stack.
    * @param array $renderer_config
    *   The renderer configuration array.
+   * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface|null $stylePluginManager
+   *   The style plugin manager.
    */
   public function __construct(
     protected CallableResolver $callableResolver,
@@ -81,11 +96,18 @@ class Renderer implements RendererInterface {
     protected RenderCacheInterface $renderCache,
     protected RequestStack $requestStack,
     array $renderer_config,
+    ?StylePluginManagerInterface $stylePluginManager = NULL,
   ) {
     if (!isset($renderer_config['debug'])) {
       $renderer_config['debug'] = FALSE;
     }
     $this->rendererConfig = $renderer_config;
+
+    if (!isset($stylePluginManager)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $stylePluginManager argument is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3631504', E_USER_DEPRECATED);
+      $stylePluginManager = \Drupal::service(StylePluginManagerInterface::class);
+    }
+    $this->stylePluginManager = $stylePluginManager;
 
     // Initialize the context collection if needed.
     if (!isset(static::$contextCollection)) {
@@ -417,6 +439,24 @@ class Renderer implements RendererInterface {
       }
       $elements = $new_elements;
       $elements['#lazy_builder_built'] = TRUE;
+    }
+
+    if (!empty($elements['#styles']) && empty($elements['#styles_processed'])) {
+      foreach ($elements['#styles'] as $styleId => $styleOption) {
+        try {
+          $style = $this->stylePluginManager->getDefinition($styleId);
+          $style->applyOrBubbleOnArray($styleOption, $elements);
+        }
+        catch (PluginNotFoundException $exception) {
+          $this->logger?->error($exception->getMessage());
+        }
+        catch (StyleDefinitionErrorException $exception) {
+          $this->logger?->error($exception->getMessage());
+        }
+      }
+      // Avoid processing multiple times. Keep #styles so #pre_render callbacks
+      // can still read it.
+      $elements['#styles_processed'] = TRUE;
     }
 
     // Make any final changes to the element before it is rendered. This means
