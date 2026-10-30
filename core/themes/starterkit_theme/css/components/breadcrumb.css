@@ -20,7 +20,6 @@
   padding: 0;
   list-style-type: none;
 }
-/* IE8 does not support :not() and :last-child. */
 .breadcrumb li::before {
   content: " \BB ";
 }
