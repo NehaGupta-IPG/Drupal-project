@@ -7,13 +7,14 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\MenuLinkBase;
+use Drupal\Core\Menu\MenuLinkTranslationInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 
 /**
  * Provides the menu link plugin for content menu links.
  */
-class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInterface {
+class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInterface, MenuLinkTranslationInterface {
 
   /**
    * Entities IDs to load.
@@ -263,6 +264,19 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    */
   public function isTranslatable() {
     return $this->getEntity()->isTranslatable();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasTranslation($langcode) : bool {
+    $entity = $this->getEntity();
+
+    if (!$entity->hasTranslation($langcode)) {
+      return FALSE;
+    }
+
+    return (bool) $entity->getTranslation($langcode)->content_translation_status->value;
   }
 
   /**

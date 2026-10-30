@@ -232,6 +232,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ['callable' => 'menu.language_tree_manipulator:filterLanguage'],
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
     return $this->menuTree->build($tree);
