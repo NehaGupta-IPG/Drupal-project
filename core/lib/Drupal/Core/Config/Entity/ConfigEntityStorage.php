@@ -21,11 +21,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * Configuration object names of configuration entities are comprised of two
  * parts, separated by a dot:
- * - config_prefix: A string denoting the owner (module/extension) of the
+ * - config_prefix: (optional) A string denoting the owner (module/extension) of the
  *   configuration object, followed by arbitrary other namespace identifiers
  *   that are declared by the owning extension; e.g., 'node.type'. The
  *   config_prefix does NOT contain a trailing dot. It is defined by the entity
- *   type's annotation.
+ *   type's annotation. If omitted the config_prefix will result in the module
+ *   name followed by the entity ID, separated by a dot. e.g. 'node.article'
  * - ID: A string denoting the entity ID within the entity type namespace; e.g.,
  *   'article'. Entity IDs may contain dots/periods. The entire remaining string
  *   after the config_prefix in a config name forms the entity ID. Additional or
