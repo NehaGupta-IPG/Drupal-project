@@ -150,8 +150,13 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
   protected function doLoadMultiple(array $names, $immutable = TRUE) {
     $list = [];
 
+    // The cache key suffix is the same for every name in this call, so build
+    // it once instead of once per name: getCacheKeys() walks every override
+    // service, and this loop runs for every config lookup in the request.
+    $suffix = $immutable ? ':' . implode(':', $this->getCacheKeys()) : '';
+
     foreach ($names as $key => $name) {
-      $cache_key = $this->getConfigCacheKey($name, $immutable);
+      $cache_key = $name . $suffix;
       if (isset($this->cache[$cache_key])) {
         $list[$name] = $this->cache[$cache_key];
         unset($names[$key]);
@@ -169,8 +174,12 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
         $module_overrides = $this->loadOverrides($names);
       }
 
+      // Recomputed after loadOverrides(): an override service is free to
+      // change its cache suffix while collecting overrides.
+      $suffix = $immutable ? ':' . implode(':', $this->getCacheKeys()) : '';
+
       foreach ($storage_data as $name => $data) {
-        $cache_key = $this->getConfigCacheKey($name, $immutable);
+        $cache_key = $name . $suffix;
 
         $this->cache[$cache_key] = $this->createConfigObject($name, $immutable);
         $this->cache[$cache_key]->initWithData($data);
