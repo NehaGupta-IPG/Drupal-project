@@ -185,6 +185,9 @@ class ContentModerationHooks {
    */
   #[Hook('entity_view')]
   public function entityView(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+    if ($view_mode !== 'full') {
+      return;
+    }
     \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityView($build, $entity, $display, $view_mode);
   }
 
