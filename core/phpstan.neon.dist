@@ -6,6 +6,7 @@ includes:
 
 parameters:
 
+  phpVersion: 80300
   tmpDir: phpstan-tmp
 
   level: 1
