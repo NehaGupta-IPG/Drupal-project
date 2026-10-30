@@ -2,6 +2,7 @@
 
 namespace Drupal\media;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -11,6 +12,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Form\SubformState;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
@@ -188,11 +190,21 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
     elseif ($form_state->get('operation') === 'edit') {
       $form['source_field']['#access'] = FALSE;
       $fields = $this->entityFieldManager->getFieldDefinitions('media', $form_state->get('type')->id());
+      $source_field = $fields[$this->configuration['source_field']];
       $form['source_field_message'] = [
         '#markup' => $this->t('%field_name field is used to store the essential information about the media item.', [
-          '%field_name' => $fields[$this->configuration['source_field']]->getLabel(),
+          '%field_name' => $source_field->getLabel(),
         ]),
       ];
+      if ($this->entityTypeManager->getDefinition('field_config')->hasHandlerClass('form', 'edit')) {
+        $form['source_field_subform'] = [
+          '#parents' => ['source_field_subform'],
+        ];
+        $field_form = $this->entityTypeManager->getFormObject('field_config', 'edit');
+        $field_form->setEntity($source_field);
+        $subform_state = SubformState::createForSubform($form['source_field_subform'], $form, $form_state, $field_form);
+        $form['source_field_subform'] = $field_form->buildForm($form['source_field_subform'], $subform_state, $source_field);
+      }
     }
 
     return $form;
@@ -202,6 +214,14 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->get('operation') === 'edit' && $this->entityTypeManager->getDefinition('field_config')->hasHandlerClass('form', 'edit')) {
+      $fields = $this->entityFieldManager->getFieldDefinitions('media', $form_state->get('type')->id());
+      $source_field = $fields[$this->configuration['source_field']];
+      $field_form = $this->entityTypeManager->getFormObject('field_config', 'edit');
+      $field_form->setEntity($source_field);
+      $subform_state = SubformState::createForSubform($form['source_field_subform'], $form, $form_state, $field_form);
+      $field_form->validateForm($form['source_field_subform'], $subform_state);
+    }
   }
 
   /**
@@ -217,6 +237,16 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
       $field_storage = $this->createSourceFieldStorage();
       $field_storage->save();
       $this->configuration['source_field'] = $field_storage->getName();
+    }
+
+    if ($form_state->get('operation') === 'edit' && $this->entityTypeManager->getDefinition('field_config')->hasHandlerClass('form', 'edit')) {
+      $fields = $this->entityFieldManager->getFieldDefinitions('media', $form_state->get('type')->id());
+      $source_field = $fields[$this->configuration['source_field']];
+      $field_form = $this->entityTypeManager->getFormObject('field_config', 'edit');
+      $field_form->setEntity($source_field);
+      $subform_state = SubformState::createForSubform($form['source_field_subform'], $form, $form_state, $field_form);
+      $field_form->submitForm($form['source_field_subform'], $subform_state);
+      $field_form->save($form['source_field_subform'], $subform_state);
     }
   }
 

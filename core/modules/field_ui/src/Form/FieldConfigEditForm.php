@@ -165,7 +165,7 @@ class FieldConfigEditForm extends EntityForm {
         'class' => ['js-hide'],
       ],
       '#value' => $this->t('Update settings'),
-      '#process' => ['::processFieldStorageSubmit'],
+      '#process' => [[static::class, 'processFieldStorageSubmit']],
       '#limit_validation_errors' => [$form['field_storage']['subform']['#parents']],
       '#submit' => ['::fieldStorageSubmit'],
     ];
