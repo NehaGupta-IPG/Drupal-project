@@ -35,7 +35,6 @@ final class ConfigConfigurator {
    */
   public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration) {
     $this->recipeConfigDirectory = is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
-    // @todo Consider defaulting this to FALSE in https://drupal.org/i/3478669.
     $this->strict = $config['strict'] ?? TRUE;
 
     $recipe_storage = $this->getConfigStorage();
@@ -76,7 +75,7 @@ final class ConfigConfigurator {
    * Gets a config storage object for reading config from the recipe.
    *
    * @return \Drupal\Core\Config\StorageInterface
-   *   The  config storage object for reading config from the recipe.
+   *   The config storage object for reading config from the recipe.
    */
   public function getConfigStorage(): StorageInterface {
     $storages = [];
