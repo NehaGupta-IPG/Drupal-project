@@ -28,7 +28,7 @@ class PhpUnitApiGetTestClassesTest extends KernelTestBase {
   public function testSuite(
     array $suites = [],
     ?string $extension = NULL,
-    ?string $directory = NULL,
+    string|array|null $directory = NULL,
     array $testsArg = [],
     ?int $minCount = NULL,
     ?int $maxCount = NULL,
@@ -81,6 +81,55 @@ class PhpUnitApiGetTestClassesTest extends KernelTestBase {
       'testsArg' => ['Menu'],
       'maxCount' => 1,
     ];
+    yield 'two directories' => [
+      'directory' => ['core/modules/help/tests/src', 'core/modules/syslog/tests/src'],
+    ];
+  }
+
+  /**
+   * Checks discovery in several directories at once.
+   */
+  public function testMultipleDirectories(): void {
+    $configurationFilePath = $this->container->getParameter('app.root') . \DIRECTORY_SEPARATOR . 'core';
+    $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($configurationFilePath);
+    $help = $this->getClassNames($phpUnitTestDiscovery->getTestClasses(NULL, [], 'core/modules/help/tests/src'));
+    $syslog = $this->getClassNames($phpUnitTestDiscovery->getTestClasses(NULL, [], 'core/modules/syslog/tests/src'));
+    $this->assertNotEmpty($help);
+    $this->assertNotEmpty($syslog);
+
+    // Both directories together find the tests of each directory.
+    $directories = [
+      'core/modules/help/tests/src',
+      'core/modules/syslog/tests/src',
+    ];
+    $both = $this->getClassNames($phpUnitTestDiscovery->getTestClasses(NULL, [], $directories));
+    $expected = array_merge($help, $syslog);
+    sort($expected);
+    $this->assertSame($expected, $both);
+
+    // A group still limits the tests found in several directories.
+    $syslogGroup = $this->getClassNames($phpUnitTestDiscovery->getTestClasses(NULL, [], $directories, ['syslog']));
+    $this->assertSame($syslog, $syslogGroup);
+  }
+
+  /**
+   * Gets the sorted test class names from a discovery result.
+   *
+   * @param array $groupedTestClassInfoList
+   *   The test classes grouped by group name, as returned by
+   *   \Drupal\Core\Test\PhpUnitTestDiscovery::getTestClasses().
+   *
+   * @return list<string>
+   *   The test class names, without duplicates and sorted by name.
+   */
+  private function getClassNames(array $groupedTestClassInfoList): array {
+    $classNames = [];
+    foreach ($groupedTestClassInfoList as $testClasses) {
+      $classNames = array_merge($classNames, array_keys($testClasses));
+    }
+    $classNames = array_values(array_unique($classNames));
+    sort($classNames);
+    return $classNames;
   }
 
 }
