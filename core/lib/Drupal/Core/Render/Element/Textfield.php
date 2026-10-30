@@ -51,11 +51,9 @@ class Textfield extends FormElementBase {
         [static::class, 'processAutocomplete'],
         [static::class, 'processAjaxForm'],
         [static::class, 'processPattern'],
-        [static::class, 'processGroup'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderTextfield'],
-        [static::class, 'preRenderGroup'],
       ],
       '#theme' => 'input__textfield',
       '#theme_wrappers' => ['form_element'],

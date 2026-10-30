@@ -111,6 +111,40 @@ class FileManagedFileElementTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests AJAX upload and removal without changing grouped file value parents.
+   */
+  public function testGroupedManagedFile(): void {
+    $filename = 'public://grouped-file.txt';
+    file_put_contents($filename, $this->randomString(128));
+    $this->drupalGet('file/test/1/0/0', ['query' => ['grouped' => 1]]);
+    $assert_session = $this->assertSession();
+    $assert_session->elementExists('css', '#edit-group input[name="files[nested_file]"]');
+
+    // The widget's own group member must survive each AJAX replacement.
+    // @todo Once https://www.drupal.org/project/drupal/issues/2926030 is fixed,
+    //   also assert uniqueness and value preservation. Duplicate inputs currently
+    //   prevent those checks.
+    $textfield_selector = '#edit-group .form-managed-file input[name="textfield"]';
+    $assert_session->elementExists('css', $textfield_selector);
+
+    $this->getSession()->getPage()->attachFileToField('files[nested_file]', $this->container->get('file_system')->realpath($filename));
+    $this->assertNotNull($assert_session->waitForElement('css', '#edit-group .file--mime-text-plain'));
+    $assert_session->elementExists('css', $textfield_selector);
+    $fid = $this->getLastFileId();
+    $this->submitForm([], 'Save');
+    $assert_session->pageTextContains("The file ids are $fid.");
+
+    $this->drupalGet('file/test/1/0/0/' . $fid, ['query' => ['grouped' => 1]]);
+    $this->getSession()->getPage()->pressButton('Remove');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->elementExists('css', '#edit-group input[name="files[nested_file]"]');
+    $assert_session->elementNotExists('css', '#edit-group .file--mime-text-plain');
+    $assert_session->elementExists('css', $textfield_selector);
+    $this->submitForm([], 'Save');
+    $assert_session->pageTextContains('The file ids are .');
+  }
+
+  /**
    * Retrieves the fid of the last inserted file.
    */
   protected function getLastFileId(): int {

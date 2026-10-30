@@ -7,6 +7,8 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Render\Element\Container;
+use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Render\ElementInfoManager;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -25,11 +27,14 @@ class ElementInfoManagerTest extends UnitTestCase {
   /**
    * Tests the getInfo() method when render element plugins are used.
    *
+   * Data sets can supply plugin info with existing callbacks to check that the
+   * manager preserves them. By default, the plugin declares no callbacks.
+   *
    * @legacy-covers ::getInfo
    * @legacy-covers ::buildInfo
    */
   #[DataProvider('providerTestGetInfoElementPlugin')]
-  public function testGetInfoElementPlugin(string $plugin_class, $expected_info): void {
+  public function testGetInfoElementPlugin(string $plugin_class, $expected_info, array $plugin_info = ['#theme' => 'page']): void {
     // Override the module handler to set expectations.
     $moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $moduleHandler->expects($this->once())
@@ -40,9 +45,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $plugin = $this->createMock($plugin_class);
     $plugin->expects($this->once())
       ->method('getInfo')
-      ->willReturn([
-        '#theme' => 'page',
-      ]);
+      ->willReturn($plugin_info);
 
     $themeManager = $this->createStub(ThemeManagerInterface::class);
 
@@ -68,7 +71,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $element_info->expects($this->once())
       ->method('getDefinitions')
       ->willReturn([
-        'page' => ['class' => 'TestElementPlugin'],
+        'page' => ['class' => $plugin_class],
       ]);
 
     $this->assertEquals($expected_info, $element_info->getInfo('page'));
@@ -83,23 +86,38 @@ class ElementInfoManagerTest extends UnitTestCase {
   public static function providerTestGetInfoElementPlugin(): array {
     $data = [];
     $data[] = [
-      'Drupal\Core\Render\Element\ElementInterface',
+      Container::class,
       [
         '#type' => 'page',
         '#theme' => 'page',
         '#defaults_loaded' => TRUE,
+        '#process' => [[Container::class, 'processGroup']],
+        '#pre_render' => [[Container::class, 'preRenderGroup']],
       ],
     ];
 
     $data[] = [
-      'Drupal\Core\Render\Element\FormElementInterface',
+      Textfield::class,
       [
         '#type' => 'page',
         '#theme' => 'page',
         '#input' => TRUE,
-        '#value_callback' => ['TestElementPlugin', 'valueCallback'],
+        '#value_callback' => [Textfield::class, 'valueCallback'],
         '#defaults_loaded' => TRUE,
+        '#process' => [[Textfield::class, 'processGroup']],
+        '#pre_render' => [[Textfield::class, 'preRenderGroup']],
       ],
+    ];
+    // Container puts grouping callbacks before its own callbacks. The manager
+    // must preserve that order without adding duplicate grouping callbacks.
+    $callbacks = [
+      '#process' => [[Container::class, 'processGroup'], [Container::class, 'processContainer']],
+      '#pre_render' => [[Container::class, 'preRenderGroup'], [Container::class, 'preRenderContainer']],
+    ];
+    $data['existing group callbacks retain their order'] = [
+      Container::class,
+      $callbacks + ['#type' => 'page', '#defaults_loaded' => TRUE],
+      $callbacks,
     ];
     return $data;
   }
@@ -114,7 +132,7 @@ class ElementInfoManagerTest extends UnitTestCase {
       ->with('element_info', $this->anything())
       ->willReturnArgument(0);
 
-    $plugin = $this->createMock('Drupal\Core\Render\Element\FormElementInterface');
+    $plugin = $this->createMock(Textfield::class);
     $plugin->expects($this->once())
       ->method('getInfo')
       ->willReturn([
@@ -145,7 +163,7 @@ class ElementInfoManagerTest extends UnitTestCase {
     $element_info->expects($this->once())
       ->method('getDefinitions')
       ->willReturn([
-        'page' => ['class' => 'TestElementPlugin'],
+        'page' => ['class' => Textfield::class],
       ]);
 
     $this->assertEquals([
@@ -154,6 +172,8 @@ class ElementInfoManagerTest extends UnitTestCase {
       '#value_callback' => 'custom_value_callback',
       '#input' => TRUE,
       '#defaults_loaded' => TRUE,
+      '#process' => [[Textfield::class, 'processGroup']],
+      '#pre_render' => [[Textfield::class, 'preRenderGroup']],
     ], $element_info->getInfo('page'));
   }
 

@@ -219,6 +219,10 @@ class ManagedFile extends FormElementBase {
       $form[$current_file_count]['#attributes']['class'][] = 'ajax-new-content';
     }
 
+    // Render the widget directly, but preserve #groups so its own group members
+    // are still rendered, as in FormAjaxResponseBuilder::buildResponse().
+    unset($form['#group']);
+
     $status_messages = ['#type' => 'status_messages'];
     $form['#prefix'] .= $renderer->renderRoot($status_messages);
     $output = $renderer->renderRoot($form);

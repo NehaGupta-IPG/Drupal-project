@@ -63,4 +63,31 @@ class AjaxInGroupTest extends WebDriverTestBase {
     $assert_session->responseContains('Another AJAX checkbox in a nested group');
   }
 
+  /**
+   * Tests updating a grouped select's options via AJAX and submitting its value.
+   */
+  public function testSelectInGroup(): void {
+    $this->drupalGet('ajax_forms_test_get_form');
+
+    $assert_session = $this->assertSession();
+    $selector = '#edit-test-group select[name="select_in_group"]';
+    $assert_session->elementExists('css', $selector . ' option[value="a1"]');
+
+    // Repeated replacements must keep the select in its group without copies.
+    foreach (['b', 'a', 'b'] as $category) {
+      $this->getSession()->getPage()->selectFieldOption('select_category', $category);
+      $assert_session->assertWaitOnAjaxRequest();
+      $assert_session->elementExists('css', $selector . ' option[value="' . $category . '1"]');
+      $assert_session->elementExists('css', $selector . ' option[value="' . $category . '2"]');
+      $assert_session->elementsCount('css', $selector . ' option', 2);
+      $assert_session->elementsCount('css', 'select[name="select_in_group"]', 1);
+    }
+
+    // The submit handler reports getValue('select_in_group') in the message.
+    // Checking that message verifies that grouping preserves the submitted
+    // value at its original form-state key.
+    $this->submitForm(['select_in_group' => 'b2'], 'submit');
+    $assert_session->pageTextContains('Selected b2.');
+  }
+
 }

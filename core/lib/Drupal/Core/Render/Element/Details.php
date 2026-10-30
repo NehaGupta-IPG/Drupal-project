@@ -47,12 +47,10 @@ class Details extends RenderElementBase {
       '#summary_attributes' => [],
       '#value' => NULL,
       '#process' => [
-        [static::class, 'processGroup'],
         [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
         [static::class, 'preRenderDetails'],
-        [static::class, 'preRenderGroup'],
       ],
       '#theme_wrappers' => ['details'],
     ];
