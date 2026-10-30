@@ -275,6 +275,20 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests removing the relationship that the filter uses.
+   *
+   * The display reports the missing relationship rather than throwing while
+   * the filter builds its value options.
+   */
+  public function testRemovedRelationship(): void {
+    $view = Views::getView('test_content_moderation_filter_via_relationship');
+    $view->removeHandler('default', 'relationship', 'uid');
+
+    $errors = array_map(fn ($error) => strip_tags((string) $error), $view->validate()['default']);
+    $this->assertContains('The uid relationship used in filter criterion Content: Moderation state is not present in the Default display.', $errors);
+  }
+
+  /**
    * Tests the list of states in the filter plugin.
    */
   public function testStateFilterStatesList(): void {
