@@ -154,9 +154,9 @@ class FieldBlockTest extends EntityKernelTestBase {
    * @covers ::build
    * @dataProvider providerTestBlockAccessEntityAllowedFieldHasValue
    */
-  public function testBlockAccessEntityAllowedFieldHasValue($expected, $is_empty, $default_value): void {
+  public function testBlockAccessEntityAllowedFieldHasValue($expected, $is_empty, $default_value, $show_when_empty): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
-    $block = $this->getTestBlock($entity);
+    $block = $this->getTestBlock($entity, ['show_when_empty' => $show_when_empty]);
 
     $account = $this->prophesize(AccountInterface::class);
     $entity->access('view', $account->reveal(), TRUE)->willReturn(AccessResult::allowed());
@@ -169,7 +169,10 @@ class FieldBlockTest extends EntityKernelTestBase {
     $entity->get('the_field_name')->willReturn($field->reveal());
 
     $field->access('view', $account->reveal(), TRUE)->willReturn(AccessResult::allowed());
-    $field->isEmpty()->willReturn($is_empty)->shouldBeCalled();
+
+    if (!$show_when_empty) {
+      $field->isEmpty()->willReturn($is_empty)->shouldBeCalled();
+    }
 
     $access = $block->access($account->reveal(), TRUE);
     $this->assertSame($expected, $access->isAllowed());
@@ -180,13 +183,21 @@ class FieldBlockTest extends EntityKernelTestBase {
    */
   public static function providerTestBlockAccessEntityAllowedFieldHasValue() {
     $data = [];
-    $data['empty'] = [
+    $data['empty, hide when empty'] = [
       FALSE,
       TRUE,
       FALSE,
+      FALSE,
+    ];
+    $data['empty, show when empty'] = [
+      TRUE,
+      TRUE,
+      FALSE,
+      TRUE,
     ];
     $data['populated'] = [
       TRUE,
+      FALSE,
       FALSE,
       FALSE,
     ];
@@ -194,7 +205,9 @@ class FieldBlockTest extends EntityKernelTestBase {
       TRUE,
       TRUE,
       TRUE,
+      FALSE,
     ];
+
     return $data;
   }
 

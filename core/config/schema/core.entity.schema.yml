@@ -458,9 +458,9 @@ block.settings.field_block:*:*:*:
   mapping:
     formatter:
       type: field_formatter
-    hide_for_empty:
+    show_when_empty:
       type: boolean
-      label: 'Hide for empty'
+      label: 'Show when empty'
   constraints:
     FullyValidatable: ~
 

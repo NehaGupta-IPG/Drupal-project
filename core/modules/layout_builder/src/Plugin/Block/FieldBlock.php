@@ -212,8 +212,9 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       return $access;
     }
 
-    // Check to see if the field has any values or a default value.
-    if ($field->isEmpty() && !$this->entityFieldHasDefaultValue() && $this->getConfiguration()['hide_for_empty']) {
+    // Forbid access if the field is empty and the block is not configured to be
+    // shown when empty.
+    if (!$this->getConfiguration()['show_when_empty'] && $field->isEmpty() && !$this->entityFieldHasDefaultValue()) {
       return $access->andIf(AccessResult::forbidden());
     }
     return $access;
@@ -225,7 +226,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function defaultConfiguration() {
     return [
       'label_display' => FALSE,
-      'hide_for_empty' => TRUE,
+      'show_when_empty' => FALSE,
       'formatter' => [
         'label' => 'above',
         'type' => $this->pluginDefinition['default_formatter'],
@@ -272,11 +273,13 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       '#suffix' => '</div>',
     ];
 
-    $form['hide_for_empty'] = [
+    $form['show_when_empty'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Hide for Empty'),
-      '#default_value' => $config['hide_for_empty'],
+      '#title' => $this->t('Show block when field is empty'),
+      '#description' => $this->t("Normally it's only desirable to enable this option when using a module to add some alternate content when the field is empty."),
+      '#default_value' => $config['show_when_empty'],
     ];
+
     return $form;
   }
 
@@ -344,6 +347,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
+    $this->configuration['show_when_empty'] = $form_state->getValue('show_when_empty');
     $this->configuration['formatter'] = $form_state->getValue('formatter');
     $this->configuration['hide_for_empty'] = $form_state->getValue('hide_for_empty');
   }
