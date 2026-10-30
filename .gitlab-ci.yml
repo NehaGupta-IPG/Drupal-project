@@ -327,7 +327,7 @@ default:
 
 '⚙️️ PHPUnit Kernel':
   <<: [ *with-composer, *test-setup ]
-  parallel: 4
+  parallel: 3
   variables:
     TESTSUITE: kernel
     KUBERNETES_CPU_REQUEST: "12"
@@ -636,6 +636,8 @@ default:
     - *download-cache
     - CACHE_FILE=core/.twigcsfixercache
     - *download-cache
+    - CACHE_FILE=vendor.tar.gz
+    - *download-cache
   artifacts:
     paths:
       - core/phpstan-tmp/resultCache.php
@@ -644,6 +646,7 @@ default:
       - core/.stylelintcache
       - core/.phpcscache
       - core/.twigcsfixercache
+      - vendor.tar.gz
 
 '🧹 PHP Static Analysis (phpstan)':
   <<: [ *default-job-settings-lint ]
@@ -696,11 +699,13 @@ default:
 '📔 Spell-checking':
   <<: [ *yarn-install-from-cache ]
   stage: 🪄 Lint
+  # Any changes to the rules will probably require changes to the
+  # 'Write lint caches' job.
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1" && $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
   variables:
     KUBERNETES_CPU_REQUEST: "1"
@@ -974,8 +979,8 @@ default:
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
     - *composer-setup
-    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer /var/cache/opcache-cli
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ /var/cache/opcache-cli
   script:
     - export EXIT_CODE=0
     - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
@@ -1064,7 +1069,7 @@ default:
     - if: $PERFORMANCE_TEST != "1"
       changes:
         - core/tests/PHPStan/**/*
-        - composer/Metapackage/PinnedDevDependencies/composer.json
+        - composer/Metapackage/DevDependencies/composer.json
     - when: manual
       allow_failure: true
   script:
@@ -1093,13 +1098,20 @@ default:
   script:
     # Exit with an error if any of the lint cache files do not exist.
     - if [ ! -f core/phpstan-tmp/resultCache.php ]; then exit 1; fi
-    - if [ ! -f core/.cspellcache ]; then exit 1; fi
+    # cspell only runs on pushes to main, scheduled pipelines on main and MRs
+    # targeting main.
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "main" ] || [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" = "main" ]; then
+        if [ ! -f core/.cspellcache ]; then exit 1; fi
+      fi
     - if [ ! -f core/.eslintcache ]; then exit 1; fi
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
-    - if [ ! -d vendor ]; then exit 1; fi
-    - tar -czf vendor.tar.gz vendor
+    # Performance pipelines run no lint jobs, so there is no vendor directory;
+    # keep the tarball passed through by 'Lint cache download' instead.
+    - if [ -d vendor ]; then tar -czf vendor.tar.gz vendor; fi
+    - if [ ! -f vendor.tar.gz ]; then exit 1; fi
   artifacts:
     paths:
       - core/phpstan-tmp/resultCache.php
