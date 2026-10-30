@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -14,11 +13,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the ArgumentValidatorAccessCheck route access checker.
+ * Tests the ValidArgumentAccessCheck route access checker.
  */
 #[Group("views")]
 #[RunTestsInSeparateProcesses]
-class ArgumentValidatorAccessCheckTest extends ViewsKernelTestBase {
+class ValidArgumentAccessCheckTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
   use NodeCreationTrait;
@@ -54,19 +53,13 @@ class ArgumentValidatorAccessCheckTest extends ViewsKernelTestBase {
     $access_manager = \Drupal::accessManager();
     $test_user = $this->createUser(['access content']);
 
-    $route_names = [
-      // A 404 achieved via an exception, but converted by AccessManager.
-      'view.test_argument_validator_node.page_1',
-      // A 403 is achieved via a FALSE return value.
-      'view.test_argument_validator_node.page_2',
-    ];
+    // A 403 is achieved via a FALSE return value.
+    $route_name = 'view.test_argument_validator_node.page_2';
+    $this->assertFalse($access_manager->checkNamedRoute($route_name, [], $test_user));
 
-    foreach ($route_names as $route_name) {
-      $access = $access_manager->checkNamedRoute($route_name, [], $test_user, TRUE);
-      $this->assertTrue($access->isForbidden());
-      $this->assertInstanceOf(CacheableDependencyInterface::class, $access);
-      $this->assertSame(['config:views.view.test_argument_validator_node'], $access->getCacheTags());
-    }
+    // A 404 is returned by the controller, not the access check.
+    $route_name = 'view.test_argument_validator_node.page_1';
+    $this->assertTrue($access_manager->checkNamedRoute($route_name, [], $test_user));
   }
 
   /**
@@ -83,25 +76,13 @@ class ArgumentValidatorAccessCheckTest extends ViewsKernelTestBase {
     $access_manager = \Drupal::accessManager();
     $test_user = $this->createUser(['access content']);
 
-    $route_names = [
-      // A 404 achieved via an exception, but converted by AccessManager.
-      'view.test_argument_validator_node.page_3',
-      // A 403 is achieved via a FALSE return value.
-      'view.test_argument_validator_node.page_4',
-    ];
+    // A 403 is achieved via a FALSE return value.
+    $route_name = 'view.test_argument_validator_node.page_4';
+    $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
 
-    foreach ($route_names as $route_name) {
-      $expected_tags = [
-        'config:views.view.test_argument_validator_node',
-        // Now that we actually validate the node, its tag is also added.
-        'node:' . $node_page->id(),
-      ];
-
-      $access = $access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user, TRUE);
-      $this->assertTrue($access->isForbidden());
-      $this->assertInstanceOf(CacheableDependencyInterface::class, $access);
-      $this->assertSame($expected_tags, $access->getCacheTags());
-    }
+    // A 404 is returned by the controller, not the access check.
+    $route_name = 'view.test_argument_validator_node.page_3';
+    $this->assertTrue($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
   }
 
   /**
@@ -135,10 +116,13 @@ class ArgumentValidatorAccessCheckTest extends ViewsKernelTestBase {
     $build = $menu_tree->build($tree);
     $output = (string) $this->render($build);
 
-    $this->assertStringContainsString('article link 404', $output);
+    // Menu links are properly hidden when the view is configured to 403.
     $this->assertStringContainsString('article link 403', $output);
-    $this->assertStringNotContainsString('page link 404', $output);
     $this->assertStringNotContainsString('page link 403', $output);
+
+    // Menu links show when the view is configured to 404.
+    $this->assertStringContainsString('article link 404', $output);
+    $this->assertStringContainsString('page link 404', $output);
   }
 
 }

@@ -1,10 +1,10 @@
 QueryCount: 61
-CacheGetCount: 166
+CacheGetCount: 164
 CacheGetCountByBin:
   page: 1
-  config: 35
+  config: 34
   bootstrap: 12
-  discovery: 69
+  discovery: 68
   data: 6
   entity: 20
   dynamic_page_cache: 1
@@ -63,7 +63,6 @@ CacheTagGroupedLookups:
     - 'node:1'
   -
     - 'config:filter.format.basic_html'
-    - 'config:views.view.taxonomy_term'
     - 'taxonomy_term:13'
     - 'taxonomy_term:22'
     - 'taxonomy_term:31'

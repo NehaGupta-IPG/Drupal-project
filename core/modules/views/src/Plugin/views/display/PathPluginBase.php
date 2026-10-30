@@ -10,9 +10,10 @@ use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
-use Drupal\views\Access\ArgumentValidatorAccessCheck;
+use Drupal\views\Access\ValidArgumentAccessCheck;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
+use Drupal\views\ParamConverter\ValidArgumentConverter;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Route;
@@ -130,10 +131,6 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     // Replace % with %views_arg for menu autoloading and add to the
     // page arguments so the argument actually comes through.
     $arg_counter = 0;
-
-    $argument_ids = array_keys((array) $this->getOption('arguments'));
-    $total_arguments = count($argument_ids);
-
     $argument_map = [];
 
     $bits = [];
@@ -161,6 +158,8 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
 
     // Add missing arguments not defined in the path, but added as handler.
+    $arguments = (array) $this->getOption('arguments');
+    $total_arguments = count($arguments);
     while (($total_arguments - $arg_counter) > 0) {
       $arg_id = 'arg_' . $arg_counter++;
       $bit = '{' . $arg_id . '}';
@@ -191,16 +190,38 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     }
     $access_plugin->alterRouteDefinition($route);
 
-    // If a NULL or invalid argument could lead to a 403 or 404 response, we
-    // need to make sure the route checks the argument and does the same.
-    $arguments_to_check = [];
-    foreach ((array) $this->getOption('arguments') as $name => $argument) {
-      if (ArgumentValidatorAccessCheck::requiresValue($argument) || ArgumentValidatorAccessCheck::requiresValidation($argument)) {
-        $arguments_to_check[] = $name;
+    // If a NULL or invalid argument could lead to a 403 response, we need to
+    // make sure the route checks the argument and does the same. We do not
+    // check for 404 responses as access checks are not fit for that, but we can
+    // enforce this from route enhancers.
+    $arguments_to_check_403 = $arguments_to_check_404 = $route_parameters = [];
+    $arg_counter = 0;
+    foreach ($arguments as $argument_id => $argument) {
+      $arg_id = 'arg_' . $arg_counter++;
+
+      // If there are somehow more views argument plugins than route arguments,
+      // we can bail out early.
+      if (!isset($argument_map[$arg_id])) {
+        break;
+      }
+
+      $param_name = $argument_map[$arg_id];
+      if (ValidArgumentAccessCheck::requiresValue($argument) || ValidArgumentAccessCheck::requiresValidation($argument)) {
+        $arguments_to_check_403[] = $argument_id;
+      }
+      if (ValidArgumentConverter::requiresValue($argument) || ValidArgumentConverter::requiresValidation($argument)) {
+        $arguments_to_check_404[] = $argument_id;
+        $route_parameters[$param_name] = [
+          'converter' => 'paramconverter.views.valid_argument',
+          'argument_id' => $argument_id,
+        ];
       }
     }
-    if ($arguments_to_check) {
-      $route->setRequirement('_views_argument_access', implode(',', $arguments_to_check));
+    if ($arguments_to_check_403) {
+      $route->setRequirement('_views_argument_access', implode(',', $arguments_to_check_403));
+    }
+    if ($arguments_to_check_404) {
+      $route->setOption('parameters', $route_parameters);
     }
 
     // Set the argument map, in order to support named parameters.

@@ -1,9 +1,9 @@
-QueryCount: 262
-CacheGetCount: 260
+QueryCount: 261
+CacheGetCount: 258
 CacheGetCountByBin:
-  config: 56
+  config: 55
   bootstrap: 15
-  discovery: 87
+  discovery: 86
   data: 13
   entity: 24
   dynamic_page_cache: 1
@@ -12,7 +12,7 @@ CacheGetCountByBin:
   render: 17
   file_parsing: 2
   menu: 21
-CacheSetCount: 268
+CacheSetCount: 266
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 30
@@ -64,7 +64,6 @@ CacheTagGroupedLookups:
     - 'node:1'
   -
     - 'config:filter.format.basic_html'
-    - 'config:views.view.taxonomy_term'
     - 'taxonomy_term:13'
     - 'taxonomy_term:22'
     - 'taxonomy_term:31'

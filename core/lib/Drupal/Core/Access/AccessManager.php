@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Access;
 
-use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\RouteMatch;
@@ -98,17 +97,8 @@ class AccessManager implements AccessManagerInterface {
       $result = AccessResult::forbidden()->addCacheTags(['config:core.extension']);
       return $return_as_object ? $result : $result->isAllowed();
     }
-    catch (CacheableNotFoundHttpException $e) {
-      // Route access checks or param converters are allowed to 404 with
-      // cacheable metadata as we do not support other route enhancers here, and
-      // a custom route enhancer is therefore not an option.
+    catch (ParamNotConvertedException $e) {
       $result = AccessResult::forbidden()->addCacheableDependency($e);
-      return $return_as_object ? $result : $result->isAllowed();
-    }
-    catch (ParamNotConvertedException) {
-      // Uncacheable because conversion of the parameter may not have been
-      // possible due to dynamic circumstances.
-      $result = AccessResult::forbidden()->setCacheMaxAge(0);
       return $return_as_object ? $result : $result->isAllowed();
     }
   }
