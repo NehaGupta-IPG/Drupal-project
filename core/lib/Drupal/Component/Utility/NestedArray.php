@@ -318,16 +318,25 @@ class NestedArray {
    * @param bool $preserve_integer_keys
    *   (optional) If given, integer keys will be preserved and merged instead of
    *   appended. Defaults to FALSE.
+   * @param bool $preserve_null_values
+   *   (optional) If FALSE, NULL values will be treated as undefined i.e. NULL
+   *   values will not override non-NULL values present in earlier arrays.
+   *   Defaults to TRUE.
    *
    * @return array
    *   The merged array.
    *
    * @see NestedArray::mergeDeep()
    */
-  public static function mergeDeepArray(array $arrays, $preserve_integer_keys = FALSE) {
+  public static function mergeDeepArray(array $arrays, $preserve_integer_keys = FALSE, $preserve_null_values = TRUE) {
     $result = [];
     foreach ($arrays as $array) {
       foreach ($array as $key => $value) {
+        // Ensure that NULL values don't override real values, if instructed so.
+        if ($value === NULL && $preserve_null_values === FALSE) {
+          continue;
+        }
+
         // Renumber integer keys as array_merge_recursive() does unless
         // $preserve_integer_keys is set to TRUE. Note that PHP automatically
         // converts array keys that are integer strings (e.g., '1') to integers.
