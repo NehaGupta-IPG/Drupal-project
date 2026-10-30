@@ -152,6 +152,31 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
     $output = $test($input);
     $this->assertSame($expected_output, $output->getProcessedText());
     $this->assertEquals($cache_tag, $output->getCacheTags());
+
+    // Test cases for aspect ratio maintenance:
+    // Image with width only; calculate height to maintain aspect ratio.
+    $input = '<img src="llama.jpg" data-entity-type="file" data-entity-uuid="' . $uuid . '" width="400" />';
+    $expected_width = 400;
+    // Calculate height to maintain aspect ratio.
+    $expected_height = (int) ($height * ($expected_width / $width));
+    // Note the order of attributes here matches the actual output.
+    $expected_output = '<img src="/' . $this->siteDirectory . '/files/llama.jpg" data-entity-type="file" data-entity-uuid="' . $uuid . '" width="' . $expected_width . '" height="' . $expected_height . '">';
+    $output = $test($input);
+    $this->assertStringContainsString('width="' . $expected_width . '"', $output->getProcessedText());
+    $this->assertStringContainsString('height="' . $expected_height . '"', $output->getProcessedText());
+    $this->assertEquals($cache_tag, $output->getCacheTags());
+
+    // Image with height only; calculate width to maintain aspect ratio.
+    $input = '<img src="llama.jpg" data-entity-type="file" data-entity-uuid="' . $uuid . '" height="200" />';
+    $expected_height = 200;
+    // Calculate width to maintain aspect ratio.
+    $expected_width = (int) ($width * ($expected_height / $height));
+    // Note the order of attributes here matches the actual output.
+    $expected_output = '<img src="/' . $this->siteDirectory . '/files/llama.jpg" data-entity-type="file" data-entity-uuid="' . $uuid . '" width="' . $expected_width . '" height="' . $expected_height . '">';
+    $output = $test($input);
+    $this->assertStringContainsString('width="' . $expected_width . '"', $output->getProcessedText());
+    $this->assertStringContainsString('height="' . $expected_height . '"', $output->getProcessedText());
+    $this->assertEquals($cache_tag, $output->getCacheTags());
   }
 
 }
