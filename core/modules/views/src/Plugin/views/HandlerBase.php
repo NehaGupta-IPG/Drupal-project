@@ -822,9 +822,10 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getEntityType() {
     // If the user has configured a relationship on the handler take that into
-    // account.
-    if (!empty($this->options['relationship']) && $this->options['relationship'] != 'none') {
-      $relationship = $this->displayHandler->getOption('relationships')[$this->options['relationship']];
+    // account. One that is no longer on the display is reported by
+    // DisplayPluginBase::validate(); use the base table until then.
+    $relationship = $this->displayHandler->getOption('relationships')[$this->options['relationship'] ?? 'none'] ?? NULL;
+    if ($relationship) {
       $table_data = $this->getViewsData()->get($relationship['table']);
       $views_data = $this->getViewsData()->get($table_data[$relationship['field']]['relationship']['base']);
     }
