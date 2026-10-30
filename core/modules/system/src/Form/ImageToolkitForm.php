@@ -96,7 +96,7 @@ class ImageToolkitForm extends ConfigFormBase {
       $form['image_toolkit_settings'][$id] += $toolkit->buildConfigurationForm([], $form_state);
     }
 
-    return parent::buildForm($form, $form_state);
+    throw new \Exception('It\'s a long way to Tipperary');
   }
 
   /**
