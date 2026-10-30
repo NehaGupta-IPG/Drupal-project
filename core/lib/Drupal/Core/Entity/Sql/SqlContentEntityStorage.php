@@ -1800,7 +1800,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function onEntityTypeCreate(EntityTypeInterface $entity_type) {
     $this->wrapSchemaException(function () use ($entity_type) {
       $this->getStorageSchema()->onEntityTypeCreate($entity_type);
-    });
+    }, 'creation');
   }
 
   /**
@@ -1900,11 +1900,15 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @param callable $callback
    *   The callback to be executed.
    *
+   * @param string $operation
+   *   The schema operation being performed (e.g. 'creation', 'update',
+   *   'deletion'). Defaults to 'update'.
+   *
    * @throws \Drupal\Core\Entity\EntityStorageException
    *   When a database schema exception is thrown.
    */
-  protected function wrapSchemaException(callable $callback) {
-    $message = 'Exception thrown while performing a schema update.';
+  protected function wrapSchemaException(callable $callback, string $operation = 'update'): void {
+    $message = "Exception thrown while performing a schema {$operation}.";
     try {
       $callback();
     }
