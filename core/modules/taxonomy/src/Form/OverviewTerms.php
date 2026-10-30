@@ -10,9 +10,12 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
+use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,6 +28,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
 
   /**
+   * Indicator that a term matches the filter.
+   */
+  protected const MATCHING_TERM_INDICATOR = '⇒';
+
+  /**
    * The term storage handler.
    */
   protected TermStorageInterface $storageController;
@@ -35,14 +43,22 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   protected EntityListBuilderInterface $termListBuilder;
 
   /**
+   * The term filter.
+   *
+   * @var string|null
+   */
+  protected ?string $termFilter;
+
+  /**
    * Constructs an OverviewTerms object.
    */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     EntityTypeManagerInterface $entity_type_manager,
-    private readonly RendererInterface $renderer,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly PagerManagerInterface $pagerManager,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+    protected PagerManagerInterface $pagerManager,
+    protected LanguageManagerInterface $languageManager,
   ) {
     $this->setModuleHandler($module_handler);
     $this->setEntityTypeManager($entity_type_manager);
@@ -59,7 +75,8 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       $container->get('entity_type.manager'),
       $container->get('renderer'),
       $container->get('entity.repository'),
-      $container->get('pager.manager')
+      $container->get('pager.manager'),
+      $container->get('language_manager')
     );
   }
 
@@ -119,6 +136,44 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     $tree = $this->storageController->loadTree($taxonomy_vocabulary->id(), 0, NULL, FALSE);
     $tree_index = 0;
     $complete_tree = NULL;
+
+    // Filter tree preserving all parents of each matching term.
+    $this->termFilter = $form_state->getValue('filter');
+    if ($this->termFilter) {
+      $matchingTerms = $this->filterTerms($tree, $this->termFilter);
+      $matchingTids = array_map(
+        static function (\stdClass $term) {
+          return $term->tid;
+        }, $matchingTerms
+      );
+
+      /** @var \Drupal\taxonomy\TermStorageInterface $taxonomyStorage */
+      $termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
+
+      // Determine the matching terms parents to make them visible too.
+      $parentsTids = [];
+      foreach ($matchingTerms as $term) {
+        $parentsTids = array_unique(
+          array_merge(
+            $parentsTids,
+            array_map(
+              static function (TermInterface $term) {
+                return $term->id();
+              },
+              $termStorage->loadAllParents($term->tid)
+            )
+          )
+        );
+      }
+
+      $matchingPlusParentsTids = array_unique(array_merge($matchingTids, $parentsTids));
+
+      // Filter the tree to only show the matching terms and their parents.
+      $tree = array_values(array_filter($tree, static function ($term) use ($matchingPlusParentsTids) {
+        return in_array($term->tid, $matchingPlusParentsTids, FALSE);
+      }));
+    }
+
     do {
       // In case this tree is completely empty.
       if (empty($tree[$tree_index])) {
@@ -140,7 +195,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       $raw_term = $tree[$tree_index];
       if (isset($raw_term->depth) && ($raw_term->depth > 0) && !isset($back_step)) {
         $back_step = 0;
-        while ($parent_term = $tree[--$tree_index]) {
+        while ($tree_index > 0 && $parent_term = $tree[--$tree_index]) {
           $before_entries--;
           $back_step++;
           if ($parent_term->depth == 0) {
@@ -197,8 +252,12 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     // If this form was already submitted once, it's probably hit a validation
     // error. Ensure the form is rebuilt in the same order as the user
     // submitted.
-    $user_input = $form_state->getUserInput();
-    if (!empty($user_input['terms'])) {
+    // The method ->getUserInput() gives problems when using the filter, so we
+    // use ->getValues() instead.
+    $user_input = $form_state->getValues();
+    $triggering_element = $form_state->getTriggeringElement() ? $form_state->getTriggeringElement()['#array_parents'] : NULL;
+    $filter = !empty($triggering_element) && in_array('filter', $triggering_element);
+    if (!empty($user_input) && !$filter) {
       // Get the POST order.
       $order = array_flip(array_keys($user_input['terms']));
       // Update our form with the new order.
@@ -256,10 +315,43 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       '#type' => 'container',
       'message' => ['#markup' => $help_message],
     ];
+    if ($update_tree_access->isAllowed()) {
+      $form['filter_warning'] = [
+        '#type' => 'container',
+        'message' => ['#markup' => '<strong>' . $this->t('Reordering is disabled while terms are filtered.') . '</strong>'],
+      ];
+    }
 
     $operations_access = !empty($pending_term_ids) || $vocabulary_hierarchy === VocabularyInterface::HIERARCHY_MULTIPLE;
     if ($operations_access) {
       $form['help']['#attributes']['class'] = ['messages', 'messages--warning'];
+    }
+
+    // Add filter field.
+    $form['filter'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['container-inline'],
+      ],
+    ];
+    $form['filter']['filter'] = [
+      '#type' => 'textfield',
+      '#size' => 30,
+      '#placeholder' => $this->t('Filter by name...'),
+    ];
+    $form['filter']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Filter'),
+      '#id' => 'filter-submit',
+    ];
+
+    // Only show the reset button when a filter is active.
+    if ($this->termFilter) {
+      $form['filter']['reset'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Reset'),
+        '#id' => 'filter-reset',
+      ];
     }
 
     $errors = $form_state->getErrors();
@@ -280,12 +372,26 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'term' => $this->t('Name'),
         'status' => $this->t('Status'),
         'operations' => $this->t('Operations'),
-        'weight' => !$operations_access ? $this->t('Weight') : NULL,
       ],
       '#attributes' => [
         'id' => 'taxonomy',
       ],
     ];
+    if (!$operations_access && !$this->termFilter) {
+      $form['terms']['#header']['weight'] = $this->t('Weight');
+    }
+    // Table caption.
+    if ($this->termFilter) {
+      $form['terms']['#caption'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        'child' => [
+          '#markup' => $this->t('<span class="color-success">@indicator</span> indicates matching terms. Parents of matching terms are also shown.', [
+            '@indicator' => self::MATCHING_TERM_INDICATOR,
+          ]),
+        ],
+      ];
+    }
     $this->renderer->addCacheableDependency($form['terms'], $create_access);
 
     foreach ($current_page as $key => $term) {
@@ -293,24 +399,51 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'term' => [],
         'status' => [],
         'operations' => [],
-        'weight' => $update_tree_access->isAllowed() ? [] : NULL,
+        'weight' => $update_tree_access->isAllowed() && !$this->termFilter ? [] : NULL,
       ];
       /** @var \Drupal\Core\Entity\EntityInterface $term */
       $term = $this->entityRepository->getTranslationFromContext($term);
       $form['terms'][$key]['#term'] = $term;
-      $indentation = [];
+      $prefix = [];
+      if ($this->termFilter) {
+        $resultType = [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          'child' => [
+            '#markup' => self::MATCHING_TERM_INDICATOR,
+          ],
+        ];
+        if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
+          $resultType['#attributes']['title'] = $this->t('Matching term');
+          $resultType['#attributes']['class'] = ['color-success'];
+        }
+        else {
+          $resultType['#attributes']['title'] = $this->t('Non-matching term');
+          $resultType['#attributes']['class'] = ['visually-hidden'];
+        }
+        $prefix[] = $resultType;
+      }
       if (isset($term->depth) && $term->depth > 0) {
-        $indentation = [
+        $prefix[] = [
           '#theme' => 'indentation',
           '#size' => $term->depth,
         ];
       }
       $form['terms'][$key]['term'] = [
-        '#prefix' => !empty($indentation) ? $this->renderer->render($indentation) : '',
+        '#prefix' => !empty($prefix) ? $this->renderer->render($prefix) : '',
         '#type' => 'link',
         '#title' => $term->getName(),
         '#url' => $term->toUrl(),
       ];
+      if ($this->termFilter) {
+        if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = $this->t('Matching term: @name', ['@name' => $term->getName()]);
+          $form['terms'][$key]['term']['#attributes']['class'][] = 'color-success';
+        }
+        else {
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = $this->t('Non-matching term: @name', ['@name' => $term->getName()]);
+        }
+      }
       $form['terms'][$key]['status'] = [
         '#type' => 'item',
         '#markup' => ($term->isPublished()) ? $this->t('Published') : $this->t('Unpublished'),
@@ -353,7 +486,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         ];
       }
 
-      if ($update_tree_access->isAllowed()) {
+      if ($update_tree_access->isAllowed() && !$this->termFilter) {
         $form['terms'][$key]['weight'] = [
           '#type' => 'weight',
           '#delta' => $delta,
@@ -399,7 +532,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     }
 
     $this->renderer->addCacheableDependency($form['terms'], $update_tree_access);
-    if ($update_tree_access->isAllowed()) {
+    if ($update_tree_access->isAllowed() && !$this->termFilter) {
       if ($parent_fields) {
         $form['terms']['#tabledrag'][] = [
           'action' => 'match',
@@ -415,11 +548,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           'group' => 'term-depth',
           'hidden' => FALSE,
         ];
-        $form['terms']['#attached']['library'][] = 'taxonomy/drupal.taxonomy';
-        $form['terms']['#attached']['drupalSettings']['taxonomy'] = [
-          'backStep' => $back_step,
-          'forwardStep' => $forward_step,
-        ];
       }
       $form['terms']['#tabledrag'][] = [
         'action' => 'order',
@@ -427,8 +555,13 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         'group' => 'term-weight',
       ];
     }
+    $form['terms']['#attached']['library'][] = 'taxonomy/drupal.taxonomy';
+    $form['terms']['#attached']['drupalSettings']['taxonomy'] = [
+      'backStep' => $back_step,
+      'forwardStep' => $forward_step,
+    ];
 
-    if ($update_tree_access->isAllowed() && count($tree) > 1) {
+    if ($update_tree_access->isAllowed() && count($tree) > 1 && !$this->termFilter) {
       $form['actions'] = ['#type' => 'actions', '#tree' => FALSE];
       $form['actions']['submit'] = [
         '#type' => 'submit',
@@ -465,6 +598,22 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+
+    // Rebuild form if filter is submitted and discard a possible page query
+    // parameter.
+    if ('filter-submit' === $form_state->getTriggeringElement()['#id']) {
+      $this->getRequest()->query->remove('page');
+      return $form_state->setRebuild(TRUE);
+    }
+
+    // Reset filter.
+    if ('filter-reset' === $form_state->getTriggeringElement()['#id']) {
+      $this->getRequest()->query->remove('page');
+      $form_state->setValue('filter', NULL);
+      $this->termFilter = NULL;
+      return $form_state->setRebuild(FALSE);
+    }
+
     // Sort term order based on weight.
     uasort($form_state->getValue('terms'), ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
 
@@ -562,6 +711,48 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     /** @var \Drupal\taxonomy\VocabularyInterface $vocabulary */
     $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
     $form_state->setRedirectUrl($vocabulary->toUrl('reset-form'));
+  }
+
+  /**
+   * Filter a term, returning true if the term matches the filter or false.
+   *
+   * @param \stdClass $term
+   *   The taxonomy term to compare against.
+   *
+   * @return bool
+   *   Whether the term matches the filter.
+   */
+  public function filter(\stdClass $term): bool {
+    return stripos($term->name, $this->termFilter) !== FALSE;
+  }
+
+  /**
+   * Filters taxonomy terms, returning only those matching a search string.
+   *
+   * @param array $tree
+   *   The taxonomy term tree to search in.
+   * @param string $searchString
+   *   The search string.
+   *
+   * @return array
+   *   The terms from the taxonomy tree that match the filter.
+   */
+  protected function filterTerms(array $tree, string $searchString): array {
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+    return array_filter($tree, static function (\stdClass $term) use ($searchString, $term_storage, $langcode) {
+      // Loads taxonomy terms to handle translations.
+      if ($term->langcode !== $langcode) {
+        $taxonomy_term = $term_storage->load($term->tid);
+        if ($taxonomy_term instanceof TermInterface && $taxonomy_term->hasTranslation($langcode)) {
+          $taxonomy_term = $taxonomy_term->getTranslation($langcode);
+        }
+
+        return stripos($taxonomy_term->label(), $searchString) !== FALSE;
+      }
+
+      return stripos($term->name, $searchString) !== FALSE;
+    });
   }
 
 }
