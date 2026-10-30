@@ -23,7 +23,7 @@ class PathProcessorDecode implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    return urldecode($path);
+    return rawurldecode($path);
   }
 
 }
