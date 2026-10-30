@@ -309,35 +309,34 @@ function hook_uninstall($is_syncing): void {
  * final import of languages and the end of the installation. This is invoked
  * by install_tasks(). You can have any number of custom tasks to perform
  * during this phase.
- *
- * Each task you define here corresponds to a callback function which you must
- * separately define and which is called when your task is run. This function
- * will receive the global installation state variable, $install_state, as
- * input, and has the opportunity to access or modify any of its settings. See
- * the install_state_defaults() function in the installer for the list of
+ * Each task you define here corresponds to a class which you must separately
+ * define and which is called when your task is run. This class will receive
+ * the global installation state variable, $install_state, as input, and has
+ * the opportunity to access or modify any of its settings.
+ * See the install_state_defaults() function in the installer for the list of
  * $install_state settings used by Drupal core.
  *
- * At the end of your task function, you can indicate that you want the
- * installer to pause and display a page to the user by returning any themed
- * output that should be displayed on that page (but see below for tasks that
- * use the form API or batch API; the return values of these task functions are
- * handled differently). You should also use #title within the task
- * callback function to set a custom page title. For some tasks, however, you
- * may want to simply do some processing and pass control to the next task
- * without ending the page request; to indicate this, simply do not send back
- * a return value from your task function at all. This can be used, for
- * example, by installation profiles that need to configure certain site
- * settings in the database without obtaining any input from the user.
+ * At the end of your task class, you can indicate that you want the installer
+ * to pause and display a page to the user by returning any themed output that
+ * should be displayed on that page (but see below for tasks that use the
+ * form API or batch API; the return values of these task classes are handled
+ * differently). You should also use #title within the task class to set a
+ * custom page title. For some tasks, however, you may want to simply do some
+ * processing and pass control to the next task without ending the page
+ * request; to indicate this, simply do not send back a return value from your
+ * task class at all. This can be used, for example, by installation profiles
+ * that need to configure certain site settings in the database without
+ * obtaining any input from the user.
  *
- * The task function is treated specially if it defines a form or requires
- * batch processing; in that case, you should return either the form API
- * definition or batch API array, as appropriate. See below for more
- * information on the 'type' key that you must define in the task definition
- * to inform the installer that your task falls into one of those two
- * categories. It is important to use these APIs directly, since the installer
- * may be run non-interactively (for example, via a command line script), all
- * in one page request; in that case, the installer will automatically take
- * care of submitting forms and processing batches correctly for both types of
+ * The task class is treated specially if it defines a form or requires batch
+ * processing; in that case, you should return either the form API definition
+ * or batch API array, as appropriate. See below for more information on the
+ * 'type' key that you must define in the task definition to inform the
+ * installer that your task falls into one of those two categories. It is
+ * important to use these APIs directly, since the installer may be run
+ * non-interactively (for example, via a command line script), all in one page
+ * request; in that case, the installer will automatically take care of
+ * submitting forms and processing batches correctly for both types of
  * installations. You can inspect the $install_state['interactive'] boolean to
  * see whether or not the current installation is interactive, if you need
  * access to this information.
@@ -353,14 +352,14 @@ function hook_uninstall($is_syncing): void {
  *
  * @return array
  *   A keyed array of tasks the profile will perform during the final stage of
- *   the installation. Each key represents the name of a function (usually a
- *   function defined by this profile, although that is not strictly required)
- *   that is called when that task is run. The values are associative arrays
- *   containing the following key-value pairs (all of which are optional):
- *   - display_name: The human-readable name of the task. This will be
- *     displayed to the user while the installer is running, along with a list
- *     of other tasks that are being run. Leave this unset to prevent the task
- *     from appearing in the list.
+ *   the installation. Each key represents the name of a class (usually a class
+ *   defined by this profile, although that is not strictly required) that is
+ *   called when that task is run. The values are associative arrays containing
+ *   the following key-value pairs (all of which are optional):
+ *   - display_name: The human-readable name of the task. This will be displayed
+ *     to the user while the installer is running, along with a list of other
+ *     tasks that are being run. Leave this unset to prevent the task from
+ *     appearing in the list.
  *   - display: This is a boolean which can be used to provide finer-grained
  *     control over whether or not the task will display. This is mostly useful
  *     for tasks that are intended to display only under certain conditions;
@@ -370,13 +369,13 @@ function hook_uninstall($is_syncing): void {
  *   - type: A string representing the type of task. This parameter has three
  *     possible values:
  *     - normal: (default) This indicates that the task will be treated as a
- *       regular callback function, which does its processing and optionally
+ *       regular class, which does its processing and optionally
  *       returns HTML output.
- *     - batch: This indicates that the task function will return a batch API
+ *     - batch: This indicates that the task class will return a batch API
  *       definition suitable for batch_set() or an array of batch definitions
  *       suitable for consecutive batch_set() calls. The installer will then
  *       take care of automatically running the task via batch processing.
- *     - form: This indicates that the task function will return a standard
+ *     - form: This indicates that the task class will return a standard
  *       form API definition (and separately define validation and submit
  *       handlers, as appropriate). The installer will then take care of
  *       automatically directing the user through the form submission process.
@@ -393,10 +392,10 @@ function hook_uninstall($is_syncing): void {
  *       each installation page request that reaches it. This is rarely
  *       necessary for an installation profile to use; it is primarily used by
  *       the Drupal installer for bootstrap-related tasks.
- *   - function: Normally this does not need to be set, but it can be used to
- *     force the installer to call a different function when the task is run
- *     (rather than the function whose name is given by the array key). This
- *     could be used, for example, to allow the same function to be called by
+ *   - class: Normally this does not need to be set, but it can be used to
+ *     force the installer to call a different class when the task is run
+ *     (rather than the class whose name is given by the array key). This
+ *     could be used, for example, to allow the same class to be called by
  *     two different tasks.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
@@ -414,59 +413,57 @@ function hook_install_tasks(&$install_state) {
   // processor-intensive batch process needs to be triggered later on in the
   // installation.
   $my_profile_needs_batch_processing = \Drupal::state()->get('my_profile.needs_batch_processing', FALSE);
-  $tasks = [
-    // This is an example of a task that defines a form which the user who is
-    // installing the site will be asked to fill out. To implement this task,
-    // your profile would define a function named my_profile_data_import_form()
-    // as a normal form API callback function, with associated validation and
-    // submit handlers. In the submit handler, in addition to saving whatever
-    // other data you have collected from the user, you might also call
-    // \Drupal::state()->set('my_profile.needs_batch_processing', TRUE) if the
-    // user has entered data which requires that batch processing will need to
-    // occur later on.
-    'my_profile_data_import_form' => [
-      'display_name' => t('Data import options'),
-      'type' => 'form',
-    ],
-    // Similarly, to implement this task, your profile would define a function
-    // named my_profile_settings_form() with associated validation and submit
-    // handlers. This form might be used to collect and save additional
-    // information from the user that your profile needs. There are no extra
-    // steps required for your profile to act as an "installation wizard"; you
-    // can simply define as many tasks of type 'form' as you wish to execute,
-    // and the forms will be presented to the user, one after another.
-    'my_profile_settings_form' => [
-      'display_name' => t('Additional options'),
-      'type' => 'form',
-    ],
-    // This is an example of a task that performs batch operations. To
-    // implement this task, your profile would define a function named
-    // my_profile_batch_processing() which returns a batch API array definition
-    // that the installer will use to execute your batch operations. Due to the
-    // 'my_profile.needs_batch_processing' variable used here, this task will be
-    // hidden and skipped unless your profile set it to TRUE in one of the
-    // previous tasks.
-    'my_profile_batch_processing' => [
-      'display_name' => t('Import additional data'),
-      'display' => $my_profile_needs_batch_processing,
-      'type' => 'batch',
-      'run' => $my_profile_needs_batch_processing ? INSTALL_TASK_RUN_IF_NOT_COMPLETED : INSTALL_TASK_SKIP,
-    ],
-    // This is an example of a task that will not be displayed in the list that
-    // the user sees. To implement this task, your profile would define a
-    // function named my_profile_final_site_setup(), in which additional,
-    // automated site setup operations would be performed. Since this is the
-    // last task defined by your profile, you should also use this function to
-    // call \Drupal::state()->delete('my_profile.needs_batch_processing') and
-    // clean up the state that was used above. If you want the user to pass
-    // to the final Drupal installation tasks uninterrupted, return no output
-    // from this function. Otherwise, return themed output that the user will
-    // see (for example, a confirmation page explaining that your profile's
-    // tasks are complete, with a link to reload the current page and therefore
-    // pass on to the final Drupal installation tasks when the user is ready to
-    // do so).
-    'my_profile_final_site_setup' => [],
+  $tasks = [];
+  // This is an example of a task that defines a form which the user who is
+  // installing the site will be asked to fill out. To implement this task,
+  // your profile would define a class named MyProfileDataImportForm as a
+  // normal form API class, with associated validation and submit handlers.
+  // In the submit handler, in addition to saving whatever other data you have
+  // collected from the user, you might also call
+  // \Drupal::state()->set('my_profile.needs_batch_processing', TRUE) if the
+  // user has entered data which requires that batch processing will need to
+  // occur later on.
+  $tasks['DRUPAL\INSTALL_PROFILE\FORM\MyProfileDataImportForm'] = [
+    'display_name' => t('Data import options'),
+    'type' => 'form',
   ];
+  // Similarly, to implement this task, your profile would define a class
+  // named MyProfileSettingsForm with associated validation and submit
+  // handlers. This form might be used to collect and save additional
+  // information from the user that your profile needs. There are no extra
+  // steps required for your profile to act as an "installation wizard"; you
+  // can simply define as many tasks of type 'form' as you wish to execute,
+  // and the forms will be presented to the user, one after another.
+  $tasks['DRUPAL\INSTALL_PROFILE\FORM\MyProfileSettingsForm'] = [
+    'display_name' => t('Additional options'),
+    'type' => 'form',
+  ];
+  // This is an example of a task that performs batch operations. To
+  // implement this task, your profile would define a class named
+  // MyProfileBatchProcessing which returns a batch API array definition
+  // that the installer will use to execute your batch operations. Due to the
+  // 'my_profile.needs_batch_processing' variable used here, this task will be
+  // hidden and skipped unless your profile set it to TRUE in one of the
+  // previous tasks.
+  $tasks['DRUPAL\INSTALL_PROFILE\CONTROLLER\MyProfileBatchProcessing'] = [
+    'display_name' => t('Import additional data'),
+    'display' => $my_profile_needs_batch_processing,
+    'type' => 'batch',
+    'run' => $my_profile_needs_batch_processing ? INSTALL_TASK_RUN_IF_NOT_COMPLETED : INSTALL_TASK_SKIP,
+  ];
+  // This is an example of a task that will not be displayed in the list that
+  // the user sees. To implement this task, your profile would define a class
+  // named MyProfileFinalSiteSetup, in which additional, automated site setup
+  // operations would be performed. Since this is the last task defined by your
+  // profile, you should also use this class to call
+  // \Drupal::state()->delete('my_profile.needs_batch_processing') and clean up
+  // the state that was used above. If you want the user to pass to the final
+  // Drupal installation tasks uninterrupted, return no output from this class.
+  // Otherwise, return themed output that the user will see (for example, a
+  // confirmation page explaining that your profile's tasks are complete, with a
+  // link to reload the current page and therefore pass on to the final Drupal
+  // installation tasks when the user is ready to do so).
+  $tasks['DRUPAL\INSTALL_PROFILE\FORM\MyProfileFinalSiteSetup'] = [];
   return $tasks;
 }
 
