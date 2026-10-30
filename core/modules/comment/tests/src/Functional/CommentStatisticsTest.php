@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
@@ -85,8 +85,8 @@ class CommentStatisticsTest extends CommentTestBase {
     $this->drupalLogout();
 
     // Prepare for anonymous comment submission (comment approval enabled).
-    // Note we don't use user_role_change_permissions(), because that caused
-    // random test failures.
+    // Note we don't use RoleInterface::changePermissions(), because that
+    // caused random test failures.
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('admin/people/permissions');
@@ -99,7 +99,7 @@ class CommentStatisticsTest extends CommentTestBase {
     $this->drupalLogout();
 
     // Ensure that the poster can leave some contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAY_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Allowed);
 
     // Post comment #2 as anonymous (comment approval enabled).
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
@@ -114,8 +114,8 @@ class CommentStatisticsTest extends CommentTestBase {
     $this->assertEquals(1, $node->get('comment')->comment_count, 'The value of node comment_count is still 1.');
 
     // Prepare for anonymous comment submission (no approval required).
-    // Note we don't use user_role_change_permissions(), because that caused
-    // random test failures.
+    // Note we don't use RoleInterface::changePermissions(), because that
+    // caused random test failures.
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/permissions');
     $edit = [

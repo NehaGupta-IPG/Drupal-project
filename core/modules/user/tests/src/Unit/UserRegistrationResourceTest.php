@@ -9,10 +9,12 @@ use Drupal\Core\Password\PasswordGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\User;
+use Drupal\user\NotificationHandler;
 use Drupal\user\Plugin\rest\resource\UserRegistrationResource;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -24,21 +26,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 #[Group('user')]
 class UserRegistrationResourceTest extends UnitTestCase {
 
-  const ERROR_MESSAGE = "Unprocessable Entity: validation failed.\nproperty_path: message\nproperty_path_2: message_2\n";
-
   /**
    * Class to be tested.
    *
    * @var \Drupal\user\Plugin\rest\resource\UserRegistrationResource
    */
   protected $testClass;
-
-  /**
-   * A reflection of self::$testClass.
-   *
-   * @var \ReflectionClass
-   */
-  protected $reflection;
 
   /**
    * A user settings config instance.
@@ -69,6 +62,11 @@ class UserRegistrationResourceTest extends UnitTestCase {
   protected $passwordGenerator;
 
   /**
+   * The user mail handler.
+   */
+  protected NotificationHandler&Stub $notificationHandler;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -82,8 +80,9 @@ class UserRegistrationResourceTest extends UnitTestCase {
 
     $this->passwordGenerator = $this->prophesize(PasswordGeneratorInterface::class)->reveal();
 
-    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator);
-    $this->reflection = new \ReflectionClass($this->testClass);
+    $this->notificationHandler = $this->createStub(NotificationHandler::class);
+
+    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator, $this->notificationHandler);
   }
 
   /**
@@ -91,7 +90,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
    */
   public function testEmptyPost(): void {
     $this->expectException(BadRequestHttpException::class);
-    $this->testClass->post(NULL);
+    $this->testClass->post();
   }
 
   /**
@@ -114,7 +113,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
 
     $this->currentUser->isAnonymous()->willReturn(TRUE);
 
-    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator);
+    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator, $this->notificationHandler);
 
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(TRUE);
@@ -130,7 +129,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   public function testRegistrationAnonymousOnlyPost(): void {
     $this->currentUser->isAnonymous()->willReturn(FALSE);
 
-    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator);
+    $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator, $this->notificationHandler);
 
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(TRUE);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\ArgumentsResolver;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,11 +18,13 @@ use PHPUnit\Framework\TestCase;
 #[Group('Access')]
 class ArgumentsResolverTest extends TestCase {
 
+  use ForwardCompatibilityTrait;
+
   /**
    * Tests the getArgument() method.
    */
   #[DataProvider('providerTestGetArgument')]
-  public function testGetArgument($callable, $scalars, $objects, $wildcards, $expected): void {
+  public function testGetArgument(callable $callable, $scalars, $objects, $wildcards, $expected): void {
     $arguments = (new ArgumentsResolver($scalars, $objects, $wildcards))->getArguments($callable);
     $this->assertSame($expected, $arguments);
   }
@@ -29,27 +32,27 @@ class ArgumentsResolverTest extends TestCase {
   /**
    * Provides test data to testGetArgument().
    */
-  public static function providerTestGetArgument() {
+  public static function providerTestGetArgument(): array {
     $data = [];
 
     // Test an optional parameter with no provided value.
     $data[] = [
-      function ($foo = 'foo') {}, [], [], [] , ['foo'],
+      function ($foo = 'foo'): void {}, [], [], [] , ['foo'],
     ];
 
     // Test an optional parameter with a provided value.
     $data[] = [
-      function ($foo = 'foo') {}, ['foo' => 'bar'], [], [], ['bar'],
+      function ($foo = 'foo'): void {}, ['foo' => 'bar'], [], [], ['bar'],
     ];
 
     // Test with a provided value.
     $data[] = [
-      function ($foo) {}, ['foo' => 'bar'], [], [], ['bar'],
+      function ($foo): void {}, ['foo' => 'bar'], [], [], ['bar'],
     ];
 
     // Test with an explicitly NULL value.
     $data[] = [
-      function ($foo) {}, [], ['foo' => NULL], [], [NULL],
+      function ($foo): void {}, [], ['foo' => NULL], [], [NULL],
     ];
 
     // Test with a raw value that overrides the provided upcast value, since
@@ -57,7 +60,7 @@ class ArgumentsResolverTest extends TestCase {
     $scalars = ['foo' => 'baz'];
     $objects = ['foo' => new \stdClass()];
     $data[] = [
-      function ($foo) {}, $scalars, $objects, [], ['baz'],
+      function ($foo): void {}, $scalars, $objects, [], ['baz'],
     ];
 
     // Test a static method string.
@@ -76,7 +79,7 @@ class ArgumentsResolverTest extends TestCase {
    * Tests getArgument() with an object.
    */
   public function testGetArgumentObject(): void {
-    $callable = function (\stdClass $object) {};
+    $callable = function (\stdClass $object): void {};
 
     $object = new \stdClass();
     $arguments = (new ArgumentsResolver([], ['object' => $object], []))->getArguments($callable);
@@ -87,7 +90,7 @@ class ArgumentsResolverTest extends TestCase {
    * Tests getArgument() with a wildcard object for a parameter with a custom name.
    */
   public function testGetWildcardArgument(): void {
-    $callable = function (\stdClass $custom_name) {};
+    $callable = function (\stdClass $custom_name): void {};
 
     $object = new \stdClass();
     $arguments = (new ArgumentsResolver([], [], [$object]))->getArguments($callable);
@@ -98,9 +101,9 @@ class ArgumentsResolverTest extends TestCase {
    * Tests getArgument() with a Route, Request, and Account object.
    */
   public function testGetArgumentOrder(): void {
-    $a1 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
-    $a2 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\TestClass')->getMock();
-    $a3 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test2Interface')->getMock();
+    $a1 = $this->createStub(Test1Interface::class);
+    $a2 = $this->createStub(TestClass::class);
+    $a3 = $this->createStub(Test2Interface::class);
 
     $objects = [
       't1' => $a1,
@@ -109,12 +112,12 @@ class ArgumentsResolverTest extends TestCase {
     $wildcards = [$a3];
     $resolver = new ArgumentsResolver([], $objects, $wildcards);
 
-    $callable = function (Test1Interface $t1, TestClass $tc, Test2Interface $t2) {};
+    $callable = function (Test1Interface $t1, TestClass $tc, Test2Interface $t2): void {};
     $arguments = $resolver->getArguments($callable);
     $this->assertSame([$a1, $a2, $a3], $arguments);
 
     // Test again, but with the arguments in a different order.
-    $callable = function (Test2Interface $t2, TestClass $tc, Test1Interface $t1) {};
+    $callable = function (Test2Interface $t2, TestClass $tc, Test1Interface $t1): void {};
     $arguments = $resolver->getArguments($callable);
     $this->assertSame([$a3, $a2, $a1], $arguments);
   }
@@ -126,13 +129,13 @@ class ArgumentsResolverTest extends TestCase {
    * callable.
    */
   public function testGetWildcardArgumentNoTypeHint(): void {
-    $a = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
+    $a = $this->createStub(Test1Interface::class);
     $wildcards = [$a];
     $resolver = new ArgumentsResolver([], [], $wildcards);
 
-    $callable = function ($route) {};
+    $callable = function ($route): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$route" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testGetWildcardArgumentNoTypeHint.*\" requires a value for the \"\$route\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -146,22 +149,23 @@ class ArgumentsResolverTest extends TestCase {
     $scalars = ['route' => 'foo'];
     $resolver = new ArgumentsResolver($scalars, [], []);
 
-    $callable = function ($route) {};
+    $callable = function ($route): void {};
     $arguments = $resolver->getArguments($callable);
     $this->assertSame(['foo'], $arguments);
   }
 
   /**
-   * Tests handleUnresolvedArgument() for a scalar argument.
+   * Tests handleUnresolvedArgument() for a non-upcasted argument.
    */
   public function testHandleNotUpcastedArgument(): void {
     $objects = ['foo' => 'bar'];
     $scalars = ['foo' => 'baz'];
+    // @phpstan-ignore argument.type
     $resolver = new ArgumentsResolver($scalars, $objects, []);
 
-    $callable = function (\stdClass $foo) {};
+    $callable = function (\stdClass $foo): void {};
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*testHandleNotUpcastedArgument.*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
@@ -169,19 +173,19 @@ class ArgumentsResolverTest extends TestCase {
    * Tests handleUnresolvedArgument() for missing arguments.
    */
   #[DataProvider('providerTestHandleUnresolvedArgument')]
-  public function testHandleUnresolvedArgument($callable): void {
+  public function testHandleUnresolvedArgument(callable $callable): void {
     $resolver = new ArgumentsResolver([], [], []);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage('requires a value for the "$foo" argument.');
+    $this->expectExceptionMessageMatches('/Callable \".*\" requires a value for the \"\$foo\" argument\./');
     $resolver->getArguments($callable);
   }
 
   /**
    * Provides test data to testHandleUnresolvedArgument().
    */
-  public static function providerTestHandleUnresolvedArgument() {
+  public static function providerTestHandleUnresolvedArgument(): array {
     $data = [];
-    $data[] = [function ($foo) {}];
+    $data[] = [function ($foo): void {}];
     $data[] = [[new TestClass(), 'access']];
     $data[] = ['Drupal\Tests\Component\Utility\test_access_arguments_resolver_access'];
     return $data;
@@ -194,7 +198,7 @@ class ArgumentsResolverTest extends TestCase {
  */
 class TestClass {
 
-  public function access($foo) {
+  public function access($foo): void {
   }
 
 }
@@ -204,7 +208,7 @@ class TestClass {
  */
 class TestStaticMethodClass {
 
-  public static function access($foo) {
+  public static function access($foo): void {
   }
 
 }
@@ -221,5 +225,5 @@ interface Test1Interface {
 interface Test2Interface {
 }
 
-function test_access_arguments_resolver_access($foo) {
+function test_access_arguments_resolver_access($foo): void {
 }

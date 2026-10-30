@@ -34,7 +34,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -48,7 +48,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
     'language',
     'help',
     'node',
-    'search',
+    'page_cache',
     'views',
   ];
 
@@ -84,10 +84,9 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
     $this->drupalCreateContentType(['type' => 'page', 'title' => 'Basic page']);
     $this->addDefaultCommentField('node', 'page');
 
-    // To generate search and comment tags.
+    // To generate comment tags.
     $anonymous = Role::load(RoleInterface::ANONYMOUS_ID);
     $anonymous
-      ->grantPermission('search content')
       ->grantPermission('access comments');
     $anonymous->save();
 
@@ -112,7 +111,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
     ]);
 
     // Place a block, but only make it visible on full node page 2.
-    $block = $this->drupalPlaceBlock('views_block:comments_recent-block_1', [
+    $this->drupalPlaceBlock('views_block:comments_recent-block_1', [
       'visibility' => [
         'request_path' => [
           'pages' => '/node/' . $node_2->id(),
@@ -122,7 +121,6 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
 
     $cache_contexts = [
       'languages:' . LanguageInterface::TYPE_INTERFACE,
-      'route',
       'theme',
       'timezone',
       // The placed block is only visible on certain URLs through a visibility
@@ -142,33 +140,12 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
     $this->assertPageCacheContextsAndTags($node_1->toUrl(), $cache_contexts, [
       'http_response',
       'rendered',
-      'block_view',
-      'local_task',
       'config:block_list',
-      'config:block.block.olivero_site_branding',
-      'config:block.block.olivero_breadcrumbs',
-      'config:block.block.olivero_content',
-      'config:block.block.olivero_help',
-      'config:block.block.olivero_search_form_narrow',
-      'config:block.block.olivero_search_form_wide',
-      'config:block.block.' . $block->id(),
-      'config:block.block.olivero_powered',
-      'config:block.block.olivero_main_menu',
-      'config:block.block.olivero_account_menu',
-      'config:block.block.olivero_messages',
-      'config:block.block.olivero_primary_local_tasks',
-      'config:block.block.olivero_secondary_local_tasks',
-      'config:block.block.olivero_primary_admin_actions',
-      'config:block.block.olivero_page_title',
       'node_view',
-      'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'node:' . $node_1->id(),
       'user:' . $author_1->id(),
+      'user_view',
       'config:filter.format.basic_html',
-      'config:search.settings',
-      'config:system.menu.account',
-      'config:system.menu.main',
-      'config:system.site',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',
@@ -181,33 +158,12 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
     $this->assertPageCacheContextsAndTags($node_2->toUrl(), $cache_contexts, [
       'http_response',
       'rendered',
-      'block_view',
-      'local_task',
       'config:block_list',
-      'config:block.block.olivero_site_branding',
-      'config:block.block.olivero_breadcrumbs',
-      'config:block.block.olivero_content',
-      'config:block.block.olivero_help',
-      'config:block.block.olivero_search_form_narrow',
-      'config:block.block.olivero_search_form_wide',
-      'config:block.block.' . $block->id(),
-      'config:block.block.olivero_powered',
-      'config:block.block.olivero_main_menu',
-      'config:block.block.olivero_account_menu',
-      'config:block.block.olivero_messages',
-      'config:block.block.olivero_primary_local_tasks',
-      'config:block.block.olivero_secondary_local_tasks',
-      'config:block.block.olivero_primary_admin_actions',
-      'config:block.block.olivero_page_title',
       'node_view',
-      'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'node:' . $node_2->id(),
       'user:' . $author_2->id(),
+      'user_view',
       'config:filter.format.full_html',
-      'config:search.settings',
-      'config:system.menu.account',
-      'config:system.menu.main',
-      'config:system.site',
       'comment_list',
       'node_list',
       'config:views.view.comments_recent',

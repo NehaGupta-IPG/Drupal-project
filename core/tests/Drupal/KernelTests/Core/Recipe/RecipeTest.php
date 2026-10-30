@@ -12,6 +12,7 @@ use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\TestWith;
  */
 #[CoversClass(Recipe::class)]
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class RecipeTest extends KernelTestBase {
 
   use RecipeTestTrait;
@@ -43,15 +45,13 @@ class RecipeTest extends KernelTestBase {
 
   /**
    * Tests creating a recipe from an empty directory.
-   *
-   * @legacy-covers ::createFromDirectory
    */
   public function testCreateFromDirectoryNoRecipe(): void {
     $dir = uniqid('public://');
     mkdir($dir);
 
     $this->expectException(RecipeFileException::class);
-    $this->expectExceptionMessage('There is no ' . $dir . '/recipe.yml file');
+    $this->expectExceptionMessageIs('There is no ' . $dir . '/recipe.yml file');
     Recipe::createFromDirectory($dir);
   }
 
@@ -96,9 +96,9 @@ class RecipeTest extends KernelTestBase {
    */
   public function testExampleRecipe(): void {
     // The example recipe imports all the configurations from the node module
-    // including optional configurations associated with the search and view
-    // modules. So we have to install them before applying the example recipe.
-    $this->container->get('module_installer')->install(['search', 'views']);
+    // including optional configurations associated with the views module. So we
+    // have to install views before applying the example recipe.
+    $this->container->get('module_installer')->install(['views']);
     // Apply the example recipe.
     $recipe = Recipe::createFromDirectory('core/recipes/example');
     RecipeRunner::processRecipe($recipe);

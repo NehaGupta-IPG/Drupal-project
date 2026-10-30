@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that user.mail default settings are parsed correctly.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserMailDefaultsTest extends KernelTestBase {
 
   /**
@@ -28,10 +31,9 @@ class UserMailDefaultsTest extends KernelTestBase {
 
   /**
    * Tests that each user mail contains blank lines.
-   *
-   * @dataProvider userMailsProvider
    */
-  public function testMailDefaults($key): void {
+  #[DataProvider('userMailsProvider')]
+  public function testMailDefaults(string $key): void {
     $body = $this->config('user.mail')->get("$key.body");
     $this->assertStringContainsString("\n\n", $body);
   }
@@ -42,7 +44,7 @@ class UserMailDefaultsTest extends KernelTestBase {
    * @return array
    *   Array of arrays containing the set of user mail configuration keys.
    */
-  public static function userMailsProvider() {
+  public static function userMailsProvider(): array {
     return [
       ['cancel_confirm'],
       ['password_reset'],

@@ -6,13 +6,18 @@ namespace Drupal\Tests\block_content\Kernel;
 
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of block_content_type entities.
- *
- * @group block_content
- * @group #slow
  */
+#[Group('block_content')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class BlockContentTypeValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -28,8 +33,8 @@ class BlockContentTypeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = BlockContentType::create([
       'id' => 'test',

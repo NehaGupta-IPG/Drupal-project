@@ -54,10 +54,13 @@
      *   An optional selector string.
      */
     insert({ data, method, selector }) {
-      const target = htmx.find(selector);
+      const targets = htmx.findAll(selector);
 
-      // Detach behaviors.
-      htmx.trigger(target, 'htmx:drupal:unload');
+      // In rare circumstances, the targets may not be found, such as if
+      // the targets are in noscript elements.
+      if (!targets || !targets.length) {
+        return;
+      }
 
       // Map jQuery manipulation methods to the DOM equivalent.
       const styleMap = {
@@ -68,11 +71,19 @@
         append: 'beforeend',
         after: 'afterend',
       };
-
-      // Make the actual swap and initialize everything.
-      htmx.swap(target, data, {
-        swapStyle: styleMap[method] || 'outerHTML',
-      });
+      // In htmx 4, htmx.swap() returns a Promise. Build an Iterable of these
+      // promises and wrap them in a single Promise which is returned to
+      // Drupal.bigPipe.commandExecutionQueue for resolution.
+      return Promise.all(
+        targets.map((target) =>
+          htmx.swap({
+            target,
+            text: data,
+            swap: styleMap[method] || 'outerHTML',
+            transition: false,
+          }),
+        ),
+      );
     },
 
     /**

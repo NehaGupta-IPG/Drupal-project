@@ -27,8 +27,6 @@ class TopBarItemManagerTest extends UnitTestCase {
 
   /**
    * The top bar item manager under test.
-   *
-   * @var \Drupal\navigation\TopBarItemManagerInterface
    */
   protected TopBarItemManagerInterface $manager;
 
@@ -84,8 +82,6 @@ class TopBarItemManagerTest extends UnitTestCase {
 
   /**
    * Tests get definitions by region.
-   *
-   * @legacy-covers ::getDefinitionsByRegion
    */
   public function testGetDefinitionsByRegion(): void {
     $tools = $this->manager->getDefinitionsByRegion(TopBarRegion::Tools);

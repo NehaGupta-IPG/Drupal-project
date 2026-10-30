@@ -114,7 +114,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
 
-    $this->expectDeprecation('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
+    $this->expectUserDeprecationMessage('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
   }
 
   /**
@@ -263,13 +263,11 @@ class LayoutPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests process definition.
-   *
-   * @legacy-covers ::processDefinition
    */
   public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
+    $this->expectExceptionMessageIs('The "module_a_derived_layout:array_based" layout definition must extend ' . LayoutDefinition::class);
     $module_a_provided_layout = <<<'EOS'
 module_a_derived_layout:
   deriver: \Drupal\Tests\Core\Layout\LayoutDeriver
@@ -286,9 +284,30 @@ EOS;
   }
 
   /**
-   * Tests get theme implementations.
+   * Tests ::processDefinition() with a layout that doesn't have a category.
    *
-   * @legacy-covers ::getThemeImplementations
+   * @legacy-covers ::processDefinition
+   */
+  public function testProcessDefinitionWithMissingLayoutCategory(): void {
+    $module_a_category_less_layout = <<<'EOS'
+module_a_category_less_layout:
+  label: Category-less Layout
+  description: A layout that doesn't have a category.
+EOS;
+    $file_name = 'module_a.layouts.yml';
+    vfsStream::create([
+      'modules' => [
+        'module_a' => [
+          $file_name => $module_a_category_less_layout,
+        ],
+      ],
+    ]);
+    $definitions = $this->layoutPluginManager->getDefinitions();
+    $this->assertEquals($file_name, $definitions['module_a_category_less_layout']->getCategory());
+  }
+
+  /**
+   * Tests get theme implementations.
    */
   public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
@@ -322,8 +341,6 @@ EOS;
 
   /**
    * Tests get categories.
-   *
-   * @legacy-covers ::getCategories
    */
   public function testGetCategories(): void {
     $expected = [
@@ -336,8 +353,6 @@ EOS;
 
   /**
    * Tests get sorted definitions.
-   *
-   * @legacy-covers ::getSortedDefinitions
    */
   public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
@@ -355,8 +370,6 @@ EOS;
 
   /**
    * Tests get grouped definitions.
-   *
-   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGetGroupedDefinitions(): void {
     $category_expected = [
@@ -381,8 +394,6 @@ EOS;
 
   /**
    * Test that modules and themes can alter the list of layouts.
-   *
-   * @legacy-covers ::getLayoutOptions
    */
   public function testGetLayoutOptions(): void {
     $this->moduleHandler->alter(
@@ -541,6 +552,7 @@ class LayoutDeriver extends DeriverBase {
       $this->derivatives['invalid_provider'] = new LayoutDefinition([
         'id' => 'invalid_provider',
         'provider' => 'invalid_provider',
+        'label' => 'invalid_provider',
       ]);
       $this->derivatives['invalid_provider']->setClass(LayoutInterface::class);
     }

@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(ModerationStateFilter::class)]
 #[Group('content_moderation')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ViewsModerationStateFilterTest extends ViewTestBase {
 
@@ -173,7 +172,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
    * Tests the moderation state filter when the configured workflow is changed.
    */
   #[DataProvider('providerTestWorkflowChanges')]
-  public function testWorkflowChanges($view_id): void {
+  public function testWorkflowChanges(string $view_id): void {
     // First, apply the Editorial workflow to both of our content types.
     $this->drupalGet('admin/config/workflow/workflows/manage/editorial/type/node');
     $this->submitForm([
@@ -206,7 +205,11 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
     // Check that only the archived nodes from both bundles are displayed by the
     // view.
     $view = $this->loadViewUnchanged($view_id);
-    $this->executeAndAssertIdenticalResultset($view, [['nid' => $archived_node_a->id()], ['nid' => $archived_node_b->id()]], ['nid' => 'nid']);
+    $this->executeAndAssertIdenticalResultset(
+      $view,
+      [['nid' => $archived_node_a->id()], ['nid' => $archived_node_b->id()]],
+      ['nid' => 'nid'],
+    );
 
     // Remove the Editorial workflow from one of the bundles.
     $this->drupalGet('admin/config/workflow/workflows/manage/editorial/type/node');
@@ -266,7 +269,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
    * @return string[]
    *   An array of view IDs.
    */
-  public static function providerTestWorkflowChanges() {
+  public static function providerTestWorkflowChanges(): array {
     return [
       'view on base table, filter on base table' => [
         'test_content_moderation_state_filter_base_table',
@@ -298,7 +301,16 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
     // Adding a second workflow to nodes will also show new states.
     $this->drupalGet('admin/config/workflow/workflows/manage/new_workflow/type/node');
     $this->submitForm(['bundles[example_b]' => TRUE], 'Save');
-    $this->assertFilterStates(['All', 'editorial-draft', 'editorial-published', 'editorial-archived', 'editorial-foo', 'new_workflow-draft', 'new_workflow-published', 'new_workflow-bar']);
+    $this->assertFilterStates([
+      'All',
+      'editorial-draft',
+      'editorial-published',
+      'editorial-archived',
+      'editorial-foo',
+      'new_workflow-draft',
+      'new_workflow-published',
+      'new_workflow-bar',
+    ]);
 
     // Add a few more states and change the exposed filter to allow multiple
     // selections so we can check that the size of the select element does not
@@ -321,7 +333,17 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
     $this->drupalGet("admin/structure/views/view/{$view_id}");
     $this->submitForm([], 'Save');
 
-    $this->assertFilterStates(['editorial-draft', 'editorial-published', 'editorial-archived', 'editorial-foo', 'editorial-foo2', 'editorial-foo3', 'new_workflow-draft', 'new_workflow-published', 'new_workflow-bar'], TRUE);
+    $this->assertFilterStates([
+      'editorial-draft',
+      'editorial-published',
+      'editorial-archived',
+      'editorial-foo',
+      'editorial-foo2',
+      'editorial-foo3',
+      'new_workflow-draft',
+      'new_workflow-published',
+      'new_workflow-bar',
+    ], TRUE);
   }
 
   /**

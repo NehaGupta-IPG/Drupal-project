@@ -13,12 +13,14 @@ use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test decoupled translation revisions.
  */
 #[CoversClass(ContentEntityStorageBase::class)]
 #[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
   /**
@@ -60,7 +62,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * The previous untranslatable field value.
    *
-   * @var string[]
+   * @var array<string,?string>
    */
   protected $previousUntranslatableFieldValue;
 
@@ -110,7 +112,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testDecoupledDefaultRevisions.
    */
-  public static function dataTestDecoupledPendingRevisions() {
+  public static function dataTestDecoupledPendingRevisions(): array {
     $sets = [];
 
     $sets['Intermixed languages - No initial default translation'][] = [
@@ -211,7 +213,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testUntranslatableFields.
    */
-  public static function dataTestUntranslatableFields() {
+  public static function dataTestUntranslatableFields(): array {
     $sets = [];
 
     $sets['Default behavior - Untranslatable fields affect all revisions'] = [
@@ -482,7 +484,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @return string
    *   The formatted message.
    */
-  protected function formatMessage($message) {
+  protected function formatMessage(string $message): mixed {
     $args = func_get_args();
     array_shift($args);
     $params = array_merge($args, $this->stepInfo);
@@ -588,8 +590,6 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
   /**
    * Checks that the revision create hook works as expected.
-   *
-   * @legacy-covers ::createRevision
    */
   public function testCreateRevisionHook(): void {
     $entity = EntityTestMulRev::create();

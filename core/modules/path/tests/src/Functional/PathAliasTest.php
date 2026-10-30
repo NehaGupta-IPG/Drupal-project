@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path\Functional;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\Tests\WaitTerminateTestTrait;
@@ -50,40 +49,6 @@ class PathAliasTest extends PathTestBase {
     // after Drupal has flushed the response to the client. We use
     // WaitTerminateTestTrait to wait for Drupal to do this before continuing.
     $this->setWaitForTerminate();
-  }
-
-  /**
-   * Tests the path cache.
-   */
-  public function testPathCache(): void {
-    // Create test node.
-    $node1 = $this->drupalCreateNode();
-
-    // Create alias.
-    $edit = [];
-    $edit['path[0][value]'] = '/node/' . $node1->id();
-    $edit['alias[0][value]'] = '/' . $this->randomMachineName(8);
-    $this->drupalGet('admin/config/search/path/add');
-    $this->submitForm($edit, 'Save');
-
-    // Check the path alias prefix list cache.
-    $prefix_list = \Drupal::cache('bootstrap')->get('path_alias_prefix_list');
-    $this->assertTrue($prefix_list->data['node']);
-    $this->assertFalse($prefix_list->data['admin']);
-
-    // Visit the system path for the node and confirm a cache entry is
-    // created.
-    \Drupal::cache('data')->deleteAll();
-    // Make sure the path is not converted to the alias.
-    $this->drupalGet(trim($edit['path[0][value]'], '/'), ['alias' => TRUE]);
-    $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
-
-    // Visit the alias for the node and confirm a cache entry is created.
-    \Drupal::cache('data')->deleteAll();
-    // @todo Remove this once https://www.drupal.org/node/2480077 lands.
-    Cache::invalidateTags(['rendered']);
-    $this->drupalGet(trim($edit['alias[0][value]'], '/'));
-    $this->assertNotEmpty(\Drupal::cache('data')->get('preload-paths:' . $edit['path[0][value]']), 'Cache entry was created.');
   }
 
   /**
@@ -266,7 +231,13 @@ class PathAliasTest extends PathTestBase {
     $edit = [];
     $edit['path[0][alias]'] = '/' . $this->randomMachineName(8);
     $this->drupalGet('node/' . $node1->id() . '/edit');
+    // Assert that the details form is closed.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.path-form', 'open');
     $this->submitForm($edit, 'Save');
+
+    $this->drupalGet('node/' . $node1->id() . '/edit');
+    // Assert that the details form is still closed even though it has a url.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.path-form', 'open');
 
     // Confirm that the alias works.
     $this->drupalGet($edit['path[0][alias]']);
@@ -411,7 +382,7 @@ class PathAliasTest extends PathTestBase {
    * @return int
    *   Integer representing the path ID.
    */
-  public function getPID($alias) {
+  public function getPID($alias): mixed {
     $result = \Drupal::entityTypeManager()->getStorage('path_alias')->getQuery()
       ->condition('alias', $alias, '=')
       ->accessCheck(FALSE)
@@ -450,7 +421,8 @@ class PathAliasTest extends PathTestBase {
     // This error should still be present next to the field.
     $this->assertSession()->pageTextContains("The alias {$edit['path[0][alias]']} is already in use in this language.");
     // The validation error set for the page should include this text.
-    $this->assertSession()->statusMessageContains('1 error has been found: URL alias', 'error');
+    $this->assertSession()->statusMessageContains('1 error has been found:', 'error');
+    $this->assertSession()->statusMessageContains('URL alias', 'error');
     // The text 'URL alias' should be a link.
     $this->assertSession()->linkExists('URL alias');
     // The link should be to the ID of the URL alias field.

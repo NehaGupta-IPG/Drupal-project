@@ -6,11 +6,13 @@ namespace Drupal\KernelTests\Core\File;
 
 use Drupal\Core\File\Exception\NotRegularFileException;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the unmanaged file delete function.
  */
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileDeleteTest extends FileTestBase {
 
   /**
@@ -79,7 +81,7 @@ class FileDeleteTest extends FileTestBase {
     symlink(\Drupal::service('file_system')->realpath($directory), \Drupal::service('file_system')->realpath($link));
     $this->assertDirectoryExists($link);
 
-    $this->expectExceptionMessage("Cannot delete '$link' because it is a directory. Use deleteRecursive() instead.");
+    $this->expectExceptionMessageIs("Cannot delete '$link' because it is a directory. Use deleteRecursive() instead.");
     $this->expectException(NotRegularFileException::class);
     \Drupal::service('file_system')->delete($link);
   }

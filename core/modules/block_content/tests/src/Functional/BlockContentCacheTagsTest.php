@@ -25,7 +25,10 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block_content'];
+  protected static $modules = [
+    'block_content',
+    'page_cache',
+  ];
 
   /**
    * {@inheritdoc}
@@ -87,7 +90,7 @@ class BlockContentCacheTagsTest extends EntityCacheTagsTestBase {
     // Expected keys, contexts, and tags for the block.
     // @see \Drupal\block\BlockViewBuilder::viewMultiple()
     $expected_block_cache_keys = ['entity_view', 'block', $block->id()];
-    $expected_block_cache_tags = Cache::mergeTags(['block_view', 'rendered'], $block->getCacheTags());
+    $expected_block_cache_tags = Cache::mergeTags(['rendered'], $block->getCacheTags());
     $expected_block_cache_tags = Cache::mergeTags($expected_block_cache_tags, $block->getPlugin()->getCacheTags());
 
     // Expected contexts and tags for the BlockContent entity.

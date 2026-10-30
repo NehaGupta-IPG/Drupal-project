@@ -8,17 +8,16 @@
  * @module drupalImage/imagealternativetext/drupalimagealternativetextui
  */
 
-import { Plugin } from 'ckeditor5/src/core';
-import { IconLowVision } from '@ckeditor/ckeditor5-icons';
 import {
+  Plugin,
+  IconLowVision,
   ButtonView,
   ContextualBalloon,
+  CssTransitionDisablerMixin,
   clickOutsideHandler,
-} from 'ckeditor5/src/ui';
-import {
-  repositionContextualBalloon,
-  getBalloonPositionData,
-} from '@ckeditor/ckeditor5-image/src/image/ui/utils';
+  _repositionImageContextualBalloon as repositionContextualBalloon,
+  _getImageBalloonPositionData as getBalloonPositionData,
+} from 'ckeditor5';
 import ImageAlternativeTextFormView from './ui/imagealternativetextformview';
 import MissingAlternativeTextView from './ui/missingalternativetextview';
 
@@ -186,7 +185,9 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
      *
      * @member {module:drupalImage/imagetextalternative/ui/imagealternativetextformview~ImageAlternativeTextFormView}
      */
-    this._form = new ImageAlternativeTextFormView(editor.locale);
+    this._form = new (CssTransitionDisablerMixin(ImageAlternativeTextFormView))(
+      editor.locale,
+    );
 
     // Render the form so its #element is available for clickOutsideHandler.
     this._form.render();

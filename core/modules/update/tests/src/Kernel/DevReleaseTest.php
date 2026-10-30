@@ -12,12 +12,14 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the project data when the installed version is a dev version.
- *
- * @group update
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class DevReleaseTest extends KernelTestBase {
 
   /**
@@ -53,7 +55,7 @@ class DevReleaseTest extends KernelTestBase {
    */
   protected function setCoreVersion(string $version): void {
     $this->config('update_test.settings')
-      ->set('system_info.#all.version', $version)
+      ->set('extension_info.#all.version', $version)
       ->save();
   }
 
@@ -86,13 +88,13 @@ class DevReleaseTest extends KernelTestBase {
    * seconds.
    */
   public function testSecurityUpdates(): void {
-    $system_info = [
+    $extension_info = [
       '#all' => [
         'version' => '8.1.0-dev',
         'datestamp' => '1280424641',
       ],
     ];
-    $project_data = $this->getProjectData($system_info);
+    $project_data = $this->getProjectData($extension_info);
     $this->assertCount(1, $project_data['drupal']['security updates']);
     $this->assertSame('8.1.2', $project_data['drupal']['security updates'][0]['version']);
     $this->assertSame(UpdateManagerInterface::NOT_CURRENT, $project_data['drupal']['status']);
@@ -106,36 +108,39 @@ class DevReleaseTest extends KernelTestBase {
    *  no updates will be shown as security update.
    */
   public function testSecurityUpdateEmptyProjectTimestamp(): void {
-    $system_info = [
+    $extension_info = [
       '#all' => [
         'version' => '8.1.0-dev',
         'datestamp' => '0',
       ],
     ];
-    $project_data = $this->getProjectData($system_info);
+    $project_data = $this->getProjectData($extension_info);
     $this->assertArrayNotHasKey('security updates', $project_data['drupal']);
     $this->assertSame(UpdateFetcherInterface::NOT_CHECKED, $project_data['drupal']['status']);
     $this->assertSame('Unknown release date', (string) $project_data['drupal']['reason']);
   }
 
   /**
-   * Gets project data from update_calculate_project_data().
+   * Gets project data from \Drupal\update\UpdateManagerInterface::calculateProjectData().
    *
-   * @param array $system_info
-   *   System test information as used by update_test_system_info_alter().
+   * @param array $extension_info
+   *   System test information as used by
+   *   \Drupal\update_test\Hook\UpdateTestHooks::extensionInfoAlter().
    *
    * @return array[]
-   *   The project data as returned by update_calculate_project_data().
+   *   The project data as returned by
+   *   \Drupal\update\UpdateManagerInterface::calculateProjectData().
    *
-   * @see update_test_system_info_alter()
+   * @see \Drupal\update_test\Hook\UpdateTestHooks::extensionInfoAlter()
    */
-  private function getProjectData(array $system_info): array {
+  private function getProjectData(array $extension_info): array {
     $this->config('update_test.settings')
-      ->set('system_info', $system_info)
+      ->set('extension_info', $extension_info)
       ->save();
-    update_storage_clear();
-    $available = update_get_available(TRUE);
-    return update_calculate_project_data($available);
+
+    \Drupal::service(UpdateManagerInterface::class)->reset();
+    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
+    return \Drupal::service(UpdateManagerInterface::class)->calculateProjectData($available);
   }
 
 }

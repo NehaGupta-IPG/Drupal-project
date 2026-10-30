@@ -6,18 +6,18 @@ namespace Drupal\Tests\Component\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait;
 use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait.
  */
-#[CoversClass(DiscoveryCachedTrait::class)]
+#[CoversTrait(DiscoveryCachedTrait::class)]
 #[Group('Plugin')]
-#[UsesClass(DiscoveryTrait::class)]
+#[UsesTrait(DiscoveryTrait::class)]
 class DiscoveryCachedTraitTest extends TestCase {
 
   /**
@@ -29,7 +29,7 @@ class DiscoveryCachedTraitTest extends TestCase {
    *   - Definitions to be returned by getDefinitions().
    *   - Plugin name to query for.
    */
-  public static function providerGetDefinition() {
+  public static function providerGetDefinition(): array {
     return [
       ['definition', [], ['plugin_name' => 'definition'], 'plugin_name'],
       ['definition', ['plugin_name' => 'definition'], [], 'plugin_name'],
@@ -38,10 +38,10 @@ class DiscoveryCachedTraitTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDefinition
+   * Tests get definition.
    */
   #[DataProvider('providerGetDefinition')]
-  public function testGetDefinition($expected, $cached_definitions, $get_definitions, $plugin_id): void {
+  public function testGetDefinition(?string $expected, array $cached_definitions, array $get_definitions, string $plugin_id): void {
     $trait = $this->getMockBuilder(DiscoveryCachedTraitMockableClass::class)
       ->onlyMethods(['getDefinitions'])
       ->getMock();
@@ -55,12 +55,14 @@ class DiscoveryCachedTraitTest extends TestCase {
       $trait->expects($this->once())
         ->method('getDefinitions')
         // Use a callback method, so we can perform the side-effects.
-        ->willReturnCallback(function () use ($reflection_definitions, $trait, $get_definitions) {
+        ->willReturnCallback(function () use ($reflection_definitions, $trait, $get_definitions): array {
           $reflection_definitions->setValue($trait, $get_definitions);
           return $get_definitions;
         });
     }
     else {
+      $trait->expects($this->never())
+        ->method('getDefinitions');
       // Put $cached_definitions into our mocked ::$definitions.
       $reflection_definitions->setValue($trait, $cached_definitions);
     }

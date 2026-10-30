@@ -14,6 +14,7 @@ use Drupal\Tests\Core\Database\Stub\StubSchema;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 #[CoversClass(InstallerRedirectTrait::class)]
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerRedirectTraitTest extends KernelTestBase {
 
   /**
@@ -31,9 +33,9 @@ class InstallerRedirectTraitTest extends KernelTestBase {
    *   - Exceptions to be handled by shouldRedirectToInstaller()
    *   - Whether or not there is a database connection.
    *   - Whether or not there is database connection info.
-   *   - Whether or not there exists a sequences table in the database.
+   *   - Whether or not the key_value table exists in the database.
    */
-  public static function providerShouldRedirectToInstaller() {
+  public static function providerShouldRedirectToInstaller(): array {
     return [
       [TRUE, DatabaseNotFoundException::class, FALSE, FALSE],
       [TRUE, DatabaseNotFoundException::class, TRUE, FALSE],
@@ -69,18 +71,16 @@ class InstallerRedirectTraitTest extends KernelTestBase {
 
   /**
    * Tests should redirect to installer.
-   *
-   * @legacy-covers ::shouldRedirectToInstaller
    */
   #[DataProvider('providerShouldRedirectToInstaller')]
-  public function testShouldRedirectToInstaller(bool $expected, string $exception, bool $connection, bool $connection_info, bool $sequences_table_exists = TRUE): void {
+  public function testShouldRedirectToInstaller(bool $expected, string $exception, bool $connection, bool $connection_info, bool $key_value_table_exists = TRUE): void {
     // Mock the trait.
     $trait = $this->getMockBuilder(InstallerRedirectTraitMockableClass::class)
       ->onlyMethods(['isCli'])
       ->getMock();
 
     // Make sure that the method thinks we are not using the cli.
-    $trait->expects($this->any())
+    $trait->expects($this->once())
       ->method('isCli')
       ->willReturn(FALSE);
 
@@ -92,24 +92,17 @@ class InstallerRedirectTraitTest extends KernelTestBase {
 
     if ($connection) {
       // Mock the database connection.
-      $connection = $this->getMockBuilder(StubConnection::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['schema'])
-        ->getMock();
+      $connection = $this->createStub(StubConnection::class);
 
       if ($connection_info) {
         // Mock the database schema class.
-        $schema = $this->getMockBuilder(StubSchema::class)
-          ->disableOriginalConstructor()
-          ->onlyMethods(['tableExists'])
-          ->getMock();
+        $schema = $this->createStub(StubSchema::class);
 
-        $schema->expects($this->any())
+        $schema
           ->method('tableExists')
-          ->with('sequences')
-          ->willReturn($sequences_table_exists);
+          ->willReturn($key_value_table_exists);
 
-        $connection->expects($this->any())
+        $connection
           ->method('schema')
           ->willReturn($schema);
       }

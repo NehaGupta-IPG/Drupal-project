@@ -39,7 +39,10 @@ class NodeIntegrationTest extends NodeTestBase {
 
       for ($j = 0; $j < 5; $j++) {
         // Ensure the right order of the nodes.
-        $node = $this->drupalCreateNode(['type' => $type->id(), 'created' => \Drupal::time()->getRequestTime() - ($i * 5 + $j)]);
+        $node = $this->drupalCreateNode([
+          'type' => $type->id(),
+          'created' => \Drupal::time()->getRequestTime() - ($i * 5 + $j),
+        ]);
         $nodes[$type->id()][$node->id()] = $node;
         $all_nids[] = $node->id();
       }
@@ -68,7 +71,7 @@ class NodeIntegrationTest extends NodeTestBase {
    * @internal
    */
   protected function assertNids(array $expected_nids = []): void {
-    $result = $this->xpath('//span[@class="field-content"]');
+    $result = $this->getNodeElementsByXpath('//span[@class="field-content"]');
     $nids = [];
     foreach ($result as $element) {
       $nids[] = (int) $element->getText();

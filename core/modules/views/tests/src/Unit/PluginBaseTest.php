@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
+use Drupal\Core\Utility\Token;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Tests\TestHelperPlugin;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests Drupal\views\Plugin\views\PluginBase.
@@ -35,6 +37,79 @@ class PluginBaseTest extends UnitTestCase {
   }
 
   /**
+   * Tests the getAvailableGlobalTokens method.
+   */
+  #[DataProvider('providerTestGetAvailableGlobalTokens')]
+  public function testGetAvailableGlobalTokens(array $info, array $types, array $expected): void {
+    // Get the token service and set the container.
+    $token = $this->createStub(Token::class);
+    $token
+      ->method('getInfo')
+      ->willReturn($info);
+
+    $container = new ContainerBuilder();
+    $container->set('token', $token);
+    \Drupal::setContainer($container);
+
+    $prepared = FALSE;
+    $actual = $this->testHelperPlugin->getAvailableGlobalTokens($prepared, $types);
+    $this->assertEquals($expected, $actual);
+  }
+
+  /**
+   * Data provider for testGetAvailableGlobalTokens().
+   *
+   * @return array
+   *   - An associative array of token information.
+   *   - An array of additional token types.
+   *   - The expected tokens.
+   */
+  public static function providerTestGetAvailableGlobalTokens(): array {
+    return [
+      '0 global, 0 added' => [
+        ['tokens' => []],
+        [],
+        [],
+      ],
+      '0 global, 1 added' => [
+        ['tokens' => []],
+        ['date'],
+        [],
+      ],
+      '1 global, 1 added, same' => [
+        ['tokens' => ['date' => 'bar']],
+        ['date'],
+        ['date' => 'bar'],
+      ],
+      '1 global, 0 added' => [
+        ['tokens' => ['site' => 'foo']],
+        [],
+        ['site' => 'foo'],
+      ],
+      '1 global, 1 added' => [
+        ['tokens' => ['site' => 'foo']],
+        ['date'],
+        ['site' => 'foo'],
+      ],
+      '2 global, 1 added' => [
+        ['tokens' => ['site' => 'foo', 'date' => 'bar']],
+        ['date'],
+        ['site' => 'foo', 'date' => 'bar'],
+      ],
+      '3 global, 0 added' => [
+        ['tokens' => ['site' => 'foo', 'view' => 'baz', 'date' => 'bar']],
+        [],
+        ['site' => 'foo', 'view' => 'baz'],
+      ],
+      '3 global, 1 added' => [
+        ['tokens' => ['site' => 'foo', 'view' => 'baz', 'date' => 'bar']],
+        ['date'],
+        ['site' => 'foo', 'view' => 'baz', 'date' => 'bar'],
+      ],
+    ];
+  }
+
+  /**
    * Tests the unpackOptions method.
    *
    * @param array $storage
@@ -47,8 +122,6 @@ class PluginBaseTest extends UnitTestCase {
    *   The expected array after unpacking.
    * @param bool $all
    *   Whether to unpack all options.
-   *
-   * @legacy-covers ::unpackOptions
    */
   #[DataProvider('providerTestUnpackOptions')]
   public function testUnpackOptions($storage, $options, $definition, $expected, $all = FALSE): void {
@@ -80,7 +153,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestUnpackOptions() {
+  public static function providerTestUnpackOptions(): array {
     $test_parameters = [];
     // Set a storage but no value, so the storage value should be kept.
     $test_parameters[] = [
@@ -229,7 +302,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestSetOptionDefault() {
+  public static function providerTestSetOptionDefault(): array {
     $test_parameters = [];
     // No definition should change anything on the storage.
     $test_parameters[] = [
@@ -287,8 +360,6 @@ class PluginBaseTest extends UnitTestCase {
 
   /**
    * Tests filter by defined options.
-   *
-   * @legacy-covers ::filterByDefinedOptions
    */
   #[DataProvider('providerTestFilterByDefinedOptions')]
   public function testFilterByDefinedOptions($storage, $options, $expected_storage): void {
@@ -300,7 +371,7 @@ class PluginBaseTest extends UnitTestCase {
   /**
    * Provides data to testFilterByDefinedOptions().
    */
-  public static function providerTestFilterByDefinedOptions() {
+  public static function providerTestFilterByDefinedOptions(): array {
     $data = [];
 
     // A simple defined option.

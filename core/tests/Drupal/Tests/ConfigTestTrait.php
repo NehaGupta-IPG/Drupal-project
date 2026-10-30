@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\Core\Config\ConfigImporter;
+use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Config\StorageCopyTrait;
 use Drupal\Core\Config\StorageInterface;
@@ -22,26 +23,14 @@ trait ConfigTestTrait {
    * @return \Drupal\Core\Config\ConfigImporter
    *   The config importer object.
    */
-  protected function configImporter() {
+  protected function configImporter(): ConfigImporter {
     if (!$this->configImporter) {
       // Set up the ConfigImporter object for testing.
       $storage_comparer = new StorageComparer(
         $this->container->get('config.storage.sync'),
         $this->container->get('config.storage')
       );
-      $this->configImporter = new ConfigImporter(
-        $storage_comparer,
-        $this->container->get('event_dispatcher'),
-        $this->container->get('config.manager'),
-        $this->container->get('lock'),
-        $this->container->get('config.typed'),
-        $this->container->get('module_handler'),
-        $this->container->get('module_installer'),
-        $this->container->get('theme_handler'),
-        $this->container->get('string_translation'),
-        $this->container->get('extension.list.module'),
-        $this->container->get('extension.list.theme')
-      );
+      $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer);
     }
     // Always recalculate the changelist when called.
     return $this->configImporter->reset();
@@ -55,7 +44,7 @@ trait ConfigTestTrait {
    * @param \Drupal\Core\Config\StorageInterface $target_storage
    *   The target config storage service.
    */
-  protected function copyConfig(StorageInterface $source_storage, StorageInterface $target_storage) {
+  protected function copyConfig(StorageInterface $source_storage, StorageInterface $target_storage): void {
     static::replaceStorageContents($source_storage, $target_storage);
   }
 

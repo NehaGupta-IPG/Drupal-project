@@ -103,7 +103,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -169,6 +169,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertSession()->elementAttributeContains('css', '.ui-dialog', 'class', 'media-library-widget-modal');
 
     // Ensure that the tab order is correct.
     $tabs = $page->findAll('css', '.media-library-menu__link');
@@ -182,7 +183,7 @@ class MediaLibraryTest extends WebDriverTestBase {
 
     $assert_session->elementExists('css', '.js-media-library-item')->click();
     $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector, 1000));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector));
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
     $drupal_media = $xpath->query('//drupal-media')[0];
     $expected_attributes = [
@@ -210,7 +211,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
     $assert_session->elementExists('css', '.js-media-library-item')->click();
     $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector, 1000));
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector));
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
     $drupal_media = $xpath->query('//drupal-media')[0];
     $expected_attributes = [

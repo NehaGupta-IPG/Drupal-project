@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Installs the config translation module on a site installed in non english.
  */
 #[Group('config_translation')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ConfigTranslationInstallTest extends InstallerTestBase {
 
@@ -34,7 +35,7 @@ class ConfigTranslationInstallTest extends InstallerTestBase {
   protected function setUpLanguage(): void {
     // Place custom local translations in the translations directory.
     mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.eo.po', $this->getPo('eo'));
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.eo.po', $this->getPo('eo'));
 
     parent::setUpLanguage();
 

@@ -72,7 +72,8 @@ core.entity_view_display.*.*.*:
       type: string
       label: 'Bundle'
       constraints:
-        EntityBundleExists: '%parent.targetEntityType'
+        EntityBundleExists:
+          entityTypeId: '%parent.targetEntityType'
     mode:
       type: string
       label: 'View or form mode machine name'
@@ -87,6 +88,39 @@ core.entity_view_display.*.*.*:
       sequence:
         type: boolean
         label: 'Value'
+
+core.design_token.*:
+  type: config_entity
+  label: 'Design token'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+    path:
+      type: string
+      label: 'The CSS variable path'
+      constraints:
+        Regex:
+          pattern: '/^[a-z0-9_\s\-\.]+$/'
+          message: "The %value path is not valid."
+    type:
+      type: string
+      label: 'The design token value type'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.design_token_value
+          interface: 'Drupal\Core\Theme\DesignToken\DesignTokenValueInterface'
+    scopes:
+      type: sequence
+      label: 'The scopes of the value overrides.'
+      sequence:
+        type: design_token_value.[%parent.%parent.type]
+      constraints:
+        ValidSequenceKeys:
+          constraints:
+            CssSelector: []
 
 field_formatter:
   type: mapping
@@ -139,7 +173,8 @@ core.entity_form_display.*.*.*:
       type: string
       label: 'Bundle'
       constraints:
-        EntityBundleExists: '%parent.targetEntityType'
+        EntityBundleExists:
+          entityTypeId: '%parent.targetEntityType'
     mode:
       type: string
       label: 'View or form mode machine name'
@@ -329,6 +364,15 @@ field.formatter.settings.string:
     link_to_entity:
       type: boolean
       label: 'Link to the entity'
+    link_rel:
+      type: string
+      label: 'Link destination'
+      constraints:
+        Choice:
+          choices:
+            - canonical
+            - edit-form
+      requiredKey: false
 
 field.formatter.settings.language:
   type: field.formatter.settings.string

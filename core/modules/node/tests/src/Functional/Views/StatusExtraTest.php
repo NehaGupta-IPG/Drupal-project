@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Functional\Views;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -57,7 +58,10 @@ class StatusExtraTest extends NodeTestBase {
 
     // Create one unpublished node by a user who does not have the `view own
     // unpublished content` permission.
-    $node_unpublished3 = $this->drupalCreateNode(['uid' => $node_author_not_unpublished->id(), 'status' => NodeInterface::NOT_PUBLISHED]);
+    $node_unpublished3 = $this->drupalCreateNode([
+      'uid' => $node_author_not_unpublished->id(),
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
 
     // The administrator should simply see all nodes.
     $this->drupalLogin($admin_user);
@@ -103,9 +107,13 @@ class StatusExtraTest extends NodeTestBase {
     \Drupal::service('module_installer')->install(['node_access_test']);
     NodeType::create(['type' => 'page', 'name' => 'page'])->save();
     $this->addPrivateField(NodeType::load('page'));
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $node_published_private = $this->drupalCreateNode(['uid' => $admin_user->id(), 'private' => ['value' => 1]]);
-    $node_unpublished_private = $this->drupalCreateNode(['uid' => $admin_user->id(), 'status' => NodeInterface::NOT_PUBLISHED, 'private' => ['value' => 1]]);
+    $node_unpublished_private = $this->drupalCreateNode([
+      'uid' => $admin_user->id(),
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'private' => ['value' => 1],
+    ]);
 
     // An unprivileged user must not see the published and unpublished content
     // when access is granted via hook_node_grants().

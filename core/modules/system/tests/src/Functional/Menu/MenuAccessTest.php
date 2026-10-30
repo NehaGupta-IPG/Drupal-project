@@ -20,7 +20,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'filter', 'toolbar', 'menu_ui'];
+  protected static $modules = ['block', 'filter', 'menu_ui'];
 
   /**
    * {@inheritdoc}
@@ -345,6 +345,12 @@ class MenuAccessTest extends BrowserTestBase {
     $this->assertMenuItemRoutesAccess(403, Url::fromRoute('menu_test.parent_test_param', ['param' => 'any-other']));
     // $childOnlyUser has the 'access child1 test page' permission.
     $this->assertMenuItemRoutesAccess(200, Url::fromRoute('menu_test.child_test_param', ['param' => 'any-other']));
+
+    // User that has access to the child route must also have access to the
+    // parent route if it's a systemAdminMenuBlockPage page.
+    // This test validates the cases where the child link has a url attribute.
+    $this->drupalLogin($noParentAccessUser);
+    $this->assertMenuItemRoutesAccess(200, Url::fromRoute('menu_test.parent_url_test'));
   }
 
   /**
@@ -370,7 +376,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $return = parent::drupalGet($path, $options, $headers);
     $this->assertSession()->pageTextNotContains('You do not have any administrative items.');
     return $return;
@@ -409,7 +415,7 @@ class MenuAccessTest extends BrowserTestBase {
 
       }
     }
-    $debug = fn($accessibleRoutes, $inaccessibleRoutes) => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
+    $debug = fn($accessibleRoutes, $inaccessibleRoutes): string => "\nAccessible routes: " . implode(', ', $accessibleRoutes) . "\nInaccessible routes: " . implode(', ', $inaccessibleRoutes);
     $expected = $debug($expectedAccessibleRoutes, $expectedInaccessibleRoutes);
     $actual = $debug($actualAccessibleRoutes, $actualInaccessibleRoutes);
     $this->assertSession()->assert($expected === $actual, "Routes do not match. \nExpected routes:$expected\nActual routes: $actual");

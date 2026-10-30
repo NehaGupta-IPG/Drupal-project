@@ -42,7 +42,7 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
     );
   }
 
-  protected function getTestRoute() {
+  protected function getTestRoute(): Route {
     $route = new Route('/test/{test_revision}');
     $route->setOption('parameters', [
       'test_revision' => [
@@ -74,8 +74,6 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests the convert() method.
-   *
-   * @legacy-covers ::convert
    */
   #[DataProvider('providerTestConvert')]
   public function testConvert($value, array $definition, array $defaults, $expected_result): void {
@@ -95,22 +93,35 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * Provides test data for testConvert.
    */
-  public static function providerTestConvert() {
+  public static function providerTestConvert(): array {
     $data = [];
     // Existing entity type.
-    $data[] = ['valid_id', ['type' => 'entity_revision:entity_test'], ['test_revision' => 'valid_id'], (object) ['revision_id' => 'valid_id']];
+    $data[] = [
+      'valid_id',
+      ['type' => 'entity_revision:entity_test'],
+      ['test_revision' => 'valid_id'],
+      (object) ['revision_id' => 'valid_id'],
+    ];
     // Invalid ID.
-    $data[] = ['invalid_id', ['type' => 'entity_revision:entity_test'], ['test_revision' => 'invalid_id'], NULL];
+    $data[] = [
+      'invalid_id',
+      ['type' => 'entity_revision:entity_test'],
+      ['test_revision' => 'invalid_id'],
+      NULL,
+    ];
     // Entity type placeholder.
-    $data[] = ['valid_id', ['type' => 'entity_revision:{entity_type}'], ['test_revision' => 'valid_id', 'entity_type' => 'entity_test'], (object) ['revision_id' => 'valid_id']];
+    $data[] = [
+      'valid_id',
+      ['type' => 'entity_revision:{entity_type}'],
+      ['test_revision' => 'valid_id', 'entity_type' => 'entity_test'],
+      (object) ['revision_id' => 'valid_id'],
+    ];
 
     return $data;
   }
 
   /**
    * Tests the convert() method with an invalid entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidEntityType(): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
@@ -124,23 +135,19 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidType(): void {
     $this->expectException(ParamNotConvertedException::class);
-    $this->expectExceptionMessage('The type definition "entity_revision_{entity_type_id}" is invalid. The expected format is "entity_revision:<entity_type_id>".');
+    $this->expectExceptionMessageIs('The type definition "entity_revision_{entity_type_id}" is invalid. The expected format is "entity_revision:<entity_type_id>".');
     $this->converter->convert('valid_id', ['type' => 'entity_revision_{entity_type_id}'], 'foo', ['foo' => 'valid_id']);
   }
 
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidDynamicEntityType(): void {
     $this->expectException(ParamNotConvertedException::class);
-    $this->expectExceptionMessage('The "foo" parameter was not converted because the "invalid_entity_type_id" parameter is missing.');
+    $this->expectExceptionMessageIs('The "foo" parameter was not converted because the "invalid_entity_type_id" parameter is missing.');
     $this->converter->convert('valid_id', ['type' => 'entity_revision:{invalid_entity_type_id}'], 'foo', ['foo' => 'valid_id']);
   }
 

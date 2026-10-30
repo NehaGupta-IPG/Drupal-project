@@ -89,7 +89,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Returns an edit array containing the values to be posted.
    */
-  protected function getEditValues($values, $langcode, $new = FALSE) {
+  protected function getEditValues(array $values, $langcode, $new = FALSE) {
     $edit = parent::getEditValues($values, $langcode, $new);
 
     // To be able to post values for the configurable base fields (name,
@@ -129,7 +129,10 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
    * Tests translate link on vocabulary term list.
    */
   public function testTranslateLinkVocabularyAdminPage(): void {
-    $this->drupalLogin($this->drupalCreateUser(array_merge(parent::getTranslatorPermissions(), ['access administration pages', 'administer taxonomy'])));
+    $this->drupalLogin($this->drupalCreateUser(array_merge(parent::getTranslatorPermissions(), [
+      'access administration pages',
+      'administer taxonomy',
+    ])));
 
     $values = [
       'name' => $this->randomMachineName(),

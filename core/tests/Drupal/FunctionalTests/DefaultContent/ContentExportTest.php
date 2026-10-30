@@ -6,7 +6,8 @@ namespace Drupal\FunctionalTests\DefaultContent;
 
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Component\Serialization\Yaml;
-use Drupal\Core\DefaultContent\ContentExportCommand;
+use Drupal\Component\Utility\SortArray;
+use Drupal\Core\DefaultContent\Command\ContentExportCommand;
 use Drupal\Core\DefaultContent\Exporter;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
@@ -18,9 +19,11 @@ use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\file\Entity\File;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\media\Entity\Media;
+use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -35,11 +38,13 @@ use Psr\Log\LogLevel;
 #[CoversClass(Exporter::class)]
 #[Group('DefaultContent')]
 #[Group('Recipe')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ContentExportTest extends BrowserTestBase {
 
   use EntityReferenceFieldCreationTrait;
   use RecipeTestTrait;
+  use TaxonomyTestTrait;
 
   /**
    * {@inheritdoc}
@@ -69,7 +74,7 @@ class ContentExportTest extends BrowserTestBase {
 
     // Apply the recipe that sets up the fields and configuration for our
     // default content.
-    $fixtures_dir = $this->getDrupalRoot() . '/core/tests/fixtures';
+    $fixtures_dir = $this->root . '/core/tests/fixtures';
     $this->applyRecipe($fixtures_dir . '/recipes/default_content_base');
 
     // We need an administrative user to import and export content.
@@ -147,16 +152,29 @@ class ContentExportTest extends BrowserTestBase {
         $exported_data['default']['uid'][0]['entity'] = $imported_data['default']['uid'][0]['entity'] = $new_owner;
       }
 
-      self::recursiveSortByKey($exported_data);
-      self::recursiveSortByKey($imported_data);
+      SortArray::sortByKeyRecursive($exported_data);
+      SortArray::sortByKeyRecursive($imported_data);
       $this->assertSame($imported_data, $exported_data);
     }
   }
 
   /**
+   * Tests various entity export scenarios.
+   */
+  public function testEntityExportScenarios(): void {
+    $this->doTestExportSingleEntityToDirectory();
+    $this->doTestExportWithDependencies();
+    $this->doTestCircularDependency();
+    $this->doTestMissingDependenciesAreLogged();
+    $this->doTestExportFileEntityWithMissingPhysicalFile();
+    $this->doTestExportedPasswordIsPreserved();
+    $this->doTestExportEntitiesFilteredByType();
+  }
+
+  /**
    * Tests that an exported user account can be logged in with after import.
    */
-  public function testExportedPasswordIsPreserved(): void {
+  protected function doTestExportedPasswordIsPreserved(): void {
     $account = $this->createUser();
     $this->assertNotEmpty($account->passRaw);
 
@@ -167,7 +185,7 @@ class ContentExportTest extends BrowserTestBase {
       $account->id(),
     ]);
     $this->assertSame(0, $process->wait());
-    $dir = 'public://content';
+    $dir = 'public://user-content';
     mkdir($dir);
     file_put_contents($dir . '/user.yml', $process->getOutput());
 
@@ -178,7 +196,12 @@ class ContentExportTest extends BrowserTestBase {
     // Ensure the import succeeded, and that we can log in with the imported
     // account. We want to use the standard login form, rather than a one-time
     // login link, to ensure the password is preserved.
-    $this->assertIsObject(user_load_by_name($account->getAccountName()));
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $account->getAccountName()]);
+    $user = reset($users);
+
+    $this->assertIsObject($user);
     $this->useOneTimeLoginLinks = FALSE;
     $this->drupalLogin($account);
     $this->assertSession()->addressMatches('/\/user\/[0-9]+$/');
@@ -187,7 +210,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting a single entity to a directory with attachments.
    */
-  public function testExportSingleEntityToDirectory(): void {
+  protected function doTestExportSingleEntityToDirectory(): void {
     $file = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('file', '7fb09f9f-ba5f-4db4-82ed-aa5ccf7d425d');
     $this->assertInstanceOf(File::class, $file);
@@ -200,7 +223,7 @@ class ContentExportTest extends BrowserTestBase {
       "--dir=$dir",
     ]);
     $this->assertSame(0, $process->wait());
-    $this->assertStringContainsString('The file "' . $file->label() . '" was exported to ', $process->getOutput());
+    $this->assertStringContainsString('One entity was exported to', $process->getOutput());
     $this->assertFileExists($dir . '/file/' . $file->uuid() . '.yml');
     $this->assertFileExists($dir . '/file/' . $file->getFilename());
   }
@@ -208,7 +231,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting a piece of content with its dependencies.
    */
-  public function testExportWithDependencies(): void {
+  protected function doTestExportWithDependencies(): void {
     $image_uri = $this->getRandomGenerator()
       ->image(uniqid('public://') . '.png', '200x200', '300x300');
     $file = File::create(['uri' => $image_uri]);
@@ -233,14 +256,14 @@ class ContentExportTest extends BrowserTestBase {
     // With no `--dir` option, we should get an error.
     $process = $this->runDrupalCommand($command);
     $this->assertGreaterThan(0, $process->wait());
-    $this->assertStringContainsString('The --dir option is required when exporting with dependencies.', $process->getErrorOutput());
+    $this->assertStringContainsString('The --dir option is required to export multiple entities', $process->getErrorOutput());
 
     $command[] = "--dir=public://content";
     $process = $this->runDrupalCommand($command);
     $this->assertSame(0, $process->wait());
     $expected_output_dir = $this->container->get(FileSystemInterface::class)
       ->realpath('public://content');
-    $this->assertStringContainsString('5 items were exported to ', $process->getOutput());
+    $this->assertStringContainsString('5 entities were exported to ', $process->getOutput());
 
     $this->assertFileExists($expected_output_dir . '/node/' . $node->uuid() . '.yml');
     $this->assertFileExists($expected_output_dir . '/taxonomy_term/' . $node->field_tags[0]->entity->uuid() . '.yml');
@@ -259,7 +282,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests that the exporter handles circular dependencies gracefully.
    */
-  public function testCircularDependency(): void {
+  protected function doTestCircularDependency(): void {
     $this->createEntityReferenceField('node', 'article', 'field_related', 'Related Content', 'node', selection_handler_settings: [
       'target_bundles' => ['page' => 'page'],
     ]);
@@ -294,7 +317,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests that the exporter handles missing dependencies gracefully.
    */
-  public function testMissingDependenciesAreLogged(): void {
+  protected function doTestMissingDependenciesAreLogged(): void {
     $this->createEntityReferenceField('node', 'article', 'field_related', 'Related Content', 'node', selection_handler_settings: [
       'target_bundles' => ['page' => 'page'],
     ]);
@@ -341,7 +364,7 @@ class ContentExportTest extends BrowserTestBase {
   /**
    * Tests exporting file entities without an accompanying physical file.
    */
-  public function testExportFileEntityWithMissingPhysicalFile(): void {
+  protected function doTestExportFileEntityWithMissingPhysicalFile(): void {
     $file = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('file', '2b8e0616-3ef0-4a91-8cfb-b31d9128f9f8');
     $this->assertInstanceOf(File::class, $file);
@@ -370,21 +393,125 @@ class ContentExportTest extends BrowserTestBase {
   }
 
   /**
-   * Recursively sorts an array by key.
-   *
-   * @param array $data
-   *   The array to sort.
+   * Tests exporting entities filtered by type.
    */
-  private static function recursiveSortByKey(array &$data): void {
-    // If the array is a list, it is by definition already sorted.
-    if (!array_is_list($data)) {
-      ksort($data);
+  protected function doTestExportEntitiesFilteredByType(): void {
+    // We should get an error if we try to export a non-existent entity type.
+    $process = $this->runDrupalCommand(['content:export', 'camels']);
+    $this->assertSame(1, $process->wait());
+    $this->assertStringContainsString('The entity type "camels" does not exist.', $process->getOutput());
+
+    // We should get an error if we try to export a config entity.
+    $process = $this->runDrupalCommand(['content:export', 'taxonomy_vocabulary']);
+    $this->assertSame(1, $process->wait());
+    $this->assertStringContainsString('taxonomy_vocabulary is not a content entity type.', $process->getOutput());
+
+    $content = Node::loadMultiple();
+    $this->assertNotEmpty($content);
+
+    $command = ['content:export', 'node'];
+    // With no `--dir` option, we should get an error.
+    $process = $this->runDrupalCommand($command);
+    $this->assertGreaterThan(0, $process->wait());
+    $this->assertStringContainsString('The --dir option is required to export multiple entities', $process->getErrorOutput());
+
+    $command[] = "--dir=public://content";
+    $process = $this->runDrupalCommand($command);
+    $this->assertSame(0, $process->wait());
+    $expected_output_dir = $this->container->get(FileSystemInterface::class)
+      ->realpath('public://content');
+    $this->assertStringContainsString(count($content) . ' entities were exported to ', $process->getOutput());
+
+    /** @var \Drupal\node\NodeInterface $node */
+    foreach ($content as $node) {
+      $this->assertFileExists($expected_output_dir . '/node/' . $node->uuid() . '.yml');
     }
-    foreach ($data as &$value) {
-      if (is_array($value)) {
-        self::recursiveSortByKey($value);
-      }
+  }
+
+  /**
+   * Tests exporting entities filtered by bundle.
+   */
+  public function testExportEntitiesFilteredByBundle(): void {
+    $command = ['content:export', 'node', '--bundle=article'];
+
+    // With no `--dir` option, we should get an error.
+    $process = $this->runDrupalCommand($command);
+    $this->assertGreaterThan(0, $process->wait());
+    $this->assertStringContainsString('The --dir option is required to export multiple entities', $process->getErrorOutput());
+
+    $command[] = "--dir=public://content";
+    $process = $this->runDrupalCommand($command);
+    $this->assertSame(0, $process->wait());
+    $expected_output_dir = $this->container->get(FileSystemInterface::class)
+      ->realpath('public://content');
+    $this->assertStringContainsString('2 entities were exported to ', $process->getOutput());
+
+    $this->assertFileExists($expected_output_dir . '/node/2d3581c3-92c7-4600-8991-a0d4b3741198.yml');
+    $this->assertFileExists($expected_output_dir . '/node/e1714f23-70c0-4493-8e92-af1901771921.yml');
+
+    // Create two additional taxonomy vocabularies, with two terms each, to
+    // test multiple `--bundle` options.
+    $vocabulary1 = $this->createVocabulary();
+    $vocabulary2 = $this->createVocabulary();
+    $term1 = $this->createTerm($vocabulary1)->uuid();
+    $term2 = $this->createTerm($vocabulary1)->uuid();
+    $term3 = $this->createTerm($vocabulary2)->uuid();
+    $term4 = $this->createTerm($vocabulary2)->uuid();
+
+    $process = $this->runDrupalCommand([
+      'content:export',
+      'taxonomy_term',
+      '--bundle=tags',
+      '--bundle=' . $vocabulary2->id(),
+      '--dir=public://content',
+    ]);
+    $this->assertSame(0, $process->wait());
+    $this->assertStringContainsString('4 entities were exported to ', $process->getOutput());
+
+    $tags = $this->container->get(EntityTypeManagerInterface::class)
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['vid' => 'tags']);
+    $this->assertCount(2, $tags);
+    foreach ($tags as $tag) {
+      $this->assertFileExists($expected_output_dir . '/taxonomy_term/' . $tag->uuid() . '.yml');
     }
+    $this->assertFileDoesNotExist($expected_output_dir . '/taxonomy_term/' . $term1 . '.yml');
+    $this->assertFileDoesNotExist($expected_output_dir . '/taxonomy_term/' . $term2 . '.yml');
+    $this->assertFileExists($expected_output_dir . '/taxonomy_term/' . $term3 . '.yml');
+    $this->assertFileExists($expected_output_dir . '/taxonomy_term/' . $term4 . '.yml');
+
+    // Export a single entity, with the bundle filter matching the entity's
+    // bundle.
+    $process = $this->runDrupalCommand([
+      'content:export',
+      'taxonomy_term',
+      1,
+      '--bundle=tags',
+    ]);
+    $this->assertSame(0, $process->wait());
+
+    // If we try that with a mismatched bundle filter, it should result in no
+    // entity being exported, which is an error, but a hint should be given.
+    $process = $this->runDrupalCommand([
+      'content:export',
+      'taxonomy_term',
+      1,
+      '--bundle=' . $vocabulary1->id(),
+    ]);
+    $this->assertSame(1, $process->wait());
+    $output = $process->getOutput();
+    $this->assertStringContainsString('taxonomy_term 1 does not exist.', $output);
+    $this->assertStringContainsString('Maybe this entity is not one of the specified bundles: ' . $vocabulary1->id(), $output);
+
+    // We should get an error if we try to export bundles that don't exist.
+    $process = $this->runDrupalCommand([
+      'content:export',
+      'taxonomy_term',
+      '--bundle=junk',
+      '--bundle=tags',
+    ]);
+    $this->assertSame(1, $process->wait());
+    $this->assertStringContainsString('These bundles do not exist on the taxonomy_term entity type: junk', $process->getOutput());
   }
 
 }

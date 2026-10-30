@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Functional;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\media\OEmbed\UrlResolver;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,7 +46,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerEndpointMatching() {
+  public static function providerEndpointMatching(): array {
     return [
       'match by endpoint: Twitter' => [
         'https://twitter.com/Dries/status/999985431595880448',
@@ -78,7 +79,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @legacy-covers ::getResourceUrl
    */
   #[DataProvider('providerEndpointMatching')]
-  public function testEndpointMatching($url, $resource_url): void {
+  public function testEndpointMatching(string $url, string $resource_url): void {
     $this->assertSame(
       $resource_url,
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($url)
@@ -109,15 +110,15 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerUrlDiscovery() {
+  public static function providerUrlDiscovery(): array {
     return [
       'JSON resource' => [
         'video_vimeo.html',
-        'https://vimeo.com/api/oembed.json?url=video_vimeo.html',
+        'https://vimeo.com/api/oembed.json?%s',
       ],
       'XML resource' => [
         'video_dailymotion.html',
-        'https://www.dailymotion.com/services/oembed?url=video_dailymotion.html',
+        'https://www.dailymotion.com/services/oembed?%s',
       ],
     ];
   }
@@ -135,10 +136,19 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @legacy-covers ::getResourceUrl
    */
   #[DataProvider('providerUrlDiscovery')]
-  public function testUrlDiscovery($url, $resource_url): void {
+  public function testUrlDiscovery(string $url, string $resource_url): void {
+    $settings['settings']['media_oembed_discovery_trusted_host_patterns'] = (object) [
+      'value' => [
+        \preg_quote(\parse_url($this->baseUrl, \PHP_URL_HOST)),
+      ],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $this->rebuildAll();
+    $fully_qualified_url = $this->getFixturesUrl() . '/' . $url;
     $this->assertSame(
-      $this->container->get('media.oembed.url_resolver')->getResourceUrl($url),
-      $resource_url
+      \sprintf($resource_url, UrlHelper::buildQuery(['url' => $fully_qualified_url])),
+      $this->container->get('media.oembed.url_resolver')->getResourceUrl($fully_qualified_url)
     );
   }
 

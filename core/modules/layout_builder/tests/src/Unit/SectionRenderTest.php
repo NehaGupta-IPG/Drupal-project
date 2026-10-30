@@ -103,8 +103,6 @@ class SectionRenderTest extends UnitTestCase {
 
   /**
    * Tests to render array.
-   *
-   * @legacy-covers ::toRenderArray
    */
   public function testToRenderArray(): void {
     $block_content = ['#markup' => 'The block content.'];
@@ -154,8 +152,6 @@ class SectionRenderTest extends UnitTestCase {
 
   /**
    * Tests to render array access denied.
-   *
-   * @legacy-covers ::toRenderArray
    */
   public function testToRenderArrayAccessDenied(): void {
     $block = $this->prophesize(BlockPluginInterface::class);
@@ -188,8 +184,6 @@ class SectionRenderTest extends UnitTestCase {
 
   /**
    * Tests to render array preview.
-   *
-   * @legacy-covers ::toRenderArray
    */
   public function testToRenderArrayPreview(): void {
     $block_content = ['#markup' => 'The block content.'];
@@ -240,8 +234,6 @@ class SectionRenderTest extends UnitTestCase {
 
   /**
    * Tests to render array empty.
-   *
-   * @legacy-covers ::toRenderArray
    */
   public function testToRenderArrayEmpty(): void {
     $section = [];
@@ -306,12 +298,10 @@ class SectionRenderTest extends UnitTestCase {
 
   /**
    * Tests to render array missing plugin id.
-   *
-   * @legacy-covers ::toRenderArray
    */
   public function testToRenderArrayMissingPluginId(): void {
     $this->expectException(PluginException::class);
-    $this->expectExceptionMessage('No plugin ID specified for component with "some_uuid" UUID');
+    $this->expectExceptionMessageIs('No plugin ID specified for component with "some_uuid" UUID');
     (new Section('layout_onecol', [], [new SectionComponent('some_uuid', 'content')]))->toRenderArray();
   }
 

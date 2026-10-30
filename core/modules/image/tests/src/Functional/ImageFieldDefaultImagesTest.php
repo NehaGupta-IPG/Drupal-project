@@ -55,8 +55,18 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
       $file->save();
     }
     $default_images = [];
-    foreach (['field_storage', 'field', 'field2', 'field_storage_new', 'field_new', 'field_storage_private', 'field_private'] as $image_target) {
+    foreach ([
+      'field_storage',
+      'field',
+      'field2',
+      'field_storage_new',
+      'field_new',
+      'field_storage_private',
+      'field_private',
+    ] as $image_target) {
       $file = File::create((array) array_pop($files));
+      // Setting owner as current user so private images are accessible.
+      $file->setOwner($this->adminUser);
       $file->save();
       $default_images[$image_target] = $file;
     }

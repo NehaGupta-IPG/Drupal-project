@@ -11,12 +11,14 @@ use Drupal\Core\Config\StorageTransformerException;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore arrr
 /**
  * Tests the import storage transformer.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ImportStorageTransformerTest extends KernelTestBase {
 
   /**
@@ -86,7 +88,7 @@ class ImportStorageTransformerTest extends KernelTestBase {
     );
 
     $this->expectException(StorageTransformerException::class);
-    $this->expectExceptionMessage("Cannot acquire config import transformer lock.");
+    $this->expectExceptionMessageIs("Cannot acquire config import transformer lock.");
     $transformer->transform(new MemoryStorage());
   }
 

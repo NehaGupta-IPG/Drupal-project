@@ -11,6 +11,4 @@ use Drupal\Core\Field\FieldItemBase;
  * order to remain backwards compatible with any changes added in the future
  * to EntityReferenceItemInterface.
  */
-abstract class EntityReferenceItemBase extends FieldItemBase implements EntityReferenceItemInterface {
-
-}
+abstract class EntityReferenceItemBase extends FieldItemBase implements EntityReferenceItemInterface {}

@@ -6,13 +6,20 @@ namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests validation of view entities.
- *
- * @group views
  */
+#[Group('views')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
+#[ShareEnvironment]
 class ViewValidationTest extends ConfigEntityValidationTestBase {
 
   /**
@@ -21,43 +28,22 @@ class ViewValidationTest extends ConfigEntityValidationTestBase {
   protected static $modules = ['views', 'views_test_config'];
 
   /**
+   * The state key listing the handler types whose `broken` fallback is off.
+   */
+  private const string DISABLE_BROKEN_HANDLER_STATE = 'views_test_config_disable_broken_handler';
+
+  /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
+  protected function setUpEnvironment(): void {
+    parent::setUpEnvironment();
 
     $this->entity = View::create([
       'id' => 'test',
       'label' => 'Test',
     ]);
     $this->entity->save();
-  }
 
-  /**
-   * Tests that the various plugin IDs making up a view display are validated.
-   *
-   * @param string ...$parents
-   *   The array parents of the property of the view's default display which
-   *   will be set to `non_existent`.
-   *
-   * @testWith ["display_plugin"]
-   *   ["display_options", "pager", "type"]
-   *   ["display_options", "exposed_form", "type"]
-   *   ["display_options", "access", "type"]
-   *   ["display_options", "style", "type"]
-   *   ["display_options", "row", "type"]
-   *   ["display_options", "query", "type"]
-   *   ["display_options", "cache", "type"]
-   *   ["display_options", "header", "non_existent", "plugin_id"]
-   *   ["display_options", "footer", "non_existent", "plugin_id"]
-   *   ["display_options", "empty", "non_existent", "plugin_id"]
-   *   ["display_options", "arguments", "non_existent", "plugin_id"]
-   *   ["display_options", "sorts", "non_existent", "plugin_id"]
-   *   ["display_options", "fields", "non_existent", "plugin_id"]
-   *   ["display_options", "filters", "non_existent", "plugin_id"]
-   *   ["display_options", "relationships", "non_existent", "plugin_id"]
-   */
-  public function testInvalidPluginId(string ...$parents): void {
     // Disable the `broken` handler plugin, which is used as a fallback for
     // non-existent handler plugins. This ensures that when we use an
     // invalid handler plugin ID, we will get the expected validation error.
@@ -65,7 +51,7 @@ class ViewValidationTest extends ConfigEntityValidationTestBase {
     //   Views' config schema.
     // @see views_test_config.module
     $this->container->get('state')
-      ->set('views_test_config_disable_broken_handler', [
+      ->set(self::DISABLE_BROKEN_HANDLER_STATE, [
         'area',
         'argument',
         'sort',
@@ -74,7 +60,32 @@ class ViewValidationTest extends ConfigEntityValidationTestBase {
         'relationship',
       ]);
     $this->container->get('plugin.cache_clearer')->clearCachedDefinitions();
+  }
 
+  /**
+   * Tests that the various plugin IDs making up a view display are validated.
+   *
+   * @param string ...$parents
+   *   The array parents of the property of the view's default display which
+   *   will be set to `non_existent`.
+   */
+  #[TestWith(["display_plugin"])]
+  #[TestWith(["display_options", "pager", "type"])]
+  #[TestWith(["display_options", "exposed_form", "type"])]
+  #[TestWith(["display_options", "access", "type"])]
+  #[TestWith(["display_options", "style", "type"])]
+  #[TestWith(["display_options", "row", "type"])]
+  #[TestWith(["display_options", "query", "type"])]
+  #[TestWith(["display_options", "cache", "type"])]
+  #[TestWith(["display_options", "header", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "footer", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "empty", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "arguments", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "sorts", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "fields", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "filters", "non_existent", "plugin_id"])]
+  #[TestWith(["display_options", "relationships", "non_existent", "plugin_id"])]
+  public function testInvalidPluginId(string ...$parents): void {
     $display = &$this->entity->getDisplay('default');
     NestedArray::setValue($display, $parents, 'non_existent');
     $property_path = 'display.default.' . implode('.', $parents);

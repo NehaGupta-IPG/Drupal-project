@@ -8,12 +8,15 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\Log;
 use Drupal\Core\Database\StatementWrapperIterator;
+use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Tests\Core\Database\Stub\Driver\Schema;
 
 /**
  * A stub of the abstract Connection class for testing purposes.
  *
  * Includes minimal implementations of Connection's abstract methods.
+ *
+ * @internal
  */
 class StubConnection extends Connection {
 
@@ -37,10 +40,10 @@ class StubConnection extends Connection {
    *   An object of the PDO class representing a database connection.
    * @param array $connection_options
    *   An array of options for the connection.
-   * @param string[]|null $identifier_quotes
+   * @param array{0: string, 1: string}|null $identifier_quotes
    *   The identifier quote characters. Defaults to an empty strings.
    */
-  public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
+  public function __construct(\PDO $connection, array $connection_options, ?array $identifier_quotes = ['', '']) {
     $this->identifierQuotes = $identifier_quotes;
     parent::__construct($connection, $connection_options);
   }
@@ -48,40 +51,54 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(array &$connection_options = []): \stdClass {
     return new \stdClass();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function queryRange($query, $from, $count, array $args = [], array $options = []) {
+  public function getKey() {
+    return 'default';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTarget() {
+    return 'default';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function queryRange($query, $from, $count, array $args = [], array $options = []): null {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return $this->driver;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function databaseType() {
+  public function databaseType(): string {
     return 'stub';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createDatabase($database) {}
+  public function createDatabase($database): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function mapConditionOperator($operator) {
+  public function mapConditionOperator($operator): NULL {
     return NULL;
   }
 
@@ -98,14 +115,20 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public function exceptionHandler() {
+  public function exceptionHandler(): ExceptionHandler {
     return new ExceptionHandler();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function upsert($table, array $options = []) {
+  public function insert($table, array $options = []): void {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function upsert($table, array $options = []): StubUpsert {
     return new StubUpsert($this, $table, $options);
   }
 
@@ -122,8 +145,15 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public function condition($conjunction) {
+  public function condition($conjunction): StubCondition {
     return new StubCondition($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function driverTransactionManager(): TransactionManagerInterface {
+    return new StubTransactionManager($this);
   }
 
 }

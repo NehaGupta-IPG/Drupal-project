@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
+use Drupal\Core\Extension\ModuleInstallerInterface;
+use Drupal\Core\Update\UpdateHookRegistry;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
@@ -106,7 +108,6 @@ class EquivalentUpdateTest extends BrowserTestBase {
     \Drupal::state()->set('equivalent_update_test_update_100101', FALSE);
 
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
-    $this->updateRequirementsProblem();
     $this->assertSession()->pageTextContains('The version of the Equivalent Update test module that you are attempting to update to is missing update 100101 (which was marked as an equivalent by 100002). Update to at least Drupal Core 11.1.0.');
 
     \Drupal::state()->set('equivalent_update_test_update_100101', TRUE);
@@ -158,7 +159,6 @@ class EquivalentUpdateTest extends BrowserTestBase {
     \Drupal::state()->set('equivalent_update_test_update_100400', FALSE);
     \Drupal::state()->set('equivalent_update_test_update_100401', TRUE);
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
-    $this->updateRequirementsProblem();
     $this->assertSession()->pageTextContains('The version of the Equivalent Update test module that you are attempting to update to is missing update 100402 (which was marked as an equivalent by 100400). Update to at least Drupal Core 11.2.0.');
 
     \Drupal::state()->set('equivalent_update_test_update_100400', TRUE);
@@ -173,7 +173,6 @@ class EquivalentUpdateTest extends BrowserTestBase {
     \Drupal::state()->set('equivalent_update_test_update_100400', FALSE);
     \Drupal::state()->set('equivalent_update_test_update_100401', FALSE);
     $this->drupalGet($this->updateUrl, ['external' => TRUE]);
-    $this->updateRequirementsProblem();
     $this->assertSession()->pageTextContains('The version of the Equivalent Update test module that you are attempting to update to is missing update 100402 (which was marked as an equivalent by 100401). Update to at least Drupal Core 11.2.0.');
 
     \Drupal::state()->set('equivalent_update_test_update_100402', TRUE);
@@ -235,6 +234,21 @@ class EquivalentUpdateTest extends BrowserTestBase {
 
     $this->assertNull($update_registry->getEquivalentUpdate('equivalent_update_test', 100101));
     $this->assertEmpty($update_registry->getAllEquivalentUpdates());
+  }
+
+  /**
+   * Tests MarkFutureUpdateEquivalent attribute functionality on module install.
+   */
+  public function testAttributeOnInstall(): void {
+    // Test an update function with the MarkFutureUpdateEquivalent attribute
+    // registers on module install.
+    \Drupal::service(ModuleInstallerInterface::class)->install(['equivalent_update_test_attribute_install']);
+    /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
+    $update_registry = \Drupal::service(UpdateHookRegistry::class);
+    $this->assertEquals(100001, $update_registry->getInstalledVersion('equivalent_update_test_attribute_install'));
+    $equivalent_update = $update_registry->getEquivalentUpdate('equivalent_update_test_attribute_install', 110001);
+    $this->assertSame(100001, $equivalent_update->ran_update);
+    $this->assertSame('11.0.0', $equivalent_update->future_version);
   }
 
 }

@@ -13,11 +13,13 @@ use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the allowed list of entity properties.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigAllowListTest extends KernelTestBase {
 
   /**
@@ -26,13 +28,6 @@ class TwigAllowListTest extends KernelTestBase {
    * @var \Drupal\taxonomy\TermInterface
    */
   protected $term;
-
-  /**
-   * Twig environment.
-   *
-   * @var \Drupal\Core\Template\TwigEnvironment
-   */
-  protected $twig;
 
   /**
    * {@inheritdoc}
@@ -113,8 +108,6 @@ class TwigAllowListTest extends KernelTestBase {
         'type' => 'entity_reference_label',
       ])
       ->save();
-    // Boot twig environment.
-    $this->twig = \Drupal::service('twig');
   }
 
   /**
