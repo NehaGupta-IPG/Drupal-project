@@ -78,7 +78,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidTableInSchema(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('All members of the \'tables\' argument of a Schema must be Table objects');
+    $this->expectExceptionMessageIs('All members of the \'tables\' argument of a Schema must be Table objects');
     $table = new Schema(
       type: SchemaDefinitionType::Test,
       name: 'test',
@@ -101,11 +101,46 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing duplicate Table to Schema::$tables.
+   */
+  public function testDuplicateTableInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Duplicate tables for \'test_foo_bar\' schema: foo, foo');
+    $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test_foo_bar',
+      tables: [
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->assertInstanceOf(Schema::class, $schemaDefinition);
+  }
+
+  /**
    * Tests passing a non Column array member to Table::$columns.
    */
   public function testInvalidColumnInTable(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('All members of the \'columns\' argument of the \'test\' Table must be Column objects');
+    $this->expectExceptionMessageIs('All members of the \'columns\' argument of the \'test\' Table must be Column objects');
     $table = new Table(
       name: 'test',
       // @phpstan-ignore argument.type
@@ -125,11 +160,32 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing duplicate Column to Table::$columns.
+   */
+  public function testDuplicateColumnInTable(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Duplicate columns for \'test\' table: id, id');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'id',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
    * Tests passing a non Column array member to Table::$columns.
    */
   public function testInvalidForeignKeyForMismatchingColumnCount(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Mismatching count of columns for the \'user_id\' foreign key');
+    $this->expectExceptionMessageIs('Mismatching count of columns for the \'user_id\' foreign key');
     $table = new Table(
       name: 'test',
       description: 'Basic test table for the database unit tests.',
@@ -186,7 +242,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidSerialForNotNull(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'notNull\' for serial column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'notNull\' for serial column \'id\'');
     new Table(
       name: 'test',
       columns: [
@@ -205,7 +261,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidSerialForUnsigned(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'unsigned\' for serial column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'unsigned\' for serial column \'id\'');
     new Table(
       name: 'test',
       columns: [
@@ -224,7 +280,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidSerialForGeneratedExpression(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'generatedExpression\' for serial column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'generatedExpression\' for serial column \'id\'');
     new Table(
       name: 'test',
       columns: [
@@ -244,7 +300,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidPrimaryKeyForGeneratedColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage("The primary key of the 'test' Table cannot include generated columns");
+    $this->expectExceptionMessageIs("The primary key of the 'test' Table cannot include generated columns");
     new Table(
       name: 'test',
       columns: [
@@ -432,7 +488,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForUnsigned(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'unsigned\' for text column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'unsigned\' for text column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -452,7 +508,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForLength(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'length\' for int column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'length\' for int column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -472,7 +528,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForBinary(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'binary\' for int column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'binary\' for int column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -492,7 +548,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForScale(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'scale\' for text column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'scale\' for text column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -512,7 +568,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForPrecision(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'precision\' for text column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'precision\' for text column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -532,7 +588,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidColumnTypeForSerialize(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Cannot set \'serialize\' for int column \'id\'');
+    $this->expectExceptionMessageIs('Cannot set \'serialize\' for int column \'id\'');
     $table = new Table(
       name: 'test',
       columns: [
@@ -552,7 +608,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidPrimaryKeyForPartialLengthColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Limited length columns not allowed in this context');
+    $this->expectExceptionMessageIs('Limited length columns not allowed in this context');
     $table = new Table(
       name: 'test',
       columns: [
@@ -573,7 +629,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidUniqueKeyForPartialLengthColumn(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('Limited length columns not allowed in this context');
+    $this->expectExceptionMessageIs('Limited length columns not allowed in this context');
     $table = new Table(
       name: 'test',
       columns: [
@@ -593,6 +649,24 @@ class SchemaDefinitionTest extends UnitTestCase {
       ],
     );
     $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing varchar columns without length.
+   */
+  public function testMissingVarcharColumnLength(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Missing \'length\' for varchar column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
   }
 
 }

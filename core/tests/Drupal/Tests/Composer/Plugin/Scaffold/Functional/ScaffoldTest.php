@@ -8,6 +8,7 @@ use Composer\Util\Filesystem;
 use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
 use Drupal\Tests\Composer\Plugin\Scaffold\ScaffoldTestResult;
+use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,9 @@ use PHPUnit\Framework\TestCase;
  */
 #[Group('Scaffold')]
 class ScaffoldTest extends TestCase {
+
   use AssertUtilsTrait;
+  use ForwardCompatibilityTrait;
 
   /**
    * The root of this project.
@@ -146,13 +149,13 @@ class ScaffoldTest extends TestCase {
 
       [
         'project-with-empty-scaffold-path',
-        'No scaffold file path given for [web-root]/my-error in package fixtures/project-with-empty-scaffold-path',
+        'No scaffold file path given for [web-root]/my-error in package fixtures/project-with-empty-scaffold-path.',
         FALSE,
       ],
 
       [
         'project-with-invalid-dir-scaffold',
-        'Scaffold file assets in package fixtures/project-with-invalid-dir-scaffold is a directory; only files may be scaffolded',
+        'Scaffold file assets in package fixtures/project-with-invalid-dir-scaffold is a directory; only files may be scaffolded.',
         FALSE,
       ],
     ];
@@ -175,7 +178,7 @@ class ScaffoldTest extends TestCase {
     $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3150040');
     // Test scaffold. Expect an error.
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->scaffoldSut($fixture_name, $is_link);
   }
 

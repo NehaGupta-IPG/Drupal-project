@@ -185,7 +185,6 @@ class FormHooks {
   #[Hook('form_media_library_add_form_alter')]
   public function formMediaLibraryAddFormAlter(array &$form): void {
     $form['#attributes']['class'][] = 'media-library-add-form';
-    $form['#attached']['library'][] = 'default_admin/media_library.theme';
 
     // If there are unsaved media items, apply styling classes to various parts
     // of the form.
@@ -737,8 +736,12 @@ class FormHooks {
         ],
       ],
     ];
-    // Copy footer over.
+    // Copy footer over. A group is identified by its #parents, so pin them to
+    // those of the original: on forms that set #tree the copy would otherwise
+    // register under a different name and elements with '#group' => 'footer'
+    // would resolve to the original, which this theme does not render.
     $form['default_admin_sidebar']['footer'] = ($form['footer']) ?? [];
+    $form['default_admin_sidebar']['footer']['#parents'] = ['footer'];
 
     // Sidebar close button.
     $close_sidebar_translation = $this->t('Close sidebar panel');
