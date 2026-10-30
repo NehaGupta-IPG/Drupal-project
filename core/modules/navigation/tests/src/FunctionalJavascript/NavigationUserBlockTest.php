@@ -81,7 +81,7 @@ class NavigationUserBlockTest extends WebDriverTestBase {
       return $page->find('css', '[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')->getText() !== 'My Account';
     });
     // We should see the users name in the navigation menu.
-    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
+    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getHtml();
     $this->assertEquals($this->normalUser->getDisplayName(), $rendered_user_name);
 
     // Login as an admin access user, and verify that the username is displayed
@@ -93,7 +93,7 @@ class NavigationUserBlockTest extends WebDriverTestBase {
       return $page->find('css', '[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')->getText() !== 'My Account';
     });
     // We should see the users name in the navigation menu.
-    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
+    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getHtml();
     $this->assertEquals($this->adminUser->getDisplayName(), $rendered_user_name);
 
     // Change the users name, assert that the changes reflect in the navigation.
@@ -105,7 +105,7 @@ class NavigationUserBlockTest extends WebDriverTestBase {
       return $page->find('css', '[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')->getText() !== 'My Account';
     });
     // We should see the users name in the navigation menu.
-    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
+    $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getHtml();
     $this->assertEquals($new_username, $rendered_user_name);
   }
 
