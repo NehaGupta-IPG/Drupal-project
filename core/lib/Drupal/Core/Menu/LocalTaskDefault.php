@@ -7,7 +7,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Default object used for LocalTaskPlugins.
@@ -15,13 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 class LocalTaskDefault extends PluginBase implements LocalTaskInterface, CacheableDependencyInterface {
 
   use DependencySerializationTrait;
-
-  /**
-   * The route provider to load routes by name.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
+  use LocalLinkTrait;
 
   /**
    * TRUE if this plugin is forced active for options attributes.
@@ -29,57 +22,6 @@ class LocalTaskDefault extends PluginBase implements LocalTaskInterface, Cacheab
    * @var bool
    */
   protected $active = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRouteName() {
-    return $this->pluginDefinition['route_name'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRouteParameters(RouteMatchInterface $route_match) {
-    $route_parameters = $this->pluginDefinition['route_parameters'] ?? [];
-    $route = $this->routeProvider()->getRouteByName($this->getRouteName());
-    $variables = $route->compile()->getVariables();
-
-    // Normally the \Drupal\Core\ParamConverter\ParamConverterManager has
-    // run, and the route parameters have been upcast. The original values can
-    // be retrieved from the raw parameters. For example, if the route's path is
-    // /filter/tips/{filter_format} and the path is /filter/tips/plain_text then
-    // $raw_parameters->get('filter_format') == 'plain_text'. Parameters that
-    // are not represented in the route path as slugs might be added by a route
-    // enhancer and will not be present in the raw parameters.
-    $raw_parameters = $route_match->getRawParameters();
-    $parameters = $route_match->getParameters();
-
-    foreach ($variables as $name) {
-      if (isset($route_parameters[$name])) {
-        continue;
-      }
-
-      if ($raw_parameters->has($name)) {
-        $route_parameters[$name] = $raw_parameters->get($name);
-      }
-      elseif ($parameters->has($name)) {
-        $route_parameters[$name] = $parameters->get($name);
-      }
-    }
-
-    // The UrlGenerator will throw an exception if expected parameters are
-    // missing. This method should be overridden if that is possible.
-    return $route_parameters;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTitle(?Request $request = NULL) {
-    // The title from YAML file discovery may be a TranslatableMarkup object.
-    return (string) $this->pluginDefinition['title'];
-  }
 
   /**
    * Returns the weight of the local task.
@@ -127,19 +69,6 @@ class LocalTaskDefault extends PluginBase implements LocalTaskInterface, Cacheab
    */
   public function getActive() {
     return $this->active;
-  }
-
-  /**
-   * Returns the route provider.
-   *
-   * @return \Drupal\Core\Routing\RouteProviderInterface
-   *   The route provider.
-   */
-  protected function routeProvider() {
-    if (!$this->routeProvider) {
-      $this->routeProvider = \Drupal::service('router.route_provider');
-    }
-    return $this->routeProvider;
   }
 
   /**

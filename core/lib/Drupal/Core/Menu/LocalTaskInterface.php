@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Core\Routing\RouteMatchInterface;
-
 /**
  * Defines an interface for menu local tasks.
  *
@@ -13,56 +11,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
  *
  * @see \Drupal\Core\Menu\LocalTaskManagerInterface
  */
-interface LocalTaskInterface {
-
-  /**
-   * Get the route name from the settings.
-   *
-   * @return string
-   *   The name of the route this local task links to.
-   */
-  public function getRouteName();
-
-  /**
-   * Returns the localized title to be shown for this tab.
-   *
-   * Subclasses may add optional arguments like NodeInterface $node = NULL that
-   * will be supplied by the ControllerResolver.
-   *
-   * @return string
-   *   The title of the local task.
-   */
-  public function getTitle();
-
-  /**
-   * Returns the route parameters needed to render a link for the local task.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   *
-   * @return array
-   *   An array of parameter names and values.
-   */
-  public function getRouteParameters(RouteMatchInterface $route_match);
-
-  /**
-   * Returns the weight of the local task.
-   *
-   * @return int|null
-   *   The weight of the task or NULL.
-   */
-  public function getWeight();
-
-  /**
-   * Returns options for rendering a link to the local task.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   *
-   * @return array
-   *   An associative array of options.
-   */
-  public function getOptions(RouteMatchInterface $route_match);
+interface LocalTaskInterface extends LocalLinkInterface {
 
   /**
    * Sets the active status.
