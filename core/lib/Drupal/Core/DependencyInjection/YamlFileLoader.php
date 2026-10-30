@@ -9,14 +9,15 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
@@ -41,6 +42,7 @@ class YamlFileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
+        'bind' => 'bind',
     ];
 
     /**
@@ -192,6 +194,16 @@ class YamlFileLoader
                         throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in "%s". Check your YAML syntax.', $name, $attribute, $file));
                     }
                 }
+            }
+        }
+
+        if (isset($defaults['bind'])) {
+            if (!\is_array($defaults['bind'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "bind" in "_defaults" must be an array in "%s". Check your YAML syntax.', $file));
+            }
+
+            foreach ($this->resolveServices($defaults['bind']) as $argument => $value) {
+                $defaults['bind'][$argument] = new BoundArgument($value, true, BoundArgument::DEFAULTS_BINDING, $file);
             }
         }
 
@@ -420,6 +432,28 @@ class YamlFileLoader
 
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($defaults['bind']) || isset($service['bind'])) {
+            // Deep clone, to avoid multiple process of the same instance in the passes
+            $bindings = $definition->getBindings();
+            $bindings += isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
+
+            if (isset($service['bind'])) {
+                if (!\is_array($service['bind'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "bind" must be an array for service "%s" in "%s". Check your YAML syntax.', $id, $file));
+                }
+
+                $bindings = array_merge($bindings, $this->resolveServices($service['bind']));
+                $bindingType = BoundArgument::SERVICE_BINDING;
+                foreach ($bindings as $argument => $value) {
+                    if (!$value instanceof BoundArgument) {
+                        $bindings[$argument] = new BoundArgument($value, true, $bindingType, $file);
+                    }
+                }
+            }
+
+            $definition->setBindings($bindings);
         }
 
         $this->container->setDefinition($id, $definition);

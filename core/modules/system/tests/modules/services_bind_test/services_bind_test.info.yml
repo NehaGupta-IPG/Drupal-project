@@ -1,0 +1,5 @@
+name: 'Services bind test'
+type: module
+description: "Test module for the 'bind' key in *.container.yml."
+package: Testing
+version: VERSION
