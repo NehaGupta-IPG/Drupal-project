@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the generated URLs incorrectly include /index.php/ prefix.
  */
 #[Group('DrupalKernel')]
-#[RunInSeparateProcesses]
+#[RunTestsInSeparateProcesses]
 class BasePathDetectionTest extends KernelTestBase {
 
   /**
