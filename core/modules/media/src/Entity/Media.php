@@ -119,7 +119,10 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
 
     if (empty($name)) {
       $media_source = $this->getSource();
-      return $media_source->getMetadata($this, $media_source->getPluginDefinition()['default_name_metadata_attribute']);
+      $name = $media_source->getMetadata($this, $media_source->getPluginDefinition()['default_name_metadata_attribute']);
+      if ($name === NULL) {
+        $name = $this->t('@id (unable to get name from media source, check the logs)', ['@id' => $this->id()]);
+      }
     }
 
     return $name;
