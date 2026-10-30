@@ -7,8 +7,17 @@
 
 .progress {
   position: relative;
+  display: grid;
+  grid-template-areas:
+    "label"
+    "track"
+    "meta";
+}
+.progress__label {
+  grid-area: label;
 }
 .progress__track {
+  grid-area: track;
   min-width: 100px;
   max-width: 100%;
   height: 16px;
@@ -25,22 +34,22 @@
 }
 .progress__description,
 .progress__percentage {
-  overflow: hidden;
+  grid-area: meta;
   margin-top: 0.2em;
   color: #555;
   font-size: 0.875em;
 }
 .progress__description {
-  float: left; /* LTR */
+  justify-self: start; /* LTR */
 }
 [dir="rtl"] .progress__description {
-  float: right;
+  justify-self: end;
 }
 .progress__percentage {
-  float: right; /* LTR */
+  justify-self: end; /* LTR */
 }
 [dir="rtl"] .progress__percentage {
-  float: left;
+  justify-self: start;
 }
 .progress--small .progress__track {
   height: 7px;
