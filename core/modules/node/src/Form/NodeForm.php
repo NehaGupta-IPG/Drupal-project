@@ -3,6 +3,7 @@
 namespace Drupal\node\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -94,13 +95,10 @@ class NodeForm extends ContentEntityForm {
     // parent::form().
     $store = $this->tempStoreFactory->get('node_preview');
 
-    // Because of the temp store integration, this is not cacheable.
-    // @todo add the correct cache contexts in https://www.drupal.org/project/drupal/issues/3397987
-    $form['#cache']['max-age'] = 0;
-
     // Attempt to load from preview when the uuid is present unless we are
     // rebuilding the form.
     $request_uuid = \Drupal::request()->query->get('uuid');
+    $form['#cache']['contexts'] = ['url.query_args:uuid'];
     if (!$form_state->isRebuilding() && $request_uuid && $preview = $store->get($request_uuid)) {
       /** @var \Drupal\Core\Form\FormStateInterface $preview */
 
@@ -138,6 +136,8 @@ class NodeForm extends ContentEntityForm {
     ];
 
     $form = parent::form($form, $form_state);
+    // Override max-age set by EntityFormDisplay::buildForm.
+    $form['#cache']['max-age'] = CacheBackendInterface::CACHE_PERMANENT;
 
     $form['advanced']['#attributes']['class'][] = 'entity-meta';
 
