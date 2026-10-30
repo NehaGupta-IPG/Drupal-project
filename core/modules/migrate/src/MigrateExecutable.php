@@ -361,7 +361,14 @@ class MigrateExecutable implements MigrateExecutableInterface {
    */
   public function processRow(Row $row, ?array $process = NULL, $value = NULL) {
     foreach ($this->migration->getProcessPlugins($process) as $destination => $plugins) {
-      $this->processPipeline($row, $destination, $plugins, $value);
+      try {
+        $this->processPipeline($row, $destination, $plugins, $value);
+      }
+      catch (MigrateException $e) {
+        // Prepend the destination property to the message.
+        $message = sprintf("%s: %s", $destination, $e->getMessage());
+        throw new MigrateException($message);
+      }
     }
   }
 
