@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[Filter(
   id: "filter_caption",
   title: new TranslatableMarkup("Caption images"),
-  description: new TranslatableMarkup("Uses a <code>data-caption</code> attribute on <code>&lt;img&gt;</code> tags to caption images."),
+  description: new TranslatableMarkup("Uses a <code>data-caption</code> attribute on <code>&lt;img&gt;</code> tags and embedded media to caption images."),
   type: FilterInterface::TYPE_TRANSFORM_REVERSIBLE
 )]
 class FilterCaption extends FilterBase implements ContainerFactoryPluginInterface {
