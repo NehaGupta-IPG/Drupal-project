@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Utility;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Utility\Error;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,6 +18,51 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(Error::class)]
 #[Group('Utility')]
 class ErrorTest extends UnitTestCase {
+
+  /**
+   * Tests the renderExceptionSafe() method.
+   */
+  public function testRenderExceptionSafe(): void {
+    // Use the class name as namespace, to avoid collisions.
+    $namespace = self::class;
+    $this->defineTestFunctions(
+      [
+        'foo10' => 10,
+        'foo70' => 70,
+        'foo30' => 30,
+        'foo20' => 20,
+      ],
+      $namespace,
+      \RuntimeException::class,
+    );
+    $exception = "$namespace\\foo10"();
+
+    $output = Error::renderExceptionSafe($exception);
+
+    $this->assertInstanceOf(FormattableMarkup::class, $output);
+
+    $this->assertStringStartsWith(strtr(
+      '<em class="placeholder">:exception</em>: Something went wrong. in <em class="placeholder">:function</em> (line <em class="placeholder">:line</em> of <em class="placeholder">:file</em>). <pre class="backtrace">:trace',
+      [
+        ':exception' => \RuntimeException::class,
+        ':function' => "$namespace\\foo20()",
+        // The line number inside foo20() where the exception is thrown.
+        ':line' => '21',
+        ':file' => Html::escape($exception->getFile()),
+        // The function name from above is repeated in the first backtrace item, but
+        // the line number is not.
+        ':trace' => <<<EOT
+$namespace\\foo20() (Line: 31)
+$namespace\\foo30() (Line: 71)
+$namespace\\foo70() (Line: 11)
+$namespace\\foo10() (Line:
+EOT,
+      ],
+    ), (string) $output);
+
+    // Do not assert the other backtrace items.
+    $this->assertStringEndsWith('</pre>', (string) $output);
+  }
 
   /**
    * Tests the getLastCaller() method.
@@ -147,6 +194,47 @@ class ErrorTest extends UnitTestCase {
     }
 
     return $backtrace;
+  }
+
+  /**
+   * Defines a number of functions with guaranteed line numbers.
+   *
+   * Each of the functions will call the next function in the list, except the
+   * last one, which will throw an exception.
+   *
+   * @param array<string, int> $functions_lines
+   *   Line numbers by function name without namespace.
+   * @param string $namespace
+   *   Namespace to prepend to the function names, without leading or trailing
+   *   namespace separator.
+   * @param string $exception_class
+   *   Exception class to throw in the last function.
+   */
+  protected function defineTestFunctions(array $functions_lines, string $namespace, string $exception_class): void {
+    $next_function = NULL;
+    assert($functions_lines !== []);
+    foreach (array_reverse($functions_lines) as $function => $line) {
+      $newlines = str_repeat("\n", $line - 1);
+      $return_expression = ($next_function !== NULL)
+        ? "$next_function()"
+        : "new \\$exception_class('Something went wrong.')";
+      // Use eval() to get fixed line numbers.
+      // This is safe, because all values are hard-coded in this class.
+      $php = <<<PHP
+namespace $namespace;{$newlines}function $function(): \Exception {
+  return $return_expression;
+}
+PHP;
+      $wrapper_line = $line + 1000;
+      $eval_newlines = str_repeat("\n", $wrapper_line - 1);
+      // Use a second layer of eval() to get distinguishable file names.
+      eval($eval_newlines . 'eval(' . var_export($php, TRUE) . ');');
+      $eval_line = __LINE__ - 1;
+      $reflection_function = new \ReflectionFunction("$namespace\\$function");
+      $this->assertSame($line, $reflection_function->getStartLine());
+      $this->assertSame(__FILE__ . "($eval_line) : eval()'d code($wrapper_line) : eval()'d code", $reflection_function->getFileName());
+      $next_function = $function;
+    }
   }
 
 }

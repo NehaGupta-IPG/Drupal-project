@@ -40,7 +40,24 @@ class FinalExceptionSubscriberTest extends UnitTestCase {
     $response = $event->getResponse();
 
     $this->assertInstanceOf(Response::class, $response);
-    $this->assertStringStartsWith('The website encountered an unexpected error. Try again later.<br><br><em class="placeholder">Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException</em>: test message in ', $response->getContent());
+
+    $this->assertStringStartsWith(strtr(
+      'The website encountered an unexpected error. Try again later.<br><br><em class="placeholder">:exception</em>: test message in <em class="placeholder">:method</em> (line <em class="placeholder">:line</em> of <em class="placeholder">:file</em>). <pre class="backtrace">:trace',
+      [
+        ':exception' => MethodNotAllowedHttpException::class,
+        ':method' => self::class . '-&gt;' . __FUNCTION__ . '()',
+        ':line' => $e->getLine(),
+        ':file' => $e->getFile(),
+        // Assert only the first two backtrace items.
+        // The method reported for the first backtrace item is the same as
+        // already reported. However the line number and file path in the first
+        // backtrace item are different. They describe where the method is
+        // called, not where the exception is thrown.
+        ':trace' => self::class . '-&gt;' . __FUNCTION__ . '() (Line: ' . $e->getTrace()[0]['line'] . ')
+' . $e->getTrace()[1]['class'] . '-&gt;' . $e->getTrace()[1]['function'] . '() (Line: ' . $e->getTrace()[1]['line'],
+      ],
+    ), $response->getContent());
+
     $this->assertEquals(405, $response->getStatusCode());
     $this->assertEquals('POST, PUT', $response->headers->get('Allow'));
     // Also check that the text/plain content type was added.
