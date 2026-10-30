@@ -186,6 +186,44 @@ class ImageItemTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that deleting a file does not break the generation of sample items.
+   */
+  public function testImageGenerationFileDeletion(): void {
+    // Use the image test that only has one extension and will fill up the
+    // max 5 items to be generated.
+    $fieldDefinition = FieldConfig::loadByName('entity_test', 'entity_test', 'image_test');
+    $sampleItems = [];
+    for ($i = 0; $i < 5; $i++) {
+      $sampleItems[] = ImageItem::generateSampleValue($fieldDefinition);
+    }
+
+    // Assert 5 different files.
+    $this->assertCount(5, array_unique(array_map(function ($item) {
+      return $item['target_id'];
+    }, $sampleItems)));
+
+    // Simulate that some other process or functionality, has for some reason
+    // deleted the files during the request.
+    foreach ($sampleItems as $sampleItem) {
+      $file = File::load($sampleItem['target_id']);
+      $file->delete();
+    }
+
+    // Ensure that the sample items can be generated again.
+    $newSampleItems = [];
+    for ($i = 0; $i < 5; $i++) {
+      $newSampleItems[] = ImageItem::generateSampleValue($fieldDefinition);
+    }
+
+    // Assert that the 5 files are all different from the previous ones.
+    $this->assertEmpty(array_intersect(array_map(function ($item) {
+      return $item['target_id'];
+    }, $sampleItems), array_map(function ($item) {
+      return $item['target_id'];
+    }, $newSampleItems)));
+  }
+
+  /**
    * Tests a malformed image.
    */
   public function testImageItemMalformed(): void {
