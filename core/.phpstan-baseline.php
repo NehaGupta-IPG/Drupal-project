@@ -13714,12 +13714,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldConfigDeleteForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\field_ui\\\\Form\\\\FieldConfigEditForm\\:\\:afterBuild\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldConfigEditForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\Form\\\\FieldConfigEditForm\\:\\:configureEntityFormDisplay\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

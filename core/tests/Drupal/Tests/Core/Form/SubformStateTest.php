@@ -331,4 +331,24 @@ class SubformStateTest extends UnitTestCase {
     $this->assertSame($parent_form_object, $subform_state->getCompleteFormState()->getFormObject());
   }
 
+  /**
+   * Tests prepare callback.
+   *
+   * @legacy-covers ::prepareCallback
+   */
+  public function testPrepareCallback(): void {
+    $parent_form_object = $this->prophesize(FormInterface::class)->reveal();
+    $parent_form_state = $this->prophesize(FormStateInterface::class);
+    $parent_form_state->prepareCallback('::submitForm')->willReturn([$parent_form_object, 'submitForm'])->shouldBeCalledOnce();
+    $parent_form_state->prepareCallback('test_callback')->willReturn('test_callback')->shouldBeCalledOnce();
+
+    $subform_form_object = $this->prophesize(FormInterface::class)->reveal();
+    $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal(), $subform_form_object);
+    $this->assertSame([$subform_form_object, 'submitForm'], $subform_state->prepareCallback('::submitForm'));
+    $this->assertSame('test_callback', $subform_state->prepareCallback('test_callback'));
+
+    $subform_state = SubformState::createForSubform($this->parentForm['dog'], $this->parentForm, $parent_form_state->reveal());
+    $this->assertSame([$parent_form_object, 'submitForm'], $subform_state->prepareCallback('::submitForm'));
+  }
+
 }

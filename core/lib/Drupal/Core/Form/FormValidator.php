@@ -40,9 +40,18 @@ class FormValidator implements FormValidatorInterface {
       $handlers = $form['#validate'];
     }
 
+    // Button handlers see the button's #form_object.
+    $triggering_element = $form_state->getTriggeringElement();
+    if (($triggering_element['#form_object'] ?? NULL) !== NULL && ($triggering_element['#validate'] ?? NULL) === $handlers) {
+      $handler_form_state = FormObjectScopedFormState::createForElement($triggering_element, $form_state);
+    }
+    else {
+      $handler_form_state = &$form_state;
+    }
+
     foreach ($handlers as $callback) {
-      $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
-      $callable($form, $form_state);
+      $callable = $this->callableResolver->getCallableFromDefinition($handler_form_state->prepareCallback($callback));
+      $callable($form, $handler_form_state);
     }
   }
 
@@ -193,6 +202,14 @@ class FormValidator implements FormValidatorInterface {
    *   and not on recursive calls.
    */
   protected function doValidateForm(&$elements, FormStateInterface &$form_state, $form_id = NULL) {
+    // Callbacks of the element and its children see its #form_object.
+    if (($elements['#form_object'] ?? NULL) === NULL) {
+      $element_form_state = &$form_state;
+    }
+    else {
+      $element_form_state = FormObjectScopedFormState::createForElement($elements, $form_state);
+    }
+
     // Recurse through all children, sorting the elements so that the order of
     // error messages displayed to the user matches the order of elements in
     // the form. Use a copy of $elements so that it is not modified by the
@@ -200,7 +217,7 @@ class FormValidator implements FormValidatorInterface {
     $elements_sorted = $elements;
     foreach (Element::children($elements_sorted, TRUE) as $key) {
       if (isset($elements[$key]) && $elements[$key]) {
-        $this->doValidateForm($elements[$key], $form_state);
+        $this->doValidateForm($elements[$key], $element_form_state);
       }
     }
 
@@ -243,8 +260,8 @@ class FormValidator implements FormValidatorInterface {
       elseif (isset($elements['#element_validate'])) {
         foreach ($elements['#element_validate'] as $callback) {
           $complete_form = &$form_state->getCompleteForm();
-          $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
-          $callable($elements, $form_state, $complete_form);
+          $callable = $this->callableResolver->getCallableFromDefinition($element_form_state->prepareCallback($callback));
+          $callable($elements, $element_form_state, $complete_form);
         }
       }
 

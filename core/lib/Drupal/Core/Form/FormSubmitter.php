@@ -81,6 +81,15 @@ class FormSubmitter implements FormSubmitterInterface {
       $handlers = $form['#submit'];
     }
 
+    // Button handlers see the button's #form_object.
+    $triggering_element = $form_state->getTriggeringElement();
+    if (($triggering_element['#form_object'] ?? NULL) !== NULL && ($triggering_element['#submit'] ?? NULL) === $handlers) {
+      $handler_form_state = FormObjectScopedFormState::createForElement($triggering_element, $form_state);
+    }
+    else {
+      $handler_form_state = &$form_state;
+    }
+
     foreach ($handlers as $callback) {
       // Check if a previous _submit handler has set a batch, but make sure we
       // do not react to a batch that is already being processed (for instance
@@ -89,13 +98,13 @@ class FormSubmitter implements FormSubmitterInterface {
       if (($batch = &$this->batchGet()) && !isset($batch['id'])) {
         // Some previous submit handler has set a batch. To ensure correct
         // execution order, store the call in a special 'control' batch set.
-        // See _batch_next_set().
+        // See _batch_next_set(). These handlers do not see #form_object.
         $batch['sets'][] = ['form_submit' => $callback];
         $batch['has_form_submits'] = TRUE;
       }
       else {
-        $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
-        $callable($form, $form_state);
+        $callable = $this->callableResolver->getCallableFromDefinition($handler_form_state->prepareCallback($callback));
+        $callable($form, $handler_form_state);
       }
     }
   }

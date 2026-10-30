@@ -6,7 +6,9 @@ namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Form\FormErrorHandlerInterface;
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormValidator;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -345,6 +347,44 @@ class FormValidatorTest extends UnitTestCase {
   }
 
   /**
+   * Tests validate handlers of a button with #form_object.
+   */
+  #[DataProvider('providerTestExecuteValidateHandlersFormObject')]
+  public function testExecuteValidateHandlersFormObject(bool $button_handlers): void {
+    $this->callableResolver->method('getCallableFromDefinition')->willReturnArgument(0);
+    $form_validator = new FormValidator(new RequestStack(), $this->getStringTranslationStub(), $this->csrfToken, $this->logger, $this->formErrorHandler, $this->callableResolver);
+
+    $form_object = $this->createMock(FormInterface::class);
+    $subform_object = $this->createMock(FormInterface::class);
+    $expected_form_object = $button_handlers ? $subform_object : $form_object;
+    $expected_form_object->expects($this->once())
+      ->method('validateForm')
+      ->with($this->isArray(), $this->callback(fn (FormStateInterface $form_state): bool => $form_state->getFormObject() === $expected_form_object));
+    ($button_handlers ? $form_object : $subform_object)->expects($this->never())
+      ->method('validateForm');
+
+    $form = ['#validate' => ['::validateForm']];
+    $form_state = (new FormState())->setFormObject($form_object);
+    $triggering_element = ['#form_object' => $subform_object];
+    if ($button_handlers) {
+      $triggering_element['#validate'] = ['::validateForm'];
+      $form_state->setValidateHandlers($triggering_element['#validate']);
+    }
+    $form_state->setTriggeringElement($triggering_element);
+    $form_validator->executeValidateHandlers($form, $form_state);
+  }
+
+  /**
+   * Provides test data for testExecuteValidateHandlersFormObject().
+   */
+  public static function providerTestExecuteValidateHandlersFormObject(): array {
+    return [
+      'button handlers' => [TRUE],
+      'form handlers' => [FALSE],
+    ];
+  }
+
+  /**
    * Tests required error message.
    *
    * @legacy-covers ::doValidateForm
@@ -440,6 +480,46 @@ class FormValidatorTest extends UnitTestCase {
     ];
     $form_state = new FormState();
     $form_validator->validateForm('test_form_id', $form, $form_state);
+  }
+
+  /**
+   * Tests element validate within an element with #form_object.
+   *
+   * @legacy-covers ::doValidateForm
+   */
+  public function testElementValidateFormObject(): void {
+    $this->callableResolver->method('getCallableFromDefinition')->willReturnArgument(0);
+    $form_validator = new FormValidator(new RequestStack(), $this->getStringTranslationStub(), $this->csrfToken, $this->logger, $this->formErrorHandler, $this->callableResolver);
+
+    $form_objects = [];
+    $element_validate = function (array $element, FormStateInterface $form_state) use (&$form_objects): void {
+      $form_objects[$element['#name']] = $form_state->getFormObject();
+    };
+    $form_object = $this->createStub(FormInterface::class);
+    $subform_object = $this->createStub(FormInterface::class);
+    $form = [
+      'subform' => [
+        '#name' => 'subform',
+        '#form_object' => $subform_object,
+        '#element_validate' => [$element_validate],
+        'child' => [
+          '#name' => 'child',
+          '#element_validate' => [$element_validate],
+        ],
+      ],
+      'sibling' => [
+        '#name' => 'sibling',
+        '#element_validate' => [$element_validate],
+      ],
+    ];
+    $form_state = (new FormState())->setFormObject($form_object);
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+
+    $this->assertSame([
+      'child' => $subform_object,
+      'subform' => $subform_object,
+      'sibling' => $form_object,
+    ], $form_objects);
   }
 
   /**

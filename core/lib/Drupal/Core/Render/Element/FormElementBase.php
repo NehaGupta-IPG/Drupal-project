@@ -58,6 +58,13 @@ use Drupal\Core\Url;
  *   this suffix are wrapped in a <span> element, so the value should not
  *   contain block level HTML. Any HTML must also be valid, i.e. any tags
  *   introduce inside this suffix must also be terminated within the suffix.
+ * - #form_object: (\Drupal\Core\Form\FormInterface) The form object of a form
+ *   embedded at this element. Callbacks of the element and its children, and
+ *   the #validate, #submit and #ajax callbacks of their buttons, get a form
+ *   state whose getFormObject() returns it and which resolves '::method'
+ *   against it. Form state values stay relative to the complete form. It is
+ *   stored in the form cache, so it must be serializable. Not supported on
+ *   the form root. See \Drupal\Core\Form\FormObjectScopedFormState.
  * - #value: (mixed) A value that cannot be edited by the user.
  * - #has_garbage_value: (bool) Internal only. Set to TRUE to indicate that the
  *   #value property of an element should not be used or processed.

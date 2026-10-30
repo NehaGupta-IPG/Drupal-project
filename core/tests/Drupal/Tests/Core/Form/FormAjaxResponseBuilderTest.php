@@ -7,6 +7,8 @@ namespace Drupal\Tests\Core\Form;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Form\FormAjaxResponseBuilder;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\MainContent\MainContentRendererInterface;
@@ -229,6 +231,47 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
     $result = $this->formAjaxResponseBuilder->buildResponse($request, $form, $form_state, $commands);
     $this->assertInstanceOf('\Drupal\Core\Ajax\AjaxResponse', $result);
     $this->assertSame($commands_expected, $result->getCommands());
+  }
+
+  /**
+   * Tests the callback of a triggering element with #form_object.
+   */
+  public function testBuildResponseFormObject(): void {
+    $response = new AjaxResponse([]);
+    $subform_object = $this->createMock(FormAjaxResponseBuilderTestForm::class);
+    $subform_object->expects($this->once())
+      ->method('ajaxCallback')
+      ->with($this->isArray(), $this->callback(fn (FormStateInterface $form_state): bool => $form_state->getFormObject() === $subform_object))
+      ->willReturn($response);
+    $triggering_element = [
+      '#form_object' => $subform_object,
+      '#ajax' => [
+        'callback' => '::ajaxCallback',
+      ],
+    ];
+    $form = [];
+    $form_state = (new FormState())->setFormObject($this->createStub(FormInterface::class));
+    $form_state->setTriggeringElement($triggering_element);
+
+    $this->callableResolver->method('getCallableFromDefinition')->willReturnArgument(0);
+    $this->renderer->expects($this->never())
+      ->method('renderResponse');
+
+    $this->assertSame($response, $this->formAjaxResponseBuilder->buildResponse(new Request(), $form, $form_state, []));
+  }
+
+}
+
+/**
+ * Form class used in the mocking process of this test.
+ */
+abstract class FormAjaxResponseBuilderTestForm extends FormBase {
+
+  /**
+   * Ajax callback used in the mocking process of this test.
+   */
+  public function ajaxCallback(array $form, FormStateInterface $form_state): AjaxResponse {
+    return new AjaxResponse([]);
   }
 
 }

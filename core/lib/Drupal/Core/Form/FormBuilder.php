@@ -992,6 +992,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Special handling if we're on the top level form element.
     if (isset($element['#type']) && $element['#type'] == 'form') {
+      assert(!array_key_exists('#form_object', $element), 'The #form_object property is not supported on the form root.');
       if (!empty($element['#https']) && !UrlHelper::isExternal($element['#action'])) {
         global $base_root;
 
@@ -1061,19 +1062,34 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!empty($element['#description'])) {
       $element['#attributes']['aria-describedby'] = $element['#id'] . '--description';
     }
+    // Callbacks of the element and its children see its #form_object.
+    $form_object = $element['#form_object'] ?? NULL;
+    if ($form_object === NULL) {
+      $element_form_state = &$form_state;
+    }
+    else {
+      $element_form_state = FormObjectScopedFormState::createForElement($element, $form_state);
+    }
+
     // Handle input elements.
     if (!empty($element['#input'])) {
-      $this->handleInputElement($form_id, $element, $form_state);
+      $this->handleInputElement($form_id, $element, $element_form_state);
     }
     // Allow for elements to expand to multiple elements, e.g., radios,
     // checkboxes and files.
     if (isset($element['#process']) && !$element['#processed']) {
       foreach ($element['#process'] as $callback) {
         $complete_form = &$form_state->getCompleteForm();
-        $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
-        $element = $callable($element, $form_state, $complete_form);
+        $callable = $this->callableResolver->getCallableFromDefinition($element_form_state->prepareCallback($callback));
+        $element = $callable($element, $element_form_state, $complete_form);
       }
       $element['#processed'] = TRUE;
+
+      // A #process callback may have embedded a form object.
+      if (($element['#form_object'] ?? NULL) !== $form_object) {
+        unset($element_form_state);
+        $element_form_state = FormObjectScopedFormState::createForElement($element, $form_state);
+      }
     }
 
     // We start off assuming all form elements are in the correct order.
@@ -1134,7 +1150,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // later.
         unset($element['#sorted']);
       }
-      $element[$key] = $this->doBuildForm($form_id, $element[$key], $form_state);
+      $element[$key] = $this->doBuildForm($form_id, $element[$key], $element_form_state);
       $count++;
     }
 
@@ -1142,8 +1158,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // after normal input parsing has been completed.
     if (isset($element['#after_build']) && !isset($element['#after_build_done'])) {
       foreach ($element['#after_build'] as $callback) {
-        $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
-        $element = $callable($element, $form_state);
+        $callable = $this->callableResolver->getCallableFromDefinition($element_form_state->prepareCallback($callback));
+        $element = $callable($element, $element_form_state);
       }
       $element['#after_build_done'] = TRUE;
     }
@@ -1357,9 +1373,15 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // \Drupal\Core\Form\FormState::cleanValues(). Enforce the same input
     // processing restrictions as above.
     if ($process_input) {
+      // Copies of the element keep the form object it was built with.
+      $element_copy = $element;
+      if ($form_state instanceof FormObjectScopedFormState) {
+        $element_copy['#form_object'] = $form_state->getFormObject();
+      }
+
       // Detect if the element triggered the submission via Ajax or HTMX.
       if ($this->elementTriggeredScriptedSubmission($element, $form_state)) {
-        $form_state->setTriggeringElement($element);
+        $form_state->setTriggeringElement($element_copy);
       }
 
       // If the form was submitted by the browser rather than via Ajax, then it
@@ -1372,13 +1394,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         // self::doBuildForm() code that handles a form submission containing no
         // button information in \Drupal::request()->request.
         $buttons = $form_state->getButtons();
-        $buttons[] = $element;
+        $buttons[] = $element_copy;
         $form_state->setButtons($buttons);
         if ($this->buttonWasClicked($element, $form_state)) {
           // A correctly formatted request should only have one triggering
           // element.
           if (empty($form_state->getTriggeringElement())) {
-            $form_state->setTriggeringElement($element);
+            $form_state->setTriggeringElement($element_copy);
           }
         }
       }
