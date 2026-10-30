@@ -75,4 +75,12 @@ interface ContentEntityFormInterface extends EntityFormInterface {
    */
   public function validateForm(array &$form, FormStateInterface $form_state);
 
+  /**
+   * Returns the current estimation if entity deep serialization is required.
+   *
+   * @return bool
+   *   TRUE if deep serialization is reqired, FALSE otherwise.
+   */
+  public function isEntityDeepSerializationRequired();
+
 }

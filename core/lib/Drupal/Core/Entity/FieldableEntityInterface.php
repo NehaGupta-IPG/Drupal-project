@@ -236,4 +236,34 @@ interface FieldableEntityInterface extends EntityInterface {
    */
   public function setValidationRequired($required);
 
+  /**
+   * Flags the entity for deep serialization.
+   *
+   * When an entity is deeply serialized then its field items will have the
+   * opportunity to return also e.g. computed properties in order to serialize
+   * the whole entity structure and cover changes made on computed properties,
+   * which are not yet saved instead of only returning the metadata needed to
+   * re-compute/load the computed property. An example for this are entity
+   * reference fields, which during deep serialization will return their
+   * referenced entities. In this case not only the changes on the main entity
+   * will be serialized, but also the changes made on the referenced entities.
+   *
+   * Example usage:
+   * - Alter the title of a referenced entity and serialize the parent entity
+   * through deep serialization in order to serialize the change made on the
+   * referenced entity.
+   * @code
+   *   $entity->entity_reference_field->entity->setTitle('new entity reference title');
+   *   $entity->setDeepSerialization(TRUE);
+   *   serialize($entity);
+   * @endcode
+   *
+   * @param bool $deep_serialization
+   *   TRUE if deep serialization should be performed when the entity is being
+   *   serialized, FALSE otherwise.
+   *
+   * @return $this
+   */
+  public function setDeepSerialization($deep_serialization);
+
 }

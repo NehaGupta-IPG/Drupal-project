@@ -3,6 +3,7 @@
 namespace Drupal\node\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -57,16 +58,11 @@ class NodeForm extends ContentEntityForm {
    *   The current user.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
    */
-  public function __construct(
-    EntityRepositoryInterface $entity_repository,
-    PrivateTempStoreFactory $temp_store_factory,
-    EntityTypeBundleInfoInterface $entity_type_bundle_info,
-    TimeInterface $time,
-    AccountInterface $current_user,
-    DateFormatterInterface $date_formatter,
-  ) {
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+  public function __construct(EntityRepositoryInterface $entity_repository, PrivateTempStoreFactory $temp_store_factory, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, AccountInterface $current_user, DateFormatterInterface $date_formatter, PluginManagerInterface $widget_plugin_manager = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time, $widget_plugin_manager);
     $this->tempStoreFactory = $temp_store_factory;
     $this->currentUser = $current_user;
     $this->dateFormatter = $date_formatter;
@@ -82,7 +78,8 @@ class NodeForm extends ContentEntityForm {
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
       $container->get('current_user'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get('plugin.manager.field.widget')
     );
   }
 

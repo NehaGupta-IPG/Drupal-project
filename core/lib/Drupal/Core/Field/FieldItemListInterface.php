@@ -301,4 +301,19 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    */
   public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode);
 
+  /**
+   * Gets the data value prepared for serialization.
+   *
+   * @param bool $deep_serialization
+   *   Whether a deep serialization should be performed.
+   *
+   * @return array[]
+   *   Depending on whether deep serialization is being performed or not the
+   *   returned value might be either the data value as returned by ::getValue()
+   *   if deep serialization is not being performed or additionally contain
+   *   computed properties next to the data values if deep serialization is
+   *   being performed.
+   */
+  public function getSerializationValue($deep_serialization);
+
 }

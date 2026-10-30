@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
@@ -21,6 +22,13 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\RevisionLogInterface
    */
   protected $entity;
+
+  /**
+   * Whether a deep serialization should be performed on the entity object.
+   *
+   * @var bool
+   */
+  protected $entityDeepSerializationRequired = FALSE;
 
   /**
    * The entity type bundle info service.
@@ -44,6 +52,13 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   protected $entityRepository;
 
   /**
+   * The widget plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $widgetPluginManager;
+
+  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -52,11 +67,18 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time) {
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, PluginManagerInterface $widget_plugin_manager = NULL) {
+    if ($entity_repository instanceof EntityManagerInterface) {
+      @trigger_error('Passing the entity.manager service to ContentEntityForm::__construct() is deprecated in Drupal 8.6.0 and will be removed before Drupal 9.0.0. Pass the entity.repository service instead. See https://www.drupal.org/node/2549139.', E_USER_DEPRECATED);
+      $this->entityManager = $entity_repository;
+    }
     $this->entityRepository = $entity_repository;
-    $this->entityTypeBundleInfo = $entity_type_bundle_info;
-    $this->time = $time;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info ?: \Drupal::service('entity_type.bundle.info');
+    $this->time = $time ?: \Drupal::service('datetime.time');
+    $this->widgetPluginManager = $widget_plugin_manager ?: \Drupal::service('plugin.manager.field.widget');
   }
 
   /**
@@ -66,7 +88,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     return new static(
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('plugin.manager.field.widget')
     );
   }
 
@@ -355,6 +378,20 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    */
   public function setFormDisplay(EntityFormDisplayInterface $form_display, FormStateInterface $form_state) {
     $form_state->set('form_display', $form_display);
+
+    // If one of the widgets requires a deep entity serialization then the
+    // entity should be deeply serialized as part of the form object
+    // serialization.
+    foreach ($form_display->getComponents() as $component) {
+      // There might be components that don't have a type property, therefore
+      // we have to check that the component has a type. This could occur by
+      // adding components e.g. through hook_entity_extra_field_info().
+      if (isset($component['type']) && ($widget_definition = $this->widgetPluginManager->getDefinition($component['type'])) && !empty($widget_definition['entity_deep_serialization'])) {
+        $this->entityDeepSerializationRequired = TRUE;
+        break;
+      }
+    }
+
     return $this;
   }
 
@@ -476,6 +513,21 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    */
   protected function showRevisionUi() {
     return $this->entity->getEntityType()->showRevisionUi();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEntityDeepSerializationRequired() {
+    return $this->entityDeepSerializationRequired;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep() {
+    $this->entity->setDeepSerialization($this->entityDeepSerializationRequired);
+    return parent::__sleep();
   }
 
 }

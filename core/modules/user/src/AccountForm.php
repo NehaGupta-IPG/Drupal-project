@@ -5,6 +5,7 @@ namespace Drupal\user;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -43,9 +44,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $widget_plugin_manager
+   *   The widget plugin manager.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, PluginManagerInterface $widget_plugin_manager = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time, $widget_plugin_manager);
     $this->languageManager = $language_manager;
   }
 
@@ -57,7 +60,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $container->get('entity.repository'),
       $container->get('language_manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('plugin.manager.field.widget')
     );
   }
 

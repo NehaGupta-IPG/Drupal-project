@@ -198,6 +198,18 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   protected static $fieldsToSkipFromTranslationChangesCheck = [];
 
   /**
+   * Whether to serialize the complete entity structure.
+   *
+   * If set to TRUE when the entity is being serialized a deep serialization
+   * will be performed and the flag will be automatically set back to FALSE.
+   *
+   * @var bool
+   *
+   * @see \Drupal\Core\Entity\ContentEntityInterface::setDeepSerialization()
+   */
+  protected $deepSerialization = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = []) {
@@ -550,9 +562,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function __sleep(): array {
     // Get the values of instantiated field objects, only serialize the values.
+    /** @var \Drupal\Core\Field\FieldItemListInterface[] $fields */
     foreach ($this->fields as $name => $fields) {
       foreach ($fields as $langcode => $field) {
-        $this->values[$name][$langcode] = $field->getValue();
+        $this->values[$name][$langcode] = $field->getSerializationValue($this->deepSerialization);
       }
     }
     $this->fields = [];
@@ -560,7 +573,21 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $this->languages = NULL;
     $this->clearTranslationCache();
 
+    // As during the serialization process referenced entities might also have
+    // the "deepSerialization" flag set the only place of unsetting it remains
+    // in the sleep method right after the entity is prepared for the
+    // serialization and before executing it.
+    // @see \Drupal\Core\Field\EntityReferenceFieldItemList::getSerializationValue().
+    $this->deepSerialization = FALSE;
+
     return parent::__sleep();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDeepSerialization($deep_serialization) {
+    $this->deepSerialization = $deep_serialization;
   }
 
   /**
@@ -962,6 +989,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $translation->enforceIsNew = &$this->enforceIsNew;
     $translation->newRevision = &$this->newRevision;
     $translation->entityKeys = &$this->entityKeys;
+    $translation->deepSerialization = &$this->deepSerialization;
     $translation->translatableEntityKeys = &$this->translatableEntityKeys;
     $translation->translationInitialize = FALSE;
     $translation->typedData = NULL;
@@ -1266,7 +1294,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // overwriting the original references with ones pointing to copies of
     // them: enforceIsNew, newRevision, loadedRevisionId, fields, entityKeys,
     // translatableEntityKeys, values, isDefaultRevision,
-    // enforceRevisionTranslationAffected and originalEntity.
+    // enforceRevisionTranslationAffected, isSyncing and deepSerialization.
     $enforce_is_new = $this->enforceIsNew;
     $this->enforceIsNew = &$enforce_is_new;
 
@@ -1299,6 +1327,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     $is_syncing = $this->isSyncing;
     $this->isSyncing = &$is_syncing;
+
+    $deepSerialization = $this->deepSerialization;
+    $this->deepSerialization = &$deepSerialization;
 
     foreach ($this->fields as $name => $fields_by_langcode) {
       $this->fields[$name] = [];

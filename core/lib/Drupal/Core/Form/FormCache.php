@@ -172,6 +172,22 @@ class FormCache implements FormCacheInterface {
       return;
     }
 
+    // Cache the form state. We have to first cache the form state as
+    // serializing it will lead to serializing the contained form object, which
+    // might make changes to the contained entity object such as flagging it
+    // for deep serialization in the sleep method of the form object, but if we
+    // first serialize the form array then the entity contained within it will
+    // be serialized without the logic from the sleep method of the form object
+    // has been executed and therefore deep serialization of the entity
+    // contained in the form object will not be possible anymore as the sleep
+    // method of the entity will have been called already without first
+    // flagging the entity for deep serialization.
+    // @see \Drupal\Core\Entity\ContentEntityForm::__sleep().
+    // @see \Drupal\Core\Entity\ContentEntityBase::__sleep().
+    if ($data = $form_state->getCacheableArray()) {
+      $this->keyValueExpirableFactory->get('form_state')->setWithExpire($form_build_id, $data, $expire);
+    }
+
     // Cache form structure.
     if (isset($form)) {
       if ($this->currentUser->isAuthenticated()) {
@@ -179,10 +195,6 @@ class FormCache implements FormCacheInterface {
       }
       unset($form['#build_id_old']);
       $this->keyValueExpirableFactory->get('form')->setWithExpire($form_build_id, $form, $expire);
-    }
-
-    if ($data = $form_state->getCacheableArray()) {
-      $this->keyValueExpirableFactory->get('form_state')->setWithExpire($form_build_id, $data, $expire);
     }
   }
 

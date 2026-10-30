@@ -43,7 +43,7 @@ class EntityTestCompositeConstraint extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['name']->setDisplayOptions('form', [
-      'type' => 'string',
+      'type' => 'string_textfield',
       'weight' => 0,
     ]);
 
