@@ -455,6 +455,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         }
         $this->isAutoCommitted = FALSE;
       }
+      // @phpstan-ignore method.deprecated
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
       unset($this->voidedItems[$id]);
@@ -485,6 +486,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $this->commit($name, $id, CommitType::ImplicitOnDestruct);
     $this->removeStackItem($id);
     if ($this->rootId === $id) {
+      // @phpstan-ignore method.deprecated
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
     }
