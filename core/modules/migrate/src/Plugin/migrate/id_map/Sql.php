@@ -332,6 +332,12 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
   protected function ensureTables() {
+    $source_ids_hash[$this::SOURCE_IDS_HASH] = [
+      'type' => 'varchar',
+      'length' => '64',
+      'not null' => TRUE,
+      'description' => 'Hash of source ids. Used as primary key',
+    ];
     if (!$this->getDatabase()->schema()->tableExists($this->mapTableName)) {
       // Generate appropriate schema info for the map and message tables,
       // and map from the source field names to the map/msg field names.
@@ -345,12 +351,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
         $source_id_schema[$map_key]['not null'] = TRUE;
       }
 
-      $source_ids_hash[$this::SOURCE_IDS_HASH] = [
-        'type' => 'varchar',
-        'length' => '64',
-        'not null' => TRUE,
-        'description' => 'Hash of source ids. Used as primary key',
-      ];
       $fields = $source_ids_hash + $source_id_schema;
 
       // Add destination identifiers to map table.
@@ -430,36 +430,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
           }
         }
       }
-
-      // Now do the message table.
-      if (!$this->getDatabase()->schema()->tableExists($this->messageTableName())) {
-        $fields = [];
-        $fields['msgid'] = [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ];
-        $fields += $source_ids_hash;
-
-        $fields['level'] = [
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 1,
-        ];
-        $fields['message'] = [
-          'type' => 'text',
-          'size' => 'medium',
-          'not null' => TRUE,
-        ];
-        $schema = [
-          'description' => 'Messages generated during a migration process',
-          'fields' => $fields,
-          'primary key' => ['msgid'],
-          'indexes' => [$this::SOURCE_IDS_HASH => [$this::SOURCE_IDS_HASH]],
-        ];
-        $this->getDatabase()->schema()->createTable($this->messageTableName(), $schema);
-      }
     }
     else {
       // Add any missing columns to the map table.
@@ -494,6 +464,36 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
           'description' => 'Hash of source ids. Used as primary key',
         ]);
       }
+    }
+
+    // Now do the message table.
+    if (!$this->getDatabase()->schema()->tableExists($this->messageTableName())) {
+      $fields = [];
+      $fields['msgid'] = [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ];
+      $fields += $source_ids_hash;
+
+      $fields['level'] = [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+      ];
+      $fields['message'] = [
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ];
+      $schema = [
+        'description' => 'Messages generated during a migration process',
+        'fields' => $fields,
+        'primary key' => ['msgid'],
+        'indexes' => [$this::SOURCE_IDS_HASH => [$this::SOURCE_IDS_HASH]],
+      ];
+      $this->getDatabase()->schema()->createTable($this->messageTableName(), $schema);
     }
   }
 
