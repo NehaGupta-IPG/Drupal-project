@@ -428,6 +428,10 @@ services:
     class: Drupal\Core\Config\ConfigManager
     arguments: ['@entity_type.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage', '@event_dispatcher', '@entity.repository', '@extension.path.resolver']
   Drupal\Core\Config\ConfigManagerInterface: '@config.manager'
+  config.comparator:
+    class: Drupal\Core\Config\ConfigComparator
+    arguments: ['@config.storage']
+  Drupal\Core\Config\ConfigComparator: '@config.comparator'
   config.factory:
     class: Drupal\Core\Config\ConfigFactory
     tags:
