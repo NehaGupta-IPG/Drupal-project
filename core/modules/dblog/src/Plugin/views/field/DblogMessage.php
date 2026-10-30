@@ -2,7 +2,7 @@
 
 namespace Drupal\dblog\Plugin\views\field;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
@@ -60,7 +60,7 @@ class DblogMessage extends FieldPluginBase {
 
     if ($this->options['replace_variables']) {
       $variables = unserialize($this->getvalue($values, 'variables'));
-      return new FormattableMarkup($value, (array) $variables);
+      return new TranslatableMarkup($value, (array) $variables);
     }
     else {
       return $this->sanitizeValue($value);
