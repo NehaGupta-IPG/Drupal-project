@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Breadcrumb;
 
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,7 +33,7 @@ class Breadcrumb404Test extends BrowserTestBase {
   /**
    * Tests that different 404s don't create unnecessary cache entries.
    */
-  public function testBreadcrumbOn404Pages(): void {
+  public function testBreadcrumbCacheEntrieOn404Pages(): void {
     $this->placeBlock('system_breadcrumb_block', ['id' => 'breadcrumb']);
 
     // Prime the cache first.
@@ -45,6 +47,26 @@ class Breadcrumb404Test extends BrowserTestBase {
     $this->drupalGet('/not-found-3');
     $next_count = count($this->getBreadcrumbCacheEntries());
     $this->assertEquals($base_count, $next_count);
+  }
+
+  /**
+   * Tests whether breadcrumbs can cause infinite recursion on 404 pages.
+   */
+  public function testBreadcrumbInfiniteRecursion() {
+    \Drupal::service('module_installer')->install(['node', 'comment']);
+    $this->placeBlock('system_breadcrumb_block', ['id' => 'breadcrumb']);
+
+    NodeType::create([
+      'type' => 'test',
+    ])->save();
+    Node::create([
+      'type' => 'test',
+      'title' => 'test',
+      'status' => 1,
+    ])->save();
+
+    $this->drupalGet('/comment/reply/node/1/whatever/1');
+    $this->assertSession()->statusCodeEquals(404);
   }
 
   /**
