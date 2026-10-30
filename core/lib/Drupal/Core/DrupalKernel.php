@@ -518,7 +518,36 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+    $bootstrap_definition = Settings::get('bootstrap_container_definition');
+    if ($bootstrap_definition === NULL) {
+      $bootstrap_definition = $this->defaultBootstrapContainerDefinition;
+      // When APCu is available, wrap cache.container in a ChainedFastBackend
+      // to avoid fetching the container definition from the database on
+      // every request. Skipped during installation (same as
+      // ChainedFastBackendFactory) and when sites override
+      // bootstrap_container_definition.
+      if (function_exists('apcu_enabled') && apcu_enabled() && !InstallerKernel::installationAttempted()) {
+        $bootstrap_definition['services']['cache.container.consistent'] = $bootstrap_definition['services']['cache.container'];
+        $bootstrap_definition['services']['cache.container.fast'] = [
+          'class' => 'Drupal\Core\Cache\ApcuBackend',
+          'arguments' => [
+            'container',
+            Settings::getApcuPrefix('cache_container', $this->root, $this->sitePath),
+            '@cache_tags_provider.container',
+            '@datetime.time',
+          ],
+        ];
+        $bootstrap_definition['services']['cache.container'] = [
+          'class' => 'Drupal\Core\Cache\ChainedFastBackend',
+          'arguments' => [
+            '@cache.container.consistent',
+            '@cache.container.fast',
+            'container',
+          ],
+        ];
+      }
+    }
+    $this->bootstrapContainer = new $this->bootstrapContainerClass($bootstrap_definition);
 
     // Initialize the container.
     $this->initializeContainer();
