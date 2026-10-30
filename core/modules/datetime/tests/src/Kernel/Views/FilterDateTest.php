@@ -167,6 +167,34 @@ class FilterDateTest extends DateTimeHandlerTestBase {
       ];
       $this->assertIdenticalResultset($view, $expected_result, $this->map);
       $view->destroy();
+
+      // Test between with min and max as dynamic dates.
+      $view->initHandlers();
+      $view->filter[$field]->operator = 'between';
+      $view->filter[$field]->value['type'] = 'offset';
+      $view->filter[$field]->value['min'] = 'now';
+      $view->filter[$field]->value['max'] = '+2 days';
+      $view->setDisplay('default');
+      $this->executeView($view);
+      $expected_result = [
+        ['nid' => $this->nodes[0]->id()],
+        ['nid' => $this->nodes[1]->id()],
+      ];
+      $this->assertIdenticalResultset($view, $expected_result, $this->map);
+      $view->destroy();
+
+      // Test between with only max with dynamic date.
+      $view->initHandlers();
+      $view->filter[$field]->operator = 'between';
+      $view->filter[$field]->value['type'] = 'offset';
+      $view->filter[$field]->value['max'] = 'now';
+      $this->executeView($view);
+      $expected_result = [
+        ['nid' => $this->nodes[1]->id()],
+        ['nid' => $this->nodes[2]->id()],
+      ];
+      $this->assertIdenticalResultset($view, $expected_result, $this->map);
+      $view->destroy();
     }
   }
 

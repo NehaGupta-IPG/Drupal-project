@@ -192,6 +192,34 @@ class FilterDateTest extends ViewTestBase {
       ['nid' => $this->nodes[3]->id()],
     ];
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with min and max as dynamic dates.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['type'] = 'offset';
+    $view->filter['created']->value['min'] = 'now';
+    $view->filter['created']->value['max'] = '+2 days';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[3]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with only max with dynamic date.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['type'] = 'offset';
+    $view->filter['created']->value['max'] = 'now';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[0]->id()],
+      ['nid' => $this->nodes[1]->id()],
+      ['nid' => $this->nodes[2]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
   }
 
   /**

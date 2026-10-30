@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsFilter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter to handle dates stored as a timestamp.
@@ -12,6 +13,22 @@ use Drupal\views\Attribute\ViewsFilter;
  */
 #[ViewsFilter("date")]
 class Date extends NumericFilter {
+
+  /**
+   * The time service.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->time = $container->get("datetime.time");
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}
@@ -217,8 +234,9 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opBetween($field) {
-    $a = intval(strtotime($this->value['min'], 0));
-    $b = intval(strtotime($this->value['max'], 0));
+    $request_time = $this->time->getRequestTime();
+    $a = intval(strtotime($this->value['min'], $request_time));
+    $b = intval(strtotime($this->value['max'], $request_time));
 
     if ($this->value['type'] == 'offset') {
       // Keep sign.
@@ -237,7 +255,8 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opSimple($field) {
-    $value = intval(strtotime($this->value['value'], 0));
+    $request_time = $this->time->getRequestTime();
+    $value = intval(strtotime($this->value['value'], $request_time));
     if (!empty($this->value['type']) && $this->value['type'] == 'offset') {
       // Keep sign.
       $value = '***CURRENT_TIME***' . sprintf('%+d', $value);
