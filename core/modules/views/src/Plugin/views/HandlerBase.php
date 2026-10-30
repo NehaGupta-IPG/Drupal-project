@@ -826,21 +826,24 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     $operator = '';
     $value = [];
 
-    // Determine if the string has 'or' operators (plus signs) or 'and'
-    // operators (commas) and split the string accordingly.
-    if (preg_match('/^([\w0-9-_\.]+[+ ]+)+[\w0-9-_\.]+$/u', $str)) {
-      // The '+' character in a query string may be parsed as ' '.
-      $operator = 'or';
-      $value = preg_split('/[+ ]/', $str);
-    }
-    elseif (preg_match('/^([\w0-9-_\.]+[, ]+)*[\w0-9-_\.]+$/u', $str)) {
-      $operator = 'and';
-      $value = explode(',', $str);
+    // Remove whitespace, + and , characters from start and end of string.
+    $str = trim($str, " \n\r\t\v\0,+");
+    if ($str !== '') {
+      // Check for 'or' operators (plus signs or spaces) along with a comma.
+      if ((strpos($str, '+') || strpos($str, ' ')) && strpos($str, ',') === FALSE) {
+        $operator = 'or';
+        // Replace plus signs with spaces and split.
+        $value = explode(' ', str_replace('+', ' ', $str));
+      }
+      // Check for 'and' operators (commas) or if the string has only one
+      // word without any delimiters.
+      else {
+        $operator = 'and';
+        $value = explode(',', $str);
+      }
     }
 
-    // Filter any empty matches (Like from '++' in a string) and reset the
-    // array keys. 'strlen' is used as the filter callback so we do not lose
-    // 0 values (would otherwise evaluate == FALSE).
+    // Filter any empty matches and reset array keys.
     $value = array_values(FilterArray::removeEmptyStrings($value));
 
     if ($force_int) {
