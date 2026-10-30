@@ -3,10 +3,7 @@
 namespace Drupal\user\Plugin\LanguageNegotiation;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\PathProcessor\PathProcessorManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Routing\AdminContext;
-use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
@@ -15,7 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
-use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
  * Identifies admin language from the user preferences.
@@ -66,34 +62,15 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
   protected $stackedRouteMatch;
 
   /**
-   * Constructs a new LanguageNegotiationUserAdmin instance.
-   *
-   * @param \Drupal\Core\Routing\AdminContext $admin_context
-   *   The admin context.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $router
-   *   The router.
-   * @param \Drupal\Core\PathProcessor\PathProcessorManager $path_processor_manager
-   *   The path processor manager.
-   * @param \Drupal\Core\Routing\StackedRouteMatchInterface $stacked_route_match
-   *   The stacked route match.
-   */
-  public function __construct(AdminContext $admin_context, UrlMatcherInterface $router, PathProcessorManager $path_processor_manager, StackedRouteMatchInterface $stacked_route_match) {
-    $this->adminContext = $admin_context;
-    $this->router = $router;
-    $this->pathProcessorManager = $path_processor_manager;
-    $this->stackedRouteMatch = $stacked_route_match;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $container->get('router.admin_context'),
-      $container->get('router'),
-      $container->get('path_processor_manager'),
-      $container->get('current_route_match')
-    );
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->adminContext = $container->get('router.admin_context');
+    $instance->router = $container->get('router');
+    $instance->pathProcessorManager = $container->get('path_processor_manager');
+    $instance->stackedRouteMatch = $container->get('current_route_match');
+    return $instance;
   }
 
   /**

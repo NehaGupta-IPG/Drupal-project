@@ -176,11 +176,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    */
   public function getNegotiationMethodInstance($method_id) {
     if (!isset($this->methods[$method_id])) {
-      $instance = $this->negotiatorManager->createInstance($method_id, []);
-      $instance->setLanguageManager($this->languageManager);
-      $instance->setConfig($this->configFactory);
-      $instance->setCurrentUser($this->currentUser);
-      $this->methods[$method_id] = $instance;
+      $this->methods[$method_id] = $this->negotiatorManager->createInstance($method_id, []);
     }
     return $this->methods[$method_id];
   }
