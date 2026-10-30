@@ -200,8 +200,6 @@ class RecipeCommandTest extends BrowserTestBase {
    *   The extension type, either 'module' or 'theme'.
    * @param array<string, string> $info
    *   Additional info.yml keys for the extension.
-   *
-   * @see https://www.drupal.org/node/3501858
    */
   #[TestWith(['module', []])]
   #[TestWith(['theme', ['base theme' => 'stark']])]
