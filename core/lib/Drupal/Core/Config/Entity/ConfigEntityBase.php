@@ -684,7 +684,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Helper function to add config entity dependencies.
+   * Adds a configuration entity dependency.
    *
    * Using this method ensures that the error message contains helpful
    * information to debug problems when an entity does not exist.
@@ -696,10 +696,6 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @return $this
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *   Thrown if the entity type is invalid.
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   *   Thrown if the entity type is invalid.
    * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityDependencyException
    *   Thrown if the entity does not exist.
    */
