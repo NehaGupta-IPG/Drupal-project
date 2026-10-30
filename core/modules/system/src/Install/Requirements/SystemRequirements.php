@@ -267,6 +267,23 @@ class SystemRequirements implements InstallRequirementsInterface {
     }
     $requirements['php_opcache']['title'] = t('PHP OPcode caching');
 
+    // Check that the required cache backends exist.
+    $cache_default_bin_backends = \Drupal::getContainer()->getParameter('cache_default_bin_backends');
+    if (!empty($cache_default_bin_backends)) {
+      foreach ($cache_default_bin_backends as $bin => $backend) {
+        if (!\Drupal::getContainer()->has($backend)) {
+          $requirements['cache_backend_bin_' . $bin] = [
+            'title' => t('Cache Backend'),
+            'value' => t('Missing'),
+            'severity' => REQUIREMENT_WARNING,
+            'description' => new TranslatableMarkup(
+              'The configured cache backend %backend is not available for the bin %bin.',
+              ['%backend' => $backend, '%bin' => $bin]),
+          ];
+        }
+      }
+    }
+
     // Test whether we have a good source of random bytes.
     $requirements['php_random_bytes'] = [
       'title' => t('Random number generation'),
