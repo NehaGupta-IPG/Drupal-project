@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\Any;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\serialization\Normalizer\TypedDataNormalizer;
+use Drupal\Tests\serialization\Traits\JsonSchemaTestTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -20,6 +21,8 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(TypedDataNormalizer::class)]
 #[Group('serialization')]
 class TypedDataNormalizerTest extends UnitTestCase {
+
+  use JsonSchemaTestTrait;
 
   /**
    * The TypedDataNormalizer instance.
@@ -76,6 +79,20 @@ class TypedDataNormalizerTest extends UnitTestCase {
     return [
       'optional' => [FALSE, ['oneOf' => [['type' => 'string'], ['type' => 'null']]]],
       'required' => [TRUE, ['type' => 'string']],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function jsonSchemaDataProvider(): array {
+    $optional = new Any(DataDefinition::createFromDataType('any'));
+    $optional->setValue(Markup::create('<p>Text</p>'));
+    $required = new Any(DataDefinition::createFromDataType('any')->setRequired(TRUE));
+    $required->setValue(Markup::create('<p>Text</p>'));
+    return [
+      'stringable' => [$optional],
+      'stringable, required' => [$required],
     ];
   }
 

@@ -45,10 +45,12 @@ trait SchematicNormalizerHelperTrait {
    *   The value passed to ::getNormalizationSchema().
    *
    * @return bool
-   *   FALSE for typed data with a required definition, otherwise TRUE.
+   *   TRUE for a class name, which has no definition to check, and for typed
+   *   data whose definition is not required.
    */
   protected function isNullable(mixed $object): bool {
-    return !$object instanceof TypedDataInterface || !$object->getDataDefinition()->isRequired();
+    return is_string($object)
+      || ($object instanceof TypedDataInterface && !$object->getDataDefinition()->isRequired());
   }
 
   /**
