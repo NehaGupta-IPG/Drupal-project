@@ -145,6 +145,11 @@ class FilterCriteriaTest extends WebDriverTestBase {
     // Open the "Rearrange filter criteria" dialog.
     $this->openFilterDialog();
 
+    $assert_session = $this->assertSession();
+    // Labels are drawn after attach (deferred to the next task so :visible
+    // works once the modal is shown); wait and assert first paint.
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '#views-rearrange-filters .views-operator-label'));
+
     // Get the last filter on the list.
     $row = $page->findAll('css', '.draggable');
     $row_count = count($row);
