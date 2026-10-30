@@ -47,9 +47,13 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
       if (!empty($item->_loaded)) {
         $entity = $item->entity;
 
-        // Set the entity in the correct language for display.
+        // Set the entity in the correct language for display. Use the
+        // current content language rather than the referring entity's
+        // language so that referenced entities are rendered in the page
+        // language even when the referring entity lacks a translation and
+        // falls back to its original language.
         if ($entity instanceof TranslatableInterface) {
-          $entity = \Drupal::service('entity.repository')->getTranslationFromContext($entity, $langcode);
+          $entity = \Drupal::service('entity.repository')->getTranslationFromContext($entity);
         }
 
         $access = $this->checkAccess($entity);

@@ -169,6 +169,13 @@ class EntityReferenceFieldTranslatedReferenceViewTest extends BrowserTestBase {
     $this->assertEntityReferenceDisplay();
     $this->assertEntityReferenceFormDisplay();
 
+    // Create a translatable referrer entity that has NO translation in the
+    // target language. Referenced entities that do have a translation should
+    // still be displayed in the target language (content language), not in the
+    // referrer's fallback language.
+    $this->referrerEntity = $this->createReferrerEntity(FALSE);
+    $this->assertEntityReferenceDisplay();
+
     // Disable translation for referrer content type.
     static::disableBundleTranslation('node', 'referrer');
 
