@@ -47,7 +47,7 @@
         // If the offset from UTC is identical on January 1 and July 1,
         // assume daylight saving time is not used in this time zone.
         if (offsetJan === offsetJul) {
-          isDaylightSavingTime = '';
+          isDaylightSavingTime = -1;
         }
         // If the maximum annual offset is equivalent to the current offset,
         // assume daylight saving time is in effect.
