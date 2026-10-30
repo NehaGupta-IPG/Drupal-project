@@ -643,7 +643,7 @@ class Ckeditor5Hooks {
     // The theme may not be installed yet. For example, the installer installs
     // modules before themes. Theme CSS for CKEditor 5 is optional, so leave it
     // out until the theme is installed.
-    if (isset($theme) && $this->themeExtensionList->exists($theme)) {
+    if (isset($theme) && !isset($this->themeExtensionList->getAllInstalledInfo()[$theme])) {
       return $css;
     }
     if (isset($theme) && $theme_path = $this->themeExtensionList->getPath($theme)) {
