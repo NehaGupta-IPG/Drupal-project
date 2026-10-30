@@ -129,4 +129,57 @@ class Bundle extends InOperator {
     return $dependencies;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $tags = parent::getCacheTags();
+
+    $exposed = $this->options['exposed'] ?? FALSE;
+
+    // Do not handle bundle list cache tags for exposed filter.
+    if ($exposed) {
+      return $tags;
+    }
+
+    foreach ($this->getRealBundles() as $bundle) {
+      $tags[] = $this->entityTypeId . '_list:' . $bundle;
+    }
+
+    return $tags;
+  }
+
+  /**
+   * Get the real bundles.
+   *
+   * @return array
+   *   The bundles.
+   */
+  public function getRealBundles() {
+    $bundle_entity_type = $this->entityType->getBundleEntityType();
+    $bundle_entity_storage = $this->entityTypeManager->getStorage($bundle_entity_type);
+
+    $field = $this->realField ?: $this->entityType->getKey('bundle');
+    $value = $this->value;
+    $operator = NULL;
+
+    $operators_info = $this->operators();
+    $operator_method = $operators_info[$this->operator]['method'] ?? NULL;
+
+    // @see \Drupal\views\Plugin\views\filter\InOperator::opSimple()
+    if ($operator_method === 'opSimple') {
+      $operator = $this->operator;
+    }
+    // @see \Drupal\views\Plugin\views\filter\InOperator::opEmpty()
+    elseif ($operator_method === 'opEmpty') {
+      $operator = $this->operator == 'empty' ? 'IS NULL' : 'IS NOT NULL';
+    }
+
+    $operator = strtoupper($operator);
+
+    $bundles = $field && $operator ? $bundle_entity_storage->getQuery()->condition($field, $value, $operator)->accessCheck(FALSE)->execute() : [];
+
+    return is_array($bundles) ? array_values($bundles) : [];
+  }
+
 }
