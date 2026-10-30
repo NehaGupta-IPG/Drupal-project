@@ -1,0 +1,8 @@
+breadcrumb_render_cache_test.title_test:
+  path: '/breadcrumb-render-cache-test/title-test/{api_id}'
+  defaults:
+    _title_callback: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::getTitle'
+    _controller: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::build'
+    api_id: '12345685'
+  requirements:
+    _permission: 'access content'
