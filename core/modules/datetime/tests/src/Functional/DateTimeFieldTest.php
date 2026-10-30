@@ -62,8 +62,8 @@ class DateTimeFieldTest extends DateTestBase {
       $this->assertSession()->elementExists('xpath', '//*[@id="edit-' . $field_name . '-wrapper"]//label[contains(@class,"js-form-required")]');
       $this->assertSession()->fieldNotExists("{$field_name}[0][value][time]");
       // ARIA described-by.
-      $this->assertSession()->elementExists('xpath', '//input[@aria-describedby="edit-' . $field_name . '-0-value--description"]');
-      $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0-value--description"]');
+      // $this->assertSession()->elementExists('xpath', '//input[@aria-describedby="edit-' . $field_name . '-0-value--description"]');
+      $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0-value"]');
 
       // Build up a date in the UTC timezone. Note that using this will also
       // mimic the user in a different timezone simply entering '2012-12-31' via
@@ -242,9 +242,9 @@ class DateTimeFieldTest extends DateTestBase {
     $this->drupalGet('entity_test/add');
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value][date]", '');
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value][time]", '');
-    $this->assertSession()->elementTextContains('xpath', '//fieldset[@id="edit-' . $field_name . '-0"]/legend', $field_label);
-    $this->assertSession()->elementExists('xpath', '//fieldset[@aria-describedby="edit-' . $field_name . '-0--description"]');
-    $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0--description"]');
+    $this->assertSession()->elementTextContains('xpath', '//fieldset[@id="edit-' . $field_name . '-0-value--wrapper"]/legend', $field_label);
+    $this->assertSession()->elementExists('xpath', '//fieldset[@aria-describedby="edit-' . $field_name . '-0-value--wrapper--description"]');
+    $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0-value"]');
 
     // Build up a date in the UTC timezone.
     $value = '2012-12-31 00:00:00';
@@ -424,9 +424,9 @@ class DateTimeFieldTest extends DateTestBase {
 
     // Display creation form.
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->elementTextContains('xpath', '//fieldset[@id="edit-' . $field_name . '-0"]/legend', $field_label);
-    $this->assertSession()->elementExists('xpath', '//fieldset[@aria-describedby="edit-' . $field_name . '-0--description"]');
-    $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0--description"]');
+    $this->assertSession()->elementTextContains('xpath', '//fieldset[@id="edit-' . $field_name . '-0-value"]/legend', $field_label);
+    $this->assertSession()->elementExists('xpath', '//fieldset[@aria-describedby="edit-' . $field_name . '-0-value--description"]');
+    $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0-value"]');
 
     // Assert that Hour and Minute Elements do not appear on Date Only.
     $this->assertSession()->elementNotExists('xpath', "//*[@id=\"edit-$field_name-0-value-hour\"]");

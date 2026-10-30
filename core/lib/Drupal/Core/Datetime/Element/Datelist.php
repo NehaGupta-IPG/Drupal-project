@@ -35,7 +35,7 @@ class Datelist extends DateElementBase {
         [static::class, 'processDatelist'],
       ],
       '#theme' => 'datetime_form',
-      '#theme_wrappers' => ['datetime_wrapper'],
+      '#theme_wrappers' => ['fieldset'],
       '#date_part_order' => ['year', 'month', 'day', 'hour', 'minute'],
       '#date_year_range' => '1900:2050',
       '#date_increment' => 1,

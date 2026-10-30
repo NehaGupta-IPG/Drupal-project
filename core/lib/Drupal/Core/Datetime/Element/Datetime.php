@@ -20,9 +20,28 @@ class Datetime extends DateElementBase {
   use DoTrustedCallbackTrait;
 
   /**
+   * @var \DateTimeInterface
+   */
+  protected static $dateExample;
+
+  /**
    * {@inheritdoc}
    */
   public function getInfo() {
+    $date_format = '';
+    $time_format = '';
+    // Date formats cannot be loaded during install or update.
+    if (!defined('MAINTENANCE_MODE')) {
+      if ($date_format_entity = DateFormat::load('html_date')) {
+        /** @var \Drupal\Core\Datetime\DateFormatInterface $date_format_entity */
+        $date_format = $date_format_entity->getPattern();
+      }
+      if ($time_format_entity = DateFormat::load('html_time')) {
+        /** @var \Drupal\Core\Datetime\DateFormatInterface $time_format_entity */
+        $time_format = $time_format_entity->getPattern();
+      }
+    }
+
     // Note that since this information is cached, the #date_timezone property
     // is not set here, as this needs to vary potentially by-user.
     return [
@@ -40,8 +59,10 @@ class Datetime extends DateElementBase {
       ],
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],
+      '#date_date_format' => $date_format,
       '#date_date_element' => 'date',
       '#date_date_callbacks' => [],
+      '#date_time_format' => $time_format,
       '#date_time_element' => 'time',
       '#date_time_callbacks' => [],
       '#date_year_range' => '1900:2050',
@@ -53,14 +74,7 @@ class Datetime extends DateElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    $formats = DateFormat::loadMultiple(['html_date', 'html_time']);
-    $date_format = $formats['html_date']->getPattern();
-    $time_format = $formats['html_time']->getPattern();
-    $element += [
-      '#date_timezone' => date_default_timezone_get(),
-      '#date_date_format' => $date_format,
-      '#date_time_format' => $time_format,
-    ];
+    $element += ['#date_timezone' => date_default_timezone_get()];
 
     if ($input !== FALSE) {
       if ($element['#date_date_element'] === 'datetime-local' && !empty($input['date'])) {
@@ -70,12 +84,14 @@ class Datetime extends DateElementBase {
         // 'html_datetime' is not a valid format to pass to
         // DrupalDateTime::createFromFormat()
         [$date_input, $time_input] = explode('T', $input['date']);
+        $date_format = DateFormat::load('html_date')->getPattern();
+        $time_format = DateFormat::load('html_time')->getPattern();
       }
       else {
         $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
         $time_input = $element['#date_time_element'] != 'none' && !empty($input['time']) ? $input['time'] : '';
-        $date_format = $element['#date_date_element'] != 'none' && $element['#date_date_format'] != 'none' ? static::getHtml5DateFormat($element) : '';
-        $time_format = $element['#date_time_element'] != 'none' && $element['#date_time_format'] != 'none' ? static::getHtml5TimeFormat($element) : '';
+        $date_format = $element['#date_date_format'] != 'none' ? static::getHtml5DateFormat($element) : '';
+        $time_format = $element['#date_time_element'] != 'none' ? static::getHtml5TimeFormat($element) : '';
       }
 
       // Seconds will be omitted in a post in case there's no entry.
@@ -219,14 +235,6 @@ class Datetime extends DateElementBase {
    * @see \Drupal\Core\Datetime\DateFormatterInterface::format()
    */
   public static function processDatetime(&$element, FormStateInterface $form_state, &$complete_form) {
-    $formats = DateFormat::loadMultiple(['html_date', 'html_time']);
-    $date_format = $formats['html_date']->getPattern();
-    $time_format = $formats['html_time']->getPattern();
-
-    $element += [
-      '#date_date_format' => $date_format,
-      '#date_time_format' => $time_format,
-    ];
     $format_settings = [];
     // The value callback has populated the #value array.
     $date = !empty($element['#value']['object']) ? $element['#value']['object'] : NULL;
@@ -243,10 +251,13 @@ class Datetime extends DateElementBase {
       // a valid format.
       // @see https://www.drupal.org/project/drupal/issues/3505318
       if ($element['#date_date_element'] === 'datetime-local') {
-        $date_format = $formats['html_date']->getPattern() . '\T' . $formats['html_time']->getPattern();
+        $date_format = DateFormat::load('html_date')->getPattern() . '\T' . DateFormat::load('html_time')->getPattern();
       }
       $date_value = !empty($date) ? $date->format($date_format, $format_settings) : $element['#value']['date'];
 
+      // Creating format examples on every individual date item is messy, and
+      // placeholders are invalid for HTML5 date and datetime, so an example
+      // format is appended to the title to appear in tooltips.
       $extra_attributes = [
         'type' => $element['#date_date_element'],
       ];
