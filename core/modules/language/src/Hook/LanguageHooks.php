@@ -267,7 +267,7 @@ class LanguageHooks {
       $entity = $form_object->getEntity();
       $entity_type = $entity->getEntityType();
       $langcode_key = $entity_type->getKey('langcode');
-      if (isset($form[$langcode_key]) && $form[$langcode_key]['#access'] !== FALSE) {
+      if (!empty($form[$langcode_key]) && (!isset($form[$langcode_key]['#access']) || $form[$langcode_key]['#access'] !== FALSE)) {
         $language_configuration = ContentLanguageSettings::loadByEntityTypeBundle($entity->getEntityTypeId(), $entity->bundle());
         $form[$langcode_key]['#access'] = $language_configuration->isLanguageAlterable();
       }
