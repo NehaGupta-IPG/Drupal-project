@@ -35,6 +35,7 @@ class Submit extends Button {
   public function getInfo() {
     return [
       '#executes_submit_callback' => TRUE,
+      '#theme_wrappers' => ['input__submit'],
     ] + parent::getInfo();
   }
 
