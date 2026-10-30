@@ -187,7 +187,7 @@
       }
 
       function preventEnterKey(event) {
-        if (event.which === 13) {
+        if (event.key === 'Enter') {
           event.preventDefault();
           event.stopPropagation();
         }
