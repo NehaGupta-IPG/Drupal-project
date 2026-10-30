@@ -129,6 +129,19 @@ class AdminTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the sticky action buttons theme setting.
+   */
+  public function testStickyActionButtonsThemeSetting(): void {
+    $this->drupalGet('admin/appearance/settings/default_admin');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->checkboxNotChecked('sticky_action_buttons');
+
+    $this->submitForm(['sticky_action_buttons' => TRUE], 'Save configuration');
+    $this->container->get('config.factory')->reset('default_admin.settings');
+    $this->assertTrue($this->config('default_admin.settings')->get('sticky_action_buttons'));
+  }
+
+  /**
    * Disabled: Test user settings.
    */
   public function disabledTestUserSettings(): void {

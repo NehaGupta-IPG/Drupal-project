@@ -73,4 +73,26 @@ class AdminNodeTest extends BrowserTestBase {
     $this->assertTrue($node->isPublished());
   }
 
+  /**
+   * Tests the sticky action buttons theme setting on a content form.
+   */
+  public function testStickyActionButtonsSetting(): void {
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementNotExists('css', 'form.has-sticky-form-actions');
+    $this->assertSession()->elementNotExists('css', '[data-drupal-selector="edit-actions"].sticky-form-actions');
+    $this->assertSession()->elementNotExists('css', 'header.region-sticky [data-drupal-selector="sticky-edit-actions-submit"]');
+
+    $this->container->get('config.factory')
+      ->getEditable('default_admin.settings')
+      ->set('sticky_action_buttons', TRUE)
+      ->save();
+
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementExists('css', 'form.has-sticky-form-actions');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-actions"].sticky-form-actions');
+    $this->assertSession()->elementExists('css', 'header.region-sticky [data-drupal-selector="sticky-edit-actions-submit"]');
+  }
+
 }

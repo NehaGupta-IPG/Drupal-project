@@ -14,7 +14,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Site\Settings as CoreSettings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Form\ViewsForm;
 use Drupal\views_ui\Form\Ajax\ViewsFormInterface;
@@ -486,6 +485,7 @@ class FormHooks {
         'focus_color' => $form_state->getValue('focus_color'),
         'layout_density' => $form_state->getValue('layout_density'),
         'show_description_toggle' => $form_state->getValue('show_description_toggle'),
+        'sticky_action_buttons' => (bool) $form_state->getValue('sticky_action_buttons'),
       ];
       $settings->setAll($user_settings, $account);
     }
@@ -632,11 +632,12 @@ class FormHooks {
 
     // Save form types and behaviors.
     $is_content_form = Helper::isContentForm($form_state, $form_id);
+    $use_sticky_action_buttons = self::useStickyActionButtons();
 
     // If there are action buttons, and they should either be sticky or there
     // is a content form, where the sidebar toggle is required, prepare the
     // sticky action container for the top bar.
-    if (isset($form['actions']) && (self::useStickyActionButtons($is_content_form) || $is_content_form)) {
+    if (isset($form['actions']) && ($use_sticky_action_buttons || $is_content_form)) {
       // Sticky action container.
       $form['default_admin_sticky_actions'] = [
         '#type' => 'container',
@@ -650,7 +651,7 @@ class FormHooks {
     }
 
     // Sticky action buttons.
-    if (self::useStickyActionButtons($is_content_form) && isset($form['actions'])) {
+    if ($use_sticky_action_buttons && isset($form['actions'])) {
       // Add sticky class.
       $form['actions']['#attributes']['class'][] = 'sticky-form-actions';
 
@@ -773,21 +774,14 @@ class FormHooks {
   }
 
   /**
-   * Determines the feature flag to use for sticky action buttons.
-   *
-   * @param bool $is_content_form
-   *   TRUE if this should return the flag for content forms, FALSE if it should
-   *   return the flag for any form.
+   * Determines whether sticky action buttons are enabled.
    *
    * @return bool
-   *   TRUE if core_admin_theme_use_sticky_action_buttons is enabled, FALSE
-   *   otherwise.
+   *   TRUE if the sticky_action_buttons theme setting is enabled for the
+   *   current user, FALSE otherwise.
    */
-  private static function useStickyActionButtons(bool $is_content_form = TRUE): bool {
-    $flag = CoreSettings::get('core_admin_theme_use_sticky_action_buttons', 'never');
-    return $is_content_form ?
-      $flag === 'content_forms' || $flag === 'always' :
-      $flag === 'always';
+  private static function useStickyActionButtons(): bool {
+    return (bool) Settings::getInstance()->get('sticky_action_buttons');
   }
 
   /**
