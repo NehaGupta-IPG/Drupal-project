@@ -420,10 +420,10 @@ class FilterKernelTest extends KernelTestBase {
     // cSpell:disable
     // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [
-      // Single line breaks should be changed to <br /> tags, while paragraphs
+      // Single line breaks should be changed to <br> tags, while paragraphs
       // separated with double line breaks should be enclosed with <p></p> tags.
       "aaa\nbbb\n\nccc" => [
-        "<p>aaa<br />\nbbb</p>\n<p>ccc</p>" => TRUE,
+        "<p>aaa<br>\nbbb</p>\n<p>ccc</p>" => TRUE,
       ],
       // Skip contents of certain block tags entirely.
       "<script>aaa\nbbb\n\nccc</script>
@@ -445,7 +445,7 @@ class FilterKernelTest extends KernelTestBase {
         "<!--\nThree.\n-->" => TRUE,
       ],
       // Do not add paragraph tags around Twig theme debugging.
-      "<p>Text here<!--\n\nTHEME DEBUG --><!--\nTHEME HOOK: 'html' --><!--\nFILE NAME SUGGESTIONS:\n* html--node.html.twig\nx html.html.twig\n--><!--\nBEGIN OUTPUT from 'core/themes/olivero/templates/layout/html.html.twig'\n--><span>Test</span></p>" => [
+      "<p>Text here<!--\n\nTHEME DEBUG --><!--\nTHEME HOOK: 'html' --><!--\nFILE NAME SUGGESTIONS:\n* html--node.html.twig\nx html.html.twig\n--><!--\nBEGIN OUTPUT from 'core/themes/stark/templates/layout/html.html.twig'\n--><span>Test</span></p>" => [
         "<p>Text here" => TRUE,
         "<p>Text here</p>" => FALSE,
         "<span>Test</span></p>" => TRUE,
@@ -470,7 +470,7 @@ class FilterKernelTest extends KernelTestBase {
       ],
       "<pre>aaa\nbbb\nccc</pre>\nddd\neee" => [
         "<pre>aaa\nbbb\nccc</pre>" => TRUE,
-        "<p>ddd<br />\neee</p>" => TRUE,
+        "<p>ddd<br>\neee</p>" => TRUE,
       ],
       // Comments remain unchanged and subsequent lines/paragraphs are
       // transformed normally.
@@ -1151,7 +1151,7 @@ END CUSTOM TEMPLATE OUTPUT from 'container.html.twig'
     $this->assertEquals('<img src="http://example.com/test.jpg">test', $f, 'HTML corrector -- Fix self-closing single tags.');
 
     $f = Html::normalize('<br></br>');
-    $this->assertEquals('<br><br>', $f, "HTML corrector -- Transform empty tags to a self-closed tag if the tag's content model is EMPTY.");
+    $this->assertEquals('<br><br>', $f, "HTML corrector -- Transform empty tags into two br tags if the tag's content model is EMPTY.");
 
     $f = Html::normalize('<div></div>');
     $this->assertEquals('<div></div>', $f, "HTML corrector -- Do not transform empty tags to a single closed tag if the tag's content model is not EMPTY.");

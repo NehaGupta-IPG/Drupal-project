@@ -34,6 +34,8 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Install\TasksInterface;
 use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
@@ -252,7 +254,7 @@ function install_state_defaults(): array {
     // An array of available installation profiles.
     'profiles' => [],
     // The name of the theme to use during installation.
-    'theme' => 'claro',
+    'theme' => InstallerKernel::INSTALL_THEME,
     // The server URL where the interface translation files can be downloaded.
     // Tokens in the pattern will be replaced by appropriate values for the
     // required translation file.
@@ -867,11 +869,19 @@ function install_tasks($install_state): array {
       if (file_exists($profile_install_file)) {
         include_once \Drupal::root() . '/' . $profile_install_file;
       }
-      $function = $install_state['parameters']['profile'] . '_install_tasks';
-      if (function_exists($function)) {
-        $result = $function($install_state);
-        if (is_array($result)) {
-          $tasks += $result;
+      $profile_tasks = install_get_tasks($install_state['profiles'][$profile], $install_state);
+
+      if (!empty($profile_tasks)) {
+        $tasks += $profile_tasks;
+      }
+      else {
+        $function = $install_state['parameters']['profile'] . '_install_tasks';
+        if (function_exists($function)) {
+          @trigger_error('Procedural hook_install_tasks() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
+          $result = $function($install_state);
+          if (is_array($result)) {
+            $tasks += $result;
+          }
         }
       }
     }
@@ -891,9 +901,15 @@ function install_tasks($install_state): array {
   // Allow the installation profile to modify the full list of tasks.
   if (!empty($install_state['parameters']['profile'])) {
     $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
+    // Load the profile file if it exists so TasksInterface::alter can rely on
+    // functions in it.
+    $install_state['profiles'][$profile]->load();
+    $profile_tasks_altered = install_alter_tasks($install_state['profiles'][$profile], $tasks, $install_state);
+
+    if (!$profile_tasks_altered) {
       $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
       if (function_exists($function)) {
+        @trigger_error('Procedural hook_install_tasks_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
         $function($tasks, $install_state);
       }
     }
@@ -1619,13 +1635,23 @@ function install_profile_modules(&$install_state) {
   arsort($required);
   arsort($non_required);
 
+  $module_order = $required + $non_required;
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($module_order[$database_module])) {
+    $module_order = [$database_module => $module_order[$database_module]] + $module_order;
+  }
+
   $batch_builder = new BatchBuilder();
 
   // Put modules into groups of up to the maximum batch size, or until a module
   // states that it needs a container rebuild before and after install.
   $index = 0;
   $module_groups = [];
-  foreach (array_keys($required + $non_required) as $module) {
+  foreach (array_keys($module_order) as $module) {
     // If the container needs to be rebuilt, ensure this happens both before and
     // after the module is installed.
     $container_rebuild_required = !empty($files[$module]->info['container_rebuild_required']);
@@ -2562,6 +2588,14 @@ function install_recipe_required_modules(array $install_state) {
     }
   }
   arsort($required);
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($required[$database_module])) {
+    $required = [$database_module => $required[$database_module]] + $required;
+  }
 
   $modules = [];
   $names = [];
@@ -2622,4 +2656,59 @@ function _install_get_database_module_name(): ?string {
     }
   }
   return $database_module;
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return array
+ *   The tasks.
+ *
+ * @internal
+ */
+function install_get_tasks(Extension $extension, array &$install_state): array {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $install_tasks = [];
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $install_tasks = $tasks_class->getTasks($install_state);
+  }
+  return $install_tasks;
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return bool
+ *   Whether tasks were altered.
+ *
+ * @internal
+ */
+function install_alter_tasks(Extension $extension, array &$tasks, array $install_state): bool {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $tasks_altered = FALSE;
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_altered = TRUE;
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $tasks_class->alter($tasks, $install_state);
+  }
+  return $tasks_altered;
 }
