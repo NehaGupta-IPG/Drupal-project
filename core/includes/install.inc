@@ -188,28 +188,24 @@ function drupal_verify_profile($install_state): array {
  *   to set the default language.
  */
 function drupal_install_system($install_state): void {
-  // Remove the service provider of the early installer.
-  unset($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']);
-  // Add the normal installer service provider.
-  $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\NormalInstallerServiceProvider';
-
-  // Get the existing request.
-  $request = \Drupal::request();
-  // Reboot into a full production environment to continue the installation.
-  /** @var \Drupal\Core\Installer\InstallerKernel $kernel */
+  // Set flag on the global $install_state so that the container rebuild at the
+  // end of this function makes InstallerServiceProvider::register() switch
+  // from early-phase services (fallback config, memory keyvalue, null routing)
+  // to full database-backed services. We write to $GLOBALS directly rather
+  // than using 'global $install_state' to avoid redeclaring the parameter.
+  $GLOBALS['install_state']['base_system_verified'] = TRUE;
+  // The old installer reboot path called $kernel->shutdown(), which reset the
+  // bootstrap config storage used during service provider discovery.
+  // Without resetting, later rebuildContainer() calls in this request can read
+  // a stale pre-install core.extension and omit newly installed module
+  // services.
   $kernel = \Drupal::service('kernel');
-  $kernel->shutdown();
-  // Have installer rebuild from the disk, rather then building from scratch.
-  $kernel->rebuildContainer();
-  // Reboot the kernel with new container.
-  $kernel->boot();
-  $kernel->preHandle($request);
-  // Ensure our request includes the session if appropriate.
-  if (PHP_SAPI !== 'cli') {
-    $request->setSession($kernel->getContainer()->get('session'));
+  if ($kernel instanceof InstallerKernel) {
+    $kernel->resetConfigStorage();
   }
 
   // Install base system configuration.
+  // Writes go through InstallerFallbackConfigStorage → DatabaseStorage.
   \Drupal::service('config.installer')->installDefaultConfig('core', 'core');
 
   // Store the installation profile in configuration to populate the
@@ -223,6 +219,14 @@ function drupal_install_system($install_state): void {
     $config->set('profile', $install_state['parameters']['profile']);
   }
   $config->save();
+
+  // Rebuild the container so that the remaining tasks in this request run with
+  // the database-backed services. Without this, state writes such as the
+  // install_task marker go to the in-memory key value store and are lost, and
+  // the next request restarts from the early installer phase. The request
+  // stack and the session survive the rebuild, so no reboot is needed.
+  // @see \Drupal\Core\DrupalKernel::initializeContainer()
+  $kernel->rebuildContainer();
 }
 
 /**
