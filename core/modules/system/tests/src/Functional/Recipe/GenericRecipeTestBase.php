@@ -25,17 +25,6 @@ abstract class GenericRecipeTestBase extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Returns the path of the recipe under test.
-   *
-   * @return string
-   *   The absolute path of the recipe that contains this test.
-   */
-  protected function getRecipePath(): string {
-    // Assume this test in located in RECIPE_DIR/tests/src/Functional.
-    return dirname((new \ReflectionObject($this))->getFileName(), 4);
-  }
-
-  /**
    * Applies the recipe under test.
    */
   protected function doApply(): void {
