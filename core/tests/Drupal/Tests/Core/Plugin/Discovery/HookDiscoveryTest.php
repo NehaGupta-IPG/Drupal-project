@@ -52,8 +52,8 @@ class HookDiscoveryTest extends UnitTestCase {
       ->method('invokeAllWith')
       ->with('test_plugin')
       ->willReturnCallback(function (string $hook, callable $callback): void {
-        $callback(\Closure::fromCallable([$this, 'hookDiscoveryTestTestPlugin']), 'hook_discovery_test');
-        $callback(\Closure::fromCallable([$this, 'hookDiscoveryTest2TestPlugin']), 'hook_discovery_test2');
+        $callback($this->hookDiscoveryTestTestPlugin(...), 'hook_discovery_test');
+        $callback($this->hookDiscoveryTest2TestPlugin(...), 'hook_discovery_test2');
       });
     $this->moduleHandler->expects($this->never())
       ->method('invoke');
@@ -83,8 +83,8 @@ class HookDiscoveryTest extends UnitTestCase {
       ->method('invokeAllWith')
       ->with('test_plugin')
       ->willReturnCallback(function (string $hook, callable $callback): void {
-        $callback(\Closure::fromCallable([$this, 'hookDiscoveryTestTestPlugin']), 'hook_discovery_test');
-        $callback(\Closure::fromCallable([$this, 'hookDiscoveryTest2TestPlugin']), 'hook_discovery_test2');
+        $callback($this->hookDiscoveryTestTestPlugin(...), 'hook_discovery_test');
+        $callback($this->hookDiscoveryTest2TestPlugin(...), 'hook_discovery_test2');
       });
     $this->hookDiscovery = new HookDiscovery($this->moduleHandler, 'test_plugin');
 

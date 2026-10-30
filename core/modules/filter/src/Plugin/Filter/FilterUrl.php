@@ -121,17 +121,17 @@ class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
     // Match absolute URLs.
     $url_pattern = "(?:$auth)?(?:$domain|$ip)/?(?:$trail)?";
     $pattern = "`((?:$protocols)(?:$url_pattern))`u";
-    $tasks[] = [static::class . '::parseFullLinks', $pattern];
+    $tasks[] = [$this->parseFullLinks(...), $pattern];
 
     // Match email addresses.
     $url_pattern = "[\p{L}\p{M}\p{N}._+-]{1,254}@(?:$email_domain)";
     $pattern = "`($url_pattern)`u";
-    $tasks[] = [static::class . '::parseEmailLinks', $pattern];
+    $tasks[] = [$this->parseEmailLinks(...), $pattern];
 
     // Match www domains.
     $url_pattern = "www\.(?:$domain)/?(?:$trail)?";
     $pattern = "`($url_pattern)`u";
-    $tasks[] = [static::class . '::parsePartialLinks', $pattern];
+    $tasks[] = [$this->parsePartialLinks(...), $pattern];
 
     // Each type of URL needs to be processed separately. The text is joined and
     // re-split after each task, since all injected HTML tags must be correctly
@@ -145,7 +145,7 @@ class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
       // HTML comments need to be handled separately, as they may contain HTML
       // markup, especially a '>'. Therefore, remove all comment contents and
       // add them back later.
-      $text = is_null($text) ? '' : preg_replace_callback('`<!--(.*?)-->`s', static::class . '::escapeComments', $text);
+      $text = is_null($text) ? '' : preg_replace_callback('`<!--(.*?)-->`s', $this->escapeComments(...), $text);
 
       // Split at all tags; ensures that no tags or attributes are processed.
       $chunks = is_null($text) ? [''] : preg_split('/(<.+?>)/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -194,7 +194,7 @@ class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
       }
 
       // Revert to the original comment contents.
-      $text = $text ? preg_replace_callback('`<!--(.*?)-->`', static::class . '::unescapeComments', $text) : $text;
+      $text = $text ? preg_replace_callback('`<!--(.*?)-->`', $this->unescapeComments(...), $text) : $text;
     }
 
     // If there is no text at this point, revert to the previous text.

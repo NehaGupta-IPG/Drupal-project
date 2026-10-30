@@ -32,7 +32,7 @@ final class DebugExtension extends AbstractExtension {
       return [
         new TwigFunction(
           'dump',
-          [self::class, 'dump'],
+          self::dump(...),
           [
             'needs_context' => TRUE,
             'needs_environment' => TRUE,
