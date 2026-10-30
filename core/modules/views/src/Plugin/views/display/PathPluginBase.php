@@ -331,7 +331,14 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
         }
         // Copy the original options from the route, so for example we ensure
         // that parameter conversion options is carried over.
-        $view_route->setOptions($view_route->getOptions() + $original_route->getOptions());
+        $view_options = $view_route->getOptions();
+
+        // The only time we set parameters ourselves in ::getRoute() is for
+        // argument validation and that works via a param converter. As only one
+        // param converter can be set per parameter, we do not wish to keep this
+        // for overridden routes as to not break their normal conversion.
+        unset($view_options['parameters']);
+        $view_route->setOptions($view_options + $original_route->getOptions());
 
         if ($original_route->hasDefault('_title_callback')) {
           $view_route->setDefault('_title_callback', $original_route->getDefault('_title_callback'));
