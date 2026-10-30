@@ -14,8 +14,8 @@
  * @see batch_get()
  */
 
-use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Batch\Percentage;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Url;
@@ -23,7 +23,6 @@ use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Renders the batch processing page based on the current state of the batch.
@@ -31,83 +30,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @param \Symfony\Component\HttpFoundation\Request $request
  *   The current request object.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Batch\BatchProcessor::page() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_shutdown()
  */
 function _batch_page(Request $request) {
-  $batch = &batch_get();
-
-  if (!($request_id = $request->query->get('id'))) {
-    return FALSE;
-  }
-
-  // Retrieve the current state of the batch.
-  if (!$batch) {
-    $batch = \Drupal::service('batch.storage')->load($request_id);
-    if (!$batch) {
-      \Drupal::messenger()->addError(t('No batch with ID @batch exists.', ['@batch' => $request_id]));
-      throw new NotFoundHttpException(sprintf('No batch with ID %s exists.', $request_id));
-    }
-  }
-
-  // We need to store the updated batch information in the batch storage after
-  // processing the batch. In order for the error page to work correctly this
-  // needs to be done even in case of a PHP fatal error in which case the end of
-  // this function is never reached. Therefore we register a shutdown function
-  // to handle this case. Because with FastCGI and fastcgi_finish_request()
-  // shutdown functions are called after the HTTP connection is closed, updating
-  // the batch information in a shutdown function would lead to race conditions
-  // between consecutive requests if the batch processing continues. In case of
-  // a fatal error the processing stops anyway, so it works even with FastCGI.
-  // However, we must ensure to only update in the shutdown phase in this
-  // particular case we track whether the batch information still needs to be
-  // updated.
-  // @see _batch_shutdown()
-  // @see \Symfony\Component\HttpFoundation\Response::send()
-  drupal_register_shutdown_function('_batch_shutdown');
-  _batch_needs_update(TRUE);
-
-  $build = [];
-
-  // Add batch-specific libraries.
-  foreach ($batch['sets'] as $batch_set) {
-    if (isset($batch_set['library'])) {
-      foreach ($batch_set['library'] as $library) {
-        $build['#attached']['library'][] = $library;
-      }
-    }
-  }
-
-  $response = FALSE;
-  $op = $request->query->get('op', '');
-  switch ($op) {
-    case 'start':
-    case 'do_nojs':
-      // Display the full progress page on startup and on each additional
-      // non-JavaScript iteration.
-      $current_set = _batch_current_set();
-      $build['#title'] = $current_set['title'];
-      $build['content'] = _batch_progress_page();
-
-      $response = $build;
-      break;
-
-    case 'do':
-      // JavaScript-based progress page callback.
-      $response = _batch_do();
-      break;
-
-    case 'finished':
-      // _batch_finished() returns a RedirectResponse.
-      $response = _batch_finished();
-      break;
-  }
-
-  if ($batch) {
-    \Drupal::service('batch.storage')->update($batch);
-  }
-  _batch_needs_update(FALSE);
-
-  return $response;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->page() instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  return \Drupal::service(BatchProcessor::class)->page($request);
 }
 
 /**
@@ -118,8 +49,14 @@ function _batch_page(Request $request) {
  *
  * @return bool
  *   TRUE if the batch information needs to be updated; FALSE otherwise.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_needs_update($new_value = NULL) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $cid = __FUNCTION__;
   $cached = \Drupal::cache('memory')->get($cid);
   $needs_update = $cached->data ?? NULL;
@@ -135,9 +72,14 @@ function _batch_needs_update($new_value = NULL) {
 /**
  * Does one execution pass with JavaScript and returns progress to the browser.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_do() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   // Perform actual processing.
   [$percentage, $message, $label] = _batch_process();
 
@@ -147,9 +89,14 @@ function _batch_do() {
 /**
  * Outputs a batch processing page.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_progress_page(): array {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
 
   $current_set = _batch_current_set();
@@ -253,133 +200,15 @@ function _batch_progress_page(): array {
  *
  * @return array
  *   An array containing a completion value (in percent) and a status message.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(BatchProcessor::class)->process() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_process() {
-  $batch       = &batch_get();
-  $current_set = &_batch_current_set();
-  // Indicate that this batch set needs to be initialized.
-  $set_changed = TRUE;
-  $task_message = '';
-
-  // If this batch was marked for progressive execution (e.g. forms submitted by
-  // \Drupal::formBuilder()->submitForm(), initialize a timer to determine
-  // whether we need to proceed with the same batch phase when a processing time
-  // of 1 second has been exceeded.
-  if ($batch['progressive']) {
-    Timer::start('batch_processing');
-  }
-
-  if (empty($current_set['start'])) {
-    $current_set['start'] = microtime(TRUE);
-  }
-
-  $queue = _batch_queue($current_set);
-
-  while (!$current_set['success']) {
-    // If this is the first time we iterate this batch set in the current
-    // request, we check if it requires an additional file for functions
-    // definitions.
-    if ($set_changed && isset($current_set['file']) && is_file($current_set['file'])) {
-      include_once \Drupal::root() . '/' . $current_set['file'];
-    }
-
-    $task_message = '';
-    // Assume a single pass operation and set the completion level to 1 by
-    // default.
-    $finished = 1;
-
-    if ($item = $queue->claimItem()) {
-      [$callback, $args] = $item->data;
-
-      // Build the 'context' array and execute the function call.
-      $batch_context = [
-        'sandbox'  => &$current_set['sandbox'],
-        'results'  => &$current_set['results'],
-        'finished' => &$finished,
-        'message'  => &$task_message,
-      ];
-      $callable_resolver = \Drupal::service(CallableResolver::class);
-      $callable = $callable_resolver->getCallableFromDefinition($callback);
-      $callable(...array_merge($args, [&$batch_context]));
-
-      if ($finished >= 1) {
-        // Make sure this step is not counted twice when computing $current.
-        $finished = 0;
-        // Remove the processed operation and clear the sandbox.
-        $queue->deleteItem($item);
-        $current_set['count']--;
-        $current_set['sandbox'] = [];
-      }
-    }
-
-    // When all operations in the current batch set are completed, browse
-    // through the remaining sets, marking them 'successfully processed'
-    // along the way, until we find a set that contains operations.
-    // _batch_next_set() executes form submit handlers stored in 'control'
-    // sets (see \Drupal::service('form_submitter')), which can in turn add new
-    // sets to the batch.
-    $set_changed = FALSE;
-    $old_set = $current_set;
-    while (empty($current_set['count']) && ($current_set['success'] = TRUE) && _batch_next_set()) {
-      $current_set = &_batch_current_set();
-      $current_set['start'] = microtime(TRUE);
-      $set_changed = TRUE;
-    }
-
-    // At this point, either $current_set contains operations that need to be
-    // processed or all sets have been completed.
-    $queue = _batch_queue($current_set);
-
-    // If we are in progressive mode, break processing after 1 second.
-    if ($batch['progressive'] && Timer::read('batch_processing') > 1000) {
-      // Record elapsed wall clock time.
-      $current_set['elapsed'] = round((microtime(TRUE) - $current_set['start']) * 1000, 2);
-      break;
-    }
-  }
-
-  if ($batch['progressive']) {
-    // Gather progress information.
-
-    // Reporting 100% progress will cause the whole batch to be considered
-    // processed. If processing was paused right after moving to a new set,
-    // we have to use the info from the new (unprocessed) set.
-    if ($set_changed && isset($current_set['queue'])) {
-      // Processing will continue with a fresh batch set.
-      $remaining        = $current_set['count'];
-      $total            = $current_set['total'];
-      $progress_message = $current_set['init_message'];
-      $task_message     = '';
-    }
-    else {
-      // Processing will continue with the current batch set.
-      $remaining        = $old_set['count'] ?? 0;
-      $total            = $old_set['total'] ?? 0;
-      $progress_message = $old_set['progress_message'] ?? '';
-    }
-
-    // Total progress is the number of operations that have fully run plus the
-    // completion level of the current operation.
-    $current    = $total - $remaining + ($finished ?? 0);
-    $percentage = _batch_api_percentage($total, $current);
-    $elapsed    = $current_set['elapsed'] ?? 0;
-    $values     = [
-      '@remaining'  => $remaining,
-      '@total'      => $total,
-      '@current'    => floor($current),
-      '@percentage' => $percentage,
-      '@elapsed'    => \Drupal::service('date.formatter')->formatInterval((int) ($elapsed / 1000)),
-      // If possible, estimate remaining processing time.
-      '@estimate'   => ($current > 0) ? \Drupal::service('date.formatter')->formatInterval((int) (($elapsed * ($total - $current) / $current) / 1000)) : '-',
-    ];
-    $message    = strtr($progress_message, $values);
-
-    return [$percentage, $message, $task_message];
-  }
-  else {
-    // If we are not in progressive mode, the entire batch has been processed.
-    return _batch_finished();
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->process($request) instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  return \Drupal::service(BatchProcessor::class)->process();
 }
 
 /**
@@ -399,18 +228,28 @@ function _batch_process() {
  *   until we are finished, but we also never print more decimal places than
  *   are meaningful.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  * @see _batch_process()
  */
 function _batch_api_percentage($total, $current) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   return Percentage::format($total, $current);
 }
 
 /**
  * Returns the batch set being currently processed.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(BatchProcessor::class)->process() instead.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function &_batch_current_set() {
-  $batch = &batch_get();
-  return $batch['sets'][$batch['current_set']];
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(BatchProcessor::class)->currentSet() instead. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
+  return \Drupal::service(BatchProcessor::class)->currentSet();
 }
 
 /**
@@ -423,8 +262,14 @@ function &_batch_current_set() {
  * @return true|null
  *   TRUE if a subsequent set was found in the batch; no value will be returned
  *   if no subsequent set was found.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_next_set() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
   $set_indexes = array_keys($batch['sets']);
   $current_set_index_key = array_search($batch['current_set'], $set_indexes);
@@ -448,8 +293,14 @@ function _batch_next_set() {
  *
  * Call the 'finished' callback of each batch set to allow custom handling of
  * the results and resolve page redirection.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
  */
 function _batch_finished() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   $batch = &batch_get();
   $batch_finished_redirect = NULL;
 
@@ -568,10 +419,15 @@ function _batch_finished() {
 /**
  * Shutdown function: Stores the current batch data for the next request.
  *
- * @see _batch_page()
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3593399
+ * @see BatchProcessor::page()
  * @see drupal_register_shutdown_function()
  */
 function _batch_shutdown(): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3593399', E_USER_DEPRECATED);
   if (($batch = batch_get()) && _batch_needs_update()) {
     \Drupal::service('batch.storage')->update($batch);
   }

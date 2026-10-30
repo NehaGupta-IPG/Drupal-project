@@ -44,15 +44,15 @@ class FormSubmitter implements FormSubmitterInterface {
 
       $batch['progressive'] = !$form_state->isProgrammed();
       $response = batch_process();
-      // If the batch has been completed and _batch_finished() called then
-      // $batch will be NULL.
+      // If the batch has been completed and BatchProcessor::finished() called
+      // then $batch will be NULL.
       if ($batch && $batch['progressive']) {
         return $response;
       }
 
       // Execution continues only for programmatic forms.
       // For 'regular' forms, we get redirected to the batch processing
-      // page. Form redirection will be handled in _batch_finished(),
+      // page. Form redirection will be handled in BatchProcessor::finished(),
       // after the batch is processed.
     }
 
@@ -89,7 +89,7 @@ class FormSubmitter implements FormSubmitterInterface {
       if (($batch = &$this->batchGet()) && !isset($batch['id'])) {
         // Some previous submit handler has set a batch. To ensure correct
         // execution order, store the call in a special 'control' batch set.
-        // See _batch_next_set().
+        // See BatchProcessor::nextSet().
         $batch['sets'][] = ['form_submit' => $callback];
         $batch['has_form_submits'] = TRUE;
       }
