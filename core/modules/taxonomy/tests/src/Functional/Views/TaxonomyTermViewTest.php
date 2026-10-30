@@ -164,8 +164,11 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     $this->drupalLogout();
     $this->drupalGet('taxonomy/term/' . $term->id());
     $this->assertSession()->statusCodeEquals(403);
+    // The path above is overridden and left alone by PathPluginBase, but the
+    // path below is a Views-only route so gets the param converter that will
+    // 404 when argument validation fails. This triggers before the 403.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/feed');
-    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->statusCodeEquals(404);
   }
 
 }
