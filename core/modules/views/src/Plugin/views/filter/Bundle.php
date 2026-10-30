@@ -77,7 +77,11 @@ class Bundle extends InOperator {
   public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
-    $this->entityTypeId = $this->getEntityType();
+    // The bundle field lives on the entity's own data table, so take the
+    // entity type from there. Resolving it through the relationship fails
+    // when that relationship has been removed, or has not been chosen yet on
+    // a view whose base table has no entity type.
+    $this->entityTypeId = $this->getViewsData()->get($this->table)['table']['entity type'] ?? $this->getEntityType();
     $this->entityType = \Drupal::entityTypeManager()->getDefinition($this->entityTypeId);
     $this->real_field = $this->entityType->getKey('bundle');
   }
