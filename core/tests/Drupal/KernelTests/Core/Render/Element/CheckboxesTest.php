@@ -33,7 +33,7 @@ class CheckboxesTest extends KernelTestBase implements FormInterface {
       'test2' => 'Test2',
       'test3' => 'Test3',
     ],
-    '#check_all' => TRUE,
+    '#select_all' => TRUE,
   ];
 
   /**
@@ -64,9 +64,9 @@ class CheckboxesTest extends KernelTestBase implements FormInterface {
   }
 
   /**
-   * Tests that #check_all generates the select-all checkbox.
+   * Tests that #select_all generates the select-all checkbox.
    */
-  public function testProcessCheckboxesWithCheckAll(): void {
+  public function testProcessCheckboxesWithSelectAll(): void {
     $form_state = new FormState();
     $form_builder = $this->container->get('form_builder');
     $form_builder->submitForm($this, $form_state);
@@ -85,9 +85,9 @@ class CheckboxesTest extends KernelTestBase implements FormInterface {
   }
 
   /**
-   * Tests that without #check_all, no select-all checkbox is generated.
+   * Tests that without #select_all, no select-all checkbox is generated.
    */
-  public function testProcessCheckboxesWithoutCheckAll(): void {
+  public function testProcessCheckboxesWithoutSelectAll(): void {
     $this->element = [
       '#type' => 'checkboxes',
       '#options' => [

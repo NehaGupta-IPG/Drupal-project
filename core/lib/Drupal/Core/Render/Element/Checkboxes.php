@@ -13,6 +13,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
+ * - #select_all: (optional) If TRUE, a "Select all" checkbox is added
+ *   client-side to select or deselect all options. Defaults to FALSE.
  *
  * Usage example:
  * @code
@@ -108,16 +110,16 @@ class Checkboxes extends FormElementBase {
       }
     }
 
-    if (!empty($element['#check_all'])) {
+    if (!empty($element['#select_all'])) {
       // The "Select all" control only works with JavaScript, so its markup
-      // is added client-side by core/drupal.checkboxes-check-all. This
+      // is added client-side by core/drupal.checkboxes-select-all. This
       // placeholder marks where it should be inserted.
       $element['all_wrapper'] = [
         '#type' => 'container',
-        '#attributes' => ['class' => ['form-checkboxes__check-all']],
+        '#attributes' => ['class' => ['form-checkboxes__select-all']],
         '#weight' => 0,
       ];
-      $element['#attached']['library'][] = 'core/drupal.checkboxes-check-all';
+      $element['#attached']['library'][] = 'core/drupal.checkboxes-select-all';
     }
 
     return $element;

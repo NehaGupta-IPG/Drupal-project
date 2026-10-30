@@ -4,30 +4,30 @@
  */
 (function (Drupal, once) {
   /**
-   * Handles multiple checkboxes check/uncheck all elements.
+   * Handles multiple checkboxes select/deselect all elements.
    *
    * @type {Drupal~behavior}
    */
-  Drupal.behaviors.checkAll = {
+  Drupal.behaviors.selectAll = {
     attach(context) {
-      once('check-all', '.form-checkboxes__check-all', context).forEach(
+      once('select-all', '.form-checkboxes__select-all', context).forEach(
         (wrapper) => {
           const container = wrapper.closest('.form-checkboxes');
           if (!container) return;
 
           const selectAll = document.createElement('input');
           selectAll.type = 'checkbox';
-          selectAll.className = 'check-all';
+          selectAll.className = 'select-all';
 
           const label = document.createElement('label');
-          label.className = 'form-checkboxes__check-all-label';
+          label.className = 'form-checkboxes__select-all-label';
           label.append(selectAll, Drupal.t('Select all'));
 
           wrapper.appendChild(label);
 
           const getCheckboxes = () => [
             ...container.querySelectorAll(
-              'input[type="checkbox"]:not(.check-all)',
+              'input[type="checkbox"]:not(.select-all)',
             ),
           ];
 

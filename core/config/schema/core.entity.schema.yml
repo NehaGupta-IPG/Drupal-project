@@ -353,9 +353,9 @@ field.widget.settings.options_buttons:
   type: mapping
   label: 'Check boxes/radio buttons format settings'
   mapping:
-    check_all_enabled:
+    select_all_enabled:
       type: boolean
-      label: 'Check All enabled'
+      label: 'Select all enabled'
 
 field.formatter.settings.boolean:
   type: mapping

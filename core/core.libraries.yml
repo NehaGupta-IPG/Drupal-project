@@ -326,10 +326,10 @@ drupal.checkbox:
   dependencies:
     - core/drupal
 
-drupal.checkboxes-check-all:
+drupal.checkboxes-select-all:
   version: VERSION
   js:
-    misc/checkboxes-check-all.js: {}
+    misc/checkboxes-select-all.js: {}
   dependencies:
     - core/drupal
     - core/once

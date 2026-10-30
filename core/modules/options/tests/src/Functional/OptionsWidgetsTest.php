@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\options\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -146,6 +147,17 @@ class OptionsWidgetsTest extends FieldTestBase {
       ])
       ->save();
 
+    // The settings form is empty for single-value fields, so Field UI hides
+    // the edit button.
+    $widget = \Drupal::service('plugin.manager.field.widget')->getInstance([
+      'field_definition' => $field,
+      'form_mode' => 'default',
+      'configuration' => ['type' => 'options_buttons'],
+    ]);
+    $form_state = new FormState();
+    $settings_form = $widget->settingsForm([], $form_state);
+    $this->assertSame([], $settings_form);
+
     // Create an entity.
     $entity = EntityTest::create([
       'user_id' => 1,
@@ -203,6 +215,16 @@ class OptionsWidgetsTest extends FieldTestBase {
         'type' => 'options_buttons',
       ])
       ->save();
+
+    // The widget settings form is only available for multiple-value fields.
+    $widget = \Drupal::service('plugin.manager.field.widget')->getInstance([
+      'field_definition' => $field,
+      'form_mode' => 'default',
+      'configuration' => ['type' => 'options_buttons'],
+    ]);
+    $form_state = new FormState();
+    $settings_form = $widget->settingsForm([], $form_state);
+    $this->assertArrayHasKey('select_all_enabled', $settings_form);
 
     // Create an entity.
     $entity = EntityTest::create([

@@ -75,30 +75,30 @@ class OptionsWidgetsJsTest extends WebDriverTestBase {
     ])->save();
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
-    // Enable form display and set check_all_enabled to TRUE.
+    // Enable form display and set select_all_enabled to TRUE.
     $display_repository->getFormDisplay('node', 'article')
       ->setComponent('field_fences_test', [
         'type' => 'options_buttons',
         'settings' => [
-          'check_all_enabled' => TRUE,
+          'select_all_enabled' => TRUE,
         ],
       ])
       ->save();
     // Go to the Create Article page and check that the checkbox is there.
     $this->drupalGet('node/add/article');
-    $this->assertSession()->elementExists('css', 'input.check-all');
+    $this->assertSession()->elementExists('css', 'input.select-all');
     // Change the setting to FALSE.
     $display_repository->getFormDisplay('node', 'article')
       ->setComponent('field_fences_test', [
         'type' => 'options_buttons',
         'settings' => [
-          'check_all_enabled' => FALSE,
+          'select_all_enabled' => FALSE,
         ],
       ])
       ->save();
     // Reload the create Article page and confirm there is no 'select all' checkbox.
     $this->drupalGet('node/add/article');
-    $this->assertSession()->elementNotExists('css', 'input.check-all');
+    $this->assertSession()->elementNotExists('css', 'input.select-all');
   }
 
 }

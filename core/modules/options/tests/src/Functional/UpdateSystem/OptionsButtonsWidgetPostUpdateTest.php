@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests options_post_update_options_buttons_check_all_setting().
+ * Tests options_post_update_options_buttons_select_all_setting().
  */
 #[Group('options')]
 #[Group('Update')]
@@ -31,6 +31,9 @@ class OptionsButtonsWidgetPostUpdateTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The name of the field under test.
+   */
   protected string $fieldName = 'test_options';
 
   /**
@@ -62,30 +65,30 @@ class OptionsButtonsWidgetPostUpdateTest extends BrowserTestBase {
       ])
       ->save();
 
-    // Remove check_all_enabled from stored config to simulate an existing
+    // Remove select_all_enabled from stored config to simulate an existing
     // site that predates the setting.
     $config_name = 'core.entity_form_display.entity_test.entity_test.default';
     $config = \Drupal::configFactory()->getEditable($config_name);
     $content = $config->get('content');
-    unset($content[$this->fieldName]['settings']['check_all_enabled']);
+    unset($content[$this->fieldName]['settings']['select_all_enabled']);
     $config->set('content', $content)->save();
 
-    // Ensure options_post_update_options_buttons_check_all_setting() runs.
+    // Ensure options_post_update_options_buttons_select_all_setting() runs.
     $existing_updates = \Drupal::keyValue('post_update')->get('existing_updates', []);
-    $index = array_search('options_post_update_options_buttons_check_all_setting', $existing_updates);
+    $index = array_search('options_post_update_options_buttons_select_all_setting', $existing_updates);
     unset($existing_updates[$index]);
     \Drupal::keyValue('post_update')->set('existing_updates', $existing_updates);
   }
 
   /**
-   * Tests that check_all_enabled is added to existing widget instances.
+   * Tests that select_all_enabled is added to existing widget instances.
    */
-  public function testAddCheckAllSetting(): void {
+  public function testAddSelectAllSetting(): void {
     // Confirm the setting is absent.
     $component = \Drupal::service('entity_display.repository')
       ->getFormDisplay('entity_test', 'entity_test')
       ->getComponent($this->fieldName);
-    $this->assertArrayNotHasKey('check_all_enabled', $component['settings'] ?? []);
+    $this->assertArrayNotHasKey('select_all_enabled', $component['settings'] ?? []);
 
     $this->runUpdates();
 
@@ -93,7 +96,7 @@ class OptionsButtonsWidgetPostUpdateTest extends BrowserTestBase {
     $component = \Drupal::service('entity_display.repository')
       ->getFormDisplay('entity_test', 'entity_test')
       ->getComponent($this->fieldName);
-    $this->assertFalse($component['settings']['check_all_enabled']);
+    $this->assertFalse($component['settings']['select_all_enabled']);
   }
 
 }
