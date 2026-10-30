@@ -96,6 +96,17 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $data_type));
     }
+
+    // Name and parent may be null, so they may not have been defined in the calling function.
+    // Test for them and set to null if not present.
+    if (!array_key_exists('name', $configuration)) {
+      $configuration['name'] = NULL;
+    }
+
+    if (!array_key_exists('parent', $configuration)) {
+      $configuration['parent'] = NULL;
+    }
+
     $typed_data = $class::createInstance($data_definition, $configuration['name'], $configuration['parent']);
     $typed_data->setTypedDataManager($this);
     return $typed_data;
@@ -193,16 +204,18 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
       // Fetch the data definition for the child object from the parent.
       if ($object instanceof ComplexDataInterface) {
         $definition = $object->getDataDefinition()->getPropertyDefinition($property_name);
-      }
+      } 
       elseif ($object instanceof ListInterface) {
         $definition = $object->getItemDefinition();
-      }
+      } 
       else {
         throw new \InvalidArgumentException("The passed object has to either implement the ComplexDataInterface or the ListInterface.");
       }
+      
       if (!$definition) {
         throw new \InvalidArgumentException("Property $property_name is unknown.");
       }
+      
       // Create the prototype without any value, but with initial parenting
       // so that constructors can set up the objects correctly.
       $prototype = $this->create($definition, NULL, $property_name, $object);
@@ -310,5 +323,4 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     }
     return $data;
   }
-
 }
