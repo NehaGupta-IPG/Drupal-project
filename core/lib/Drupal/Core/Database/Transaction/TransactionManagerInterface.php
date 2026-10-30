@@ -197,6 +197,11 @@ interface TransactionManagerInterface {
    *
    * @throws \LogicException
    *   When a callback addition is attempted but no transaction is active.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   event subscribers responding to transaction events instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function addPostTransactionCallback(callable $callback): void;
 

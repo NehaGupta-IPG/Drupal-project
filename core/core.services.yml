@@ -261,6 +261,8 @@ services:
   cache_tags.preloader:
     class: Drupal\Core\Cache\EventSubscriber\CacheTagPreloadSubscriber
     autowire: true
+  Drupal\Core\Cache\EventSubscriber\CacheTagsDeferredInvalidationSubscriber:
+    autowire: true
   cache.backend.chainedfast:
     class: Drupal\Core\Cache\ChainedFastBackendFactory
     arguments: ['@settings']

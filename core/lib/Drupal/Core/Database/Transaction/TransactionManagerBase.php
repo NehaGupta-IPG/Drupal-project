@@ -104,6 +104,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @var callable[]
    *
    * @see \Drupal\Core\Database\Transaction\TransactionManagerInterface::addPostTransactionCallback()
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   event subscribers responding to transaction events instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   private array $postTransactionCallbacks = [];
 
@@ -789,6 +794,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function addPostTransactionCallback(callable $callback): void {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use event subscribers responding to transaction events instead. See https://www.drupal.org/node/7654123", E_USER_DEPRECATED);
     if (!$this->inTransaction()) {
       $this->exceptionThrown = TRUE;
       throw new \LogicException('Root transaction end callbacks can only be added when there is an active transaction.');
@@ -880,8 +886,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
 
   /**
    * Processes the post-transaction callbacks.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   event subscribers responding to transaction events instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected function processPostTransactionCallbacks(): void {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use event subscribers responding to transaction events instead. See https://www.drupal.org/node/7654123", E_USER_DEPRECATED);
     if (!empty($this->postTransactionCallbacks)) {
       $callbacks = $this->postTransactionCallbacks;
       $this->postTransactionCallbacks = [];

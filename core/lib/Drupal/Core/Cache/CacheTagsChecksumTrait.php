@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Cache;
 
+use Drupal\Core\Database\Event\TransactionCommitEvent;
+use Drupal\Core\Database\Event\TransactionRollbackEvent;
+
 /**
  * A trait for cache tag checksum implementations.
  *
@@ -46,11 +49,37 @@ trait CacheTagsChecksumTrait {
    *
    * @param bool $success
    *   Whether or not the transaction was successful.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ::invalidateDelayedTags() and ::resetDelayedTags() from an event
+   *   subscriber instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function rootTransactionEndCallback($success): void {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::invalidateDelayedTags() and ::resetDelayedTags() from an event subscriber instead. See https://www.drupal.org/node/7654123", E_USER_DEPRECATED);
     if ($success) {
       $this->doInvalidateTags($this->delayedTags);
     }
+    $this->delayedTags = [];
+  }
+
+  /**
+   * Post-commit invalidation of deferred cache tags.
+   *
+   * @see CacheTagsDeferredInvalidationSubscriber::onTransactionCommit()
+   */
+  public function invalidateDelayedTags(): void {
+    $this->doInvalidateTags($this->delayedTags);
+    $this->resetDelayedTags();
+  }
+
+  /**
+   * Reset deferred cache tags in case of unsuccessful transaction.
+   *
+   * @see CacheTagsDeferredInvalidationSubscriber::onUnsuccessfulTransaction()
+   */
+  public function resetDelayedTags(): void {
     $this->delayedTags = [];
   }
 
@@ -74,9 +103,10 @@ trait CacheTagsChecksumTrait {
     $in_transaction = $this->getDatabaseConnection()->inTransaction();
     if ($in_transaction) {
       if (empty($this->delayedTags)) {
-        $this->getDatabaseConnection()
-          ->transactionManager()
-          ->addPostTransactionCallback([$this, 'rootTransactionEndCallback']);
+        $this->getDatabaseConnection()->enableEvents([
+          TransactionCommitEvent::class,
+          TransactionRollbackEvent::class,
+        ]);
       }
       $this->delayedTags = Cache::mergeTags($this->delayedTags, $tags);
     }
