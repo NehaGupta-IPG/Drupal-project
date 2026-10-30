@@ -51,11 +51,18 @@ class PageCache implements HttpKernelInterface {
   protected $responsePolicy;
 
   /**
-   * The cache ID for the (master) request.
+   * The cache IDs for the (main) request.
    *
-   * @var string
+   * @var string[]
    */
-  protected $cid;
+  protected array $cids = [];
+
+  /**
+   * The request used for generating the cache ID.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected Request $requestUsedForCid;
 
   /**
    * Constructs a PageCache object.
@@ -314,10 +321,23 @@ class PageCache implements HttpKernelInterface {
    */
   protected function get(Request $request, $allow_invalid = FALSE) {
     $cid = $this->getCacheId($request);
-    if ($cache = $this->cache->get($cid, $allow_invalid)) {
-      return $cache->data;
+
+    $cache = $this->cache->get($cid, $allow_invalid);
+    if (!$cache) {
+      return FALSE;
     }
-    return FALSE;
+
+    // Cached response may contain Vary header.
+    // Try to find exact match by adding relevant request headers to cache ID.
+    $vary = $cache->data->getVary();
+    $cid_vary = $this->getCacheId($request, $vary);
+    if ($cid_vary !== $cid) {
+      $cache = $this->cache->get($cid_vary, $allow_invalid);
+    }
+    if (!$cache) {
+      return FALSE;
+    }
+    return $cache->data;
   }
 
   /**
@@ -345,6 +365,13 @@ class PageCache implements HttpKernelInterface {
   protected function set(Request $request, Response $response, $expire, array $tags) {
     $cid = $this->getCacheId($request);
     $this->cache->set($cid, $response, $expire, $tags);
+    // Additionally, set cache item for varied response.
+    if ($response->hasVary()) {
+      $cid_vary = $this->getCacheId($request, $response->getVary());
+      if ($cid_vary !== $cid) {
+        $this->cache->set($cid_vary, $response, $expire, $tags);
+      }
+    }
   }
 
   /**
@@ -352,25 +379,60 @@ class PageCache implements HttpKernelInterface {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object.
+   * @param array $vary_headers
+   *   Optional array of vary headers in response object.
    *
    * @return string
    *   The cache ID for this request.
    */
-  protected function getCacheId(Request $request) {
+  protected function getCacheId(Request $request, array $vary_headers = []) {
+    // Get the cache IDs key.
+    $key = '|';
+    if (!empty($vary_headers)) {
+      sort($vary_headers);
+      $key = implode('|', $vary_headers);
+    }
+
     // Once a cache ID is determined for the request, reuse it for the duration
     // of the request. This ensures that when the cache is written, it is only
     // keyed on request data that was available when it was read. For example,
     // the request format might be NULL during cache lookup and then set during
     // routing, in which case we want to key on NULL during writing, since that
     // will be the value during lookups for subsequent requests.
-    if (!isset($this->cid)) {
-      $cid_parts = [
-        $request->getSchemeAndHttpHost() . $request->getRequestUri(),
-        $request->getRequestFormat(NULL),
-      ];
-      $this->cid = implode(':', $cid_parts);
+    if (isset($this->cids[$key])) {
+      return $this->cids[$key];
     }
-    return $this->cid;
+
+    if (!isset($this->requestUsedForCid)) {
+      $this->requestUsedForCid = clone $request;
+    }
+
+    $cid_parts = [
+      $this->requestUsedForCid->getSchemeAndHttpHost() . $this->requestUsedForCid->getRequestUri(),
+      $this->requestUsedForCid->getRequestFormat(NULL),
+    ];
+
+    // Need to separate cache IDs for responses that contain Vary headers.
+    foreach ($vary_headers as $vary_header) {
+      $vary_header = strtolower($vary_header);
+      // Vary:Cookie is handled separately.
+      // @see PageCache::get()
+      if ($vary_header === 'cookie') {
+        continue;
+      }
+
+      $request_header = $this->requestUsedForCid->headers->get($vary_header);
+
+      if (!$request_header) {
+        $request_header = '_';
+      }
+
+      $cid_parts[] = $vary_header . ':' . $request_header;
+    }
+
+    $this->cids[$key] = implode(':', $cid_parts);
+
+    return $this->cids[$key];
   }
 
 }
