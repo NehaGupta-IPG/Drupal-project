@@ -288,6 +288,16 @@ class PageCache implements HttpKernelInterface {
       $expire = Cache::PERMANENT;
     }
 
+    // Respect max-age of the cacheable metadata, allowing for precise control
+    // over when cached pages should expire and be rebuilt, even by code that
+    // has no access to the final response (and its headers).
+    // @see https://www.drupal.org/node/2352009
+    $max_age = $response->getCacheableMetadata()->getCacheMaxAge();
+    if ($max_age !== Cache::PERMANENT) {
+      $render_expire = $request_time + $max_age;
+      $expire = $expire == Cache::PERMANENT ? $render_expire : min($expire, $render_expire);
+    }
+
     if ($expire === Cache::PERMANENT || $expire > $request_time) {
       $tags = $response->getCacheableMetadata()->getCacheTags();
       $this->set($request, $response, $expire, $tags);

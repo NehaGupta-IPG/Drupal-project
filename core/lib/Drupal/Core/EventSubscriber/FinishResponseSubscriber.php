@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Response subscriber to handle finished responses.
@@ -251,6 +252,12 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     }
 
     $max_age = $this->config->get('cache.page.max_age');
+    // Respect max-age of the cacheable metadata, allowing for precise control
+    // over when cached pages should expire and be rebuilt.
+    $response_max_age = $response->getCacheableMetadata()->getCacheMaxAge();
+    if ($response_max_age !== CacheBackendInterface::CACHE_PERMANENT && $max_age > $response_max_age) {
+      $max_age = $response_max_age;
+    }
     $response->headers->set('Cache-Control', 'public, max-age=' . $max_age);
 
     // In order to support HTTP cache-revalidation, ensure that there is a
