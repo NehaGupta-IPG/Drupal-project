@@ -100,7 +100,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#type' => 'email',
       '#title' => $this->t('Email address'),
       '#description' => $this->t('The email address is not made public. It will only be used if you need to be contacted about your account or for opted-in notifications.'),
-      '#required' => !(!$account->getEmail() && $user->hasPermission('administer users')),
+      '#required' => $register || !(!$account->getEmail() && $user->hasPermission('administer users')),
       '#default_value' => (!$register ? $account->getEmail() : ''),
       '#access' => $account->mail->access('edit'),
     ];
