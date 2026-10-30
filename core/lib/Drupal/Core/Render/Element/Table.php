@@ -15,11 +15,32 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *
  * Properties:
  * - #header: An array of table header labels.
- * - #rows: An array of the rows to be displayed. Each row is either an array
- *   of cell contents or an array of properties as described in table.html.twig
- *   Alternatively specify the data for the table as child elements of the table
- *   element. Table elements would contain rows elements that would in turn
- *   contain column elements.
+ * - #rows: An array of table rows. Each row may be provided in one of the
+ *   following formats:
+ *   - An indexed array of values, keyed by position (0, 1, 2, ...), where
+ *     each value represents a column cell ordered relative to #header.
+ *   - An associative array keyed by column identifiers (for example,
+ *     matching keys used in #header). Each value represents a cell and
+ *     may be:
+ *     - A string.
+ *     - A render array.
+ *     - An associative array containing:
+ *       - data: A string or render array representing the cell contents.
+ *       - attributes: (optional) An array of HTML attributes for the
+ *         <td> element.
+ *   A row may also contain row-level properties such as:
+ *     - attributes: An array of HTML attributes for the <tr> element.
+ *   Alternatively, instead of the #rows property, table data may be provided
+ *   as child elements of the table render element. In this case:
+ *     - Each child element represents a table row.
+ *     - The children of each row represent column cells and must be render
+ *        arrays (for example, form or render elements).
+ *     - Cell attributes can be applied using each cell element's
+ *       #wrapper_attributes property, which are rendered on the <td>
+ *       element.
+ *     - Row-level attributes can be applied using #attributes on the row
+ *       <tr> element.
+ *   The #rows property is populated automatically by preRenderTable().
  * - #empty: Text to display when no rows are present.
  * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
