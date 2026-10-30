@@ -460,7 +460,7 @@
           $(document).on(
             `drupalViewportOffsetChange.ckeditor5.${id}`,
             (event, offsets) => {
-              editor.ui.viewportOffset = offsets;
+              editor.ui.viewportOffset = { ...offsets };
             },
           );
 
