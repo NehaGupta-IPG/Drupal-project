@@ -80,9 +80,9 @@ class ValidArgumentAccessCheckTest extends ViewsKernelTestBase {
     $route_name = 'view.test_argument_validator_node.page_4';
     $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
 
-    // A 404 is returned by the controller, not the access check.
+    // A 404 is triggered by an exception in the param converter.
     $route_name = 'view.test_argument_validator_node.page_3';
-    $this->assertTrue($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
+    $this->assertFalse($access_manager->checkNamedRoute($route_name, ['node' => $node_page->id()], $test_user));
   }
 
   /**
@@ -120,9 +120,9 @@ class ValidArgumentAccessCheckTest extends ViewsKernelTestBase {
     $this->assertStringContainsString('article link 403', $output);
     $this->assertStringNotContainsString('page link 403', $output);
 
-    // Menu links show when the view is configured to 404.
+    // Menu links are properly hidden when the view is configured to 404.
     $this->assertStringContainsString('article link 404', $output);
-    $this->assertStringContainsString('page link 404', $output);
+    $this->assertStringNotContainsString('page link 404', $output);
   }
 
 }
