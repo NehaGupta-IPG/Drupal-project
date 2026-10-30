@@ -361,6 +361,10 @@
 }
 
 .views-display-top {
+  /* Use a darker primary color so text and borders have sufficient contrast
+   * against the header background. */
+  --admin-color-primary: var(--admin-color-primary-active);
+
   position: relative;
   display: flex;
   flex-wrap: wrap;
