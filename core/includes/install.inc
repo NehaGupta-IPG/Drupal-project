@@ -535,7 +535,7 @@ function install_goto($path): void {
     // Not a permanent redirect.
     'Cache-Control' => 'no-cache',
   ];
-  $response = new RedirectResponse($base_url . '/' . $path, 302, $headers);
+  $response = new RedirectResponse($base_url . '/' . ltrim($path, '/'), 302, $headers);
   $response->send();
 }
 
