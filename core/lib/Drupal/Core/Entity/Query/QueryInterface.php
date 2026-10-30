@@ -159,8 +159,9 @@ interface QueryInterface extends AlterableInterface {
    * Defines the range of the query.
    *
    * @param int|null $start
-   *   (optional) The first record from the result set to return. If NULL,
-   *   removes any range directives that are set.
+   *   (optional) The first record from the result set to return.
+   *   If $start is NULL and $length is not NULL, the query will start from the
+   *   beginning of the result set and return $length rows.
    * @param int|null $length
    *   (optional) The maximum number of rows to return. If $start and $length
    *   are NULL, then a complete result set will be generated. If $start is
