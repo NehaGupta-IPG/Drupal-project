@@ -2,8 +2,10 @@
 
 namespace Drupal\content_moderation\EventSubscriber;
 
+use Drupal\Component\Utility\Html;
 use Drupal\content_moderation\ContentModerationState;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\workspaces\Event\WorkspacePrePublishEvent;
 use Drupal\workspaces\Event\WorkspacePublishEvent;
 use Drupal\workspaces\WorkspaceTrackerInterface;
@@ -85,13 +87,39 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
     }
     $query->condition($workflow_condition_group);
 
-    if ($count = $query->count()->execute()) {
+    $result_ids = $query->execute();
+    if ($count = count($result_ids)) {
       $message = \Drupal::translation()->formatPlural($count, 'The @label workspace can not be published because it contains 1 item in an unpublished moderation state.', 'The @label workspace can not be published because it contains @count items in an unpublished moderation state.', [
         '@label' => $workspace->label(),
       ]);
 
+      $items = [];
+      $moderation_state_revisions = $this->entityTypeManager->getStorage('content_moderation_state')->loadMultipleRevisions(array_keys($result_ids));
+      foreach ($moderation_state_revisions as $moderation_state) {
+        $entity_type_id = $moderation_state->content_entity_type_id->value;
+        $entity_id = $moderation_state->content_entity_id->value;
+        $entity = $this->entityTypeManager->getStorage($entity_type_id)->load($entity_id);
+        if ($entity) {
+          try {
+            $url = $entity->toUrl()->toString();
+            $items[] = '<a href="' . $url . '">' . Html::escape($entity->label()) . '</a>';
+          }
+          catch (\Exception) {
+            $items[] = Html::escape($entity->label());
+          }
+        }
+      }
+
+      $full_message = (string) $message;
+      if (count($items) === 1) {
+        $full_message = rtrim($full_message, '.') . ': ' . $items[0];
+      }
+      elseif (count($items) > 1) {
+        $full_message .= '<ul>' . implode('', array_map(fn($item) => '<li>' . $item . '</li>', $items)) . '</ul>';
+      }
+
       $event->stopPublishing();
-      $event->setPublishingStoppedReason((string) $message);
+      $event->setPublishingStoppedReason(Markup::create($full_message));
     }
   }
 
