@@ -35,7 +35,7 @@ class AttributeClassDiscoveryTest extends TestCase {
     include_once __DIR__ . '/../../../../../fixtures/plugins/CustomPlugin.php';
 
     $additionalClassLoader = new ClassLoader();
-    $additionalClassLoader->addPsr4("com\\example\\PluginNamespace\\", __DIR__ . "/../../../../../fixtures/plugins/Plugin/PluginNamespace");
+    $additionalClassLoader->addPsr4("com\\example\\", __DIR__ . "/../../../../../fixtures/plugins/Plugin");
     $additionalClassLoader->register(TRUE);
   }
 
@@ -58,7 +58,7 @@ class AttributeClassDiscoveryTest extends TestCase {
    * @legacy-covers ::prepareAttributeDefinition
    */
   public function testGetDefinitions(): void {
-    $discovery = new AttributeClassDiscovery(['com\example' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin"]]);
+    $discovery = new AttributeClassDiscovery(['com\example\PluginNamespace' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin/PluginNamespace"]]);
     $this->assertEquals([
       'discovery_test_1' => [
         'id' => 'discovery_test_1',
@@ -66,7 +66,7 @@ class AttributeClassDiscoveryTest extends TestCase {
       ],
     ], $discovery->getDefinitions());
 
-    $custom_annotation_discovery = new AttributeClassDiscovery(['com\example' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin"]], 'com\example\PluginNamespace\CustomPlugin');
+    $custom_annotation_discovery = new AttributeClassDiscovery(['com\example\PluginNamespace' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin/PluginNamespace"]], 'com\example\PluginNamespace\CustomPlugin');
     $this->assertEquals([
       'discovery_test_1' => [
         'id' => 'discovery_test_1',
@@ -75,7 +75,7 @@ class AttributeClassDiscoveryTest extends TestCase {
       ],
     ], $custom_annotation_discovery->getDefinitions());
 
-    $empty_discovery = new AttributeClassDiscovery(['com\example' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin"]], 'com\example\PluginNamespace\CustomPlugin2');
+    $empty_discovery = new AttributeClassDiscovery(['com\example\PluginNamespace' => [__DIR__ . "/../../../../../fixtures/plugins/Plugin/PluginNamespace"]], 'com\example\PluginNamespace\CustomPlugin2');
     $this->assertEquals([], $empty_discovery->getDefinitions());
   }
 
