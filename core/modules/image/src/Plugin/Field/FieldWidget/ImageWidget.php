@@ -141,28 +141,9 @@ class ImageWidget extends FileWidget {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $element['#upload_validators'] = $items[$delta]->getUploadValidators();
 
     $field_settings = $this->getFieldSettings();
-
-    // Add image validation.
-    $element['#upload_validators']['FileIsImage'] = [];
-
-    // Add upload dimensions validation.
-    if ($field_settings['max_resolution'] || $field_settings['min_resolution']) {
-      $element['#upload_validators']['FileImageDimensions'] = [
-        'maxDimensions' => $field_settings['max_resolution'],
-        'minDimensions' => $field_settings['min_resolution'],
-      ];
-    }
-
-    $extensions = $field_settings['file_extensions'];
-    $supported_extensions = $this->imageFactory->getSupportedExtensions();
-
-    // If using custom extension validation, ensure that the extensions are
-    // supported by the current image toolkit. Otherwise, validate against all
-    // toolkit supported extensions.
-    $extensions = !empty($extensions) ? array_intersect(explode(' ', $extensions), $supported_extensions) : $supported_extensions;
-    $element['#upload_validators']['FileExtension']['extensions'] = implode(' ', $extensions);
 
     // Add mobile device image capture acceptance.
     $element['#accept'] = 'image/*';
@@ -352,6 +333,9 @@ class ImageWidget extends FileWidget {
     $element = parent::errorElement($element, $error, $form, $form_state);
 
     $property_path_array = explode('.', $error->getPropertyPath());
+    if (count($property_path_array) < 2) {
+      return FALSE;
+    }
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
   }
 
