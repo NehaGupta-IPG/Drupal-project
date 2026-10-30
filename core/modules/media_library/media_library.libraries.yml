@@ -26,6 +26,9 @@ widget:
 
 ui:
   version: VERSION
+  css:
+    component:
+      css/media_library.ui.css: {}
   js:
     js/media_library.ui.js: {}
   dependencies:

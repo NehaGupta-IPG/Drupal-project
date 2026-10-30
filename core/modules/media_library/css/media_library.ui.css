@@ -1,0 +1,11 @@
+/**
+ * @file
+ * Media Library: UI overrides.
+ */
+
+/* Ensure dialog content is not hidden when scrollable. */
+.ui-dialog > .ui-dialog-content {
+  /* 4.5rem = 3.5rem height of .ui-dialog-titlebar
+     + 1rem default padding from .ui-dialog-content */
+  scroll-padding-top: 4.5rem;
+}
