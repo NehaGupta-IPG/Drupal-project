@@ -77,8 +77,8 @@
       'maxWidth',
       'position',
     ];
+    const windowHeight = $(window).height();
     let adjustedOptions = {};
-    let windowHeight = $(window).height();
     let option;
     let optionValue;
     let adjustedValue;
@@ -93,9 +93,11 @@
           /height/i.test(option)
         ) {
           // Take offsets in account.
-          windowHeight -= displace.offsets.top + displace.offsets.bottom;
+          const newWindowHeight =
+            windowHeight - displace.offsets.top - displace.offsets.bottom;
+
           adjustedValue = parseInt(
-            0.01 * parseInt(optionValue, 10) * windowHeight,
+            0.01 * parseInt(optionValue, 10) * newWindowHeight,
             10,
           );
           // Don't force the dialog to be bigger vertically than needed.
