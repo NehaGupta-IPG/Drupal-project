@@ -201,6 +201,15 @@ class ComponentValidator {
       // If there are no properties in the schema there is nothing to validate.
       return TRUE;
     }
+
+    // Add null type to all non-required properties. In Twig, not declaring
+    // the value of a prop is different than actually setting it to NULL. For
+    // DX, we want to do the same thing because otherwise, Twig developers will
+    // need to check if something is NULL before assigning it, which would
+    // worsen their experience and make their components' templates less
+    // readable, especially when reusing other components.
+    $this->makeNonRequiredPropertiesNullable($schema);
+
     $prop_names = array_keys($schema['properties']);
     $props_raw = array_intersect_key($context, array_flip($prop_names));
     // Validator::arrayToObjectRecursive stringifies the props using the JSON
@@ -254,6 +263,34 @@ class ComponentValidator {
     );
     $message = implode("\n", $message_parts);
     throw new InvalidComponentException($message);
+  }
+
+  /**
+   * This method allows non-required properties to be nullable.
+   *
+   * This improves the DX of writing component templates, as developers
+   * can avoid checking for NULL values when embedding other components.
+   *
+   * @param array $schema
+   *   The schema of this prop.
+   */
+  private function makeNonRequiredPropertiesNullable(array &$schema): void {
+    $required_props = $schema['required'] ?? [];
+    $optional_props = array_diff(array_keys($schema['properties']), $required_props);
+    foreach ($optional_props as $prop_id) {
+      $prop = &$schema['properties'][$prop_id];
+
+      if (!is_array($prop['type'])) {
+        $prop['type'] = [$prop['type']];
+      }
+      $prop['type'][] = 'null';
+
+      // If there are sub-properties for an object, it means that they need
+      // the same treatment.
+      if (in_array('object', $prop['type'], TRUE) && isset($prop['properties'])) {
+        $this->makeNonRequiredPropertiesNullable($prop);
+      }
+    }
   }
 
   /**
