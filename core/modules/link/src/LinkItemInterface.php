@@ -3,6 +3,7 @@
 namespace Drupal\link;
 
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Link;
 
 /**
  * Defines an interface for the link field item.
@@ -31,6 +32,18 @@ interface LinkItemInterface extends FieldItemInterface {
    *   TRUE if the link is external, FALSE otherwise.
    */
   public function isExternal();
+
+  /**
+   * Creates a Link object from the field data.
+   *
+   * @return \Drupal\Core\Link
+   *   Returns a Link object.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if there is an issue with the item's URI and the link cannot be
+   *   created.
+   */
+  public function toLink(): Link;
 
   /**
    * Gets the URL object.

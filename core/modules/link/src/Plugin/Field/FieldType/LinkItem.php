@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
@@ -171,6 +172,16 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    */
   public static function mainPropertyName() {
     return 'uri';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toLink(): Link {
+    if ($this->isEmpty()) {
+      throw new \InvalidArgumentException('The field item is empty and cannot be converted to a link.');
+    }
+    return Link::fromTextAndUrl($this->get('title')->getValue(), $this->getUrl());
   }
 
   /**

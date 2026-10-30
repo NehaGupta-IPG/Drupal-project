@@ -6,6 +6,7 @@ namespace Drupal\Tests\link\Kernel;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
@@ -94,6 +95,13 @@ class LinkItemTest extends FieldKernelTestBase {
     $this->assertEquals($url, $entity->field_test->resolvable_uri);
     $entity->name->value = $this->randomMachineName();
     $entity->save();
+
+    // Test the toLink method.
+    /** @var \Drupal\Core\Link $link */
+    $link = $entity->field_test[0]->toLink();
+    $this->assertInstanceOf(Link::class, $link);
+    $this->assertEquals($url, $link->getUrl()->toString());
+    $this->assertEquals($title, $link->getText());
 
     // Verify that the field value is changed.
     $id = $entity->id();
