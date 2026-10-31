@@ -5,6 +5,10 @@ media.settings:
     icon_base_uri:
       type: string
       label: 'Full URI to a folder where the media icons will be installed'
+      constraints:
+        StreamWrapperUri:
+          # StreamWrapperInterface::READ | StreamWrapperInterface::WRITE
+          filter: 12
     iframe_domain:
       type: uri
       nullable: true
