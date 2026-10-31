@@ -170,7 +170,7 @@ class NumericField extends FieldPluginBase {
     }
 
     // Use round first to avoid negative zeros.
-    $value = round($value, $precision);
+    $value = round((float) $value, $precision);
     // Test against both integer zero and float zero.
     if ($this->options['empty_zero'] && ($value === 0 || $value === 0.0)) {
       return '';
