@@ -63,6 +63,20 @@ class StubRevisionableEntity extends StubEntityBase implements RevisionableInter
   /**
    * {@inheritdoc}
    */
+  public function wasLoadedAsDefaultRevision(): bool {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateLoadedIsDefaultRevision(): static {
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isLatestRevision(): bool {
     return FALSE;
   }

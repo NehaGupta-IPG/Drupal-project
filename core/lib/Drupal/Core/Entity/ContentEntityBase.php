@@ -140,6 +140,16 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   protected $isDefaultRevision = TRUE;
 
   /**
+   * Whether the entity was the default revision when it was loaded.
+   *
+   * Callers can change the default revision status before saving, so this
+   * keeps the status the entity was loaded with safe from those changes.
+   *
+   * @var bool
+   */
+  protected $loadedIsDefaultRevision = TRUE;
+
+  /**
    * Holds untranslatable entity keys such as the ID, bundle, and revision ID.
    *
    * @var array
@@ -270,9 +280,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       }
     }
     if ($this->getEntityType()->isRevisionable()) {
-      // Store the loaded revision ID the entity has been loaded with to
-      // keep it safe from changes.
+      // Store the loaded revision ID and the default revision status the
+      // entity has been loaded with to keep them safe from changes.
       $this->updateLoadedRevisionId();
+      $this->updateLoadedIsDefaultRevision();
     }
   }
 
@@ -333,6 +344,21 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function updateLoadedRevisionId() {
     $this->loadedRevisionId = $this->getRevisionId() ?: $this->loadedRevisionId;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function wasLoadedAsDefaultRevision() {
+    return (bool) $this->loadedIsDefaultRevision;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateLoadedIsDefaultRevision() {
+    $this->loadedIsDefaultRevision = $this->isDefaultRevision;
     return $this;
   }
 
@@ -967,6 +993,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $translation->typedData = NULL;
     $translation->loadedRevisionId = &$this->loadedRevisionId;
     $translation->isDefaultRevision = &$this->isDefaultRevision;
+    $translation->loadedIsDefaultRevision = &$this->loadedIsDefaultRevision;
     $translation->enforceRevisionTranslationAffected = &$this->enforceRevisionTranslationAffected;
     $translation->isSyncing = &$this->isSyncing;
     $translation->originalEntity = &$this->originalEntity;
@@ -1217,6 +1244,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if ($entity_type->isRevisionable()) {
       $duplicate->{$entity_type->getKey('revision')}->value = NULL;
       $duplicate->loadedRevisionId = NULL;
+      $duplicate->loadedIsDefaultRevision = TRUE;
     }
 
     // Modules might need to add or change the data initially held by the new
@@ -1266,6 +1294,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // overwriting the original references with ones pointing to copies of
     // them: enforceIsNew, newRevision, loadedRevisionId, fields, entityKeys,
     // translatableEntityKeys, values, isDefaultRevision,
+    // loadedIsDefaultRevision,
     // enforceRevisionTranslationAffected and originalEntity.
     $enforce_is_new = $this->enforceIsNew;
     $this->enforceIsNew = &$enforce_is_new;
@@ -1293,6 +1322,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     $default_revision = $this->isDefaultRevision;
     $this->isDefaultRevision = &$default_revision;
+
+    $loaded_default_revision = $this->loadedIsDefaultRevision;
+    $this->loadedIsDefaultRevision = &$loaded_default_revision;
 
     $is_revision_translation_affected_enforced = $this->enforceRevisionTranslationAffected;
     $this->enforceRevisionTranslationAffected = &$is_revision_translation_affected_enforced;
