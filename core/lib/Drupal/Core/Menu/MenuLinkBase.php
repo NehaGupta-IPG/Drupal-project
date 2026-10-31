@@ -9,6 +9,11 @@ use Drupal\Core\Url;
 
 /**
  * Defines a base menu link class.
+ *
+ * @property PD $pluginDefinition
+ * @method PD getPluginDefinition()
+ * @template PD of array<string, mixed> = PluginDefinition
+ * @phpstan-import-type PluginDefinition from \Drupal\Core\Menu\MenuLinkManagerInterface
  */
 abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
 

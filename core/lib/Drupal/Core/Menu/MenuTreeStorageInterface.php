@@ -7,6 +7,8 @@ namespace Drupal\Core\Menu;
  *
  * The tree contains a hierarchy of menu links which have an ID as well as a
  * route name or external URL.
+ *
+ * @phpstan-import-type PluginDefinition from \Drupal\Core\Menu\MenuLinkManagerInterface
  */
 interface MenuTreeStorageInterface {
 
@@ -30,7 +32,7 @@ interface MenuTreeStorageInterface {
    * on all future calls, or they will be purged. This allows for automatic
    * cleanup e.g. when modules are uninstalled.
    *
-   * @param array $definitions
+   * @param PluginDefinition[] $definitions
    *   The new menu link definitions.
    */
   public function rebuild(array $definitions);
