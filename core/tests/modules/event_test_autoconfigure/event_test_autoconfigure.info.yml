@@ -1,0 +1,8 @@
+name: 'Event test with autoconfigure'
+type: module
+description: 'Support module to test event dispatching.'
+package: Testing
+version: VERSION
+
+dependencies:
+  - drupal:event_test

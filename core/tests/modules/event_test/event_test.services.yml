@@ -1,0 +1,24 @@
+services:
+  event_test.test_subscriber:
+    class: Drupal\event_test\ReusableSubscriber
+    tags:
+      - { name: event_subscriber }
+  event_test.test_subscriber_1:
+    class: Drupal\event_test\ReusableSubscriber
+    arguments: ['event_test.test_subscriber_1']
+    tags:
+      - { name: event_subscriber }
+  event_test.test_subscriber_double_tag:
+    class: Drupal\event_test\ReusableSubscriber
+    arguments: ['event_test.test_subscriber_double_tag']
+    tags:
+      - { name: event_subscriber }
+      - { name: event_subscriber }
+  event_test.test_subscriber_with_autoconfigure:
+    class: Drupal\event_test\ReusableSubscriber
+    arguments: ['event_test.test_subscriber_autoconfigure_service']
+    # Autoconfigure directly on the service itself does not work.
+    autoconfigure: true
+  event_test.test_subscriber_without_autoconfigure_or_tag:
+    class: Drupal\event_test\ReusableSubscriber
+    arguments: ['event_test.test_subscriber_without_autoconfigure_or_tag']

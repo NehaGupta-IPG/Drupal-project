@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autoconfigure: true
+  event_test_autoconfigure.test_subscriber:
+    class: Drupal\event_test_autoconfigure\AutoconfigureSubscriberService
+  event_test_autoconfigure.prioritizing_subscriber:
+    class: Drupal\event_test_autoconfigure\PrioritizingSubscriber

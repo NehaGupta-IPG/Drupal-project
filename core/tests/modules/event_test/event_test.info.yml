@@ -1,0 +1,5 @@
+name: 'Event test'
+type: module
+description: 'Support module to test event dispatching.'
+package: Testing
+version: VERSION
