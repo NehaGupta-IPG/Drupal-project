@@ -7,6 +7,7 @@ namespace Drupal\package_manager\PathExcluder;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
+use Drupal\package_manager\PathLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -24,6 +25,7 @@ final class SiteFilesExcluder implements EventSubscriberInterface {
     private readonly StreamWrapperManagerInterface $streamWrapperManager,
     private readonly Filesystem $fileSystem,
     private readonly array $wrappers,
+    private readonly PathLocator $pathLocator,
   ) {}
 
   /**
@@ -46,13 +48,15 @@ final class SiteFilesExcluder implements EventSubscriberInterface {
     // These paths could be either absolute or relative, depending on site
     // settings. If they are absolute, treat them as relative to the project
     // root. Otherwise, treat them as relative to the web root.
+    $project_root = $this->pathLocator->getProjectRoot();
     foreach ($this->wrappers as $scheme) {
       $wrapper = $this->streamWrapperManager->getViaScheme($scheme);
       if ($wrapper instanceof LocalStream) {
         $path = $wrapper->getDirectoryPath();
 
         if ($this->fileSystem->isAbsolutePath($path)) {
-          if ($path = realpath($path)) {
+          // Only exclude absolute paths, if they are under the project root
+          if ($path = realpath($path) && str_starts_with($path, $project_root)) {
             $event->addPathsRelativeToProjectRoot([$path]);
           }
         }
