@@ -458,11 +458,6 @@ class AjaxTestController {
   /**
    * Returns an empty response with the given HTTP status code.
    *
-   * Test-only endpoint: callers are expected to pass a valid HTTP
-   * status code. Out-of-range values bubble up as Symfony's own
-   * \InvalidArgumentException from Response::setStatusCode(), which is
-   * the right place to surface the test-input bug.
-   *
    * @param int $code
    *   HTTP status code.
    *
