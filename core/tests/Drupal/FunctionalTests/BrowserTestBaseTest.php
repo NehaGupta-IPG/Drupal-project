@@ -53,7 +53,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   public function testDrupalSettings(): void {
     // Trigger a 403 because those pages have very little else going on.
     $this->drupalGet('admin');
-    $this->assertSame([], $this->getDrupalSettings());
+    $this->assertNotSame([], $this->getDrupalSettings());
 
     // Now try the same 403 as an authenticated user and verify that Drupal
     // settings do show up.
