@@ -341,6 +341,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    */
   public function showOperatorForm(&$form, FormStateInterface $form_state) {
     $this->operatorForm($form, $form_state);
+    if (empty($form['operator'])) {
+      return;
+    }
     $form['operator']['#prefix'] = '<div class="views-group-box views-left-30">';
     $form['operator']['#suffix'] = '</div>';
   }
