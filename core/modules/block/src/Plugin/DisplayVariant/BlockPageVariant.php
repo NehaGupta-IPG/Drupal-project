@@ -63,7 +63,7 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
   /**
    * The page title: a string (plain title) or a render array (formatted title).
    *
-   * @var string|array
+   * @var string|array|\Stringable
    */
   protected $title = '';
 

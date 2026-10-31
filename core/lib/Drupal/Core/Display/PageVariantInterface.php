@@ -34,8 +34,8 @@ interface PageVariantInterface extends VariantInterface {
   /**
    * Sets the title for the page being rendered.
    *
-   * @param string|array $title
-   *   The page title: either a string for plain titles or a render array for
+   * @param string|array|\Stringable $title
+   *   The page title: a string for plain titles, or markup or render array for
    *   formatted titles.
    *
    * @return $this
