@@ -49,9 +49,6 @@ views.settings:
         always_live_preview:
           type: boolean
           label: 'Automatically update preview on changes'
-        exposed_filter_any_label:
-          type: string
-          label: 'Label for "Any" value on non-required single-select exposed filters'
     field_rewrite_elements:
       type: sequence
       label: 'Field rewrite elements'

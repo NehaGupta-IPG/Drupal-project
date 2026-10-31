@@ -56,13 +56,6 @@ class BasicSettingsForm extends ConfigFormBase {
       '#config_target' => 'views.settings:ui.show.display_embed',
     ];
 
-    $form['basic']['ui_exposed_filter_any_label'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Label for "Any" value on non-required single-select exposed filters'),
-      '#options' => ['old_any' => '<Any>', 'new_any' => $this->t('- Any -')],
-      '#config_target' => 'views.settings:ui.exposed_filter_any_label',
-    ];
-
     $form['live_preview'] = [
       '#type' => 'details',
       '#title' => $this->t('Live preview settings'),
