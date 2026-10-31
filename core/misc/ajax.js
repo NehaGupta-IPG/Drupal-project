@@ -1067,7 +1067,9 @@
    * The promise that will resolve once all commands have finished executing.
    */
   Drupal.Ajax.prototype.success = function (response, status) {
-    // Remove the progress element.
+    // Add scroll preservation.
+    const scrollPosition = window.scrollY;
+
     if (this.progress.element) {
       $(this.progress.element).remove();
     }
@@ -1102,6 +1104,11 @@
         // the triggering element or one of its parents if that element does not
         // exist anymore.
         .then(() => {
+          // Restore scroll position unless focus was explicitly changed.
+          if (!focusChanged) {
+            window.scrollTo(0, scrollPosition);
+          }
+
           if (!focusChanged) {
             let target = false;
             if (this.element) {
