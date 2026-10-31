@@ -8,6 +8,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -282,9 +283,26 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAllWith(string $hook, callable $callback): void {
-    $list = $this->getHookImplementationList($hook);
-    foreach ($list->iterateByModule() as $module => $listener) {
-      $callback($listener, $module);
+    if ($hook == 'requirements') {
+      // hook_requirements() is special, it typically resides in .install files
+      // and is not collected in \Drupal\Core\Hook\HookCollectorPass to avoid
+      // edge cases when those files have not yet been loaded. Fall back to an
+      // implementation similar to legacyInvoke(). Callers are responsible to
+      // load the .install files first.
+      foreach ($this->moduleList as $module => $filename) {
+        $function = $module . '_' . $hook;
+        if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyRequirementsHook::class)) {
+          $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
+          @trigger_error($message, E_USER_DEPRECATED);
+          $callback($function, $module);
+        }
+      }
+    }
+    else {
+      $list = $this->getHookImplementationList($hook);
+      foreach ($list->iterateByModule() as $module => $listener) {
+        $callback($listener, $module);
+      }
     }
   }
 
