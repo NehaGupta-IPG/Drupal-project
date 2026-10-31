@@ -85,3 +85,11 @@ language.content_settings_page:
     _form: '\Drupal\language\Form\ContentLanguageSettingsForm'
   requirements:
     _permission: 'administer languages'
+
+language.negotiation_content_entity:
+  path: '/admin/config/regional/language/detection/content-entity'
+  defaults:
+    _form: '\Drupal\language\Form\NegotiationContentEntityForm'
+    _title: 'Content entity language detection configuration'
+  requirements:
+    _permission: 'administer languages'

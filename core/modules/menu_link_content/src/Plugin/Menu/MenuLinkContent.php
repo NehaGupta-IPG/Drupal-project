@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\MenuLinkBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\menu_link_content\MenuLinkContentInterface;
 
 /**
@@ -138,9 +139,16 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
       if (!$entity) {
         throw new PluginException("Entity not found through the menu link plugin definition and could not fallback on UUID '$uuid'");
       }
+
+      $lang_type_interface = \Drupal::config('language.negotiation')->get('menu_lang_type_interface');
+      $langcode = NULL;
+      if (!empty($lang_type_interface)) {
+        $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)->getId();
+      }
+
       // Clone the entity object to avoid tampering with the static cache.
       $this->entity = clone $entity;
-      $the_entity = $this->entityRepository->getTranslationFromContext($this->entity);
+      $the_entity = $this->entityRepository->getTranslationFromContext($this->entity, $langcode);
       /** @var \Drupal\menu_link_content\MenuLinkContentInterface $the_entity */
       $this->entity = $the_entity;
       $this->entity->setInsidePlugin();

@@ -26,7 +26,8 @@ use Symfony\Component\Routing\Route;
   name: new TranslatableMarkup('Content language'),
   types: [LanguageInterface::TYPE_CONTENT],
   weight: -9,
-  description: new TranslatableMarkup("Determines the content language from the request parameter named 'language_content_entity'.")
+  description: new TranslatableMarkup("Determines the content language from the request parameter named 'language_content_entity'."),
+  config_route_name: 'language.negotiation_content_entity'
 )]
 class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase implements OutboundPathProcessorInterface, LanguageSwitcherInterface, ContainerFactoryPluginInterface {
 
