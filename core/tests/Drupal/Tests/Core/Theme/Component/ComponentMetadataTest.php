@@ -511,4 +511,244 @@ class ComponentMetadataTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests that getSchemaForUi() filters out props with noUi: true.
+   */
+  #[DataProvider('dataProviderSchemaForUi')]
+  public function testGetSchemaForUi(array $metadata_info, ?array $expected_ui_schema): void {
+    $metadata = new ComponentMetadata($metadata_info, 'foo/', FALSE);
+    $this->assertEquals($expected_ui_schema, $metadata->getSchemaForUi());
+  }
+
+  /**
+   * Data provider for the test testGetSchemaForUi.
+   *
+   * @return array[]
+   *   The batches of data.
+   */
+  public static function dataProviderSchemaForUi(): array {
+    return [
+      'no schema returns null' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+        ],
+        NULL,
+      ],
+      'props without noUi are all visible' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'required' => ['title'],
+            'properties' => [
+              'title' => [
+                'type' => 'string',
+                'title' => 'Title',
+              ],
+              'description' => [
+                'type' => 'string',
+                'title' => 'Description',
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'required' => ['title'],
+          'additionalProperties' => FALSE,
+          'properties' => [
+            'title' => [
+              'type' => ['string', 'object'],
+              'title' => 'Title',
+            ],
+            'description' => [
+              'type' => ['string', 'object'],
+              'title' => 'Description',
+            ],
+          ],
+        ],
+      ],
+      'props with noUi: true are filtered out' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'required' => ['title'],
+            'properties' => [
+              'title' => [
+                'type' => 'string',
+                'title' => 'Title',
+              ],
+              'attributes' => [
+                'type' => 'object',
+                'title' => 'Attributes',
+                'noUi' => TRUE,
+                'default' => [],
+              ],
+              'utility_classes' => [
+                'type' => 'array',
+                'title' => 'Utility Classes',
+                'noUi' => TRUE,
+                'default' => [],
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'required' => ['title'],
+          'additionalProperties' => FALSE,
+          'properties' => [
+            'title' => [
+              'type' => ['string', 'object'],
+              'title' => 'Title',
+            ],
+          ],
+        ],
+      ],
+      'props with noUi: false are visible' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'properties' => [
+              'title' => [
+                'type' => 'string',
+                'title' => 'Title',
+                'noUi' => FALSE,
+              ],
+              'hidden_prop' => [
+                'type' => 'string',
+                'title' => 'Hidden Prop',
+                'noUi' => TRUE,
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'additionalProperties' => FALSE,
+          'properties' => [
+            'title' => [
+              'type' => ['string', 'object'],
+              'title' => 'Title',
+              'noUi' => FALSE,
+            ],
+          ],
+        ],
+      ],
+      'required array is filtered when noUi props are removed' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'required' => ['title', 'attributes'],
+            'properties' => [
+              'title' => [
+                'type' => 'string',
+                'title' => 'Title',
+              ],
+              'attributes' => [
+                'type' => 'object',
+                'title' => 'Attributes',
+                'noUi' => TRUE,
+                'default' => [],
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'required' => ['title'],
+          'additionalProperties' => FALSE,
+          'properties' => [
+            'title' => [
+              'type' => ['string', 'object'],
+              'title' => 'Title',
+            ],
+          ],
+        ],
+      ],
+      'required is removed when all required props have noUi' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'required' => ['attributes'],
+            'properties' => [
+              'title' => [
+                'type' => 'string',
+                'title' => 'Title',
+              ],
+              'attributes' => [
+                'type' => 'object',
+                'title' => 'Attributes',
+                'noUi' => TRUE,
+                'default' => [],
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'additionalProperties' => FALSE,
+          'properties' => [
+            'title' => [
+              'type' => ['string', 'object'],
+              'title' => 'Title',
+            ],
+          ],
+        ],
+      ],
+      'all props hidden leaves empty properties' => [
+        [
+          'path' => 'foo/bar/component-name',
+          'id' => 'core:component-name',
+          'name' => 'Component Name',
+          'description' => 'Test component',
+          'group' => 'Test Group',
+          'props' => [
+            'type' => 'object',
+            'properties' => [
+              'attributes' => [
+                'type' => 'object',
+                'title' => 'Attributes',
+                'noUi' => TRUE,
+              ],
+            ],
+          ],
+        ],
+        [
+          'type' => 'object',
+          'additionalProperties' => FALSE,
+          'properties' => [],
+        ],
+      ],
+    ];
+  }
+
 }
