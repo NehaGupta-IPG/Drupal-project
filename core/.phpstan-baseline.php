@@ -35622,12 +35622,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeAccessPagerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getOwnerId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeCacheTagsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc type array of property Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeCreationTest\\:\\:\\$modules is not covariant with PHPDoc type array\\<string\\> of overridden property Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTestBase\\:\\:\\$modules\\.$#',
 	'identifier' => 'property.phpDocType',
 	'count' => 1,
