@@ -331,6 +331,11 @@ class Html {
     // Normalize all newlines.
     $html = str_replace(["\r\n", "\r"], "\n", $html);
 
+    // Process unconverted &nbsp; entities, excluding content within <code> tags.
+    $html = preg_replace_callback('/<(code|a)[^>]*>.*?<\/\1>(*SKIP)(*FAIL)|&nbsp;/s', function ($matches) {
+      return ' ';
+    }, $html);
+
     return $html;
   }
 
