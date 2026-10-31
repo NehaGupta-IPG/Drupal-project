@@ -136,6 +136,42 @@ class FilterDateTest extends ViewTestBase {
       ['nid' => $this->nodes[3]->id()],
     ];
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test offset for between operator with same date offset.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['type'] = 'offset';
+    $view->filter['created']->value['max'] = '+1 day';
+    $view->filter['created']->value['min'] = '+1 day';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[3]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test offset for between operator with time component.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['type'] = 'offset';
+    $view->filter['created']->value['max'] = '+1 day 4 hours';
+    $view->filter['created']->value['min'] = '+1 day';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[3]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test offset for between operator with no result.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['type'] = 'offset';
+    $view->filter['created']->value['max'] = '+1 day 12 hours';
+    $view->filter['created']->value['min'] = '+1 day 6 hours';
+    $view->executeDisplay('default');
+    $this->assertIdenticalResultset($view, [], $this->map);
   }
 
   /**
@@ -166,6 +202,39 @@ class FilterDateTest extends ViewTestBase {
       ['nid' => $this->nodes[1]->id()],
     ];
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with same min and max date.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['min'] = '1970-01-03';
+    $view->filter['created']->value['max'] = '1970-01-03';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[1]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with same min and max date with time value.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['min'] = '1970-01-03 12:00:00';
+    $view->filter['created']->value['max'] = '1970-01-03 18:00:00';
+    $view->executeDisplay('default');
+    $expected_result = [
+      ['nid' => $this->nodes[1]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with same min and max date with no results.
+    $view->initHandlers();
+    $view->filter['created']->operator = 'between';
+    $view->filter['created']->value['min'] = '1970-01-03 12:00:00';
+    $view->filter['created']->value['max'] = '1970-01-03 16:00:00';
+    $view->executeDisplay('default');
+    $this->assertIdenticalResultset($view, [], $this->map);
     $view->destroy();
 
     // Test not between with min and max.

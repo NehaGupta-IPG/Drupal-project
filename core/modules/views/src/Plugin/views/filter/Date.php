@@ -220,11 +220,32 @@ class Date extends NumericFilter {
     $a = intval(strtotime($this->value['min'], 0));
     $b = intval(strtotime($this->value['max'], 0));
 
+    if ($this->value['type'] == 'date') {
+      // Check if min and max are the same date.
+      $min_date = date('Y-m-d', strtotime($this->value['min']));
+      $max_date = date('Y-m-d', strtotime($this->value['max']));
+      if ($min_date == $max_date) {
+        // Check if max value has no time part.
+        if (date('H:i:s', strtotime($this->value['max'])) == '00:00:00') {
+          $b = intval(strtotime($this->value['max'] . ' +1 day', 0)) - 1;
+        }
+      }
+    }
+
     if ($this->value['type'] == 'offset') {
       // Keep sign.
       $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
+      // Keep sign for max, store original for checking.
+      $b_original = $b;
       // Keep sign.
       $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+      // If min and max are the same and max has no time part (whole days only).
+      if ($this->value['min'] === $this->value['max'] && ($b_original % 86400 === 0)) {
+        // Convert offset to days.
+        $offset_days = intdiv($b_original, 86400);
+        // Set $b to the end of that day (23:59:59).
+        $b = '***CURRENT_TIME***' . sprintf('%+d', ($offset_days * 86400) + 86399);
+      }
     }
     // This is safe because we are manually scrubbing the values. It is
     // necessary to do it this way because $a and $b are formulas when using an
