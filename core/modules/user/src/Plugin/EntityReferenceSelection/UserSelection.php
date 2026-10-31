@@ -75,6 +75,7 @@ class UserSelection extends DefaultSelection {
         'type' => '_none',
         'role' => NULL,
       ],
+      'include_blocked' => TRUE,
       'include_anonymous' => TRUE,
     ] + parent::defaultConfiguration();
   }
@@ -85,10 +86,24 @@ class UserSelection extends DefaultSelection {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $configuration = $this->getConfiguration();
 
+    $form['include_blocked'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include blocked users'),
+      '#default_value' => !empty($configuration['include_blocked']),
+      '#description' => $this->t('If enabled, users with the <em>administer users</em> permission may reference blocked users.'),
+    ];
+
     $form['include_anonymous'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Include the anonymous user.'),
       '#default_value' => $configuration['include_anonymous'],
+      // If inactive users are not included, then it's not possible to get the
+      // Anonymous user either.
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[handler_settings][include_blocked]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     // Add user specific filter options.
@@ -158,7 +173,7 @@ class UserSelection extends DefaultSelection {
 
     // Adding the permission check is sadly insufficient for users: core
     // requires us to also know about the concept of 'blocked' and 'active'.
-    if (!$this->currentUser->hasPermission('administer users')) {
+    if (!$configuration['include_blocked'] || !$this->currentUser->hasPermission('administer users')) {
       $query->condition('status', 1);
     }
     return $query;
