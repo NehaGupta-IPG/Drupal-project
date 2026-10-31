@@ -737,7 +737,7 @@ class ThemePreprocess {
           $child = &$item[$key];
           // If this child element does not specify how it can be rendered, then
           // we need to inherit the render properties of the current list.
-          if (!isset($child['#type']) && !isset($child['#theme']) && !isset($child['#markup'])) {
+          if (!isset($child['#type']) && !isset($child['#theme']) && !isset($child['#markup']) && !isset($child['#plain_text'])) {
             // Since item-list.html.twig supports both strings and render arrays
             // as items, the items of the nested list may have been specified as
             // the child elements of the nested list, instead of #items. For
