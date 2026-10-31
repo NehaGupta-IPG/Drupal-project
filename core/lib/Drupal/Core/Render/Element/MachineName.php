@@ -246,8 +246,12 @@ class MachineName extends Textfield {
    * - Cannot be changed after creation (via #disabled).
    */
   public static function validateMachineName(&$element, FormStateInterface $form_state, &$complete_form) {
-    // Verify that the machine name not only consists of replacement tokens.
-    if (preg_match('@^' . $element['#machine_name']['replace'] . '+$@', $element['#value'])) {
+    // Verify that the machine name is not empty and does not consist solely of
+    // replacement tokens.
+    if (
+      !empty($element['#machine_name']['replace'])
+      && preg_match('@^' . $element['#machine_name']['replace'] . '+$@', $element['#value'])
+    ) {
       $form_state->setError($element, t('The machine-readable name must contain unique characters.'));
     }
 
