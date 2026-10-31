@@ -138,10 +138,10 @@ class ConnectionTest extends DatabaseTestBase {
 
     // Get a fresh copy of the default connection options.
     $connectionOptions = $db->getConnectionOptions();
-    $this->assertSame($connectionOptions2, $connectionOptions, 'The default and replica connection options are identical.');
+    $this->assertEquals($connectionOptions2, $connectionOptions);
 
     // Set up a new connection with different connection info.
-    $test = $connection_info['default'];
+    $test = $connection_info['default']->toArray();
     $test['database'] .= 'test';
     Database::addConnectionInfo('test', 'default', $test);
     $connection_info = Database::getConnectionInfo('test');
@@ -149,37 +149,6 @@ class ConnectionTest extends DatabaseTestBase {
     // Get a fresh copy of the default connection options.
     $connectionOptions = $db->getConnectionOptions();
     $this->assertNotEquals($connection_info['default']['database'], $connectionOptions['database'], 'The test connection info database does not match the current connection options database.');
-  }
-
-  /**
-   * Tests per-table prefix connection option.
-   */
-  public function testPerTablePrefixOption(): void {
-    $connection_info = Database::getConnectionInfo('default');
-    $new_connection_info = $connection_info['default'];
-    $new_connection_info['prefix'] = [
-      'default' => $connection_info['default']['prefix'],
-      'test_table' => $connection_info['default']['prefix'] . '_bar',
-    ];
-    // @phpstan-ignore argument.type
-    Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectException(\AssertionError::class);
-    Database::getConnection('foo', 'default');
-  }
-
-  /**
-   * Tests the prefix connection option in array form.
-   */
-  public function testPrefixArrayOption(): void {
-    $connection_info = Database::getConnectionInfo('default');
-    $new_connection_info = $connection_info['default'];
-    $new_connection_info['prefix'] = [
-      'default' => $connection_info['default']['prefix'],
-    ];
-    // @phpstan-ignore argument.type
-    Database::addConnectionInfo('default', 'foo', $new_connection_info);
-    $this->expectException(\AssertionError::class);
-    Database::getConnection('foo', 'default');
   }
 
   /**

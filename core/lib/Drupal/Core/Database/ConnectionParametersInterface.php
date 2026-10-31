@@ -1,0 +1,98 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Core\Database;
+
+/**
+ * Interface for a database connection parameters object.
+ *
+ * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ */
+interface ConnectionParametersInterface {
+
+  // phpcs:disable
+  /**
+   * The driver name.
+   */
+  public string $driver { set; }
+
+  /**
+   * The module extension providing the driver.
+   */
+  public string $module { set; }
+
+  /**
+   * The driver PHP namespace.
+   */
+  public string $namespace { set; }
+
+  /**
+   * The driver PHP namespace autoload directory.
+   */
+  public string $autoload { set; }
+
+  /**
+   * The database name.
+   */
+  public string $database { set; }
+
+  /**
+   * The tables prefix.
+   */
+  public string $prefix { set; }
+  // phpcs:enable
+
+  /**
+   * Processes an array of connection options for driver specific defaults.
+   *
+   * This is used internally by the database layer, should not be called
+   * otherwise.
+   *
+   * @param UnprocessedConnectionInfoArray $options
+   *   An array of connection options.
+   *
+   * @return array
+   *   The processed options.
+   *
+   * @internal
+   */
+  public static function processOptionsArray(array $options): array;
+
+  /**
+   * Returns the list of parameters.
+   *
+   * Only the parameters defined as properties are returned, those added to
+   * static::$unknownOptions are ignored.
+   *
+   * @return list<string>
+   *   The list of parameters' names.
+   */
+  public static function getNames(): array;
+
+  /**
+   * Returns the PHP class name of the connection.
+   *
+   * @return class-string
+   *   The PHP class name of the connection.
+   */
+  public function getConnectionClass(): string;
+
+  /**
+   * Returns the connection parameters as an associative array.
+   *
+   * @return ConnectionInfoArray
+   *   The connection parameters as an associative array.
+   */
+  public function toArray(): array;
+
+  /**
+   * Returns the connection parameters as a URL.
+   *
+   * @return string
+   *   The connection parameters as as a URL.
+   */
+  public function asUrl(): string;
+
+}

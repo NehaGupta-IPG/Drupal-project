@@ -87,9 +87,10 @@ abstract class Connection {
   /**
    * The connection information for this connection object.
    *
-   * @var array
+   * @todo remove the array type once all drivers have moved to OO
+   *   ConnectionParameters.
    */
-  protected $connectionOptions = [];
+  protected ConnectionParametersInterface|array $connectionOptions;
 
   /**
    * The schema object for this connection.
@@ -170,25 +171,24 @@ abstract class Connection {
    *
    * @param object $connection
    *   An object of the client class representing a database connection.
-   * @param array $connection_options
-   *   An array of options for the connection. May include the following:
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   *   The database connection settings. May include the following:
    *   - prefix
    *   - namespace
    *   - Other driver-specific options.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
-  public function __construct(object $connection, array $connection_options) {
+  public function __construct(object $connection, ConnectionParametersInterface|array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
-    // Manage the table prefix.
-    $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
-
-    // Work out the database driver namespace if none is provided. This normally
-    // written to setting.php by installer or set by
-    // \Drupal\Core\Database\Database::parseConnectionInfo().
-    if (empty($connection_options['namespace'])) {
-      $connection_options['namespace'] = (new \ReflectionObject($this))->getNamespaceName();
+    if (is_array($connection_options)) {
+      $connection_options = ConnectionParametersFactory::createFromOptionsArray($connection_options);
     }
+
+    // Manage the table prefix.
+    $this->setPrefix($connection_options->prefix);
 
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
@@ -197,11 +197,14 @@ abstract class Connection {
   /**
    * Opens a client connection.
    *
-   * @param array $connection_options
-   *   The database connection settings array.
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|array $connection_options
+   *   The database connection settings.
    *
    * @return object
    *   A client connection object.
+   *
+   * @todo adjust type of the $connection_options parameter to
+   *   ConnectionParametersInterface once all drivers implement it.
    */
   abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
 
@@ -1431,41 +1434,15 @@ abstract class Connection {
    *   \Drupal\Core\Database\Database::getConnectionInfoAsUrl().
    *
    * @see \Drupal\Core\Database\Database::getConnectionInfoAsUrl()
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ConnectionParametersFactory::asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public static function createUrlFromConnectionOptions(array $connection_options) {
-    if (!isset($connection_options['driver'], $connection_options['database'])) {
-      throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
-    }
-
-    $user = '';
-    if (isset($connection_options['username'])) {
-      $user = $connection_options['username'];
-      if (isset($connection_options['password'])) {
-        $user .= ':' . $connection_options['password'];
-      }
-      $user .= '@';
-    }
-
-    $host = empty($connection_options['host']) ? 'localhost' : $connection_options['host'];
-
-    $db_url = $connection_options['driver'] . '://' . $user . $host;
-
-    if (isset($connection_options['port'])) {
-      $db_url .= ':' . $connection_options['port'];
-    }
-
-    $db_url .= '/' . $connection_options['database'];
-
-    // Add the module when the driver is provided by a module.
-    if (isset($connection_options['module'])) {
-      $db_url .= '?module=' . $connection_options['module'];
-    }
-
-    if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
-      $db_url .= '#' . $connection_options['prefix'];
-    }
-
-    return $db_url;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersFactory::asUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromOptionsArray($connection_options)->asUrl();
   }
 
   /**

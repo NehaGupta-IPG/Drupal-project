@@ -10,7 +10,9 @@ use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+
+// cspell:ignore djarin grogu kuiil
 
 /**
  * Tests MySQL database connections.
@@ -22,17 +24,17 @@ class ConnectionTest extends UnitTestCase {
   /**
    * A mocked MySql connection.
    */
-  private Connection&MockObject $connection;
+  private Connection&Stub $connection;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = $this->getMockBuilder(Connection::class)
+    $this->connection = $this->getStubBuilder(Connection::class)
       ->setConstructorArgs([$this->createStub(Mysql::class), []])
       ->onlyMethods(['getServerVersion'])
-      ->getMock();
+      ->getStub();
   }
 
   /**
@@ -43,12 +45,20 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerVersionAndIsMariaDb')]
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {
-    $this->connection->expects($this->atLeastOnce())
+    $connection = $this->getMockBuilder(Connection::class)
+      ->setConstructorArgs([
+        $this->createStub(Mysql::class),
+        ['driver' => 'mysql', 'database' => 'foo'],
+      ])
+      ->onlyMethods(['getServerVersion'])
+      ->getMock();
+
+    $connection->expects($this->atLeastOnce())
       ->method('getServerVersion')
       ->willReturn($server_version);
 
-    $is_mariadb = $this->connection->isMariaDb();
-    $version = $this->connection->version();
+    $is_mariadb = $connection->isMariaDb();
+    $version = $connection->version();
 
     $this->assertSame($expected_is_mariadb, $is_mariadb);
     $this->assertSame($expected_version, $version);
@@ -120,6 +130,43 @@ class ConnectionTest extends UnitTestCase {
         '5.7.28-31',
       ],
     ];
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $mysql_connection = new Connection(
+      $this->createStub(Mysql::class),
+      [
+        'driver' => 'mysql',
+        'database' => 'kaboom',
+        'foo' => 'bar',
+        'din' => [
+          'djarin',
+          'grogu',
+        ],
+      ],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
+
+    $mysql_connection->getConnectionOptions()['driver'] = 'qux';
+    $mysql_connection->getConnectionOptions()['database'] = 'qux';
+    $mysql_connection->getConnectionOptions()['foo'] = 'qux';
+    $mysql_connection->getConnectionOptions()['din']['also'] = 'kuiil';
+    $mysql_connection->getConnectionOptions()['pdo'][\PDO::ATTR_EMULATE_PREPARES] = TRUE;
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()['din']);
+    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()->din);
+    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()['pdo']);
+    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()->pdo);
   }
 
 }
