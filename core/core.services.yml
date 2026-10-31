@@ -1953,6 +1953,9 @@ services:
   early_rendering_controller_wrapper_subscriber:
     class: Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber
     arguments: ['@http_kernel.controller.argument_resolver', '@renderer']
+  translated_string_response_subscriber:
+    class: Drupal\Core\EventSubscriber\TranslatedStringResponseSubscriber
+    arguments: ['@string_translation']
   # Placeholder strategies for rendering placeholders.
   html_response.placeholder_strategy_subscriber:
     class: Drupal\Core\EventSubscriber\HtmlResponsePlaceholderStrategySubscriber
