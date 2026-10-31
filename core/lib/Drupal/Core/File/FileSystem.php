@@ -62,20 +62,62 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function moveUploadedFile($filename, $uri) {
-    $result = @move_uploaded_file($filename, $uri);
-    // PHP's move_uploaded_file() does not properly support streams if
-    // open_basedir is enabled so if the move failed, try finding a real path
-    // and retry the move operation.
-    if (!$result) {
-      if ($realpath = $this->realpath($uri)) {
-        $result = move_uploaded_file($filename, $realpath);
+    $target_real_path = $this->realpath($uri);
+
+    $source = @fopen($filename, 'r');
+    if ($source === FALSE) {
+      $this->logger->error('Failed to open %file file for reading.', [
+        '%file' => $filename,
+      ]);
+      return FALSE;
+    }
+
+    $target = @fopen($target_real_path, 'w');
+    if ($target === FALSE) {
+      $this->logger->error('Failed to open %file file for writing.', [
+        '%file' => $target_real_path,
+      ]);
+      return FALSE;
+    }
+
+    // Use stream_copy_to_stream() instead of move_uploaded_file() as the latter
+    // could run into memory issues if too big files are uploaded.
+    $written_bytes = stream_copy_to_stream($source, $target);
+
+    if (!@fclose($source)) {
+      $this->logger->warning('Failed to close %file source file.', [
+        '%file' => $filename,
+      ]);
+    }
+
+    if (!@fclose($target)) {
+      $this->logger->warning('Failed to close %file target file.', [
+        '%file' => $target_real_path,
+      ]);
+    }
+
+    // Clean-up files.
+    $is_successful = $written_bytes !== FALSE && $written_bytes === filesize($filename);
+    if (!$is_successful) {
+      if (!@unlink($target_real_path)) {
+        $this->logger->error('Failed to clean-up %file file after it failed to copy.', [
+          '%file' => $target_real_path,
+        ]);
       }
       else {
-        $result = move_uploaded_file($filename, $uri);
+        $this->logger->error('Failed to copy the uploaded file to %file.', [
+          '%file' => $target_real_path,
+        ]);
       }
     }
 
-    return $result;
+    if (!@unlink($filename)) {
+      $this->logger->warning('Failed to remove the source %file file.', [
+        '%file' => $filename,
+      ]);
+    }
+
+    return $is_successful;
   }
 
   /**
