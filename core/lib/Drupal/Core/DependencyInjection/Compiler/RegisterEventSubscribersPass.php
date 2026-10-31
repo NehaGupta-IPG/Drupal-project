@@ -28,6 +28,17 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
     $this->renameTag($container, 'event_subscriber', 'kernel.event_subscriber');
     $this->pass->process($container);
     $this->renameTag($container, 'kernel.event_subscriber', 'event_subscriber');
+
+    $definition = $container->getDefinition('event_dispatcher');
+    $listeners = [];
+    foreach ($definition->getMethodCalls() as $call) {
+      if ($call[0] === 'addListener') {
+        [$eventName, $listener, $priority] = $call[1] + [2 => 0];
+        $listeners[$eventName][$priority][] = $listener;
+      }
+    }
+    $definition->removeMethodCall('addListener');
+    $definition->addMethodCall('setListeners', [$listeners]);
   }
 
   /**
