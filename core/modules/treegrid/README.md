@@ -169,6 +169,8 @@ out at once, outside the queue.
 A unit receives a unit object with `expandRow()`, `refreshLevel()` and
 `exclusive()`. They run inside the unit. `unit.exclusive(fn2)` calls
 `fn2(unit)` at once. Every unit method throws once its unit has settled.
+Unit methods may be called concurrently: treegrid's own loads send one rows
+request at a time per tree.
 
 Calling `element.expandRow()` or `element.refreshLevel()` from inside a unit
 queues behind that unit and never finishes. Use the unit object's methods

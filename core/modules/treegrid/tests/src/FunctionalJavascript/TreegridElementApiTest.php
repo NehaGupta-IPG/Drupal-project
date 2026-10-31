@@ -1006,6 +1006,78 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
+   * A refresh and an expand on one source in one unit both run in turn.
+   */
+  public function testRefreshAndExpandOnOneSourceInOneUnit(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const p1 = element.tree.querySelector('tr[data-id="p1"]');
+      let failures = 0;
+      element.addEventListener('treegrid:level-load-failed', () => {
+        failures += 1;
+      });
+      const [refreshed, expanded] = await element.exclusive((unit) => Promise.all([
+        unit.refreshLevel('p1'),
+        unit.expandRow(p1),
+      ]));
+      return {
+        refreshed,
+        expanded,
+        failures,
+        children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+        staged: element.querySelectorAll('[data-treegrid-staging] > tbody > *').length,
+      };
+    JS);
+
+    $this->assertEquals(
+      ['refreshed' => TRUE, 'expanded' => TRUE, 'failures' => 0, 'children' => 2, 'staged' => 0],
+      $this->getSession()->evaluateScript('return window.apiTest.result;'),
+    );
+  }
+
+  /**
+   * A load whose source goes away while it waits in the chain sends nothing.
+   */
+  public function testChainedLoadForRemovedSourceSendsNothing(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree[''] = ['p2', 'leaf1'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->getSession()->executeScript(<<<'JS'
+      window.apiTest = { p1Requests: 0, done: false, result: null };
+      const originalFetch = window.fetch;
+      window.fetch = function (url) {
+        if (String(url).includes('/treegrid-test-ui/children') && String(url).includes('parent=p1')) {
+          window.apiTest.p1Requests += 1;
+        }
+        return originalFetch.apply(this, arguments);
+      };
+    JS);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const p1 = element.tree.querySelector('tr[data-id="p1"]');
+      let failures = 0;
+      element.addEventListener('treegrid:level-load-failed', () => {
+        failures += 1;
+      });
+      const [refreshed, expanded] = await element.exclusive((unit) => Promise.all([
+        unit.refreshLevel(''),
+        unit.expandRow(p1),
+      ]));
+      return { refreshed, expanded, failures, connected: p1.isConnected };
+    JS);
+
+    $this->assertEquals(
+      ['refreshed' => TRUE, 'expanded' => FALSE, 'failures' => 0, 'connected' => FALSE],
+      $this->getSession()->evaluateScript('return window.apiTest.result;'),
+    );
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.apiTest.p1Requests;'));
+  }
+
+  /**
    * A loaded row's library loads once, however many levels are loaded.
    */
   public function testLoadedRowsLibraryLoadsOnce(): void {

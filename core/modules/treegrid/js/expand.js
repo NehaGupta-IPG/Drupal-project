@@ -88,6 +88,9 @@
       // Level loads running inline in a unit, keyed by row id: the row and the
       // load's promise.
       this.loading = new Map();
+      // Tail of the rows requests: htmx keeps one request per source and
+      // resolves a second call on a busy source before its request runs.
+      this.requestChain = Promise.resolve();
     }
 
     /**
@@ -127,9 +130,10 @@
     /**
      * Loads one level's rows into staging through htmx.
      *
-     * The response is gated: a status of 400 or more, or a response without
-     * the X-Treegrid-Rows marker, is cancelled before htmx swaps or loads
-     * anything from it.
+     * Calls run one at a time: a call starts its request once the previous
+     * call has settled, whether or not that one failed. The response is gated:
+     * a status of 400 or more, or a response without the X-Treegrid-Rows
+     * marker, is cancelled before htmx swaps or loads anything from it.
      *
      * @param {HTMLElement} source
      *   The element the request belongs to: the parent row, or the element
@@ -137,11 +141,38 @@
      * @param {string} parentId
      *   The parent's plugin ID, or '' for the root level.
      *
-     * @return {Promise<{failed: boolean, status: number}>}
-     *   Whether the load failed, and the HTTP status (0 when no response
-     *   arrived).
+     * @return {Promise<{failed: boolean, status: number, gone: boolean}>}
+     *   Whether the load failed, the HTTP status (0 when no response arrived)
+     *   and whether the source left the DOM before its turn, in which case
+     *   nothing was sent.
      */
-    async requestRows(source, parentId) {
+    requestRows(source, parentId) {
+      const run = this.requestChain.then(() =>
+        this.sendRowsRequest(source, parentId),
+      );
+      this.requestChain = run.catch(() => {});
+      return run;
+    }
+
+    /**
+     * Sends one rows request; see requestRows().
+     *
+     * @param {HTMLElement} source
+     *   The element the request belongs to.
+     * @param {string} parentId
+     *   The parent's plugin ID, or '' for the root level.
+     *
+     * @return {Promise<{failed: boolean, status: number, gone: boolean}>}
+     *   The outcome.
+     */
+    async sendRowsRequest(source, parentId) {
+      if (!source.isConnected) {
+        return { failed: false, status: 0, gone: true };
+      }
+      const staging = this.staging;
+      if (!staging) {
+        return { failed: true, status: 0, gone: false };
+      }
       const url = new URL(this.childrenUrl, window.location.origin);
       if (parentId !== '') {
         url.searchParams.set('parent', parentId);
@@ -173,7 +204,7 @@
       try {
         await htmx.ajax('GET', url.toString(), {
           source,
-          target: this.staging,
+          target: staging,
           swap: 'beforeend ignoreTitle:true',
           select: '[data-treegrid-rows] > tr',
         });
@@ -184,6 +215,7 @@
       return {
         failed: !ctx || rejected || errored,
         status: ctx?.response.status ?? 0,
+        gone: false,
       };
     }
 
@@ -573,10 +605,13 @@
       }
 
       try {
-        const { failed } = await this.requestRows(
+        const { failed, gone } = await this.requestRows(
           isRoot ? this.element : parentRow,
           parentId,
         );
+        if (gone) {
+          return true;
+        }
         if (failed) {
           return false;
         }
@@ -757,7 +792,10 @@
         if (!row.isConnected) {
           return false;
         }
-        const { failed, status } = await this.requestRows(row, parentId);
+        const { failed, status, gone } = await this.requestRows(row, parentId);
+        if (gone) {
+          return false;
+        }
         if (failed) {
           if (isParent) {
             row.setAttribute('aria-expanded', 'false');
