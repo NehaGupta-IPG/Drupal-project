@@ -40,7 +40,7 @@ workflows.state.complex_test_transition:
       label: 'Extra information'
 
 workflow.type_settings.workflow_type_complex_test:
-  type: mapping
+  type: workflow.type_settings
   label: 'Workflow complex test type settings'
   mapping:
     example_setting:

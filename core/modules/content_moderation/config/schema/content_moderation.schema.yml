@@ -1,5 +1,8 @@
 content_moderation.state:
   type: workflows.state
+  label: 'Moderation state'
+  constraints:
+    FullyValidatable: ~
   mapping:
     published:
       type: boolean
@@ -9,13 +12,17 @@ content_moderation.state:
       label: 'Is default revision'
 
 workflow.type_settings.content_moderation:
-  type: mapping
+  type: workflow.type_settings
+  label: 'Content moderation'
+  constraints:
+    FullyValidatable: ~
   mapping:
     states:
       type: sequence
       label: 'Content moderation states'
       orderby: key
       sequence:
+        # @todo Validate keys: should be valid machine names.
         type: content_moderation.state
         label: 'States'
     transitions:
@@ -27,12 +34,29 @@ workflow.type_settings.content_moderation:
     entity_types:
       type: sequence
       label: 'Entity types'
+      orderby: key
+      # @todo Validate that each key here is a valid entity type. Sample config:
+      #   entity_types:
+      #    node:
+      #      - article
+      #      - page
+      constraints: {}
       sequence:
         type: sequence
         label: 'Bundles'
+        orderby: value
+        # A list of allowed bundles must be specified.
+        constraints:
+          NotBlank: []
         sequence:
           type: string
           label: 'Bundle ID'
+          constraints:
+            EntityBundleExists: '%parent.%key'
     default_moderation_state:
       type: string
       label: 'Default moderation state'
+      constraints:
+        ExistsIn:
+          selector: '%parent.states'
+          which: keys

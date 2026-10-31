@@ -18,8 +18,31 @@ workflows.workflow.*:
     type_settings:
       type: workflow.type_settings.[%parent.type]
 
+# All workflow types should have at least top-level `states` and `transitions` keys, to allow for config validation.
+workflow.type_settings:
+  type: mapping
+  mapping:
+    states:
+      type: sequence
+      label: 'Workflow states'
+      orderby: key
+      # @todo Validate keys: should be valid machine names.
+      sequence:
+        type: workflows.state
+        label: 'State'
+    transitions:
+      type: sequence
+      orderby: key
+      # @todo Validate keys: should be valid machine names.
+      sequence:
+        type: workflows.transition
+        label: 'Transition'
+
 workflows.state:
   type: mapping
+  label: 'Workflow state'
+  constraints:
+    FullyValidatable: ~
   mapping:
     label:
       type: label
@@ -28,9 +51,14 @@ workflows.state:
     weight:
       type: weight
       label: 'Weight'
+      constraints:
+        NotNull: []
 
 workflows.transition:
   type: mapping
+  label: 'Workflow transition'
+  constraints:
+    FullyValidatable: ~
   mapping:
     label:
       type: label
@@ -42,9 +70,23 @@ workflows.transition:
       sequence:
         type: string
         label: 'From state ID'
+        constraints:
+          ExistsIn:
+            # This selector is guaranteed to work thanks to `type: workflow.type_settings`.
+            # ⚠️ This will not yet work for `type: workflow.type_settings.predefined_states_workflow_test_type` — to support that, we need to also allow \Drupal\workflows\Plugin\WorkflowTypeBase::getRequiredStates()
+            selector: '%parent.%parent.%parent.%parent.states'
+            which: keys
     to:
       type: string
       label: 'To state ID'
+      constraints:
+        ExistsIn:
+          # This selector is guaranteed to work thanks to `type: workflow.type_settings`.
+          # ⚠️ This will not yet work for `type: workflow.type_settings.predefined_states_workflow_test_type` — to support that, we need to also allow \Drupal\workflows\Plugin\WorkflowTypeBase::getRequiredStates()
+          selector: '%parent.%parent.%parent.states'
+          which: keys
     weight:
       type: weight
       label: 'Weight'
+      constraints:
+        NotNull: []
