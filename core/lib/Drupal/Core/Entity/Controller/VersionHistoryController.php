@@ -9,6 +9,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Link;
@@ -230,7 +231,17 @@ class VersionHistoryController extends ControllerBase {
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->getId();
     foreach ($entityStorage->loadMultipleRevisions(array_keys($result)) as $revision) {
-      yield ($translatable ? $revision->getTranslation($currentLangcode) : $revision);
+      // Revisions can be affected by a language without having a translation
+      // in it (e.g. an untranslated revision that predates the field
+      // becoming translatable), so getTranslation() cannot be called
+      // unconditionally: it throws when the current content language isn't
+      // among the revision's translations.
+      if ($translatable && $revision instanceof TranslatableInterface && $revision->hasTranslation($currentLangcode)) {
+        yield $revision->getTranslation($currentLangcode);
+      }
+      else {
+        yield $revision;
+      }
     }
   }
 
