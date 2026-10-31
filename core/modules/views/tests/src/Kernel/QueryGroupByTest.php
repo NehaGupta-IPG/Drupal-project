@@ -353,9 +353,11 @@ class QueryGroupByTest extends ViewsKernelTestBase {
    *   The aggregation function.
    * @param int $expected
    *   The expected aggregated value.
+   * @param string $additional_function
+   *   The expected function applied to the additional fields.
    */
   #[DataProvider('providerAggregateConfigurableField')]
-  public function testAggregateConfigurableField(string $group_type, int $expected): void {
+  public function testAggregateConfigurableField(string $group_type, int $expected, string $additional_function): void {
     FieldStorageConfig::create([
       'type' => 'integer',
       'field_name' => 'field_test',
@@ -382,9 +384,14 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $this->assertCount(1, $view->result);
     // PostgreSQL returns the average as a numeric with trailing zeros.
     $this->assertEquals($expected, (float) (string) $view->getStyle()->getField(0, 'field_test'));
-    // The additional fields of the configurable field, such as langcode, are
-    // not added to the query. PostgreSQL cannot SUM() string columns.
-    $this->assertSame([], $view->field['field_test']->aliases);
+    // The value column keeps the aggregate function. Numeric functions are not
+    // applied to the other additional fields, as PostgreSQL cannot SUM()
+    // string columns such as langcode.
+    $aliases = $view->field['field_test']->aliases;
+    $this->assertSame($group_type, $view->query->fields[$aliases['field_test_value']]['function']);
+    foreach (['delta', 'langcode', 'bundle'] as $additional_field) {
+      $this->assertSame($additional_function, $view->query->fields[$aliases[$additional_field]]['function']);
+    }
   }
 
   /**
@@ -392,12 +399,12 @@ class QueryGroupByTest extends ViewsKernelTestBase {
    */
   public static function providerAggregateConfigurableField(): array {
     return [
-      'count' => ['count', 4],
-      'count distinct' => ['count_distinct', 2],
-      'sum' => ['sum', 8],
-      'average' => ['avg', 2],
-      'minimum' => ['min', 1],
-      'maximum' => ['max', 3],
+      'count' => ['count', 4, 'count'],
+      'count distinct' => ['count_distinct', 2, 'count_distinct'],
+      'sum' => ['sum', 8, 'min'],
+      'average' => ['avg', 2, 'min'],
+      'minimum' => ['min', 1, 'min'],
+      'maximum' => ['max', 3, 'max'],
     ];
   }
 

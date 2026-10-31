@@ -206,6 +206,14 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       ];
     }
 
+    // Numeric aggregate functions fail on string columns in some databases,
+    // for example SUM() on langcode in PostgreSQL. Use MIN() for additional
+    // fields other than the real field, as it works on any column type.
+    $additional_group_params = $group_params;
+    if (in_array($this->options['group_type'], ['sum', 'avg', 'stddev_pop'], TRUE)) {
+      $additional_group_params = ['function' => 'min'];
+    }
+
     if (!empty($fields) && is_array($fields)) {
       foreach ($fields as $identifier => $info) {
         if (is_array($info)) {
@@ -233,11 +241,13 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
             $params = $info['params'];
           }
 
-          $params += $group_params;
+          $is_real_field = $table_alias === $this->tableAlias && $info['field'] === $this->realField;
+          $params += $is_real_field ? $group_params : $additional_group_params;
           $this->aliases[$identifier] = $this->query->addField($table_alias, $info['field'], NULL, $params);
         }
         else {
-          $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $group_params);
+          $params = $info === $this->realField ? $group_params : $additional_group_params;
+          $this->aliases[$info] = $this->query->addField($this->tableAlias, $info, NULL, $params);
         }
       }
     }
