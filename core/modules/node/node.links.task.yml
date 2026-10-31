@@ -10,7 +10,7 @@ entity.node.delete_form:
   route_name: entity.node.delete_form
   base_route: entity.node.canonical
   title: Delete
-  weight: 10
+  weight: 80
 entity.node.version_history:
   route_name: entity.node.version_history
   base_route: entity.node.canonical

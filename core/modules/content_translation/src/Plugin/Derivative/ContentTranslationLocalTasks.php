@@ -71,6 +71,7 @@ class ContentTranslationLocalTasks extends DeriverBase implements ContainerDeriv
         'title' => $this->t('Translate'),
         'route_name' => $translation_route_name,
         'base_route' => $base_route_name,
+        'weight' => 70,
       ] + $base_plugin_definition;
     }
     return parent::getDerivativeDefinitions($base_plugin_definition);
