@@ -129,8 +129,15 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
       // by a number of mathematical-type queries regardless of the
       // original filter.
       $plugin_id = $override_plugin_id ?: $definition['id'];
+      $override_definition = $definition;
+      // The overridden handler does not use the additional fields of the
+      // original handler. Aggregating them can also fail, for example SUM()
+      // on a string column such as langcode in PostgreSQL.
+      if ($plugin_id !== $definition['id']) {
+        unset($override_definition['additional fields']);
+      }
       // Try to use the overridden handler.
-      $handler = $this->createInstance($plugin_id, $definition);
+      $handler = $this->createInstance($plugin_id, $override_definition);
       if ($override_plugin_id && method_exists($handler, 'broken') && $handler->broken()) {
         $handler = $this->createInstance($definition['id'], $definition);
       }
