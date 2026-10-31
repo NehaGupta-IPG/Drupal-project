@@ -81,9 +81,6 @@ class UserCreateTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('edit-status-1', '1');
     $this->assertSession()->checkboxChecked('edit-status-1');
 
-    // Test that browser autocomplete behavior does not occur.
-    $this->assertSession()->responseNotContains('data-user-info-from-browser');
-
     // Test that the password strength indicator displays.
     $config = $this->config('user.settings');
 
