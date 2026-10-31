@@ -17,6 +17,9 @@ class TaxonomyThemeHooks {
 
   /**
    * Implements hook_theme().
+   *
+   * @return array
+   *   Theme implementations
    */
   #[Hook('theme')]
   public function theme() : array {
@@ -30,6 +33,12 @@ class TaxonomyThemeHooks {
 
   /**
    * Implements hook_theme_suggestions_HOOK().
+   *
+   * @param array $variables
+   *   Theme hook variable array.
+   *
+   * @return string[]
+   *   Array of theme suggestions.
    */
   #[Hook('theme_suggestions_taxonomy_term')]
   public function themeSuggestionsTaxonomyTerm(array $variables): array {

@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Taxonomy module file (eventually replaced by class definitions).
  */
 
 use Drupal\Core\Entity\EntityInterface;

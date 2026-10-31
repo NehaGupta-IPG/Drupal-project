@@ -2,14 +2,21 @@
 
 namespace Drupal\taxonomy\Hook;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
 
 /**
  * Hook implementations for taxonomy.
@@ -18,14 +25,29 @@ class TaxonomyHooks {
 
   use StringTranslationTrait;
 
+  public function __construct(
+    protected ConfigFactoryInterface $configFactory,
+    protected Connection $database,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {}
+
   /**
    * Implements hook_help().
+   *
+   * @param string $route_name
+   *   Current route name.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   Current route match.
+   *
+   * @return string|\Stringable|array|null
+   *   Resulting help text.
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match): ?string {
+  public function help(string $route_name, RouteMatchInterface $route_match): string|\Stringable|array|null {
     switch ($route_name) {
       case 'help.page.taxonomy':
-        $field_ui_url = \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
+        $field_ui_url = $this->moduleHandler->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
         $output .= '<p>' . $this->t('The Taxonomy module allows users who have permission to create and edit content to categorize (tag) content of that type. Users who have the <em>Administer vocabularies and terms</em> <a href=":permissions" title="Taxonomy module permissions">permission</a> can add <em>vocabularies</em> that contain a set of related <em>terms</em>. The terms in a vocabulary can either be pre-set by an administrator or built gradually as content is added and edited. Terms may be organized hierarchically if desired.', [
@@ -79,6 +101,9 @@ class TaxonomyHooks {
    * Implements hook_local_tasks_alter().
    *
    * @todo Evaluate removing as part of https://www.drupal.org/node/2358923.
+   *
+   * @param mixed $local_tasks
+   *   Local tasks to be altered.
    */
   #[Hook('local_tasks_alter')]
   public function localTasksAlter(&$local_tasks): void {
@@ -93,6 +118,9 @@ class TaxonomyHooks {
 
   /**
    * Implements hook_entity_operation().
+   *
+   * @return array|array<string,array<string,mixed>>
+   *   Resulting operations array.
    */
   #[Hook('entity_operation')]
   public function entityOperation(EntityInterface $term): array {
@@ -144,7 +172,7 @@ class TaxonomyHooks {
    * Implements hook_ENTITY_TYPE_update() for node entities.
    */
   #[Hook('node_update')]
-  public function nodeUpdate(EntityInterface $node): void {
+  public function nodeUpdate(RevisionableInterface $node): void {
     // If we're not dealing with the default revision of the node, do not make
     // any change to the taxonomy index.
     if (!$node->isDefaultRevision()) {
@@ -168,9 +196,9 @@ class TaxonomyHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    if (\Drupal::config('taxonomy.settings')->get('maintain_index_table')) {
+    if ($this->configFactory->get('taxonomy.settings')->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
-      \Drupal::database()->delete('taxonomy_index')->condition('tid', $term->id())->execute();
+      $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
   }
 
@@ -246,5 +274,67 @@ class TaxonomyHooks {
   /**
    * @} End of "addtogroup taxonomy_index".
    */
+
+  /**
+  * Implements hook_form_BASE_FORM_ID_alter().
+  *
+  * @param array $form
+  *   Nested array of form elements that comprise the form.
+  * @param \Drupal\Core\Form\FormStateInterface $form_state
+  *   Current state of the form.
+  * @param string $form_id
+  *   String representation of form name.
+  */
+  #[Hook('form_taxonomy_term_form_alter')]
+  public function taxonomyTermFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
+    $taxonomy_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+
+    if (isset($form['parent'])) {
+      $vocabulary_id = $form['vid']['#value'];
+      $term_id = $form['tid']['#value'];
+      $term = '';
+      $parent = '';
+
+      if (isset($term_id) && !empty($term_id)) {
+        $term = $taxonomy_storage->load($term_id);
+        $parent = array_keys($taxonomy_storage->loadParents($term_id));
+      }
+
+      // \Drupal\taxonomy\TermStorageInterface::loadTree() and
+      // \Drupal\taxonomy\TermStorageInterface::loadParents() may contain large
+      // numbers of items so we check for taxonomy.settings:override_selector
+      // before loading the full vocabulary. Contrib modules can then intercept
+      // before hook_form_alter to provide scalable alternatives.
+      if (!$this->configFactory->get('taxonomy.settings')->get('override_selector')) {
+        $exclude = [];
+        if ($term instanceof TermInterface) {
+          $parent = array_keys($taxonomy_storage->loadParents($term->id()));
+          $children = $taxonomy_storage->loadTree($vocabulary_id, $term->id());
+
+          // A term can't be the child of itself, nor of its children.
+          foreach ($children as $child) {
+            $exclude[] = $child->tid;
+          }
+          $exclude[] = $term->id();
+        }
+
+        $tree = $taxonomy_storage->loadTree($vocabulary_id);
+        $options = ['<' . $this->t('root') . '>'];
+        if (empty($parent)) {
+          $parent = [0];
+        }
+
+        foreach ($tree as $item) {
+          if (!in_array($item->tid, $exclude)) {
+            $options[$item->tid] = str_repeat('-', $item->depth) . $item->name;
+          }
+        }
+
+        $form['parent']['widget']['#options'] = $options;
+      }
+    }
+
+  }
 
 }

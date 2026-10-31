@@ -209,12 +209,24 @@ class Term extends EditorialContentEntityBase implements TermInterface {
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('The weight of this term in relation to other terms.'))
-      ->setDefaultValue(0);
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', [
+        'type' => 'select',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['parent'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Term Parents'))
+      ->setLabel(t('Parent terms'))
       ->setDescription(t('The parents of this term.'))
       ->setSetting('target_type', 'taxonomy_term')
+      ->setDisplayOptions('form', [
+        'type' => 'select',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
