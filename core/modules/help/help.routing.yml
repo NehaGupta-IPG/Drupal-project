@@ -5,6 +5,8 @@ help.main:
     _title: 'Help'
   requirements:
     _permission: 'access help pages'
+  # options:
+  #   _reauthenticate: 'TRUE'
 
 help.page:
   path: '/admin/help/{name}'

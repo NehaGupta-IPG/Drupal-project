@@ -349,6 +349,7 @@ rasterizable
 rasterizes
 realpaths
 realword
+reauthentication
 rebuilder
 refback
 referenceables
