@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -480,6 +482,68 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->submitForm([
       'moderation_state[0][state]' => 'draft',
     ], 'Save (this translation)');
+  }
+
+  /**
+   * Tests translated and moderated nodes.
+   */
+  public function testContentTranslationNodeFormWithNonRequiredField(): void {
+    $this->drupalLogin($this->rootUser);
+
+    $fieldName = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $fieldName,
+      'type' => 'text',
+      'entity_type' => 'node',
+      'cardinality' => 1,
+    ])->save();
+
+    FieldConfig::create([
+      'entity_type' => 'node',
+      'field_name' => $fieldName,
+      'bundle' => 'moderated_content',
+      'label' => 'Test field',
+    ])->setRequired(FALSE)->setTranslatable(FALSE)->save();
+
+    // Add French language.
+    static::createLanguageFromLangcode('fr');
+
+    // Enable content translation on moderated_content.
+    $this->enableContentTranslation('node', 'moderated_content');
+
+    // Adding languages requires a container rebuild in the test running
+    // environment so that multilingual services are used.
+    $this->rebuildContainer();
+
+    // Create new moderated content in draft (revision 1).
+    $this->drupalGet('node/add/moderated_content');
+    $this->submitForm([
+      'title[0][value]' => 'Some moderated content',
+      'body[0][value]' => 'First version of the content.',
+      'moderation_state[0][state]' => 'published',
+    ], 'Save');
+
+    $node = $this->drupalGetNodeByTitle('Some moderated content');
+    $translate_path = sprintf('node/%d/translations/add/en/fr', $node->id());
+
+    // Add French translation.
+    $this->drupalGet($translate_path);
+    $this->submitForm([
+      'body[0][value]' => 'Second version of the content FR.',
+      'moderation_state[0][state]' => 'published',
+    ], 'Save (this translation)');
+
+    $this->drupalGet("/fr/node/{$node->id()}/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $field = FieldConfig::load("node.moderated_content.{$fieldName}");
+    $field->setRequired(TRUE);
+    $field->save();
+
+    $this->drupalGet("/fr/node/{$node->id()}/edit");
+    $this->submitForm([], 'Save');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
