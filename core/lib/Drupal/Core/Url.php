@@ -276,6 +276,10 @@ class Url implements TrustedCallbackInterface {
    * @see \Drupal\Core\Url::fromUserInput()
    */
   public static function fromUri($uri, $options = []) {
+    // Special handling for <nolink>.
+    if ($uri == '<nolink>') {
+      return Url::fromRoute('<nolink>');
+    }
     // parse_url() incorrectly parses base:number/... as hostname:port/...
     // and not the scheme. Prevent that by prefixing the path with a slash.
     if (preg_match('/^base:\d/', $uri)) {
