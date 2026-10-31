@@ -56,11 +56,16 @@ class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginI
       }
     }
     if ($skipped) {
+      // The bulk form reports every selected item as processed, so say
+      // explicitly which of them were not refreshed.
       $this->messenger()->addWarning($this->formatPlural(
         count($skipped),
-        'Skipped media item %labels: its source is missing or unavailable.',
-        'Skipped @count media items whose source is missing or unavailable: %labels.',
-        ['%labels' => implode(', ', $skipped)],
+        '1 of the @total selected media items was not refreshed because its source is missing or unavailable: %labels.',
+        '@count of the @total selected media items were not refreshed because their source is missing or unavailable: %labels.',
+        [
+          '@total' => count($entities),
+          '%labels' => implode(', ', $skipped),
+        ],
       ));
     }
   }

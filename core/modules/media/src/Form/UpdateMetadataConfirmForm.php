@@ -82,7 +82,7 @@ final class UpdateMetadataConfirmForm extends ConfirmFormBase {
   public function getDescription(): TranslatableMarkup {
     return match ($this->status) {
       MediaSourceStatus::Missing => $this->thumbnailRemoved
-        ? $this->t('The source file for media item %label is missing, unable to refresh. It already shows a placeholder icon.', ['%label' => $this->media->label()])
+        ? $this->t('The source file for media item %label is missing, unable to refresh. That is why the media library shows a placeholder icon.', ['%label' => $this->media->label()])
         : $this->t('The source file for media item %label is missing, unable to refresh.', ['%label' => $this->media->label()]),
       MediaSourceStatus::Unavailable => $this->t('The remote source for media item %label is unavailable.', ['%label' => $this->media->label()]),
       MediaSourceStatus::Available => $this->t('The source for media item %label is available again.', ['%label' => $this->media->label()]),

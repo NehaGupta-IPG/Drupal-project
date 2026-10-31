@@ -180,7 +180,7 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
     $assert_session = $this->assertSession();
     $assert_session->addressEquals('/media/' . $media->id() . '/update-metadata/confirm');
     $assert_session->pageTextContains('The source file for media item Statue is missing, unable to refresh.');
-    $assert_session->pageTextNotContains('It already shows a placeholder icon.');
+    $assert_session->pageTextNotContains('That is why the media library shows a placeholder icon.');
     $assert_session->buttonExists('Remove thumbnail');
 
     $this->submitForm([], 'Cancel');
@@ -199,7 +199,7 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
     // Refreshing again explains there is nothing left to remove, instead of
     // offering to remove the thumbnail a second time.
     $this->clickRefresh($media);
-    $assert_session->pageTextContains('The source file for media item Statue is missing, unable to refresh. It already shows a placeholder icon.');
+    $assert_session->pageTextContains('The source file for media item Statue is missing, unable to refresh. That is why the media library shows a placeholder icon.');
     $assert_session->buttonNotExists('Remove thumbnail');
     $this->submitForm([], 'Cancel');
     $assert_session->statusMessageContains('Canceled. Media item Statue remains unchanged.', 'status');
@@ -276,7 +276,7 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
 
     $messages = $this->container->get('messenger')->messagesByType('warning');
     $this->assertCount(1, $messages);
-    $this->assertStringContainsString('Skipped media item <em class="placeholder">Missing media</em>', (string) $messages[0]);
+    $this->assertSame('1 of the 2 selected media items was not refreshed because its source is missing or unavailable: <em class="placeholder">Missing media</em>.', (string) $messages[0]);
     $this->assertSame('Missing media', $this->reloadMedia($missing)->label());
   }
 

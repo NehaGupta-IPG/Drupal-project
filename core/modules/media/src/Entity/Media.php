@@ -178,10 +178,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *   The updated media item.
    *
    * @internal
-   *
-   * @todo There has been some disagreement about how to handle updates to
-   *   thumbnails. We need to decide on what the API will be for this.
-   *   https://www.drupal.org/node/2878119
    */
   protected function updateThumbnail($from_queue = FALSE) {
     $thumbnail_uri = $this->getThumbnailUri($from_queue);
