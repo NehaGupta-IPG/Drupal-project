@@ -1,0 +1,2 @@
+services:
+  Drupal\CustomInstaller\Hooks: ~

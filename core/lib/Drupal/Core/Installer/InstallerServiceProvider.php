@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Installer;
 
+use Composer\InstalledVersions;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -30,6 +32,19 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
       ->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueMemoryFactory');
     $container
       ->register('keyvalue.expirable', 'Drupal\Core\KeyValueStore\KeyValueNullExpirableFactory');
+
+    // Read the root composer.json to see if it wants to register a special
+    // service provider for the installer.
+    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+    $composer_json = Json::decode(file_get_contents($project_root . '/composer.json'));
+    $hook_classes = $composer_json['extra']['drupal-installer']['hook-classes'] ?? NULL;
+    foreach ($hook_classes ?? [] as $hook_class) {
+      if (isset($hook_class) && class_exists($hook_class)) {
+        $definition = $container->register($hook_class, $hook_class);
+        $container->set($hook_class, new $hook_class());
+        $container->addCompilerPass(new InstallerHookCompilerPass($definition), priority: -100);
+      }
+    }
 
     // Replace services with no-op implementations.
     $container

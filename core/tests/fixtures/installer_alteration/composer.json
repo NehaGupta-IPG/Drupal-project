@@ -1,0 +1,9 @@
+{
+    "name": "drupal/installer-alter",
+    "description": "A simple package that customizes the installer by providing additional services.",
+    "autoload": {
+        "psr-4": {
+            "Drupal\\CustomInstaller\\": "src"
+        }
+    }
+}
