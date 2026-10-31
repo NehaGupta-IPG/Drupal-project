@@ -80,6 +80,24 @@ class XmlEncoderTest extends UnitTestCase {
   }
 
   /**
+   * Tests that invalid XML characters are stripped before encoding.
+   */
+  public function testEncodeStripsInvalidXmlCharacters(): void {
+    $value_with_control_characters = "A\x01B\x02C\tD\nE";
+    $expected_sanitized_value = "ABC\tD\nE";
+
+    $data = ['value' => $value_with_control_characters];
+    $expected_data = ['value' => $expected_sanitized_value];
+
+    $this->baseEncoder->expects($this->once())
+      ->method('encode')
+      ->with($expected_data, 'xml', [])
+      ->willReturn('sanitized');
+
+    $this->assertSame('sanitized', $this->encoder->encode($data, 'xml'));
+  }
+
+  /**
    * Tests the decode() method.
    */
   public function testDecode(): void {

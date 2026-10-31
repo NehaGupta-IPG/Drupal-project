@@ -209,6 +209,72 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $expected = $serializer->serialize($entities, 'xml');
     $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
     $this->assertSame(trim($expected), $actual_xml);
+
+    // Test that XML output strips invalid XML 1.0 control characters.
+    // Create an entity with control characters in a field that is exposed by
+    // the test view.
+    $entity = EntityTest::create([
+      'name' => "control\x01chars\x02",
+      'user_id' => $this->adminUser->id(),
+    ]);
+    $entity->save();
+
+    // Re-load the view to pick up the new entity.
+    $view = Views::getView('test_serializer_display_entity');
+    $view->initDisplay();
+    $this->executeView($view);
+
+    $entities = [];
+    foreach ($view->result as $row) {
+      $entities[] = $row->_entity;
+    }
+
+    // Sanity check that at least one entity contains the control characters
+    // before encoding.
+    $has_control_characters = FALSE;
+    foreach ($entities as $listed_entity) {
+      if (str_contains($listed_entity->label(), "\x01") || str_contains($listed_entity->label(), "\x02")) {
+        $has_control_characters = TRUE;
+        break;
+      }
+    }
+    $this->assertTrue($has_control_characters, 'Test setup must include an entity whose label contains control characters.');
+
+    // The serialized XML produced by the serializer service should not contain
+    // the disallowed control characters.
+    $expected = $serializer->serialize($entities, 'xml');
+    $this->assertStringNotContainsString("\x01", $expected);
+    $this->assertStringNotContainsString("\x02", $expected);
+
+    // Configure the REST export display to use XML only.
+    $view->setDisplay('rest_export_1');
+    $view->getDisplay()->setOption('style', [
+      'type' => 'serializer',
+      'options' => [
+        'uses_fields' => FALSE,
+        'formats' => [
+          'xml' => 'xml',
+        ],
+      ],
+    ]);
+    $view->save();
+
+    // Request the XML REST export and ensure it matches the serializer
+    // output and is also free of disallowed control characters.
+    $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
+    $this->assertSame(trim($expected), $actual_xml);
+    $this->assertStringNotContainsString("\x01", $actual_xml);
+    $this->assertStringNotContainsString("\x02", $actual_xml);
+
+    // Ensure the XML output is parseable by an XML parser.
+    libxml_use_internal_errors(TRUE);
+    $xml_element = simplexml_load_string($actual_xml);
+    $errors = libxml_get_errors();
+    libxml_clear_errors();
+    libxml_use_internal_errors(FALSE);
+
+    $this->assertNotFalse($xml_element);
+    $this->assertSame([], $errors);
   }
 
   /**
