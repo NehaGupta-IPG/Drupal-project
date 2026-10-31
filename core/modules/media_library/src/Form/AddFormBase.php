@@ -500,8 +500,9 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $media_type = $this->getMediaType($form_state);
     $media_storage = $this->entityTypeManager->getStorage('media');
     $source_field_name = $this->getSourceFieldName($media_type);
-    $media = array_map(function ($source_field_value) use ($media_type, $media_storage, $source_field_name) {
-      return $this->createMediaFromValue($media_type, $media_storage, $source_field_name, $source_field_value);
+    $langcode = $this->getMediaLibraryState($form_state)->getOpenerParameters()['langcode'] ?? NULL;
+    $media = array_map(function ($source_field_value) use ($media_type, $media_storage, $source_field_name, $langcode) {
+      return $this->createMediaFromValue($media_type, $media_storage, $source_field_name, $source_field_value, $langcode);
     }, $source_field_values);
     // Re-key the media items before setting them in the form state.
     $form_state->set('media', array_values($media));
@@ -527,16 +528,21 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The name of the media type's source field.
    * @param mixed $source_field_value
    *   The value for the source field of the media item.
+   * @param mixed $langcode
+   *   The langcode of the media item.
    *
    * @return \Drupal\media\MediaInterface
    *   An unsaved media entity.
    */
-  protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $source_field_value) {
+  protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $source_field_value, $langcode = NULL) {
     $media = $media_storage->create([
       'bundle' => $media_type->id(),
       $source_field_name => $source_field_value,
     ]);
     $media->setName($media->getName());
+    if ($langcode) {
+      $media->set('langcode', $langcode);
+    }
     return $media;
   }
 

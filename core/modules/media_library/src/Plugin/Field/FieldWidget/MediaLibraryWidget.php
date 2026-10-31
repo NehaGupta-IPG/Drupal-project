@@ -495,6 +495,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       'entity_type_id' => $entity->getEntityTypeId(),
       'bundle' => $entity->bundle(),
       'field_name' => $field_name,
+      'langcode' => $form_state->get('langcode') ?? $entity->language()->getId(),
     ];
     // Only add the entity ID when we actually have one. The entity ID needs to
     // be a string to ensure that the media library state generates its

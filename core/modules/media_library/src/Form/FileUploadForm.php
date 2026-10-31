@@ -321,7 +321,7 @@ class FileUploadForm extends AddFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $file) {
+  protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $file, $langcode = NULL) {
     if (!($file instanceof FileInterface)) {
       throw new \InvalidArgumentException('Cannot create a media item without a file entity.');
     }
@@ -337,7 +337,7 @@ class FileUploadForm extends AddFormBase {
       throw new \RuntimeException("Unable to move file to '$upload_location'");
     }
 
-    return parent::createMediaFromValue($media_type, $media_storage, $source_field_name, $file);
+    return parent::createMediaFromValue($media_type, $media_storage, $source_field_name, $file, $langcode);
   }
 
   /**
