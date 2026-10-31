@@ -26,6 +26,30 @@ interface EntityRepositoryInterface {
   public function loadEntityByUuid($entity_type_id, $uuid);
 
   /**
+   * Loads a unique entity by properties.
+   *
+   * This method expects the passed in properties to result in a single entity
+   * being returned from the underlying entity query. This is useful, for
+   * example, when you want to load a single user by their e-mail address.
+   *
+   * If you provide properties that lead to multiple entities being found, an
+   * exception will be thrown, assuring your code will not continue to run with
+   * an unexpected entity.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID to load from.
+   * @param array $values
+   *   The properties to pass to EntityStorageInterface::loadByProperties().
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The entity object, or NULL if there is no entity.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Thrown in case multiple entities were found.
+   */
+  public function loadUniqueByProperties(string $entity_type_id, array $values = []): ?EntityInterface;
+
+  /**
    * Loads an entity by the config target identifier.
    *
    * @param string $entity_type_id
