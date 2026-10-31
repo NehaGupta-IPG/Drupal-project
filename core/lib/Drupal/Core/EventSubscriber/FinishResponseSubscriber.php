@@ -265,11 +265,18 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     $response->setEtag($timestamp);
 
     // Allow HTTP proxies to cache pages for anonymous users without a session
-    // cookie. The Vary header is used to indicates the set of request-header
+    // cookie. The Vary header is used to indicate the set of request-header
     // fields that fully determines whether a cache is permitted to use the
     // response to reply to a subsequent request for a given URL without
     // revalidation.
-    if (!$response->hasVary() && !Settings::get('omit_vary_cookie')) {
+    //
+    // Check specifically for the Cookie value rather than gating on
+    // hasVary(): other subscribers (e.g. asm89/stack-cors, which
+    // unconditionally adds Vary: Origin when the CORS service is configured
+    // with multiple allowed origins) may have already set an unrelated Vary
+    // value. In that case Cookie must still be appended so shared caches
+    // segment by session.
+    if (!in_array('Cookie', $response->getVary(), TRUE) && !Settings::get('omit_vary_cookie')) {
       $response->setVary('Cookie', FALSE);
     }
   }

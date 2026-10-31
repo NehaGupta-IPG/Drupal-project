@@ -289,6 +289,10 @@ class PageCacheTest extends BrowserTestBase {
       ],
     ]);
     $this->assertSession()->responseHeaderContains('Vary', 'user-agent');
+    // Cookie must still be present so shared caches segment by session even
+    // when another subscriber (e.g. multi-origin CORS) has already added an
+    // unrelated Vary value.
+    $this->assertSession()->responseHeaderContains('Vary', 'cookie');
 
     // Check that authenticated users bypass the cache.
     $user = $this->drupalCreateUser();
