@@ -706,6 +706,7 @@ default:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1" && $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
   variables:
     KUBERNETES_CPU_REQUEST: "1"
@@ -979,8 +980,8 @@ default:
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
     - *composer-setup
-    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer /var/cache/opcache-cli
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ /var/cache/opcache-cli
   script:
     - export EXIT_CODE=0
     - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --debug-discovery --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
@@ -1070,7 +1071,7 @@ default:
     - if: $PERFORMANCE_TEST != "1"
       changes:
         - core/tests/PHPStan/**/*
-        - composer/Metapackage/PinnedDevDependencies/composer.json
+        - composer/Metapackage/DevDependencies/composer.json
     - when: manual
       allow_failure: true
   script:
@@ -1099,7 +1100,8 @@ default:
   script:
     # Exit with an error if any of the lint cache files do not exist.
     - if [ ! -f core/phpstan-tmp/resultCache.php ]; then exit 1; fi
-    # cspell only runs on pushes to main and MRs targeting main.
+    # cspell only runs on pushes to main, scheduled pipelines on main and MRs
+    # targeting main.
     - |
       if [ "$CI_COMMIT_BRANCH" = "main" ] || [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" = "main" ]; then
         if [ ! -f core/.cspellcache ]; then exit 1; fi
