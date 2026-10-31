@@ -47,6 +47,11 @@
         "drupal-scaffold": {
             "locations": {
                 "web-root": "web/"
+            },
+            ".gitignore": {
+                "path": "composer/Template/RecommendedProject/.gitignore",
+                "mode": "replace",
+                "overwrite": false
             }
         },
         "installer-paths": {

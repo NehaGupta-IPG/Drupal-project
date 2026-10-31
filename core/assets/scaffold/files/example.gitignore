@@ -1,8 +1,8 @@
-# This file contains default .gitignore rules. To use it, copy it to .gitignore,
-# and it will cause files like your settings.php and user-uploaded files to be
-# excluded from Git version control. This is a common strategy to avoid
-# accidentally including private information in public repositories and patch
-# files.
+# This file contains example .gitignore rules used when installing Drupal from
+# source. Using a .gitignore file is a common strategy to ensure private
+# information is not included in public repositories and patch files. This
+# example excludes files like settings.php and user-uploaded files from Git
+# version control. To use this example copy it to .gitignore.
 #
 # Because .gitignore can be specific to your site, this file has a different
 # name; updating Drupal core will not override your custom .gitignore file.
