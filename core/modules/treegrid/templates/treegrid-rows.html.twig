@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * The wrapper of a treegrid rows response.
+ *
+ * The client parses the response as a whole document, and the HTML parser
+ * drops <tr> and <td> outside a table, so the rows travel inside one.
+ *
+ * Variables:
+ * - rows: the row render arrays.
+ */
+#}
+<table><tbody data-treegrid-rows>{{ rows }}</tbody></table>

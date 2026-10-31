@@ -18,6 +18,28 @@ final class TreegridHooks {
   use StringTranslationTrait;
 
   /**
+   * Implements hook_theme().
+   */
+  #[Hook('theme')]
+  public function theme(): array {
+    return [
+      'treegrid_rows' => [
+        'variables' => [
+          'rows' => [],
+        ],
+      ],
+      'treegrid_cell_checkbox' => [
+        'variables' => [
+          'value' => FALSE,
+          'label' => '',
+          'interactive' => TRUE,
+          'column_id' => '',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Implements hook_help().
    */
   #[Hook('help')]
