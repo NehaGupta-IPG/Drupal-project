@@ -1,0 +1,5 @@
+name: 'Config schema violation test'
+type: 'Testing'
+description: 'Installs filter and applies four config objects that each contain a schema violation. Used by config-import and recipe validation tests.'
+install:
+  - filter

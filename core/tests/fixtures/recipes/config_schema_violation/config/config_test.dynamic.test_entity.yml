@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_entity
+label: 'Test Entity'
+weight: 0
+# Schema violation: 'style' must be a string, not an integer.
+style: 123
+protected_property: ''
+uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890

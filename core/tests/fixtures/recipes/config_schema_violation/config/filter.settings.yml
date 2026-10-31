@@ -1,0 +1,4 @@
+langcode: en
+fallback_format: plain_text
+# Schema violation: 'always_show_fallback_choice' must be a boolean, not a string.
+always_show_fallback_choice: 'this is not a boolean'

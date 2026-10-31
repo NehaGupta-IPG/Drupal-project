@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Test format'
+format: test_format
+# Schema violation: 'weight' must be an integer, not a string.
+weight: 'this is not a number'
+filters: {  }
+uuid: b2c3d4e5-f6a7-8901-bcde-f12345678901
