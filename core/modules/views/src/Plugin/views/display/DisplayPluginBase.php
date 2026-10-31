@@ -1453,7 +1453,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         $form['css_class'] = [
           '#type' => 'textfield',
           '#title' => $this->t('CSS class name(s)'),
-          '#description' => $this->t('Separate multiple classes by spaces.'),
+          '#description' => $this->t('Separate multiple classes by spaces. Note: Wraps the view content, not from the parent level of for example a block. Use the ID generated from the machine name or a block preprocess hook for this, see <a href="https://www.drupal.org/docs/8/core/modules/views/customize-the-output-style-of-a-view-field-or-list#s-customize-a-view-list">Customize a view list</a>.'),
           '#default_value' => $this->getOption('css_class'),
         ];
         break;
