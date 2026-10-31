@@ -77,11 +77,12 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
       return $build;
     }
 
-    $page_actions = $this->navigationRenderer->getLocalTasks();
+    // @todo #3590502 Remove local tasks without breaking tests.
+    // $page_actions = $this->navigationRenderer->getLocalTasks();
 
     $build += [
       '#theme' => 'top_bar_page_actions',
-      '#page_actions' => $page_actions['page_actions'],
+      // '#page_actions' => $page_actions['page_actions'],
     ];
 
     return $build;
