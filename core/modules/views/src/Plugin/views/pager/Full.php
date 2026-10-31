@@ -29,7 +29,8 @@ class Full extends SqlBase {
 
     // Use the same default quantity that core uses by default.
     $options['quantity'] = ['default' => 9];
-
+    $options['items_per_page'] = ['default' => 9];
+    $options['offset'] = ['default' => 0];
     $options['tags']['contains']['first'] = ['default' => $this->t('« First')];
     $options['tags']['contains']['last'] = ['default' => $this->t('Last »')];
 
@@ -41,7 +42,24 @@ class Full extends SqlBase {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
+    $pager_text = $this->displayHandler->getPagerText();
+    $form['items_per_page'] = [
+      '#title' => $pager_text['items per page title'],
+      '#type' => 'number',
+      '#required' => TRUE,
+      '#min' => 0,
+      '#description' => $pager_text['items per page description'],
+      '#default_value' => $this->options['items_per_page'],
+    ];
 
+    $form['offset'] = [
+      '#type' => 'number',
+      '#required' => TRUE,
+      '#min' => 0,
+      '#title' => $this->t('Offset (number of items to skip)'),
+      '#description' => $this->t('For example, set this to 3 and the first 3 items will not be displayed.'),
+      '#default_value' => $this->options['offset'],
+    ];
     $form['quantity'] = [
       '#type' => 'number',
       '#min' => 0,
@@ -63,6 +81,7 @@ class Full extends SqlBase {
       '#default_value' => $this->options['tags']['last'],
       '#weight' => 10,
     ];
+    return $form;
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\pager;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
 
@@ -26,11 +27,51 @@ class Mini extends SqlBase {
    */
   public function defineOptions() {
     $options = parent::defineOptions();
-
+    $options['items_per_page'] = ['default' => 9];
+    $options['offset'] = ['default' => 0];
     $options['tags']['contains']['previous']['default'] = '‹‹';
     $options['tags']['contains']['next']['default'] = '››';
 
     return $options;
+  }
+
+  /**
+   * Provide the default form for setting options.
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+    $pager_text = $this->displayHandler->getPagerText();
+    $form['items_per_page'] = [
+      '#title' => $pager_text['items per page title'],
+      '#type' => 'number',
+      '#required' => TRUE,
+      '#min' => 0,
+      '#description' => $pager_text['items per page description'],
+      '#default_value' => $this->options['items_per_page'],
+    ];
+
+    $form['offset'] = [
+      '#type' => 'number',
+      '#required' => TRUE,
+      '#min' => 0,
+      '#title' => $this->t('Offset (number of items to skip)'),
+      '#description' => $this->t('For example, set this to 3 and the first 3 items will not be displayed.'),
+      '#default_value' => $this->options['offset'],
+    ];
+    $form['tags']['previous'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('First page link text'),
+      '#default_value' => $this->options['tags']['previous'],
+      '#weight' => -10,
+    ];
+
+    $form['tags']['next'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Last page link text'),
+      '#default_value' => $this->options['tags']['next'],
+      '#weight' => 10,
+    ];
+    return $form;
   }
 
   /**
