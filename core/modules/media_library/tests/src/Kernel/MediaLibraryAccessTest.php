@@ -67,7 +67,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
       'media_library',
     ]);
 
-    EntityTestBundle::create(['id' => 'test'])->save();
+    EntityTestBundle::create(['id' => 'test', 'label' => 'Test'])->save();
 
     $field_storage = FieldStorageConfig::create([
       'type' => 'entity_reference',
