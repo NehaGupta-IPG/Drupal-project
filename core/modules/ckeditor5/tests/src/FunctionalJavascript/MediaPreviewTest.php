@@ -174,12 +174,12 @@ class MediaPreviewTest extends MediaTestBase {
         // The preview rendering, which in this test will use Starterkit theme's
         // media.html.twig template, will fail without the CSRF token/header.
         // @see ::testEmbeddedMediaPreviewWithCsrfToken()
-        $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'article.media'));
+        $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'div.media'));
       }
       else {
         // If the filter isn't enabled, there won't be an error, but the
         // preview shouldn't be rendered.
-        $assert_session->elementNotExists('css', 'article.media');
+        $assert_session->elementNotExists('css', 'div.media');
       }
     }
     else {
