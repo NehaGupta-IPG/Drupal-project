@@ -28,16 +28,15 @@ interface TreeMoveHandlerInterface {
    * which items are movable, ownership/scope, depth limits, vetoes — and must
    * NOT re-implement the structural checks.
    *
-   * An error's message is safe HTML, escaped by the implementation (cast a
-   * t() string with @ placeholders), because the client announces and shows it
-   * without escaping.
+   * An error's message is markup the client announces and shows without
+   * escaping, built with t() and its placeholders.
    *
    * @param string $tree_id
    *   The tree the move happens within.
    * @param \Drupal\treegrid_reorder\MoveIntent $intent
    *   The requested move.
    *
-   * @return array{ok: bool, code?: string, message?: string}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface}
    *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
    */
   public function validateConstraints(string $tree_id, MoveIntent $intent): array;

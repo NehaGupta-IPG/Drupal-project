@@ -81,8 +81,8 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
       ['type' => 'move', 'id' => $this->ids['A'], 'new_parent' => '', 'before_id' => NULL],
     ]);
 
-    $this->assertStringContainsString('Tom&#039;s', $result['message']);
-    $this->assertStringNotContainsString('&amp;#039;', $result['message']);
+    $this->assertStringContainsString('Tom&#039;s', (string) $result['message']);
+    $this->assertStringNotContainsString('&amp;#039;', (string) $result['message']);
   }
 
   /**
@@ -127,8 +127,8 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
     $result = $this->container->get('menu_tree_ui.mover')->validateMove('test', $this->ids['A'], '', NULL);
 
     $this->assertSame('vetoed', $result['code']);
-    $this->assertStringContainsString('&lt;b&gt;', $result['message']);
-    $this->assertStringNotContainsString('<b>', $result['message']);
+    $this->assertStringContainsString('&lt;b&gt;', (string) $result['message']);
+    $this->assertStringNotContainsString('<b>', (string) $result['message']);
   }
 
   /**
@@ -160,6 +160,27 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
   }
 
   /**
+   * A vetoed move's response message holds the reason escaped once.
+   */
+  public function testVetoReasonIsEscapedOnceInMoveResponse(): void {
+    $this->createLinks('A', 'B');
+    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'name' => "Tom's"]);
+    $request = Request::create('/', 'POST', [], [], [], [], json_encode([
+      'id' => $this->ids['A'],
+      'new_parent' => '',
+      'before_id' => NULL,
+    ]));
+
+    $response = MenuTreeController::create($this->container)->move(Menu::load('test'), $request);
+
+    $this->assertSame(400, $response->getStatusCode());
+    $result = json_decode((string) $response->getContent(), TRUE);
+    $this->assertSame('vetoed', $result['code']);
+    $this->assertStringContainsString('Tom&#039;s', $result['message']);
+    $this->assertStringNotContainsString('&amp;#039;', $result['message']);
+  }
+
+  /**
    * A link title is escaped in the message of a move that fails validation.
    */
   public function testLinkTitleIsEscapedInFailedMoveMessage(): void {
@@ -170,8 +191,8 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
     ]);
 
     $this->assertFalse($result['ok']);
-    $this->assertStringContainsString('&lt;b&gt;', $result['message']);
-    $this->assertStringNotContainsString('<b>', $result['message']);
+    $this->assertStringContainsString('&lt;b&gt;', (string) $result['message']);
+    $this->assertStringNotContainsString('<b>', (string) $result['message']);
   }
 
   /**

@@ -146,7 +146,7 @@ final class MenuTreeWorkingCopyTest extends KernelTestBase {
     ]);
 
     $result = $this->mover->commitWorkingCopy('test', $this->workingCopy->getOps('test'));
-    $this->assertTrue($result['ok'], $result['message'] ?? '');
+    $this->assertTrue($result['ok'], (string) ($result['message'] ?? ''));
 
     // Live order now reflects the reorder: C, A, B.
     $this->assertSame([$c, $a, $b], $this->idsOf($this->loader->loadLevel('test', NULL)));

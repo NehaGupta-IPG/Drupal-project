@@ -10,7 +10,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -353,7 +352,7 @@ final class MenuTreeController extends ControllerBase {
         $result['message'] = (string) $this->t('Saved @applied of @total changes; the rest could not be saved. @reason', [
           '@applied' => count($applied),
           '@total' => $total,
-          '@reason' => Markup::create($result['message'] ?? ''),
+          '@reason' => $result['message'] ?? '',
         ]);
       }
       return new JsonResponse($result, 400);

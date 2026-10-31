@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid_reorder\Unit;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\UnitTestCase;
 use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeMoveHandlerInterface;
@@ -108,7 +109,11 @@ final class TreeReorderManagerTest extends UnitTestCase {
    */
   public function testDelegatesToHandler(): void {
     $this->handler->ancestors = ['b'];
-    $this->handler->constraintResult = ['ok' => FALSE, 'code' => 'too_deep', 'message' => 'Nope.'];
+    $this->handler->constraintResult = [
+      'ok' => FALSE,
+      'code' => 'too_deep',
+      'message' => new FormattableMarkup('Nope.', []),
+    ];
 
     $result = $this->manager->validateMove('t', new MoveIntent('a', 'b', NULL), $this->handler);
 
@@ -156,7 +161,11 @@ final class TreeReorderManagerTest extends UnitTestCase {
    * An individually invalid op aborts the commit before anything is applied.
    */
   public function testCommitAbortsOnInvalidOp(): void {
-    $this->handler->constraintResult = ['ok' => FALSE, 'code' => 'not_moveable', 'message' => 'No.'];
+    $this->handler->constraintResult = [
+      'ok' => FALSE,
+      'code' => 'not_moveable',
+      'message' => new FormattableMarkup('No.', []),
+    ];
     $ops = [
       ['type' => 'move', 'id' => 'a', 'new_parent' => '', 'before_id' => NULL],
     ];
@@ -190,7 +199,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
        */
       public function validateConstraints(string $tree_id, MoveIntent $intent): array {
         if ($intent->id === 'b' && in_array('a', $this->applied, TRUE)) {
-          return ['ok' => FALSE, 'code' => 'cycle', 'message' => 'No longer valid.'];
+          return ['ok' => FALSE, 'code' => 'cycle', 'message' => new FormattableMarkup('No longer valid.', [])];
         }
         return ['ok' => TRUE];
       }
@@ -242,7 +251,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
        */
       public function validateConstraints(string $tree_id, MoveIntent $intent): array {
         if ($intent->id === 'b') {
-          return ['ok' => FALSE, 'code' => 'not_moveable', 'message' => 'No.'];
+          return ['ok' => FALSE, 'code' => 'not_moveable', 'message' => new FormattableMarkup('No.', [])];
         }
         return ['ok' => TRUE];
       }

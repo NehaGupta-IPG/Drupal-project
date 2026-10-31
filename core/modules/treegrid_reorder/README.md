@@ -35,8 +35,8 @@ user-facing UI of its own.
   rules (movability, scope, depth limits, vetoes), called after
   `TreeReorderManager`'s structural checks pass. Return
   `['ok' => TRUE]` or `['ok' => FALSE, 'code' => …, 'message' => …]`. The
-  `message` is safe HTML, escaped by the handler (a `t()` string with `@`
-  placeholders cast to a string), because the client shows it unchanged.
+  `message` is markup built with `t()` and its placeholders, which the client
+  shows unchanged.
 - `getAncestorIds(string $tree_id, string $parent_id): array` — the root path
   of a prospective parent, for the manager's cycle check.
 - `applyMove(string $tree_id, MoveIntent $intent): void` — persist the move

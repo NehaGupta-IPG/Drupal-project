@@ -117,7 +117,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $parent = $this->createLink('test');
 
     $result = $this->commitMove($static_id, $parent->getPluginId(), NULL);
-    $this->assertTrue($result['ok'], $result['message'] ?? '');
+    $this->assertTrue($result['ok'], (string) ($result['message'] ?? ''));
 
     // The static link's parent override now points at the content link.
     $definition = $this->container->get('plugin.manager.menu.link')->getDefinition($static_id);
@@ -287,7 +287,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     $b = $this->createLink('test');
 
     $result = $this->commitMove($b->getPluginId(), '', $static_id);
-    $this->assertTrue($result['ok'], $result['message'] ?? '');
+    $this->assertTrue($result['ok'], (string) ($result['message'] ?? ''));
 
     $menu_link_manager = $this->container->get('plugin.manager.menu.link');
     $weight_of = static fn(string $id): int => (int) $menu_link_manager->getDefinition($id)['weight'];
@@ -362,7 +362,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
     ]);
 
     $result = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
-    $this->assertTrue($result['ok'], $result['message'] ?? '');
+    $this->assertTrue($result['ok'], (string) ($result['message'] ?? ''));
   }
 
   /**
@@ -377,7 +377,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     // Baseline: siblings at the root, so moving P under C is allowed.
     $live = $this->mover->validateMove('test', $p->getPluginId(), $c->getPluginId(), NULL);
-    $this->assertTrue($live['ok'], $live['message'] ?? '');
+    $this->assertTrue($live['ok'], (string) ($live['message'] ?? ''));
 
     // Pending: move C under P. P is now C's ancestor in the overlay.
     $this->workingCopy->addOp('test', [
@@ -411,7 +411,7 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     // Baseline: live, a leaf under the deepest link lands at depth max — OK.
     $live = $this->mover->validateMove('test', $leaf->getPluginId(), $deepest, NULL);
-    $this->assertTrue($live['ok'], $live['message'] ?? '');
+    $this->assertTrue($live['ok'], (string) ($live['message'] ?? ''));
 
     // Pending: move the chain one level deeper under X, so the deepest link now
     // sits at depth max and a leaf under it would exceed the cap.

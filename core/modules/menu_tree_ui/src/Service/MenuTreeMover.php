@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Service;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\menu_tree_ui\MenuLinkMovability;
@@ -110,7 +109,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    * @param string|null $before_id
    *   Plugin ID of the sibling the moved link should sit before, or NULL.
    *
-   * @return array{ok: bool, code?: string, message?: string}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface}
    *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
    */
   public function validateMove(
@@ -144,7 +143,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    * @param array<int, array<string, mixed>> $ops
    *   The recorded ops, in order.
    *
-   * @return array{ok: bool, code?: string, message?: string, failed_op?: int, applied_ops?: array<int, int>}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface, failed_op?: int, applied_ops?: array<int, int>}
    *   ['ok' => TRUE] on success, otherwise the first failing op's outcome plus
    *   the $ops indices of any moves from this batch already applied.
    */
@@ -168,9 +167,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
         return [
           'ok' => FALSE,
           'code' => $validation['code'] ?? 'commit_failed',
-          'message' => (string) $this->t('Could not save the move of "@title": @reason', [
+          'message' => $this->t('Could not save the move of "@title": @reason', [
             '@title' => $this->linkTitle($intent->id),
-            '@reason' => Markup::create($validation['message'] ?? (string) $this->t('A pending change could not be saved.')),
+            '@reason' => $validation['message'] ?? $this->t('A pending change could not be saved.'),
           ]),
           'failed_op' => $index,
           'applied_ops' => [],
@@ -191,7 +190,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
    *   Plugin ID => pending new parent plugin ID, for the moves that precede
    *   $intent.
    *
-   * @return array{ok: bool, code?: string, message?: string}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface}
    *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
    */
   private function validateAgainstOverlay(string $menu_name, MoveIntent $intent, array $overlay): array {
@@ -213,19 +212,19 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   }
 
   /**
-   * Returns a veto's message as safe HTML.
+   * Returns a veto's message as markup.
    *
    * @param mixed $message
    *   The message a hook set: markup is trusted, anything else is plain text.
    */
-  private function vetoMessage(mixed $message): string {
+  private function vetoMessage(mixed $message): MarkupInterface {
     if ($message instanceof MarkupInterface) {
-      return (string) $message;
+      return $message;
     }
     if (is_string($message) && $message !== '') {
-      return Html::escape($message);
+      return new FormattableMarkup('@message', ['@message' => $message]);
     }
-    return (string) $this->t('Move blocked by a module.');
+    return $this->t('Move blocked by a module.');
   }
 
   /**
@@ -257,14 +256,14 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'not_moveable',
-        'message' => (string) $this->t('This menu link cannot be reordered.'),
+        'message' => $this->t('This menu link cannot be reordered.'),
       ];
     }
     if ($link->getMenuName() !== $tree_id) {
       return [
         'ok' => FALSE,
         'code' => 'menu_mismatch',
-        'message' => (string) $this->t('Link belongs to a different menu.'),
+        'message' => $this->t('Link belongs to a different menu.'),
       ];
     }
 
@@ -272,7 +271,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'before_self',
-        'message' => (string) $this->t('A link cannot be placed before itself.'),
+        'message' => $this->t('A link cannot be placed before itself.'),
       ];
     }
 
@@ -285,7 +284,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
         return [
           'ok' => FALSE,
           'code' => 'unknown_parent',
-          'message' => (string) $this->t('The destination no longer exists.'),
+          'message' => $this->t('The destination no longer exists.'),
         ];
       }
       $new_parent_definition = $this->menuLinkManager->getDefinition($intent->newParent);
@@ -293,7 +292,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
         return [
           'ok' => FALSE,
           'code' => 'parent_menu_mismatch',
-          'message' => (string) $this->t('The destination is in a different menu.'),
+          'message' => $this->t('The destination is in a different menu.'),
         ];
       }
     }
@@ -302,7 +301,7 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
       return [
         'ok' => FALSE,
         'code' => 'too_deep',
-        'message' => (string) $this->t('Moving here would exceed the 9-level depth limit.'),
+        'message' => $this->t('Moving here would exceed the 9-level depth limit.'),
       ];
     }
 

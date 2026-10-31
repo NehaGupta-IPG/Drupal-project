@@ -39,7 +39,7 @@ final class TreeReorderManager {
    * @param \Drupal\treegrid_reorder\TreeMoveHandlerInterface $handler
    *   The consumer's move handler.
    *
-   * @return array{ok: bool, code?: string, message?: string}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface}
    *   ['ok' => TRUE] when the move is allowed, otherwise an error outcome.
    */
   public function validateMove(string $tree_id, MoveIntent $intent, TreeMoveHandlerInterface $handler): array {
@@ -47,7 +47,7 @@ final class TreeReorderManager {
       return [
         'ok' => FALSE,
         'code' => 'self_target',
-        'message' => (string) $this->t('Cannot drop an item onto itself.'),
+        'message' => $this->t('Cannot drop an item onto itself.'),
       ];
     }
 
@@ -55,7 +55,7 @@ final class TreeReorderManager {
       return [
         'ok' => FALSE,
         'code' => 'cycle',
-        'message' => (string) $this->t('Cannot drop an item into one of its own descendants.'),
+        'message' => $this->t('Cannot drop an item into one of its own descendants.'),
       ];
     }
 
@@ -82,7 +82,7 @@ final class TreeReorderManager {
    * @param \Drupal\treegrid_reorder\TreeMoveHandlerInterface $handler
    *   The consumer's move handler.
    *
-   * @return array{ok: bool, code?: string, message?: string, failed_op?: int, applied_ops?: array<int, int>}
+   * @return array{ok: bool, code?: string, message?: \Drupal\Component\Render\MarkupInterface, failed_op?: int, applied_ops?: array<int, int>}
    *   ['ok' => TRUE] on success, otherwise the first failing op's outcome plus
    *   the $ops indices of any moves from this batch already applied before the
    *   failure — the caller must drop those from the working copy so a retry
@@ -125,21 +125,21 @@ final class TreeReorderManager {
   /**
    * Shapes a failed-op outcome for commitWorkingCopy().
    *
-   * @param array{code?: string, message?: string} $validation
+   * @param array{code?: string, message?: \Drupal\Component\Render\MarkupInterface} $validation
    *   The failing validateMove() result.
    * @param int $index
    *   The $ops index of the failing move.
    * @param array<int, int> $applied
    *   The $ops indices of moves from this batch already applied.
    *
-   * @return array{ok: false, code: string, message: string, failed_op: int, applied_ops: array<int, int>}
+   * @return array{ok: false, code: string, message: \Drupal\Component\Render\MarkupInterface, failed_op: int, applied_ops: array<int, int>}
    *   The commit failure outcome.
    */
   private function commitFailure(array $validation, int $index, array $applied = []): array {
     return [
       'ok' => FALSE,
       'code' => $validation['code'] ?? 'commit_failed',
-      'message' => $validation['message'] ?? (string) $this->t('A pending change could not be saved.'),
+      'message' => $validation['message'] ?? $this->t('A pending change could not be saved.'),
       'failed_op' => $index,
       'applied_ops' => $applied,
     ];
