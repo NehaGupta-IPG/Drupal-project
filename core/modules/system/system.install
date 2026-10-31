@@ -108,3 +108,17 @@ function system_update_12002(): void {
     $entityDefinitionUpdateManager->installEntityType($designTokenEntityType);
   }
 }
+
+/**
+ * Rebuild the router after param converters stopped using lazy proxies.
+ *
+ * Routes dumped while converters were lazy: true stored
+ * drupal.proxy_original_service.* IDs in {router}. Those IDs were removed in
+ * 11.4; rebuilding replaces them with the plain service IDs.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3612050
+ * @see https://www.drupal.org/project/drupal/issues/3436295
+ */
+function system_update_12003(): void {
+  \Drupal::service('router.builder')->rebuild();
+}
