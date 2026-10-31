@@ -681,6 +681,8 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $entity->setOriginalId($entity->id());
 
     $entity->setOriginal(NULL);
+
+    $this->setStaticCache([$entity]);
   }
 
   /**
