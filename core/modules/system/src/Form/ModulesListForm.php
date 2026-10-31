@@ -454,6 +454,10 @@ class ModulesListForm extends FormBase {
 
     // Make sure the install API is available.
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
+    // Load .install files for all installed modules.
+    foreach ($this->moduleHandler->getModuleList() as $already_installed_module => $extension) {
+      $this->moduleHandler->loadInclude($already_installed_module, 'install');
+    }
 
     // Invoke hook_requirements('install'). If failures are detected, make
     // sure the dependent modules aren't installed either.
