@@ -159,6 +159,9 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    */
   public function getDefinition($entity_type_id, $exception_on_invalid = TRUE) {
     if (str_contains($entity_type_id, PluginBase::DERIVATIVE_SEPARATOR)) {
+      if (!$exception_on_invalid) {
+        return NULL;
+      }
       throw new \LogicException('Bundle entity types are not supported directly.');
     }
     if (($entity_type = parent::getDefinition($entity_type_id, FALSE)) && class_exists($entity_type->getClass())) {
