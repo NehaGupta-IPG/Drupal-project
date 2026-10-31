@@ -290,7 +290,11 @@ class PageCache implements HttpKernelInterface {
 
     if ($expire === Cache::PERMANENT || $expire > $request_time) {
       $tags = $response->getCacheableMetadata()->getCacheTags();
-      $this->set($request, $response, $expire, $tags);
+      // Create a minimal response object with only the content, status code,
+      // and headers. This avoid storing unnecessary information like
+      // cacheability and attachments which are not needed on cache hits.
+      $cached_response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+      $this->set($request, $cached_response, $expire, $tags);
     }
 
     return TRUE;
