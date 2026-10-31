@@ -20,8 +20,12 @@ use Drupal\views\Attribute\ViewsPager;
 class Some extends PagerPluginBase {
 
   /**
-   * {@inheritdoc}
+   * Total number of items in the result set before the pager limit is applied.
+   *
+   * @var int
    */
+  protected int $totalItemsBeforePagerLimit;
+
   public function summaryTitle() {
     if (!empty($this->options['offset'])) {
       return $this->formatPlural($this->options['items_per_page'],
@@ -80,7 +84,7 @@ class Some extends PagerPluginBase {
    * {@inheritdoc}
    */
   public function useCountQuery() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -95,7 +99,23 @@ class Some extends PagerPluginBase {
    * {@inheritdoc}
    */
   public function postExecute(&$result): void {
+    $this->totalItemsBeforePagerLimit = $this->total_items;
     $this->total_items = count($result);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasMoreRecords() {
+    // Determine if there are more records by comparing the total number of
+    // items to the items per page.
+    $totalItems = $this->totalItemsBeforePagerLimit ?? $this->total_items;
+    if ($this->getItemsPerPage() && ($totalItems > $this->getItemsPerPage())) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
 }
