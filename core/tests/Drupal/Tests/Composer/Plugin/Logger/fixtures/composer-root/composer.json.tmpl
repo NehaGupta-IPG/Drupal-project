@@ -1,0 +1,55 @@
+{
+  "name": "fixtures/root",
+  "description": "Test install operations logging",
+  "type": "project",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "repositories": {
+    "packagist.org": false,
+    "core-install-logger": {
+      "type": "path",
+      "url": "__PROJECT_ROOT__",
+      "options": {
+        "symlink": true
+      }
+    },
+    "composer/installers": {
+      "type": "path",
+      "url": "__COMPOSER_INSTALLERS__",
+      "options": {
+        "symlink": true
+      }
+    },
+    "module-a": {
+      "type": "path",
+      "url": "../module-a-1.0",
+      "options": {
+        "symlink": true
+      }
+    }
+  },
+  "require": {
+    "composer/installers": "*",
+    "drupal/core-installer-log": "*"
+  },
+  "extra": {
+    "installer-paths": {
+      "core": ["type:drupal-core"],
+      "modules/contrib/{$name}": ["type:drupal-module"],
+      "modules/custom/{$name}": ["type:drupal-custom-module"],
+      "themes/contrib/{$name}": ["type:drupal-theme"],
+      "themes/custom/{$name}": ["type:drupal-custom-theme"],
+      "recipes/{$name}": ["type:drupal-recipe"],
+      "profiles/contrib/{$name}": ["type:drupal-profile"],
+      "profiles/custom/{$name}": ["type:drupal-custom-profile"],
+      "libraries/{$name}": ["type:drupal-library"],
+      "drush/Commands/contrib/{$name}": ["type:drupal-drush"]
+    }
+  },
+  "config": {
+     "allow-plugins": {
+       "composer/installers": true,
+       "drupal/core-installer-log": true
+     }
+  }
+}
