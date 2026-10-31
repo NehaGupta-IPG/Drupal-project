@@ -160,7 +160,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       '#derivative_plugin_id' => $derivative_id,
       '#id' => $entity->id(),
       '#pre_render' => [
-        static::class . '::preRender',
+        static::preRender(...),
       ],
       // Add the entity so that it can be used in the #pre_render method.
       '#block' => $entity,

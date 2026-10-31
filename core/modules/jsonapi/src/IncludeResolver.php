@@ -195,7 +195,7 @@ class IncludeResolver {
       }
       $resolved_paths_per_resource_type[$resource_type_name] = static::resolveInternalIncludePaths($resource_type, $exploded_paths);
     }
-    $resolved_paths = array_reduce($resolved_paths_per_resource_type, 'array_merge', []);
+    $resolved_paths = array_reduce($resolved_paths_per_resource_type, array_merge(...), []);
     return static::buildTree($resolved_paths);
   }
 
@@ -220,7 +220,7 @@ class IncludeResolver {
       }
       return FieldResolver::resolveInternalIncludePath($base_resource_type, $exploded_path);
     }, $paths);
-    $flattened_paths = array_reduce($internal_paths, 'array_merge', []);
+    $flattened_paths = array_reduce($internal_paths, array_merge(...), []);
     return $flattened_paths;
   }
 
