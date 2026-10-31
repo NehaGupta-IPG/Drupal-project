@@ -201,20 +201,22 @@ class DefaultMenuLinkTreeManipulators {
    *   The manipulated menu link tree.
    */
   public function generateIndexAndSort(array $tree) {
-    $new_tree = [];
     foreach ($tree as $key => $v) {
       if ($tree[$key]->subtree) {
         $tree[$key]->subtree = $this->generateIndexAndSort($tree[$key]->subtree);
       }
-      $instance = $tree[$key]->link;
-      // The weights are made a uniform 5 digits by adding 50000 as an offset.
-      // After $this->menuLinkCheckAccess(), $instance->getTitle() has the
-      // localized or translated title. Adding the plugin id to the end of the
-      // index insures that it is unique.
-      $new_tree[(50000 + $instance->getWeight()) . ' ' . $instance->getTitle() . ' ' . $instance->getPluginId()] = $tree[$key];
     }
-    ksort($new_tree);
-    return $new_tree;
+
+    uasort(
+      $tree,
+      fn (MenuLinkTreeElement $a, MenuLinkTreeElement $b) => $a->link->getWeight() <=> $b->link->getWeight()
+        // If the weights are equal, sort by title.
+        // After $this->menuLinkCheckAccess(), getTitle() has the
+        // localized or translated title.
+        ?: $a->link->getTitle() <=> $b->link->getTitle()
+    );
+
+    return $tree;
   }
 
   /**
