@@ -1419,7 +1419,7 @@ class SystemRequirementsHooks {
           /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $install_class */
           $last_removed = $install_class->getLastRemoved();
         }
-        if ($last_removed ?? FALSE && $last_removed > $update_registry->getInstalledVersion($module)) {
+        if ($last_removed && $last_removed > $update_registry->getInstalledVersion($module)) {
           /** @var \Drupal\Core\Extension\Extension $module_info */
           $module_info = $module_extension_list->get($module);
           $module_list[$module] = [
