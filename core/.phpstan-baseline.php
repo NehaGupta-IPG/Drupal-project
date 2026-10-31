@@ -62391,12 +62391,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/VariationCacheTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\Core\\\\Common\\\\TagsTest\\:\\:\\$validTags \\(array\\<array\\<string\\>\\>\\) does not accept default value of type array\\<string, string\\>\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Common/TagsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorageTest\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
