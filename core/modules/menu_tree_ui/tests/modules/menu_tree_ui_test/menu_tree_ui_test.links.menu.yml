@@ -6,3 +6,19 @@ menu_tree_ui_test.static_fixture:
   route_name: '<nolink>'
   menu_name: test
   weight: 0
+
+# A parent and, under it, a link that cannot be moved and has a title holding
+# markup and an ampersand, in a menu no other test uses.
+menu_tree_ui_test.locked_parent:
+  title: 'Locked fixture parent'
+  route_name: '<nolink>'
+  menu_name: mtu-test-locked
+  weight: 0
+
+menu_tree_ui_test.locked_child:
+  title: 'Fish & <b>Chips</b>'
+  route_name: '<nolink>'
+  menu_name: mtu-test-locked
+  parent: menu_tree_ui_test.locked_parent
+  class: Drupal\menu_tree_ui_test\Plugin\Menu\LockedTestMenuLink
+  weight: 0

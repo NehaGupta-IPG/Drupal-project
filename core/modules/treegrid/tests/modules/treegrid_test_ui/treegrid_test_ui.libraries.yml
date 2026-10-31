@@ -1,7 +1,6 @@
 treegrid_test_ui:
   version: VERSION
   js:
-    js/treegrid-test-ui.js: {}
     js/treegrid-test-ui-consumer.js: {}
     js/treegrid-test-ui-detach.js: {}
     js/treegrid-test-ui-attach-count.js: {}

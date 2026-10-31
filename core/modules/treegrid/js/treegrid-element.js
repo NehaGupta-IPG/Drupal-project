@@ -7,11 +7,9 @@
  * windowing, lazy expand/collapse, WAI-ARIA navigation, and the roving-tabindex
  * focus model — and nothing domain-specific.
  *
- * A consumer provides:
- *  - a renderer, registered with Drupal.treegrid.registerProvider(name, {
- *    buildRow }) and selected via the element's data-provider attribute.
- *    buildRow(item, depth) returns the row; treegrid sets its position.
- *  - data-children-url: the endpoint returning one level as { parent, items[] }.
+ * A consumer provides data-children-url: the endpoint returning one level as a
+ * rows response. Rows are rendered by the consumer's own template, and treegrid
+ * sets their position, level and tab stop when it places them.
  *
  * Features (reorder, columns, search, …) attach without the element knowing
  * about them, through:
@@ -25,14 +23,15 @@
  *    navigation; a handler returns true to consume the event. Each call
  *    returns a function that removes the handler.
  *
- * An element initializes once. Moving it in the DOM pauses its listeners and
- * windowing on disconnect and resumes them on reconnect.
+ * An element initializes once, when the document has been parsed (an element
+ * added later initializes as it connects). Moving it in the DOM pauses its
+ * listeners and windowing on disconnect and resumes them on reconnect.
  *
  * No Drupal.behaviors: connectedCallback fires automatically when the element
  * enters the DOM, including htmx-swapped content.
  *
  * DOM contract:
- *   <drupal-treegrid data-provider="…" data-children-url="…">
+ *   <drupal-treegrid data-children-url="…">
  *     <table role="treegrid">
  *       <tbody>
  *         <tr role="row" data-id data-parent-id aria-level …>…</tr>
@@ -45,7 +44,6 @@
 
 ((Drupal) => {
   Drupal.treegrid = Drupal.treegrid || {};
-  Drupal.treegrid.providers = Drupal.treegrid.providers || {};
   const { rowOf, focusRow, initRovingTabindex, childRows, visibleRows } =
     Drupal.treegrid.treeNav;
   const { handleKeyDown } = Drupal.treegrid;
@@ -55,49 +53,6 @@
   const TOGGLE = '[data-treegrid-toggle]';
   const INTERACTIVE =
     'a, button, input, select, textarea, [role="button"], [role="switch"]';
-
-  // Elements that connected before their provider was registered. The treegrid
-  // library loads before any consumer's library, so the element is often
-  // upgraded before the consumer registers its renderer; registerProvider()
-  // adopts them once the provider arrives.
-  const pending = new Set();
-
-  /**
-   * Initializes an element if its provider is registered, else parks it.
-   * An element that has already initialized is left alone.
-   *
-   * @param {TreegridElement} element
-   *   The element to initialize.
-   */
-  function tryInit(element) {
-    if (internals.get(element).initialized) {
-      return;
-    }
-    const provider = Drupal.treegrid.providers[element.dataset.provider];
-    if (!provider) {
-      pending.add(element);
-      return;
-    }
-    pending.delete(element);
-    element.init();
-  }
-
-  /**
-   * Registers a renderer provider, adopting any element already waiting on it.
-   *
-   * @param {string} name
-   *   The provider name, matched against an element's data-provider.
-   * @param {object} provider
-   *   The renderer: { buildRow(item, depth) }.
-   */
-  Drupal.treegrid.registerProvider = (name, provider) => {
-    Drupal.treegrid.providers[name] = provider;
-    [...pending].forEach((element) => {
-      if (element.dataset.provider === name) {
-        tryInit(element);
-      }
-    });
-  };
 
   /**
    * Creates the hidden table that loaded rows are swapped into.
@@ -175,7 +130,7 @@
     }
 
     /**
-     * Resolves once the element has its provider and has initialized.
+     * Resolves once the element has initialized.
      *
      * @return {Promise<void>}
      *   The ready promise.
@@ -291,7 +246,7 @@
     }
 
     /**
-     * Validates the markup, then initializes, parks or resumes the element.
+     * Validates the markup, then initializes or resumes the element.
      */
     connectedCallback() {
       const state = internals.get(this);
@@ -317,19 +272,19 @@
         document.addEventListener(
           'DOMContentLoaded',
           () => {
-            if (this.isConnected) {
-              tryInit(this);
+            if (this.isConnected && !state.initialized) {
+              this.init();
             }
           },
           { once: true },
         );
       } else {
-        tryInit(this);
+        this.init();
       }
     }
 
     /**
-     * Wires the spine once the document is parsed and the provider is there.
+     * Wires the spine once the document is parsed.
      *
      * @internal
      */
@@ -413,7 +368,6 @@
      * Pauses listeners and windowing when removed from the DOM.
      */
     disconnectedCallback() {
-      pending.delete(this);
       if (internals.get(this).initialized) {
         this.removeListeners();
         this.rowWindow?.disconnect();

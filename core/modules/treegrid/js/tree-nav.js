@@ -45,8 +45,8 @@
    * Sets a row's depth: its aria-level and the name cell's indent.
    *
    * The one place the indent step lives (--treegrid-indent per level, 1.25rem
-   * by default); row construction (row-builder), lazy-load rebasing (expand),
-   * and the keyboard carry (move-mode) all route through here.
+   * by default); placing loaded rows and rebasing them (expand) and the
+   * keyboard carry (move-mode) all route through here.
    *
    * @param {HTMLElement} row
    *   The row.

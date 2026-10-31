@@ -35,23 +35,36 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The element is ready, and says so, only once its provider has registered.
+   * An imported element is not ready until it connects, then it is.
    */
-  public function testReadyWaitsForProvider(): void {
-    $this->openPage(['delay_provider' => 3000]);
-    $this->getSession()->executeScript(<<<'JS'
-      const element = document.querySelector('drupal-treegrid');
-      window.apiTest = { ready: false, attributeAtReady: null };
-      element.ready.then(() => {
-        window.apiTest.ready = true;
-        window.apiTest.attributeAtReady = element.hasAttribute('data-treegrid-ready');
-      });
+  public function testImportedElementIsReadyOnceAppended(): void {
+    $this->openTemplatePage();
+    $this->runAsync(<<<'JS'
+      const template = document.querySelector('template');
+      const imported = document.importNode(template.content, true);
+      const element = imported.querySelector('drupal-treegrid');
+      const before = {
+        isPromise: element.ready instanceof Promise,
+        attribute: element.hasAttribute('data-treegrid-ready'),
+        pending: (await Promise.race([element.ready, Promise.resolve('pending')])) === 'pending',
+      };
+      document.body.append(imported);
+      await element.ready;
+      return {
+        before,
+        attributeAfter: element.hasAttribute('data-treegrid-ready'),
+        pendingAfter: (await Promise.race([element.ready, Promise.resolve('pending')])) === 'pending',
+      };
     JS);
-    $this->assertFalse($this->getSession()->evaluateScript("return window.apiTest.ready;"));
-    $this->assertFalse($this->getSession()->evaluateScript("return document.querySelector('drupal-treegrid').hasAttribute('data-treegrid-ready');"));
 
-    $this->assertJsCondition('window.apiTest.ready === true', 10000);
-    $this->assertTrue($this->getSession()->evaluateScript("return window.apiTest.attributeAtReady;"));
+    $this->assertEquals(
+      [
+        'before' => ['isPromise' => TRUE, 'attribute' => FALSE, 'pending' => TRUE],
+        'attributeAfter' => TRUE,
+        'pendingAfter' => FALSE,
+      ],
+      $this->getSession()->evaluateScript('return window.apiTest.result;'),
+    );
   }
 
   /**
@@ -82,13 +95,25 @@ final class TreegridElementApiTest extends WebDriverTestBase {
    * The element reports connected, then disconnected, to its own listeners.
    */
   public function testConnectedThenDisconnectedEvents(): void {
-    $this->openPage(['delay_provider' => 1500]);
-    $this->recordLifecycleEvents();
-    $this->waitForReady();
-    $this->getSession()->executeScript("document.querySelector('drupal-treegrid').remove();");
+    $this->openTemplatePage();
+    $this->runAsync(<<<'JS'
+      const template = document.querySelector('template');
+      const imported = document.importNode(template.content, true);
+      const element = imported.querySelector('drupal-treegrid');
+      const events = [];
+      element.addEventListener('treegrid:connected', (event) => {
+        events.push('connected:' + event.detail.reconnected);
+      });
+      element.addEventListener('treegrid:disconnected', () => {
+        events.push('disconnected');
+      });
+      document.body.append(imported);
+      await element.ready;
+      element.remove();
+      return events;
+    JS);
 
-    $events = $this->getSession()->evaluateScript('return window.apiTest.events;');
-    $this->assertSame(['connected:false', 'disconnected'], $events);
+    $this->assertSame(['connected:false', 'disconnected'], $this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
   /**
@@ -116,20 +141,43 @@ final class TreegridElementApiTest extends WebDriverTestBase {
    * A consumer's setup is skipped for a tree whose behaviors were detached.
    */
   public function testConsumerSetupSkippedAfterDetach(): void {
-    $this->openPage(['delay_provider' => 2000]);
-    $this->getSession()->executeScript("Drupal.detachBehaviors(document, drupalSettings, 'unload');");
-    $this->waitForReady();
-    // Give a wrongly continuing setup the chance to run.
-    usleep(300000);
-    $this->assertNull($this->getSession()->getPage()->find('css', 'drupal-treegrid[data-test-setup]'));
+    $this->openTemplatePage();
+    $this->runAsync(<<<'JS'
+      const template = document.querySelector('template');
+      const wrapper = document.createElement('div');
+      wrapper.append(document.importNode(template.content, true));
+      const element = wrapper.querySelector('drupal-treegrid');
+      Drupal.attachBehaviors(wrapper, drupalSettings);
+      Drupal.detachBehaviors(wrapper, drupalSettings, 'unload');
+      document.body.append(element);
+      await element.ready;
+      // Give a wrongly continuing setup the chance to run.
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+      return element.hasAttribute('data-test-setup');
+    JS);
+
+    $this->assertFalse($this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
   /**
    * A consumer's setup runs for a tree left alone.
    */
   public function testConsumerSetupRunsWhenReady(): void {
-    $this->openPage(['delay_provider' => 1000]);
-    $this->assertNotNull($this->assertSession()->waitForElement('css', 'drupal-treegrid[data-test-setup]'));
+    $this->openTemplatePage();
+    $this->runAsync(<<<'JS'
+      const template = document.querySelector('template');
+      const wrapper = document.createElement('div');
+      wrapper.append(document.importNode(template.content, true));
+      const element = wrapper.querySelector('drupal-treegrid');
+      Drupal.attachBehaviors(wrapper, drupalSettings);
+      const before = element.hasAttribute('data-test-setup');
+      document.body.append(element);
+      await element.ready;
+      await new Promise((resolve) => window.setTimeout(resolve, 100));
+      return { before, after: element.hasAttribute('data-test-setup') };
+    JS);
+
+    $this->assertEquals(['before' => FALSE, 'after' => TRUE], $this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
   /**
@@ -1039,6 +1087,14 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   private function openPage(array $query = []): void {
     $this->drupalGet('/treegrid-test-ui', ['query' => $query]);
     $this->assertSession()->waitForElement('css', 'drupal-treegrid table[role="treegrid"] tbody tr[role="row"]');
+  }
+
+  /**
+   * Opens the page with the tree inside a <template>.
+   */
+  private function openTemplatePage(): void {
+    $this->drupalGet('/treegrid-test-ui', ['query' => ['template' => 1]]);
+    $this->assertNotNull($this->assertSession()->waitForElement('css', 'template'));
   }
 
   /**

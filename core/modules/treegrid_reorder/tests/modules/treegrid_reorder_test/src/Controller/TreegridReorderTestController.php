@@ -116,8 +116,11 @@ final class TreegridReorderTestController extends ControllerBase {
 
   /**
    * Renders the test page: the top level of the tree.
+   *
+   * With ?template=1 the tree is inside a <template>, so a test can import it
+   * and control when the element connects.
    */
-  public function page(): array {
+  public function page(Request $request): array {
     $handler = $this->handler();
     $items = $this->levelItems($handler, '');
     $set_size = count($items);
@@ -156,6 +159,9 @@ final class TreegridReorderTestController extends ControllerBase {
       . $rows . '</tbody></table></drupal-treegrid></div>'
       . '<input type="text" class="reorder-test-field" data-test-field="outside">';
 
+    if ($request->query->getBoolean('template')) {
+      $html = '<template>' . $html . '</template>';
+    }
     $build['#markup'] = Markup::create($html);
     return $build;
   }

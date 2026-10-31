@@ -4,19 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
+use Drupal\system\Entity\Menu;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that row labels are the same plain text whoever builds the row.
+ * Tests that row labels are the same plain text on every page of rows.
  *
- * Rows built by Twig and rows built by the client from the JSON response must
- * give the same accessible name, including for a title holding markup and an
- * ampersand.
+ * Rows on the first page and rows loaded later come from the same template and
+ * must give the same accessible name, including for a title holding markup and
+ * an ampersand.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiRowLabelTest extends MenuTreeUiJavascriptTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'menu_link_content',
+    'menu_tree_ui',
+    'menu_tree_ui_test',
+  ];
 
   /**
    * A link title that is markup and holds an ampersand.
@@ -38,46 +48,40 @@ final class MenuTreeUiRowLabelTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * A client-built row is named the same as a Twig-built row.
+   * A loaded row is named the same as a row of the first page.
    */
-  public function testClientBuiltRowNameMatchesTwigBuiltRow(): void {
+  public function testLoadedRowNameMatchesPageRow(): void {
     $this->expandRow('P');
-    $twig_name = $this->row('T')->getAttribute('aria-label');
-    $this->assertSame(self::TITLE, $twig_name);
-    $this->assertSame($twig_name, $this->row('C')->getAttribute('aria-label'));
+    $page_name = $this->row('T')->getAttribute('aria-label');
+    $this->assertSame(self::TITLE, $page_name);
+    $this->assertSame($page_name, $this->row('C')->getAttribute('aria-label'));
   }
 
   /**
-   * A client-built toggle is named the same as a Twig-built toggle.
+   * A loaded row's toggle is named the same as a first-page row's toggle.
    */
-  public function testClientBuiltToggleNameMatchesTwigBuiltToggle(): void {
+  public function testLoadedToggleNameMatchesPageToggle(): void {
     $this->expandRow('P');
     $selector = '.menu-tree-ui-row__name button.menu-tree-ui-row__toggle';
-    $twig_name = $this->row('TP')->find('css', $selector)->getAttribute('aria-label');
-    $client_name = $this->row('C')->find('css', $selector)->getAttribute('aria-label');
-    $this->assertStringContainsString(self::TITLE, $twig_name);
-    $this->assertSame($twig_name, $client_name);
+    $page_name = $this->row('TP')->find('css', $selector)->getAttribute('aria-label');
+    $loaded_name = $this->row('C')->find('css', $selector)->getAttribute('aria-label');
+    $this->assertStringContainsString(self::TITLE, $page_name);
+    $this->assertSame($page_name, $loaded_name);
   }
 
   /**
-   * A client-built locked row names the title as plain text.
+   * A loaded locked row names the title as plain text.
    */
-  public function testClientBuiltLockedRowNameIsPlainText(): void {
-    $title = json_encode(self::TITLE);
-    $label = $this->getSession()->evaluateScript(<<<JS
-      return Drupal.treegrid.providers.menu_tree_ui.buildRow({
-        id: 'locked',
-        parent_id: '',
-        title: $title,
-        enabled: true,
-        has_children: false,
-        depth: 1,
-        url: '/',
-        weight: 0,
-        movable: false,
-        columns: {},
-      }, 1).getAttribute('aria-label');
-    JS);
+  public function testLoadedLockedRowNameIsPlainText(): void {
+    Menu::create(['id' => 'mtu-test-locked', 'label' => 'Locked fixture'])->save();
+    $this->drupalGet('/admin/structure/menu/manage/mtu-test-locked/tree');
+    $parent = $this->assertSession()->waitForElement('css', 'tr[data-id="menu_tree_ui_test.locked_parent"] [data-treegrid-toggle]');
+    $this->assertNotNull($parent, 'The fixture menu shows its parent.');
+    $parent->click();
+
+    $child = $this->assertSession()->waitForElement('css', 'tr[data-id="menu_tree_ui_test.locked_child"]');
+    $this->assertNotNull($child, 'The locked child loads.');
+    $label = $child->getAttribute('aria-label');
     $this->assertStringStartsWith(self::TITLE, $label);
     $this->assertStringNotContainsString('&amp;', $label);
     $this->assertStringNotContainsString('&lt;', $label);

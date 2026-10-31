@@ -46,8 +46,24 @@ final class ReorderAttachTest extends WebDriverTestBase {
    * A handler registered after attach() on a not-yet-ready tree misses Space.
    */
   public function testHandlersRegisteredAfterAttachRunAfterThem(): void {
-    $this->openPage(['delay_provider' => 1500]);
-    $this->getSession()->executeScript('window.reorderTestKeyEvents = 0;');
+    $this->drupalGet('/treegrid-reorder-test', ['query' => ['template' => 1]]);
+    $this->assertNotNull($this->assertSession()->waitForElement('css', 'template'));
+    $this->runAsync(<<<'JS'
+      window.reorderTestKeyEvents = 0;
+      const template = document.querySelector('template');
+      const wrapper = document.createElement('div');
+      wrapper.append(document.importNode(template.content, true));
+      const element = wrapper.querySelector('drupal-treegrid');
+      // The behavior attaches reordering and registers the consumer's own key
+      // handler right after it, while the element is not connected.
+      Drupal.attachBehaviors(wrapper, drupalSettings);
+      const pending = (await Promise.race([element.ready, Promise.resolve('pending')])) === 'pending';
+      document.body.append(element);
+      await element.ready;
+      return { pending, isPromise: element.ready instanceof Promise };
+    JS);
+    $this->assertEquals(['pending' => TRUE, 'isPromise' => TRUE], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+    $this->assertNotNull($this->assertSession()->waitForElement('css', 'drupal-treegrid[data-treegrid-reorder-ready]'));
 
     $this->pressKey('2', ' ');
     $this->assertSame('true', $this->rowAttribute('2', 'aria-selected'));
@@ -319,6 +335,21 @@ final class ReorderAttachTest extends WebDriverTestBase {
   private function openPage(array $query = []): void {
     $this->drupalGet('/treegrid-reorder-test', ['query' => $query]);
     $this->assertNotNull($this->assertSession()->waitForElement('css', 'drupal-treegrid[data-test-reorder-wired]'));
+  }
+
+  /**
+   * Runs a script returning a promise and stores its value on window.apiTest.
+   *
+   * @param string $script
+   *   The script body; it must return a promise.
+   */
+  private function runAsync(string $script): void {
+    $this->getSession()->executeScript(
+      'window.apiTest = { done: false, result: null };'
+      . '(async function () {' . $script . '})().then(function (value) {'
+      . ' window.apiTest.result = value; window.apiTest.done = true; });',
+    );
+    $this->assertJsCondition('window.apiTest.done === true');
   }
 
   /**

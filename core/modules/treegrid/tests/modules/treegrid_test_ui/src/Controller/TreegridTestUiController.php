@@ -85,8 +85,11 @@ final class TreegridTestUiController extends ControllerBase {
 
   /**
    * Renders the test page: the server-rendered top level of the tree.
+   *
+   * With ?template=1 the tree is inside a <template>, so a test can import it
+   * and control when the element connects.
    */
-  public function page(): array {
+  public function page(Request $request): array {
     $top = $this->tree()[''] ?? [];
     $set_size = count($top);
     $rows = '';
@@ -108,6 +111,9 @@ final class TreegridTestUiController extends ControllerBase {
       . ' data-treegrid-csrf-token="' . TreegridCsrfToken::addPlaceholder($build) . '">'
       . '<table role="treegrid"><tbody>' . $rows . '</tbody></table></drupal-treegrid>';
 
+    if ($request->query->getBoolean('template')) {
+      $html = '<template>' . $html . '</template>';
+    }
     $build['#markup'] = Markup::create($html);
     return $build;
   }

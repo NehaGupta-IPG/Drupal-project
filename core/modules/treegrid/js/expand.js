@@ -57,7 +57,7 @@
    * A screen reader announces the expanded/collapsed state itself from the
    * row's aria-expanded change, but labels that change positionally ("row N",
    * counting the header row) instead of by name. This adds the row's name (its
-   * aria-label, set by the consumer's row renderer) so the editor hears which
+   * aria-label, set by the consumer's row template) so the editor hears which
    * item changed. The state word is deliberately left out so the screen reader
    * does not speak it twice. Skipped when a consumer leaves rows unnamed.
    * The aria-label is plain text and the announcer writes HTML, so the name is
