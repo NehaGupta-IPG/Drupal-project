@@ -1,0 +1,5 @@
+missing_options:
+  css:
+    component:
+      css/styles.css:
+      css/other.css: {}
