@@ -220,20 +220,25 @@
                 passwordStrengthBarClassesToRemove,
               );
             }
-            // Adjust the length of the strength indicator.
-            password.$strengthBar[0].style.width = `${result.strength}%`;
-            password.$strengthBar.addClass(result.indicatorClass);
-
             // Update the strength indication text.
             password.$strengthTextWrapper.html(result.indicatorText);
-          }
 
-          // Check the value in the confirm input and show results.
-          if ($confirmInput[0].value) {
-            passwordCheckMatch($confirmInput[0].value);
-            $passwordConfirmMessage[0].style.visibility = 'visible';
-          } else {
-            $passwordConfirmMessage[0].style.visibility = 'hidden';
+            // Check the value in the confirm input and show results.
+            if ($confirmInput[0].value) {
+              passwordCheckMatch($confirmInput[0].value);
+              $passwordConfirmMessage[0].style.visibility = 'visible';
+            } else {
+              $passwordConfirmMessage[0].style.visibility = 'hidden';
+            }
+            // Adjust the length of the strength indicator.
+            if (result.strength > -30) {
+              password.$strengthBar[0].style.width = `${result.strength}%`;
+              password.$strengthBar.addClass(result.indicatorClass);
+            } else {
+              password.$strengthBar[0].style.width = `0%`;
+              // Update the strength indication text.
+              password.$strengthTextWrapper.html('');
+            }
           }
 
           if (widgetClassesToRemove) {

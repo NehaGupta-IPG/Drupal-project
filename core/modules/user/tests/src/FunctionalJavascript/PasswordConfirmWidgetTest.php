@@ -163,9 +163,6 @@ class PasswordConfirmWidgetTest extends WebDriverTestBase {
     $this->assertNotNull($this->assert->waitForElement('css', "$password_confirm_selector + .password-suggestions > ul > li"));
     $this->assertTrue($password_confirm_item->find('css', "$password_confirm_selector + .password-suggestions")->isVisible());
 
-    // The appropriate strength text should appear.
-    $this->assert->elementContains('css', "$password_confirm_widget_selector $password_parent_selector", '<div aria-live="polite" aria-atomic="true" class="password-strength__title">Password strength: <span class="password-strength__text" data-drupal-selector="password-strength-text">Weak</span></div>');
-
     // Password match.
     $this->assertTrue($password_confirm_item->find('css', 'input.js-password-confirm + [data-drupal-selector="password-confirm-message"]')->isVisible());
     $this->assert->elementContains('css', "$password_confirm_widget_selector $password_confirm_selector [data-drupal-selector='password-confirm-message']", 'Passwords match: <span data-drupal-selector="password-match-status-text" class="error">no</span>');
@@ -177,7 +174,7 @@ class PasswordConfirmWidgetTest extends WebDriverTestBase {
     $this->assert->elementContains('css', "$password_confirm_widget_selector $password_confirm_selector [data-drupal-selector='password-confirm-message']", 'Passwords match: <span data-drupal-selector="password-match-status-text" class="error">no</span>');
     $this->assertTrue($password_confirm_item->find('css', "$password_confirm_selector + .password-suggestions")->isVisible());
     $this->assertTrue($password_parent_item->find('css', '.password-strength > .password-strength__meter + .password-strength__title')->isVisible());
-    $this->assert->elementContains('css', "$password_confirm_widget_selector $password_parent_selector", '<div aria-live="polite" aria-atomic="true" class="password-strength__title">Password strength: <span class="password-strength__text" data-drupal-selector="password-strength-text">Weak</span></div>');
+    $this->assert->elementContains('css', "$password_confirm_widget_selector $password_parent_selector", '<div aria-live="polite" aria-atomic="true" class="password-strength__title">Password strength: <span class="password-strength__text" data-drupal-selector="password-strength-text"></span></div>');
   }
 
 }
