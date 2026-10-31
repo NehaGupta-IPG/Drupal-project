@@ -2552,7 +2552,7 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   prevent 'click' events from also being triggered.
  * - progress: An array indicating how to show Ajax processing progress. Can
  *   contain one or more of these elements:
- *   - type: Type of indicator: 'throbber' (default) or 'bar'.
+ *   - type: Type of indicator: 'throbber' (default) or 'bar' or 'fullscreen' or 'none'.
  *   - message: Translated message to display.
  *   - url: For a bar progress indicator, URL path for determining progress.
  *   - interval: For a bar progress indicator, how often to update it.
