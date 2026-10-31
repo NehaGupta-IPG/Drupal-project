@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\StackMiddleware;
 
+use Drupal\Component\Utility\Html;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,6 +52,13 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = TRUE): Response {
+    // HTML IDs and AJAX mode belong to the main request, not the process.
+    // Subrequests share the document's ID namespace.
+    if ($type === HttpKernelInterface::MAIN_REQUEST) {
+      Html::resetSeenIds();
+      Html::setIsAjax(FALSE);
+    }
+
     return $this->httpKernel->handle($request, $type, $catch);
   }
 
