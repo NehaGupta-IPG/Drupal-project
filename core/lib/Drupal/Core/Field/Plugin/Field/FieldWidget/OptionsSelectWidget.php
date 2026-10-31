@@ -29,6 +29,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $options = $this->getOptions($items->getEntity());
 
     $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
@@ -50,6 +51,14 @@ class OptionsSelectWidget extends OptionsWidgetBase {
       '#default_value' => $selected,
       '#multiple' => $multiple,
     ];
+
+    $bundles = $items->getItemDefinition()->getSettings();
+    $type = implode('', $bundles['handler_settings']['target_bundles']);
+    if (count($options) < 2) {
+      $element['#description'] = $this->t('There are no @type types available. Contact the site administrator.', [
+        '@type' => $type,
+      ]);
+    }
 
     return $element;
   }
