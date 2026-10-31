@@ -74,12 +74,16 @@ class TermParentsTest extends BrowserTestBase {
     $term_1 = $this->submitAddTermForm('Test term 1');
     $expected = [['target_id' => 0]];
     $this->assertEquals($expected, $term_1->get('parent')->getValue());
+    $this->assertTrue($term_1->hasRootParent());
+    $this->assertFalse($term_1->hasNonRootParent());
 
     // Explicitly selecting <root> should have the same effect as not selecting
     // anything.
     $page->selectFieldOption('Parent terms', '<root>');
     $term_2 = $this->submitAddTermForm('Test term 2');
     $this->assertEquals($expected, $term_2->get('parent')->getValue());
+    $this->assertTrue($term_2->hasRootParent());
+    $this->assertFalse($term_2->hasNonRootParent());
 
     // Create two terms with the previously created ones as parents,
     // respectively.
@@ -87,26 +91,36 @@ class TermParentsTest extends BrowserTestBase {
     $term_3 = $this->submitAddTermForm('Test term 3');
     $expected = [['target_id' => $term_1->id()]];
     $this->assertEquals($expected, $term_3->get('parent')->getValue());
+    $this->assertFalse($term_3->hasRootParent());
+    $this->assertTrue($term_3->hasNonRootParent());
     $page->selectFieldOption('Parent terms', 'Test term 2');
     $term_4 = $this->submitAddTermForm('Test term 4');
     $expected = [['target_id' => $term_2->id()]];
     $this->assertEquals($expected, $term_4->get('parent')->getValue());
+    $this->assertFalse($term_4->hasRootParent());
+    $this->assertTrue($term_4->hasNonRootParent());
 
     // Create a term with term 3 as parent.
     $page->selectFieldOption('Parent terms', '-Test term 3');
     $term_5 = $this->submitAddTermForm('Test term 5');
     $expected = [['target_id' => $term_3->id()]];
     $this->assertEquals($expected, $term_5->get('parent')->getValue());
+    $this->assertFalse($term_5->hasRootParent());
+    $this->assertTrue($term_5->hasNonRootParent());
 
-    // Create a term with multiple parents.
-    $page->selectFieldOption('Parent terms', '--Test term 5');
+    // Create a term with multiple parents, including root.
+    $page->selectFieldOption('Parent terms', '<root>');
+    $page->selectFieldOption('Parent terms', '--Test term 5', TRUE);
     $page->selectFieldOption('Parent terms', '-Test term 4', TRUE);
     $term_6 = $this->submitAddTermForm('Test term 6');
     $expected = [
+      ['target_id' => 0],
       ['target_id' => $term_5->id()],
       ['target_id' => $term_4->id()],
     ];
     $this->assertEquals($expected, $term_6->get('parent')->getValue());
+    $this->assertTrue($term_6->hasRootParent());
+    $this->assertTrue($term_6->hasNonRootParent());
   }
 
   /**
