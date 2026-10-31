@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
@@ -432,9 +433,15 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    */
   public function render() {
     $build = [];
-    $build['#markup'] = $this->renderer->executeInRenderContext(new RenderContext(), function () {
+    $context = new RenderContext();
+    $build['#markup'] = $this->renderer->executeInRenderContext($context, function () {
       return $this->view->style_plugin->render();
     });
+    if (!$context->isEmpty()) {
+      $bubbleable_metadata = $context->pop();
+      assert($bubbleable_metadata instanceof BubbleableMetadata);
+      $bubbleable_metadata->applyTo($build);
+    }
 
     $this->view->element['#content_type'] = $this->getMimeType();
     $this->view->element['#cache_properties'][] = '#content_type';
