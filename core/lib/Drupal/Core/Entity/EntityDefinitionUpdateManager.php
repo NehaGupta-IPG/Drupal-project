@@ -174,10 +174,12 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
     $this->clearCachedDefinitions();
     foreach ($field_storage_definitions as $name => $field_storage_definition) {
       if ($field_storage_definition instanceof BaseFieldDefinition) {
+        // Fields added through hook_entity_base_field_info() already have a
+        // provider set, so don't overwrite it.
         $field_storage_definition
           ->setName($name)
           ->setTargetEntityTypeId($entity_type->id())
-          ->setProvider($entity_type->getProvider())
+          ->setProvider($field_storage_definition->getProvider() ?? $entity_type->getProvider())
           ->setTargetBundle(NULL);
       }
     }

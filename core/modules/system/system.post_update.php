@@ -5,6 +5,9 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -90,4 +93,42 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config = \Drupal::configFactory()->getEditable('system.site');
   $config->clear('admin_compact_mode');
   $config->save();
+}
+
+/**
+ * Fix the provider of installed base fields added by another module.
+ */
+function system_post_update_fix_base_field_providers(): void {
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  $last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
+
+  foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
+    if (!$entity_type->entityClassImplements(FieldableEntityInterface::class)) {
+      continue;
+    }
+
+    $installed_definitions = $last_installed_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type_id);
+    $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions($entity_type_id);
+    $changed = FALSE;
+
+    foreach ($installed_definitions as $name => $installed_definition) {
+      // Only fields that were given the entity type's provider can be wrong,
+      // and only the current definition can say which module they belong to.
+      if (!$installed_definition instanceof BaseFieldDefinition
+        || $installed_definition->getProvider() !== $entity_type->getProvider()
+        || !isset($field_storage_definitions[$name])
+        || $field_storage_definitions[$name]->getProvider() === $entity_type->getProvider()
+      ) {
+        continue;
+      }
+
+      $installed_definition->setProvider($field_storage_definitions[$name]->getProvider());
+      $installed_definitions[$name] = $installed_definition;
+      $changed = TRUE;
+    }
+
+    if ($changed) {
+      $last_installed_schema_repository->setLastInstalledFieldStorageDefinitions($entity_type_id, $installed_definitions);
+    }
+  }
 }

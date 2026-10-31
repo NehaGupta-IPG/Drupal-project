@@ -84,6 +84,31 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that base fields added by another module keep their provider.
+   */
+  public function testInstallFieldableEntityTypeKeepsBaseFieldProvider(): void {
+    // This module adds a base field to an entity type it does not provide.
+    $this->enableModules(['entity_base_field_test']);
+    $entity_definition_update_manager = $this->container->get('entity.definition_update_manager');
+    $entity_field_manager = $this->container->get('entity_field.manager');
+
+    $entity_type = clone $this->container->get('entity_type.manager')->getDefinition('entity_test_update');
+    $field_storage_definitions = $entity_field_manager->getFieldStorageDefinitions('entity_test_update');
+    $this->assertSame('entity_base_field_test', $field_storage_definitions['test_base_field']->getProvider());
+
+    $entity_definition_update_manager->installFieldableEntityType($entity_type, $field_storage_definitions);
+
+    // The installed definition has to keep pointing at the module that added
+    // the field, otherwise that module can no longer recognize it as its own.
+    $test_base_field = $entity_definition_update_manager->getFieldStorageDefinition('test_base_field', 'entity_test_update');
+    $this->assertSame('entity_base_field_test', $test_base_field->getProvider());
+
+    // Fields belonging to the entity type itself are unaffected.
+    $name_field = $entity_definition_update_manager->getFieldStorageDefinition('name', 'entity_test_update');
+    $this->assertSame('entity_test_update', $name_field->getProvider());
+  }
+
+  /**
    * Tests get entity types.
    */
   public function testGetEntityTypes(): void {
