@@ -7,6 +7,7 @@ namespace Drupal\Tests\treegrid\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\treegrid_test_ui\Controller\TreegridTestUiController;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -401,7 +402,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
       const attached = [];
       Drupal.behaviors.apiTestAttach = {
         attach(context) {
-          attached.push(context.dataset?.id);
+          attached.push(context.matches('[data-treegrid-staging] > tbody'));
         },
       };
       let levelLoaded = 0;
@@ -413,13 +414,21 @@ final class TreegridElementApiTest extends WebDriverTestBase {
       element.clearChildren(p1);
       const result = await expanded;
       delete Drupal.behaviors.apiTestAttach;
-      return { result, attached, levelLoaded };
+      return {
+        result,
+        attached,
+        levelLoaded,
+        placed: element.tree.querySelectorAll('tr[data-parent-id="c1b"]').length,
+        staged: element.querySelector('[data-treegrid-staging] > tbody').children.length,
+      };
     JS);
 
     $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
     $this->assertFalse($result['result']);
-    $this->assertSame([], $result['attached']);
+    $this->assertNotContains(FALSE, $result['attached'], 'Any attach saw the staging table as its context.');
     $this->assertSame(0, $result['levelLoaded']);
+    $this->assertSame(0, $result['placed']);
+    $this->assertSame(0, $result['staged']);
   }
 
   /**
@@ -564,12 +573,36 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
-   * A failing children request fires level-load-failed and leaves the row shut.
+   * A failed load fires level-load-failed and leaves the row shut and unloaded.
+   *
+   * @param string $failure
+   *   How the load fails: 'status' (a 500 carrying the marker and rows),
+   *   'network' (the request is rejected) or 'marker' (a 200 without the
+   *   marker header).
+   * @param int $expected_status
+   *   The status the event reports.
    */
-  public function testFailedLoadFiresLevelLoadFailed(): void {
-    \Drupal::state()->set(TreegridTestUiController::CHILDREN_FAIL_KEY, 1);
+  #[DataProvider('providerFailedLoads')]
+  public function testFailedLoadFiresLevelLoadFailed(string $failure, int $expected_status): void {
+    if ($failure === 'status') {
+      \Drupal::state()->set(TreegridTestUiController::CHILDREN_FAIL_KEY, 1);
+    }
+    if ($failure === 'marker') {
+      \Drupal::state()->set(TreegridTestUiController::CHILDREN_NO_MARKER_KEY, TRUE);
+    }
     $this->openPage();
     $this->waitForReady();
+    if ($failure === 'network') {
+      $this->getSession()->executeScript(<<<'JS'
+        const originalFetch = window.fetch;
+        window.fetch = function (url) {
+          if (String(url).includes('/treegrid-test-ui/children')) {
+            return Promise.reject(new TypeError('network down'));
+          }
+          return originalFetch.apply(this, arguments);
+        };
+      JS);
+    }
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
       const row = element.tree.querySelector('tr[data-id="p1"]');
@@ -583,16 +616,31 @@ final class TreegridElementApiTest extends WebDriverTestBase {
         failures,
         loaded,
         expanded: row.getAttribute('aria-expanded'),
+        hasChildren: row.dataset.hasChildren,
+        loadedFlag: row.dataset.treegridLoaded ?? null,
         children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
+        staged: element.querySelector('[data-treegrid-staging] > tbody').children.length,
       };
     JS);
 
     $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
     $this->assertFalse($result['opened']);
-    $this->assertEquals([['parentId' => 'p1', 'status' => 500]], $result['failures']);
+    $this->assertEquals([['parentId' => 'p1', 'status' => $expected_status]], $result['failures']);
     $this->assertSame([], $result['loaded']);
     $this->assertSame('false', $result['expanded']);
+    $this->assertSame('true', $result['hasChildren']);
+    $this->assertNull($result['loadedFlag']);
     $this->assertSame(0, $result['children']);
+    $this->assertSame(0, $result['staged']);
+  }
+
+  /**
+   * Data provider for testFailedLoadFiresLevelLoadFailed().
+   */
+  public static function providerFailedLoads(): \Generator {
+    yield 'error status with the marker and rows' => ['status', 500];
+    yield 'network failure' => ['network', 0];
+    yield 'success without the marker' => ['marker', 200];
   }
 
   /**
@@ -739,11 +787,10 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->waitForReady();
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
-      const row = element.tree.querySelector('tr[data-id="p1"]');
-      await element.expandRow(row);
-      return window.treegridTestUiDetaches;
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return window.treegridTestUiDetachedIds.slice();
     JS);
-    $before = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertSame([], $this->getSession()->evaluateScript('return window.apiTest.result;'), 'Loading detaches nothing.');
 
     $tree = TreegridTestUiController::CHILDREN;
     $tree['p1'] = ['c1b'];
@@ -751,18 +798,22 @@ final class TreegridElementApiTest extends WebDriverTestBase {
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
       await element.refreshLevel('p1');
-      return window.treegridTestUiDetaches;
+      const inTree = Array.from(element.tree.querySelectorAll('tr[role="row"]')).map((row) => row.dataset.id);
+      return {
+        detached: window.treegridTestUiDetachedIds.slice(),
+        detachedStillInTree: window.treegridTestUiDetachedIds.filter((id) => inTree.includes(id)),
+      };
     JS);
     $afterRefresh = $this->getSession()->evaluateScript('return window.apiTest.result;');
-    $this->assertSame($before + 1, $afterRefresh);
+    $this->assertSame(['c1a'], $afterRefresh['detached']);
+    $this->assertSame([], $afterRefresh['detachedStillInTree']);
 
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
       element.clearChildren(element.tree.querySelector('tr[data-id="p1"]'));
-      return window.treegridTestUiDetaches;
+      return window.treegridTestUiDetachedIds.slice();
     JS);
-    $afterClear = $this->getSession()->evaluateScript('return window.apiTest.result;');
-    $this->assertGreaterThan($afterRefresh, $afterClear);
+    $this->assertSame(['c1a', 'c1b'], $this->getSession()->evaluateScript('return window.apiTest.result;'));
   }
 
   /**
@@ -788,25 +839,155 @@ final class TreegridElementApiTest extends WebDriverTestBase {
   }
 
   /**
-   * Rows the provider builds carry treegrid's positions in their level.
+   * Loaded rows take treegrid's position, level and tab stop, not the server's.
    */
-  public function testBuiltRowsCarryPositions(): void {
+  public function testLoadedRowsTakeValuesFromTreegrid(): void {
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_WRONG_VALUES_KEY, TRUE);
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      const p1 = element.tree.querySelector('tr[data-id="p1"]');
+      await element.expandRow(p1);
+      const read = (id) => {
+        const row = element.tree.querySelector('tr[data-id="' + id + '"]');
+        return {
+          posinset: row.getAttribute('aria-posinset'),
+          setsize: row.getAttribute('aria-setsize'),
+          level: row.getAttribute('aria-level'),
+          tabindex: row.getAttribute('tabindex'),
+        };
+      };
+      return {
+        c1a: read('c1a'),
+        c1b: read('c1b'),
+        afterP1: [p1.nextElementSibling.dataset.id, p1.nextElementSibling.nextElementSibling.dataset.id],
+      };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertEquals(['posinset' => '1', 'setsize' => '2', 'level' => '2', 'tabindex' => '-1'], $result['c1a']);
+    $this->assertEquals(['posinset' => '2', 'setsize' => '2', 'level' => '2', 'tabindex' => '-1'], $result['c1b']);
+    $this->assertSame(['c1a', 'c1b'], $result['afterP1']);
+  }
+
+  /**
+   * Staging is empty after a load, a failed load and a bailed-out load.
+   */
+  public function testStagingIsEmptyAfterEveryLoad(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $staged = "element.querySelector('[data-treegrid-staging] > tbody').children.length";
+    $this->runAsync(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      return $staged;
+    JS);
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.apiTest.result;'), 'After a load.');
+
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_FAIL_KEY, 1);
+    $this->runAsync(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p2"]'));
+      return $staged;
+    JS);
+    $this->assertSame(0, $this->getSession()->evaluateScript('return window.apiTest.result;'), 'After a failed load.');
+
+    \Drupal::state()->set(TreegridTestUiController::CHILDREN_DELAY_KEY, 600);
+    $this->runAsync(<<<JS
+      const element = document.querySelector('drupal-treegrid');
+      const p2 = element.tree.querySelector('tr[data-id="p2"]');
+      const expanded = element.expandRow(p2);
+      await new Promise((resolve) => window.setTimeout(resolve, 200));
+      p2.remove();
+      const result = await expanded;
+      return { result, staged: $staged };
+    JS);
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertFalse($result['result']);
+    $this->assertSame(0, $result['staged'], 'After a load whose parent row was removed.');
+  }
+
+  /**
+   * Behaviors attach once per loaded row, with staging as the context.
+   */
+  public function testBehaviorsAttachOncePerLoadedRow(): void {
     $this->openPage();
     $this->waitForReady();
     $this->runAsync(<<<'JS'
       const element = document.querySelector('drupal-treegrid');
       await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
-      const read = (id) => {
-        const row = element.tree.querySelector('tr[data-id="' + id + '"]');
-        return [row.getAttribute('aria-posinset'), row.getAttribute('aria-setsize')];
+      return {
+        c1a: window.treegridTestUiAttaches.c1a,
+        c1b: window.treegridTestUiAttaches.c1b,
       };
-      return { c1a: read('c1a'), c1b: read('c1b') };
     JS);
 
     $this->assertEquals(
-      ['c1a' => ['1', '2'], 'c1b' => ['2', '2']],
+      ['c1a' => [['staging' => TRUE]], 'c1b' => [['staging' => TRUE]]],
       $this->getSession()->evaluateScript('return window.apiTest.result;'),
     );
+  }
+
+  /**
+   * A refresh keeps the nodes of rows the level still has.
+   */
+  public function testRefreshKeepsKeptRowNodes(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      element.tree.querySelector('tr[data-id="c1a"]').keptMarker = 'kept';
+      return true;
+    JS);
+
+    $tree = TreegridTestUiController::CHILDREN;
+    $tree['p1'] = ['c1a', 'c1b', 'c1new'];
+    \Drupal::state()->set(TreegridTestUiController::TREE_KEY, $tree);
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.refreshLevel('p1');
+      const ids = Array.from(element.tree.querySelectorAll('tr[data-parent-id="p1"]')).map((row) => row.dataset.id);
+      return { ids, marker: element.tree.querySelector('tr[data-id="c1a"]').keptMarker ?? null };
+    JS);
+
+    $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
+    $this->assertSame(['c1a', 'c1b', 'c1new'], $result['ids']);
+    $this->assertSame('kept', $result['marker']);
+  }
+
+  /**
+   * A loaded row's library loads once, however many levels are loaded.
+   */
+  public function testLoadedRowsLibraryLoadsOnce(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->runAsync(<<<'JS'
+      const element = document.querySelector('drupal-treegrid');
+      await element.expandRow(element.tree.querySelector('tr[data-id="p1"]'));
+      await element.expandRow(element.tree.querySelector('tr[data-id="p2"]'));
+      return {
+        runs: window.treegridTestUiRowAssetRuns ?? 0,
+        requests: performance.getEntriesByType('resource')
+          .filter((entry) => entry.name.includes('treegrid-test-ui-row-asset.js')).length,
+      };
+    JS);
+
+    $this->assertEquals(['runs' => 1, 'requests' => 1], $this->getSession()->evaluateScript('return window.apiTest.result;'));
+  }
+
+  /**
+   * The consumer's attach sees the element not ready; both are set afterwards.
+   */
+  public function testReadyIsPendingWhenConsumersAttach(): void {
+    $this->openPage();
+    $this->waitForReady();
+    $this->assertEquals(
+      ['readyPending' => TRUE, 'readyAttribute' => FALSE],
+      $this->getSession()->evaluateScript('return window.treegridTestUiAttachState;'),
+    );
+    $this->assertTrue($this->getSession()->evaluateScript("return document.querySelector('drupal-treegrid').hasAttribute('data-treegrid-ready');"));
   }
 
   /**

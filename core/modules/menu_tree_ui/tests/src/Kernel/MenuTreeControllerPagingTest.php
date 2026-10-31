@@ -31,6 +31,7 @@ final class MenuTreeControllerPagingTest extends KernelTestBase {
     'menu_link_content',
     'menu_tree_ui',
     'treegrid',
+    'treegrid_reorder',
     'system',
     'user',
   ];
@@ -55,6 +56,13 @@ final class MenuTreeControllerPagingTest extends KernelTestBase {
   private const SEEDED = MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE + 5;
 
   /**
+   * The plugin IDs of the seeded links, in order.
+   *
+   * @var list<string>
+   */
+  private array $ids = [];
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -68,13 +76,15 @@ final class MenuTreeControllerPagingTest extends KernelTestBase {
       ->load('main');
 
     for ($i = 1; $i <= self::SEEDED; $i++) {
-      MenuLinkContent::create([
+      $link = MenuLinkContent::create([
         'menu_name' => 'main',
         'title' => sprintf('Item %03d', $i),
         'link' => ['uri' => 'route:<nolink>'],
         'parent' => '',
         'weight' => $i,
-      ])->save();
+      ]);
+      $link->save();
+      $this->ids[] = $link->getPluginId();
     }
 
     $this->controller = MenuTreeController::create($this->container);
@@ -93,42 +103,61 @@ final class MenuTreeControllerPagingTest extends KernelTestBase {
   }
 
   /**
-   * Returns the first page with has_more when the level overflows.
+   * The first page holds a page of rows and points at the next one.
    */
-  public function testChildrenFirstPageHasMore(): void {
-    $data = $this->decode($this->controller->children($this->menu, Request::create('/children')));
+  public function testChildrenFirstPageHasNext(): void {
+    $build = $this->controller->children($this->menu, Request::create('/children'));
 
-    $this->assertCount(MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE, $data['items']);
-    $this->assertSame(0, $data['offset']);
-    $this->assertTrue($data['has_more']);
-    $this->assertSame(self::SEEDED, $data['total']);
+    $this->assertCount(MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE, $build['#rows']);
+    $this->assertSame((string) self::SEEDED, $this->header($build, 'X-Treegrid-Total'));
+    $this->assertSame(rawurlencode($this->ids[MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE]), $this->header($build, 'X-Treegrid-Next-Id'));
+    $this->assertSame('1', $this->header($build, 'X-Treegrid-Rows'));
   }
 
   /**
-   * Returns the remainder and clears has_more on the last page.
+   * The last page holds the remainder and no next id.
    */
-  public function testChildrenLastPageNoMore(): void {
+  public function testChildrenLastPageHasNoNext(): void {
     $offset = MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE;
     $request = Request::create('/children', 'GET', ['offset' => (string) $offset]);
-    $data = $this->decode($this->controller->children($this->menu, $request));
+    $build = $this->controller->children($this->menu, $request);
 
-    $this->assertCount(self::SEEDED - $offset, $data['items']);
-    $this->assertSame($offset, $data['offset']);
-    $this->assertFalse($data['has_more']);
-    $this->assertSame(self::SEEDED, $data['total']);
+    $this->assertCount(self::SEEDED - $offset, $build['#rows']);
+    $this->assertNull($this->header($build, 'X-Treegrid-Next-Id'));
+    $this->assertSame((string) self::SEEDED, $this->header($build, 'X-Treegrid-Total'));
   }
 
   /**
-   * Decodes a JSON response body to an array.
-   *
-   * @param \Symfony\Component\HttpFoundation\Response $response
-   *   The response.
-   *
-   * @return array
-   *   The decoded payload.
+   * Pending moves apply to the pages, with the total unchanged.
    */
-  private function decode($response): array {
-    return json_decode((string) $response->getContent(), TRUE);
+  public function testChildrenPagesApplyPendingMoves(): void {
+    $this->container->get('menu_tree_ui.working_copy')->addOp('main', [
+      'type' => 'move',
+      'id' => $this->ids[0],
+      'new_parent' => '',
+      'before_id' => NULL,
+    ]);
+
+    $first = $this->controller->children($this->menu, Request::create('/children'));
+    $this->assertSame($this->ids[1], $first['#rows'][0]['#element']->link->getPluginId());
+    $this->assertSame((string) self::SEEDED, $this->header($first, 'X-Treegrid-Total'));
+
+    $request = Request::create('/children', 'GET', ['offset' => (string) MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE]);
+    $last = $this->controller->children($this->menu, $request);
+    $this->assertSame($this->ids[0], end($last['#rows'])['#element']->link->getPluginId());
+    $this->assertNull($this->header($last, 'X-Treegrid-Next-Id'));
+  }
+
+  /**
+   * Returns a header value set through the build's attachments.
+   */
+  private function header(array $build, string $name): ?string {
+    foreach ($build['#attached']['http_header'] as [$header, $value]) {
+      if ($header === $name) {
+        return $value;
+      }
+    }
+    return NULL;
   }
 
 }

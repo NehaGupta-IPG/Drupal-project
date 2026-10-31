@@ -14,6 +14,13 @@ drupal-treegrid {
 }
 
 /*
+ * The table loaded rows are swapped into before treegrid places them.
+ */
+[data-treegrid-staging] {
+  display: none;
+}
+
+/*
  * Collapse marks a row's descendant run with data-treegrid-hidden; see
  * expand.js.
  */

@@ -9,11 +9,13 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\treegrid\TreegridCsrfToken;
+use Drupal\treegrid\TreegridRows;
 use Drupal\treegrid_reorder\MoveIntent;
 use Drupal\treegrid_reorder\TreeReorderManager;
 use Drupal\treegrid_reorder_test\TestTreeMoveHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Serves a nested treegrid that uses the reorder gestures.
@@ -159,9 +161,9 @@ final class TreegridReorderTestController extends ControllerBase {
   }
 
   /**
-   * Returns one level as JSON.
+   * Returns one level as a rows response.
    */
-  public function children(Request $request): JsonResponse {
+  public function children(Request $request): array|Response {
     $hits = $this->bump(self::CHILDREN_HITS);
     $this->sleep(self::CHILDREN_DELAY);
     $fail = $this->state()->get(self::CHILDREN_FAIL);
@@ -169,23 +171,18 @@ final class TreegridReorderTestController extends ControllerBase {
       $after = (int) ($fail['after'] ?? 0);
       $count = $fail['count'] ?? NULL;
       if ($hits > $after && ($count === NULL || $hits <= $after + (int) $count)) {
-        return new JsonResponse(['ok' => FALSE], 500);
+        return new Response('', 500);
       }
     }
 
     $parent = (string) $request->query->get('parent', '');
-    $items = [];
-    foreach ($this->levelItems($this->handler(), $parent) as $item) {
-      $items[] = [
-        'id' => $item['id'],
-        'parent_id' => $item['parent'],
-        'title' => 'Item ' . $item['id'],
-        'has_children' => $item['has_children'],
-        'movable' => $item['movable'],
-        'depth' => $item['depth'],
-      ];
+    $items = $this->levelItems($this->handler(), $parent);
+    $set_size = count($items);
+    $rows = [];
+    foreach ($items as $i => $item) {
+      $rows[] = ['#markup' => Markup::create($this->renderRow($item, $i + 1, $set_size))];
     }
-    return new JsonResponse(['parent' => $parent === '' ? NULL : $parent, 'items' => $items]);
+    return TreegridRows::build($rows, $set_size);
   }
 
   /**
@@ -318,7 +315,7 @@ final class TreegridReorderTestController extends ControllerBase {
   }
 
   /**
-   * Server-renders one row, matching the DOM the test consumer builds.
+   * Server-renders one row.
    *
    * @param array{id: string, parent: string, movable: ?bool, has_children: bool, depth: int} $item
    *   The item.

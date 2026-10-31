@@ -105,34 +105,32 @@ final class TreegridSpineTest extends WebDriverTestBase {
   }
 
   /**
-   * Lazily-built rows render their cells through the client renderer registry.
+   * Loaded rows carry the cells the server rendered for them.
    *
-   * The children come from the JSON endpoint and are built by the provider via
-   * Drupal.treegrid.renderCell, so this proves the checkbox and markup renderers
-   * run on the JS path (not just the server-rendered top level).
+   * The checkbox value and the mark cell differ by row, so the cells come from
+   * the rows response rather than from client code.
    */
-  public function testCellRenderersOnLazyChildren(): void {
+  public function testLoadedChildCellsComeFromServer(): void {
     $this->expand('p1');
 
     // c1a's checkbox value is FALSE (its ID contains "a"); c1b's is TRUE.
     $c1a_checkbox = $this->getSession()->getPage()->find(
       'css',
-      'tr[data-id="c1a"] input.treegrid-cell-checkbox',
+      'table[role="treegrid"] > tbody > tr[data-id="c1a"] input.treegrid-cell-checkbox',
     );
-    $this->assertNotNull($c1a_checkbox, 'The lazy child renders a checkbox cell.');
+    $this->assertNotNull($c1a_checkbox, 'The loaded row has a checkbox cell.');
     $this->assertFalse($c1a_checkbox->isChecked());
     $this->assertTrue(
       $this->getSession()->getPage()
-        ->find('css', 'tr[data-id="c1b"] input.treegrid-cell-checkbox')
+        ->find('css', 'table[role="treegrid"] > tbody > tr[data-id="c1b"] input.treegrid-cell-checkbox')
         ->isChecked(),
     );
 
-    // The markup cell injects the server html through the markup renderer.
     $markup = $this->getSession()->getPage()->find(
       'css',
       'tr[data-id="c1a"] .treegrid-cell-markup',
     );
-    $this->assertNotNull($markup, 'The lazy child renders a markup cell.');
+    $this->assertNotNull($markup, 'The loaded row has a mark cell.');
     $this->assertStringContainsString('m-c1a', $markup->getText());
   }
 

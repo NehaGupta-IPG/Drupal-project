@@ -4,6 +4,7 @@ treegrid_test_ui:
     js/treegrid-test-ui.js: {}
     js/treegrid-test-ui-consumer.js: {}
     js/treegrid-test-ui-detach.js: {}
+    js/treegrid-test-ui-attach-count.js: {}
   css:
     component:
       css/treegrid-test-ui.css: {}
@@ -12,3 +13,10 @@ treegrid_test_ui:
     - core/drupalSettings
     - core/once
     - treegrid/treegrid
+
+row_asset:
+  version: VERSION
+  js:
+    js/treegrid-test-ui-row-asset.js: {}
+  dependencies:
+    - core/drupal

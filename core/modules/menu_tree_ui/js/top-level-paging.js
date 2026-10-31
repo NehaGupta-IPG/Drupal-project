@@ -6,13 +6,13 @@
  * MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE) so a very wide top level does not
  * make first paint expensive. When the top level was truncated, an
  * IntersectionObserver sentinel below the tree fetches the next page from the
- * children endpoint (parent empty, with an offset) and appends the rows as
- * top-level siblings, until the server reports no more remain.
+ * children endpoint (parent empty, with an offset) through htmx and appends the
+ * rows as top-level siblings, until the server reports no more remain.
  *
  * Exposes Drupal.menuTreeUi.attachTopLevelPaging.
  */
 
-((Drupal) => {
+((Drupal, htmx) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
   const { setRowControlsActive } = Drupal.treegrid.treeNav;
 
@@ -38,8 +38,7 @@
       return noop;
     }
     const tbody = tree.querySelector('tbody');
-    const provider = Drupal.treegrid.providers[element.dataset.provider];
-    if (!tbody || !provider) {
+    if (!tbody) {
       return noop;
     }
     let offset = tbody.querySelectorAll(`${ROW}[data-parent-id=""]`).length;
@@ -81,39 +80,69 @@
         return;
       }
       loading = true;
+      let ctx = null;
+      let rejected = false;
+      let errored = false;
+      let rows = [];
+      const onBeforeResponse = (event) => {
+        if (event.detail.ctx?.sourceElement !== tbody) {
+          return;
+        }
+        ctx = event.detail.ctx;
+        const { response } = ctx;
+        if (
+          response.status >= 400 ||
+          !response.headers.has('X-Treegrid-Rows')
+        ) {
+          rejected = true;
+          event.preventDefault();
+        }
+      };
+      const onError = (event) => {
+        if (event.detail.ctx?.sourceElement === tbody) {
+          errored = true;
+        }
+      };
+      // htmx events bubble, so a swap inside a row would reach this listener.
+      const onSettle = (event) => {
+        if (event.target === tbody) {
+          rows = event.detail.newContent.filter((node) => node.matches?.(ROW));
+        }
+      };
+      document.addEventListener('htmx:before:response', onBeforeResponse);
+      document.addEventListener('htmx:error', onError);
+      tbody.addEventListener('htmx:after:settle', onSettle);
       try {
         const url = new URL(childrenUrl, window.location.origin);
         url.searchParams.set('offset', String(offset));
-        const response = await fetch(url.toString(), {
-          headers: { Accept: 'application/json' },
-          credentials: 'same-origin',
+        await htmx.ajax('GET', url.toString(), {
+          target: tbody,
+          swap: 'beforeend ignoreTitle:true',
+          select: '[data-treegrid-rows] > tr',
         });
-        if (!response.ok) {
+        if (!ctx || rejected || errored) {
           teardown();
           return;
         }
-        const data = await response.json();
-        const items = data.items ?? [];
-        const built = items.map((item) => provider.buildRow(item, 1));
-        tbody.append(...built);
-        built.forEach((row, i) => {
+        rows.forEach((row, i) => {
           // Number the rows against the full level, so a screen reader
           // announces "row N of total", not "N of page".
           row.setAttribute('aria-posinset', String(offset + i + 1));
           row.setAttribute('aria-setsize', String(total));
-          if (Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(row);
-          }
+          row.setAttribute('tabindex', '-1');
           setRowControlsActive(row, false);
           element.rowWindow?.observe(row);
         });
-        offset += items.length;
-        if (!data.has_more) {
+        offset += rows.length;
+        if (!ctx.response.headers.has('X-Treegrid-Next-Id')) {
           teardown();
         }
       } catch {
         teardown();
       } finally {
+        document.removeEventListener('htmx:before:response', onBeforeResponse);
+        document.removeEventListener('htmx:error', onError);
+        tbody.removeEventListener('htmx:after:settle', onSettle);
         loading = false;
       }
     }
@@ -133,4 +162,4 @@
   }
 
   Drupal.menuTreeUi.attachTopLevelPaging = attachTopLevelPaging;
-})(Drupal);
+})(Drupal, htmx);

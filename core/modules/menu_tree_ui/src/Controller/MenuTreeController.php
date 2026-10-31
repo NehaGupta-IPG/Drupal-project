@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\menu_tree_ui\Controller;
 
-use Drupal\Core\Cache\CacheableJsonResponse;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
@@ -19,6 +17,7 @@ use Drupal\menu_tree_ui\MenuTreeRowContext;
 use Drupal\menu_tree_ui\MenuTreeUiConstants;
 use Drupal\treegrid\TreegridColumnManager;
 use Drupal\treegrid\TreegridCsrfToken;
+use Drupal\treegrid\TreegridRows;
 use Drupal\menu_tree_ui\Service\MenuTreeLoader;
 use Drupal\menu_tree_ui\Service\MenuTreeMover;
 use Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock;
@@ -35,7 +34,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * Five actions:
  *   - page():         full admin page, server-rendered top level + JS shell.
- *   - children():     JSON for one level (called on expand).
+ *   - children():     rows for one level (called on expand and for paging).
  *   - search():       HTML partial swapped in by htmx.
  *   - move():         drag-and-drop / keyboard reorder.
  *   - columnUpdate(): interactive column toggle (e.g. "enabled").
@@ -91,23 +90,7 @@ final class MenuTreeController extends ControllerBase {
       ];
     }
 
-    $rendered_rows = [];
-    $set_size = $top_level_total;
-    $i = 0;
-    foreach ($top_level as $element) {
-      $rendered_rows[] = [
-        '#theme' => 'menu_tree_ui_row',
-        '#element' => $element,
-        '#parent_id' => '',
-        '#url' => $element->link->getUrlObject()->toString(),
-        '#linked' => $this->isLinked($element->link),
-        '#columns' => $this->buildColumnCells($element, $entity_map[$element->link->getPluginId()] ?? NULL, $columns),
-        '#depth' => 1,
-        '#pos_in_set' => ++$i,
-        '#set_size' => $set_size,
-        '#movable' => !$reorder_blocked && MenuLinkMovability::isMovable($element->link),
-      ];
-    }
+    $rendered_rows = $this->buildRows($top_level, $entity_map, $columns, '', 0, $top_level_total, $reorder_blocked);
 
     $menu_name = $menu->id();
     $has_changes = $this->workingCopy->hasChanges($menu_name);
@@ -171,12 +154,13 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Returns one level of children as JSON.
+   * Returns one level of children as a rows response.
    *
    * Query params:
    *   - parent: plugin ID of the parent link, or empty for top level.
+   *   - offset: the first row of a top-level page.
    */
-  public function children(MenuInterface $menu, Request $request): CacheableJsonResponse {
+  public function children(MenuInterface $menu, Request $request): array {
     $parent_id = $request->query->get('parent', '') ?: NULL;
     if ($parent_id !== NULL) {
       $parent_definition = $this->menuLinkManager->getDefinition($parent_id, FALSE);
@@ -193,34 +177,12 @@ final class MenuTreeController extends ControllerBase {
     $slice = $parent_id === NULL
       ? $this->loader->loadLevelForEditing($menu->id(), NULL, $offset, MenuTreeUiConstants::TOP_LEVEL_PAGE_SIZE)
       : $this->loader->loadLevelForEditing($menu->id(), $parent_id);
-    $page = $slice->elements;
-    $total = $slice->total;
     $columns = $this->columnManager->getSortedColumns();
-    $entity_map = $this->loadContentEntitiesForElements($page);
+    $entity_map = $this->loadContentEntitiesForElements($slice->elements);
     $reorder_blocked = $this->hasPendingRevisions($menu->id());
 
-    $data = [];
-    foreach ($page as $element) {
-      $data[] = $this->serializeElement($element, $entity_map, $columns, $parent_id ?? '', $reorder_blocked);
-    }
-
-    $response = new CacheableJsonResponse([
-      'parent' => $parent_id,
-      'items' => $data,
-      'offset' => $offset,
-      'has_more' => $parent_id === NULL && ($offset + count($page) < $total),
-      'total' => $total,
-    ]);
-    // Like ::page(), this level reflects the per-user working copy in
-    // tempstore, which cache metadata cannot express, so it is not cached.
-    // Without this a second editor sharing the same permissions could be
-    // served the first editor's pending overlay from the dynamic page cache.
-    $cache = (new CacheableMetadata())
-      ->setCacheMaxAge(0)
-      ->addCacheTags($menu->getCacheTags())
-      ->addCacheTags(['config:system.menu.' . $menu->id()]);
-    $response->addCacheableDependency($cache);
-    return $response;
+    $rows = $this->buildRows($slice->elements, $entity_map, $columns, $parent_id ?? '', $offset, $slice->total, $reorder_blocked);
+    return TreegridRows::build($rows, $slice->total, $slice->nextId);
   }
 
   /**
@@ -549,38 +511,44 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Serializes a tree element to the JSON shape consumed by <drupal-treegrid>.
+   * Builds the row render arrays for a slice of one level.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
-   *   The tree element to serialize.
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $elements
+   *   The slice's tree elements, in order.
    * @param array<string, \Drupal\menu_link_content\MenuLinkContentInterface> $entity_map
    *   Pre-loaded entities keyed by plugin ID.
    * @param \Drupal\treegrid\Plugin\TreegridColumn\TreegridColumnInterface[] $columns
    *   The active column plugins keyed by plugin ID.
    * @param string $parent_id
    *   The parent link plugin ID, or '' for the top level.
+   * @param int $offset
+   *   The number of rows of the level before the slice.
+   * @param int $set_size
+   *   The number of rows in the whole level.
    * @param bool $reorder_blocked
    *   Whether reordering is off for the whole menu.
    *
    * @return array
-   *   The serialized row, in the JSON shape consumed by <drupal-treegrid>.
+   *   One menu_tree_ui_row render array per element.
    */
-  private function serializeElement(MenuLinkTreeElement $element, array $entity_map, array $columns, string $parent_id, bool $reorder_blocked): array {
-    $link = $element->link;
-
-    return [
-      'id' => $link->getPluginId(),
-      'parent_id' => $parent_id,
-      'title' => (string) $link->getTitle(),
-      'enabled' => $link->isEnabled(),
-      'has_children' => $element->hasChildren,
-      'depth' => $element->depth,
-      'url' => $link->getUrlObject()->toString(),
-      'linked' => $this->isLinked($link),
-      'weight' => $link->getWeight(),
-      'movable' => !$reorder_blocked && MenuLinkMovability::isMovable($link),
-      'columns' => $this->buildColumnCells($element, $entity_map[$link->getPluginId()] ?? NULL, $columns),
-    ];
+  private function buildRows(array $elements, array $entity_map, array $columns, string $parent_id, int $offset, int $set_size, bool $reorder_blocked): array {
+    $rows = [];
+    foreach (array_values($elements) as $index => $element) {
+      $link = $element->link;
+      $rows[] = [
+        '#theme' => 'menu_tree_ui_row',
+        '#element' => $element,
+        '#parent_id' => $parent_id,
+        '#url' => $link->getUrlObject()->toString(),
+        '#linked' => $this->isLinked($link),
+        '#columns' => $this->buildColumnCells($element, $entity_map[$link->getPluginId()] ?? NULL, $columns),
+        '#depth' => $parent_id === '' ? 1 : $element->depth,
+        '#pos_in_set' => $offset + $index + 1,
+        '#set_size' => $set_size,
+        '#movable' => !$reorder_blocked && MenuLinkMovability::isMovable($link),
+      ];
+    }
+    return $rows;
   }
 
   /**

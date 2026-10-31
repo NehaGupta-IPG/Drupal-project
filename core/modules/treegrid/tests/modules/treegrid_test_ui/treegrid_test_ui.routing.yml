@@ -12,6 +12,10 @@ treegrid_test_ui.children:
     _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::children'
   requirements:
     _access: 'TRUE'
+  options:
+    _htmx_route: TRUE
+    no_cache: TRUE
+    _no_big_pipe: TRUE
 
 treegrid_test_ui.column_update:
   path: '/treegrid-test-ui/column-update'

@@ -105,7 +105,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
     }
     return $this->getSession()->getPage()->find(
       'css',
-      sprintf('tr[role="row"][data-id="%s"]', $id),
+      sprintf('table[role="treegrid"] tr[role="row"][data-id="%s"]', $id),
     );
   }
 

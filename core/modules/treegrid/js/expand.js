@@ -8,11 +8,12 @@
  * their parent. "Is this subtree already loaded" is tracked by
  * row.dataset.treegridLoaded rather than the presence of a child <ul>.
  *
- * Hands off row construction to an injected renderer and visibility tracking to
- * RowWindow. Exposes Drupal.treegrid.ExpandManager.
+ * Rows come from the server through core's htmx pipeline, into a hidden staging
+ * table the element owns, and are placed from there. Visibility tracking is
+ * RowWindow's. Exposes Drupal.treegrid.ExpandManager.
  */
 
-((Drupal) => {
+((Drupal, htmx) => {
   Drupal.treegrid = Drupal.treegrid || {};
   const {
     descendantRows,
@@ -79,17 +80,9 @@
      *   The <drupal-treegrid> element; its queue serializes level loads and
      *   refreshes, and its rowWindow tracks visibility (rebuilt on reconnect,
      *   so it is read late).
-     * @param {object} rowBuilder
-     *   The consumer's row renderer.
-     * @param {function} rowBuilder.buildRow
-     *   Builds a single row element from one item and its depth.
      */
-    constructor(element, rowBuilder) {
+    constructor(element) {
       this.element = element;
-      // The row renderer is injected so the engine stays consumer-agnostic; the
-      // consumer supplies how its items become DOM through the registered
-      // provider. rowBuilder = { buildRow }.
-      this.buildRow = rowBuilder.buildRow;
       // Level loads waiting for or running in a queue unit, keyed by row id.
       this.queued = new Map();
       // Level loads running inline in a unit, keyed by row id: the row and the
@@ -99,7 +92,7 @@
 
     /**
      * @return {string}
-     *   The endpoint returning one level of children as JSON.
+     *   The endpoint returning one level of children as rows.
      */
     get childrenUrl() {
       return this.element.dataset.childrenUrl;
@@ -122,46 +115,125 @@
     }
 
     /**
-     * Builds one level's rows, with their positions in the level.
+     * The tbody of the hidden table loaded rows are swapped into.
      *
-     * @param {Array<object>} items
-     *   The level's items, in order.
-     * @param {number} depth
-     *   The depth the rows render at.
-     *
-     * @return {DocumentFragment}
-     *   The sibling rows.
+     * @return {?HTMLTableSectionElement}
+     *   The staging tbody.
      */
-    buildLevel(items, depth) {
-      const fragment = document.createDocumentFragment();
-      items.forEach((item, index) => {
-        fragment.appendChild(
-          this.buildPositioned(item, depth, index, items.length),
-        );
-      });
-      return fragment;
+    get staging() {
+      return this.element.querySelector('[data-treegrid-staging] > tbody');
     }
 
     /**
-     * Builds one row and sets its position in its level.
+     * Loads one level's rows into staging through htmx.
      *
-     * @param {object} item
-     *   The item.
+     * The response is gated: a status of 400 or more, or a response without
+     * the X-Treegrid-Rows marker, is cancelled before htmx swaps or loads
+     * anything from it.
+     *
+     * @param {HTMLElement} source
+     *   The element the request belongs to: the parent row, or the element
+     *   itself for the top level.
+     * @param {string} parentId
+     *   The parent's plugin ID, or '' for the root level.
+     *
+     * @return {Promise<{failed: boolean, status: number}>}
+     *   Whether the load failed, and the HTTP status (0 when no response
+     *   arrived).
+     */
+    async requestRows(source, parentId) {
+      const url = new URL(this.childrenUrl, window.location.origin);
+      if (parentId !== '') {
+        url.searchParams.set('parent', parentId);
+      }
+      let ctx = null;
+      let rejected = false;
+      let errored = false;
+      const onBeforeResponse = (event) => {
+        if (event.detail.ctx?.sourceElement !== source) {
+          return;
+        }
+        ctx = event.detail.ctx;
+        const { response } = ctx;
+        if (
+          response.status >= 400 ||
+          !response.headers.has('X-Treegrid-Rows')
+        ) {
+          rejected = true;
+          event.preventDefault();
+        }
+      };
+      const onError = (event) => {
+        if (event.detail.ctx?.sourceElement === source) {
+          errored = true;
+        }
+      };
+      document.addEventListener('htmx:before:response', onBeforeResponse);
+      document.addEventListener('htmx:error', onError);
+      try {
+        await htmx.ajax('GET', url.toString(), {
+          source,
+          target: this.staging,
+          swap: 'beforeend ignoreTitle:true',
+          select: '[data-treegrid-rows] > tr',
+        });
+      } finally {
+        document.removeEventListener('htmx:before:response', onBeforeResponse);
+        document.removeEventListener('htmx:error', onError);
+      }
+      return {
+        failed: !ctx || rejected || errored,
+        status: ctx?.response.status ?? 0,
+      };
+    }
+
+    /**
+     * The rows currently in staging.
+     *
+     * @return {Array<HTMLTableRowElement>}
+     *   The staged rows, in order.
+     */
+    stagedRows() {
+      return Array.from(this.staging?.children ?? []);
+    }
+
+    /**
+     * Detaches and removes whatever is left in staging.
+     */
+    emptyStaging() {
+      this.stagedRows().forEach((row) => {
+        Drupal.detachBehaviors?.(row);
+        row.remove();
+      });
+    }
+
+    /**
+     * Sets a placed row's position, level and tab stop, and starts tracking it.
+     *
+     * The server's values for these are not relied on.
+     *
+     * @param {HTMLTableRowElement} row
+     *   The row, already in the tree.
      * @param {number} depth
      *   The depth the row renders at.
      * @param {number} index
      *   The 0-based index of the row in its level.
      * @param {number} size
      *   The number of rows in the level.
-     *
-     * @return {HTMLElement}
-     *   The row.
+     * @param {boolean} hidden
+     *   Whether the row's parent is collapsed or hidden.
      */
-    buildPositioned(item, depth, index, size) {
-      const row = this.buildRow(item, depth);
+    initPlacedRow(row, depth, index, size, hidden) {
       row.setAttribute('aria-posinset', String(index + 1));
       row.setAttribute('aria-setsize', String(size));
-      return row;
+      setRowLevel(row, depth);
+      row.setAttribute('tabindex', '-1');
+      setRowControlsActive(row, false);
+      if (hidden) {
+        row.dataset.treegridHidden = 'true';
+      } else {
+        this.rowWindow?.observe(row);
+      }
     }
 
     /**
@@ -474,7 +546,7 @@
      * Surgical diff rather than blow-the-children-away-and-rebuild: existing
      * rows are reused by data-id so their subtrees and state survive (each
      * carries its descendant run as a block); rows new in the server response
-     * are freshly built; rows gone from the response are removed with their
+     * are taken from staging; rows gone from the response are removed with their
      * blocks; order follows the server; reused rows whose level changed are
      * rebased. No-ops when the parent row isn't in the DOM.
      *
@@ -500,21 +572,46 @@
         return true;
       }
 
-      const { items } = await this.fetchChildren(parentId);
-      if (items === null) {
-        return false;
-      }
-      if (!parentRow.isConnected) {
-        return true;
-      }
-      if (!isRoot) {
-        parentRow.dataset.hasChildren = items.length > 0 ? 'true' : 'false';
-        if (parentRow.dataset.treegridLoaded !== 'true') {
-          // Rows inserted under a parent that was never opened would leave a
-          // level that looks loaded but is not.
+      try {
+        const { failed } = await this.requestRows(
+          isRoot ? this.element : parentRow,
+          parentId,
+        );
+        if (failed) {
+          return false;
+        }
+        if (!parentRow.isConnected) {
           return true;
         }
+        const staged = this.stagedRows();
+        if (!isRoot) {
+          parentRow.dataset.hasChildren = staged.length > 0 ? 'true' : 'false';
+          if (parentRow.dataset.treegridLoaded !== 'true') {
+            // Rows inserted under a parent that was never opened would leave a
+            // level that looks loaded but is not.
+            return true;
+          }
+        }
+        this.reconcile(parentId, parentRow, staged);
+        return true;
+      } finally {
+        this.emptyStaging();
       }
+    }
+
+    /**
+     * Reconciles a parent's children in the DOM against the staged rows.
+     *
+     * @param {string} parentId
+     *   Plugin ID of the parent, or '' for the root level.
+     * @param {HTMLElement} parentRow
+     *   The parent row, or the tbody for the root level.
+     * @param {Array<HTMLTableRowElement>} staged
+     *   The level's rows as the server rendered them, in order.
+     */
+    reconcile(parentId, parentRow, staged) {
+      const isRoot = parentId === '';
+      const tbody = this.tree.querySelector('tbody');
       // Rows new to a collapsed (or hidden) parent come in hidden.
       const insertHidden =
         !isRoot &&
@@ -537,25 +634,21 @@
       });
 
       const childDepth = isRoot ? 1 : levelOf(parentRow) + 1;
-      const setSize = items.length;
+      const setSize = staged.length;
       const result = [];
       const kept = new Set();
-      items.forEach((item, index) => {
+      staged.forEach((stagedRow, index) => {
         const posInSet = index + 1;
-        const entry = blocks.get(item.id);
+        const entry = blocks.get(stagedRow.dataset.id);
         if (entry) {
-          kept.add(item.id);
+          kept.add(stagedRow.dataset.id);
           rebaseRowLevel(entry.row, childDepth);
           entry.row.dataset.parentId = parentId;
           entry.row.setAttribute('aria-posinset', String(posInSet));
           entry.row.setAttribute('aria-setsize', String(setSize));
           result.push({ row: entry.row, block: entry.block, fresh: false });
         } else {
-          result.push({
-            row: this.buildPositioned(item, childDepth, index, setSize),
-            block: [],
-            fresh: true,
-          });
+          result.push({ row: stagedRow, block: [], fresh: true });
         }
       });
 
@@ -568,7 +661,7 @@
       });
 
       // Re-insert in server order. insertBefore/after on an existing node is a
-      // move (no clone), so this reorders kept rows and inserts fresh ones.
+      // move (no clone), so this reorders kept rows and places new ones.
       let anchor = isRoot ? null : parentRow;
       result.forEach(({ row, block }) => {
         if (anchor) {
@@ -583,24 +676,12 @@
         });
       });
 
-      // Attach behaviors + observe only the freshly-built rows.
-      result.forEach(({ row, fresh }) => {
+      // Set up only the rows new to the level.
+      result.forEach(({ row, fresh }, index) => {
         if (fresh) {
-          if (Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(row);
-          }
-          // Built rows are not the active row, so keep their controls out of
-          // the tab order (set after attachBehaviors, which upgrades the
-          // dropbutton).
-          setRowControlsActive(row, false);
-          if (insertHidden) {
-            row.dataset.treegridHidden = 'true';
-          } else {
-            this.rowWindow?.observe(row);
-          }
+          this.initPlacedRow(row, childDepth, index, setSize, insertHidden);
         }
       });
-      return true;
     }
 
     /**
@@ -648,38 +729,6 @@
     }
 
     /**
-     * Fetches one level of children.
-     *
-     * @param {string} parentId
-     *   Plugin ID of the parent, or '' for the root level.
-     *
-     * @return {Promise<{items: ?Array<object>, status: number}>}
-     *   The child items (null on failure) and the HTTP status (0 for a network
-     *   error).
-     */
-    async fetchChildren(parentId) {
-      try {
-        const url = new URL(this.childrenUrl, window.location.origin);
-        if (parentId !== '') {
-          url.searchParams.set('parent', parentId);
-        }
-        const response = await fetch(url.toString(), {
-          headers: { Accept: 'application/json' },
-          credentials: 'same-origin',
-        });
-        if (!response.ok) {
-          console.error('[treegrid] children fetch failed', response.status);
-          return { items: null, status: response.status };
-        }
-        const data = await response.json();
-        return { items: data.items, status: response.status };
-      } catch (e) {
-        console.error('[treegrid] children fetch error', e);
-        return { items: null, status: 0 };
-      }
-    }
-
-    /**
      * Loads and inserts a row's children, marking the row loaded.
      *
      * @param {HTMLElement} row
@@ -705,8 +754,11 @@
         }
       }
       try {
-        const { items, status } = await this.fetchChildren(parentId);
-        if (items === null) {
+        if (!row.isConnected) {
+          return false;
+        }
+        const { failed, status } = await this.requestRows(row, parentId);
+        if (failed) {
           if (isParent) {
             row.setAttribute('aria-expanded', 'false');
           }
@@ -721,23 +773,18 @@
           { parentId, change: 'insert' },
           false,
         );
+        const rows = this.stagedRows();
         const depth = levelOf(row) + 1;
-        const fragment = this.buildLevel(items, depth);
-        const inserted = Array.from(fragment.children);
+        const hidden =
+          row.dataset.treegridHidden === 'true' ||
+          row.getAttribute('aria-expanded') === 'false';
         const anchor = lastDescendantRow(row) ?? row;
-        anchor.after(fragment);
+        anchor.after(...rows);
         row.dataset.treegridLoaded = 'true';
-        inserted.forEach((r) => {
-          if (Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(r);
-          }
-          // Built rows are not the active row, so keep their controls out of
-          // the tab order (set after attachBehaviors, which upgrades the
-          // dropbutton).
-          setRowControlsActive(r, false);
-          this.rowWindow?.observe(r);
+        rows.forEach((r, index) => {
+          this.initPlacedRow(r, depth, index, rows.length, hidden);
         });
-        if (items.length === 0) {
+        if (rows.length === 0) {
           // A level with no rows is a leaf: it counts as loaded but never open.
           row.removeAttribute('aria-expanded');
           row.dataset.hasChildren = 'false';
@@ -759,10 +806,11 @@
         this.dispatch('treegrid:level-loaded', { parentId });
         return open;
       } finally {
+        this.emptyStaging();
         this.clearLoading(row);
       }
     }
   }
 
   Drupal.treegrid.ExpandManager = ExpandManager;
-})(Drupal);
+})(Drupal, htmx);

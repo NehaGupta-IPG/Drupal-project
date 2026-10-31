@@ -17,3 +17,4 @@ treegrid:
     - core/drupal
     - core/drupalSettings
     - core/drupal.announce
+    - core/drupal.htmx

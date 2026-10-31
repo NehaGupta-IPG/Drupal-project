@@ -125,27 +125,33 @@ final class MenuTreeControllerColumnUpdateTest extends KernelTestBase {
   }
 
   /**
-   * The children JSON links a navigable title and leaves a route-less one plain.
+   * The children rows link a navigable title and leave a route-less one plain.
    */
-  public function testChildrenJsonMarksNavigableTitles(): void {
-    MenuLinkContent::create([
+  public function testChildrenRowsMarkNavigableTitles(): void {
+    $linked = MenuLinkContent::create([
       'title' => 'Linked',
       'link' => ['uri' => 'https://example.com'],
       'menu_name' => 'main',
-    ])->save();
-    MenuLinkContent::create([
+    ]);
+    $linked->save();
+    $plain = MenuLinkContent::create([
       'title' => 'Plain',
       'link' => ['uri' => 'route:<nolink>'],
       'menu_name' => 'main',
-    ])->save();
+    ]);
+    $plain->save();
 
-    $response = $this->controller->children($this->menu, Request::create('/children'));
-    $items = json_decode($response->getContent(), TRUE)['items'];
-    $by_title = array_column($items, NULL, 'title');
+    $build = $this->controller->children($this->menu, Request::create('/children'));
+    $by_id = [];
+    foreach ($build['#rows'] as $row) {
+      $by_id[$row['#element']->link->getPluginId()] = $row;
+    }
+    $linked_row = $by_id[$linked->getPluginId()];
+    $plain_row = $by_id[$plain->getPluginId()];
 
-    $this->assertTrue($by_title['Linked']['linked']);
-    $this->assertSame('https://example.com', $by_title['Linked']['url']);
-    $this->assertFalse($by_title['Plain']['linked']);
+    $this->assertTrue($linked_row['#linked']);
+    $this->assertSame('https://example.com', $linked_row['#url']);
+    $this->assertFalse($plain_row['#linked']);
   }
 
   /**

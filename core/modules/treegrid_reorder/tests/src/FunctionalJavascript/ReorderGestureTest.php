@@ -203,7 +203,7 @@ final class ReorderGestureTest extends WebDriverTestBase {
    *   The row element.
    */
   private function row(string $id): NodeElement {
-    $row = $this->getSession()->getPage()->find('css', sprintf('tr[role="row"][data-id="%s"]', $id));
+    $row = $this->getSession()->getPage()->find('css', sprintf('table[role="treegrid"] tr[role="row"][data-id="%s"]', $id));
     $this->assertNotNull($row, "Row $id should be present.");
     return $row;
   }

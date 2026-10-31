@@ -64,18 +64,22 @@
 
   /**
    * Initializes an element if its provider is registered, else parks it.
+   * An element that has already initialized is left alone.
    *
    * @param {TreegridElement} element
    *   The element to initialize.
    */
   function tryInit(element) {
+    if (internals.get(element).initialized) {
+      return;
+    }
     const provider = Drupal.treegrid.providers[element.dataset.provider];
     if (!provider) {
       pending.add(element);
       return;
     }
     pending.delete(element);
-    element.init(provider);
+    element.init();
   }
 
   /**
@@ -94,6 +98,23 @@
       }
     });
   };
+
+  /**
+   * Creates the hidden table that loaded rows are swapped into.
+   *
+   * It has no role, so the table-wide row queries (which look for the treegrid
+   * table) never see staged rows.
+   *
+   * @return {HTMLTableElement}
+   *   The staging table.
+   */
+  function createStaging() {
+    const table = document.createElement('table');
+    table.setAttribute('data-treegrid-staging', '');
+    table.hidden = true;
+    table.append(document.createElement('tbody'));
+    return table;
+  }
 
   // Per-element state kept out of the element's public surface.
   const internals = new WeakMap();
@@ -292,25 +313,35 @@
         );
         return;
       }
-      tryInit(this);
+      if (document.readyState === 'loading') {
+        document.addEventListener(
+          'DOMContentLoaded',
+          () => {
+            if (this.isConnected) {
+              tryInit(this);
+            }
+          },
+          { once: true },
+        );
+      } else {
+        tryInit(this);
+      }
     }
 
     /**
-     * Wires the spine once the renderer provider is available.
-     *
-     * @param {object} provider
-     *   The renderer: { buildRow(item, depth) }.
+     * Wires the spine once the document is parsed and the provider is there.
      *
      * @internal
      */
-    init(provider) {
+    init() {
       const state = internals.get(this);
       state.initialized = true;
+      this.append(createStaging());
       this.rowWindow = new Drupal.treegrid.RowWindow(this);
       this.tree.querySelectorAll(ROW).forEach((row) => {
         this.rowWindow.observe(row);
       });
-      state.expand = new Drupal.treegrid.ExpandManager(this, provider);
+      state.expand = new Drupal.treegrid.ExpandManager(this);
 
       this.addListeners();
 

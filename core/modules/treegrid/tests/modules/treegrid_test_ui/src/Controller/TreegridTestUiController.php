@@ -9,17 +9,19 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\treegrid\TreegridCsrfToken;
+use Drupal\treegrid\TreegridRows;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Serves a minimal treegrid for exercising the spine JS in isolation.
  *
  * A two/three-level tree kept in State, so a test can change it: page()
  * server-renders the top level into a <drupal-treegrid>, and children() feeds
- * the lazy-expand engine one level at a time. Each row carries a 'checkbox' and
- * a 'markup' column cell so the client cell-renderer registry is exercised on
- * lazily-built rows. This consumer only drives the read/navigate/expand spine.
+ * the lazy-expand engine one level at a time as a rows response. Each row
+ * carries a checkbox and a markup cell. This consumer only drives the
+ * read/navigate/expand spine.
  */
 final class TreegridTestUiController extends ControllerBase {
 
@@ -39,6 +41,16 @@ final class TreegridTestUiController extends ControllerBase {
    * The State key holding how many children requests still fail with a 500.
    */
   public const CHILDREN_FAIL_KEY = 'treegrid_test_ui.children_fail';
+
+  /**
+   * The State key holding whether the rows response omits the marker header.
+   */
+  public const CHILDREN_NO_MARKER_KEY = 'treegrid_test_ui.children_no_marker';
+
+  /**
+   * The State key holding whether loaded rows carry wrong position values.
+   */
+  public const CHILDREN_WRONG_VALUES_KEY = 'treegrid_test_ui.children_wrong_values';
 
   /**
    * The State key holding how a column update is refused, if it is.
@@ -127,22 +139,39 @@ final class TreegridTestUiController extends ControllerBase {
   }
 
   /**
-   * Returns one level of children as JSON for the lazy-expand engine.
+   * Returns one level of children as a rows response.
    */
-  public function children(Request $request): JsonResponse {
+  public function children(Request $request): array|Response {
     $delay = (int) $this->state()->get(self::CHILDREN_DELAY_KEY, 0);
     if ($delay > 0) {
       usleep($delay * 1000);
     }
+    $parent = (string) $request->query->get('parent', '');
+    $ids = $this->tree()[$parent] ?? [];
+    $set_size = count($ids);
+    $wrong = (bool) $this->state()->get(self::CHILDREN_WRONG_VALUES_KEY, FALSE);
+    $html = [];
+    foreach (array_values($ids) as $i => $id) {
+      $html[] = $this->renderRow($this->item($id), $i + 1, $set_size, $wrong);
+    }
+
     $failing = (int) $this->state()->get(self::CHILDREN_FAIL_KEY, 0);
     if ($failing > 0) {
       $this->state()->set(self::CHILDREN_FAIL_KEY, $failing - 1);
-      return new JsonResponse(['ok' => FALSE], 500);
+      return new Response(
+        '<table><tbody data-treegrid-rows>' . implode('', $html) . '</tbody></table>',
+        500,
+        ['X-Treegrid-Rows' => '1'],
+      );
     }
-    $parent = (string) $request->query->get('parent', '');
-    $ids = $this->tree()[$parent] ?? [];
-    $items = array_map(fn(string $id): array => $this->item($id), $ids);
-    return new JsonResponse(['parent' => $parent ?: NULL, 'items' => array_values($items)]);
+
+    $rows = array_map(fn(string $row): array => ['#markup' => Markup::create($row)], $html);
+    $build = TreegridRows::build($rows, $set_size);
+    $build['#attached']['library'][] = 'treegrid_test_ui/row_asset';
+    if ($this->state()->get(self::CHILDREN_NO_MARKER_KEY, FALSE)) {
+      $build['#attached']['http_header'] = [];
+    }
+    return $build;
   }
 
   /**
@@ -202,7 +231,7 @@ final class TreegridTestUiController extends ControllerBase {
   }
 
   /**
-   * Server-renders one row, matching the DOM the JS row builder produces.
+   * Server-renders one row.
    *
    * @param array<string, mixed> $item
    *   The item data.
@@ -210,14 +239,23 @@ final class TreegridTestUiController extends ControllerBase {
    *   The 1-based position among siblings.
    * @param int $set_size
    *   The number of siblings.
+   * @param bool $wrong_values
+   *   Whether to render wrong level, position and tab stop values.
    *
    * @return string
    *   The row HTML.
    */
-  private function renderRow(array $item, int $pos_in_set, int $set_size): string {
+  private function renderRow(array $item, int $pos_in_set, int $set_size, bool $wrong_values = FALSE): string {
     $id = Html::escape($item['id']);
     $has_children = $item['has_children'];
     $tabindex = ($item['parent_id'] === '' && $pos_in_set === 1) ? '0' : '-1';
+    $level = $item['depth'];
+    if ($wrong_values) {
+      $level = 9;
+      $pos_in_set = 99;
+      $set_size = 99;
+      $tabindex = '0';
+    }
 
     $disclosure = $has_children
       ? '<button type="button" class="tgu-toggle" data-treegrid-toggle tabindex="-1" aria-label="Toggle ' . $id . '">&#9656;</button>'
@@ -231,10 +269,10 @@ final class TreegridTestUiController extends ControllerBase {
 
     return '<tr role="row" data-id="' . $id . '" data-parent-id="' . Html::escape($item['parent_id'])
       . '" data-has-children="' . ($has_children ? 'true' : 'false') . '"'
-      . ' aria-level="' . $item['depth'] . '" aria-posinset="' . $pos_in_set
+      . ' aria-level="' . $level . '" aria-posinset="' . $pos_in_set
       . '" aria-setsize="' . $set_size . '"' . ($has_children ? ' aria-expanded="false"' : '')
       . ' aria-label="Row ' . $id . '" tabindex="' . $tabindex . '">'
-      . '<td role="gridcell" class="tgu-name">' . $disclosure
+      . '<td role="gridcell" class="tgu-name" data-treegrid-name-cell>' . $disclosure
       . '<span class="tgu-title">' . Html::escape($item['title']) . '</span></td>'
       . '<td role="gridcell" data-column="check">' . $checkbox . '</td>'
       . '<td role="gridcell" data-column="mark">' . $markup . '</td>'

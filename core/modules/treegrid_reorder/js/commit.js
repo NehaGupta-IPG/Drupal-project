@@ -4,9 +4,9 @@
  *
  * Server is the only source of truth. We POST to the move endpoint with no DOM
  * mutation up front; on success we re-fetch the affected levels (from-parent and
- * to-parent) and rebuild their rows in place. The whole class of "client moved
+ * to-parent) and reconcile their rows in place. The whole class of "client moved
  * the DOM but forgot to update attribute X" bugs goes away — any attribute the
- * row needs is set by the renderer from the server's JSON.
+ * row needs comes from the rows the server renders.
  *
  * Trade-off: a moved row's previously-expanded descendants collapse after the
  * refresh. Acceptable for v1 — replay-expansion can be added later.
