@@ -12,6 +12,9 @@ services:
   plugin.manager.image.effect:
     class: Drupal\image\ImageEffectManager
     parent: default_plugin_manager
+  Drupal\image\ImageEffectManager: '@plugin.manager.image.effect'
+  Drupal\file\FileUsage\FileUsageInterface: '@file.usage'
+  Drupal\file\FileRepositoryInterface: '@file.repository'
   logger.channel.image:
     parent: logger.channel_base
     arguments: ['image']

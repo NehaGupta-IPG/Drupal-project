@@ -10,7 +10,7 @@ use Drupal\Core\ImageToolkit\ImageToolkitManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Requirements for the Image module.
+ * Requirements hook implementations for image.
  */
 class ImageRequirements {
 
