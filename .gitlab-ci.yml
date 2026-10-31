@@ -606,6 +606,26 @@ default:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
 
+'📦️ Yarn (CKEditor 5 nightly)':
+  <<: *default-job-settings
+  variables:
+    <<: *default-lint-variables
+    KUBERNETES_CPU_REQUEST: "2"
+  stage: 🏗️ Build
+  artifacts:
+    expire_in: 1 day
+    expose_as: 'yarn-vendor'
+    paths:
+      - core/package.json
+      - core/node_modules/
+      - core/assets/vendor/ckeditor5
+      - core/modules/ckeditor5/js/build
+  script:
+    - sudo apk add jq
+    - jq '.devDependencies | keys | .[]' core/package.json | grep ckeditor | xargs -I % yarn --cwd ./core upgrade %@nightly
+    - yarn --cwd ./core build
+    - yarn --cwd ./core build:ckeditor5-types
+
 ################
 # Lint Jobs
 ################
