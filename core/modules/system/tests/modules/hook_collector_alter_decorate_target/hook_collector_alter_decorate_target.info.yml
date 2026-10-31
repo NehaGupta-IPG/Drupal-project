@@ -1,0 +1,5 @@
+name: 'Hook collector alter decorate target'
+type: module
+description: 'Provides hook classes for testing how service alteration and decoration interacts with OOP Hook API'
+package: Testing
+version: VERSION
