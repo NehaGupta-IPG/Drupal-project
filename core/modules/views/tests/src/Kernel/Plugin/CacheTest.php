@@ -104,6 +104,48 @@ class CacheTest extends ViewsKernelTestBase {
   }
 
   /**
+   * The "Never cache" (results_lifespan 0) option should disable caching.
+   */
+  public function testTimeResultCachingNeverCacheIsPermanent(): void {
+    // Prime the results cache under "Never cache" (0).
+    $view = Views::getView('test_cache');
+    $view->setDisplay();
+    $view->display_handler->overrideOption('cache', [
+      'type' => 'time',
+      'options' => [
+        'results_lifespan' => 0,
+        'output_lifespan' => 0,
+      ],
+    ]);
+    $this->executeView($view);
+    $this->assertCount(5, $view->result);
+
+    // "Never cache" implies nothing is written to the results cache.
+    $cid = $view->display_handler->getPlugin('cache')->generateResultsKey();
+    $this->assertFalse(\Drupal::cache('data')->get($cid));
+    $view->destroy();
+
+    // With caching disabled, a new row would appear on the next execution.
+    Database::getConnection()->insert('views_test_data')->fields([
+      'name' => 'Rod Davis',
+      'age' => 29,
+      'job' => 'Banjo',
+    ])->execute();
+
+    $view = Views::getView('test_cache');
+    $view->setDisplay();
+    $view->display_handler->overrideOption('cache', [
+      'type' => 'time',
+      'options' => [
+        'results_lifespan' => 0,
+        'output_lifespan' => 0,
+      ],
+    ]);
+    $this->executeView($view);
+    $this->assertCount(6, $view->result);
+  }
+
+  /**
    * Tests result caching with filters.
    *
    * @see views_plugin_cache_time
