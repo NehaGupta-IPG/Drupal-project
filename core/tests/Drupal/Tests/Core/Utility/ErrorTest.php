@@ -33,36 +33,167 @@ class ErrorTest extends UnitTestCase {
   /**
    * Data provider for testGetLastCaller.
    *
-   * @return array
-   *   An array of parameter data.
+   * @return \Iterator<string, array{list<array>, array}>
+   *   An iterator with named datasets.
+   *   (Using an iterator instead of an array helps to avoid duplicate dataset
+   *   names.)
    */
-  public static function providerTestGetLastCaller(): array {
-    $data = [];
-
+  public static function providerTestGetLastCaller(): \Iterator {
     // Test with just one item. This should default to the function being
     // main().
-    $single_item = [self::createBacktraceItem()];
-    $data[] = [$single_item, self::createBacktraceItem('main()')];
+    yield 'single item' => [
+      [
+        self::createBacktraceItem('foo', line: 51, file: 'main.php'),
+      ],
+      self::createBacktraceItem('main()', line: 51, file: 'main.php'),
+    ];
 
-    // Add a second item, without a class.
-    $two_items = $single_item;
-    $two_items[] = self::createBacktraceItem('test_function_two');
-    $data[] = [$two_items, self::createBacktraceItem('test_function_two()')];
+    // Test with more procedural items.
+    // The function name from the first item is always ignored.
+    yield 'bar, foo, other' => [
+      [
+        self::createBacktraceItem('bar', line: 55, file: 'foo.php'),
+        self::createBacktraceItem('foo', line: 66, file: 'other.php'),
+        self::createBacktraceItem('other', line: 77, file: 'main.php'),
+      ],
+      self::createBacktraceItem('foo()', line: 55, file: 'foo.php'),
+    ];
 
-    // Add a second item, with a class.
-    $two_items = $single_item;
-    $two_items[] = self::createBacktraceItem('test_function_two', 'TestClass');
-    $data[] = [$two_items, self::createBacktraceItem('TestClass->test_function_two()')];
+    // Test with a class method as second item.
+    yield 'TestClass' => [
+      [
+        self::createBacktraceItem('foo', file: 'TestClass.php'),
+        self::createBacktraceItem('testMethod', 'TestClass', file: 'other.php'),
+        self::createBacktraceItem('other', file: 'main.php'),
+      ],
+      self::createBacktraceItem('TestClass->testMethod()', file: 'TestClass.php'),
+    ];
 
-    // Add ignored functions to backtrace. They should get removed.
+    // Test with NULL as the first item's function name.
+    // This replicates the behavior from Error::decodeException(), which
+    // prepends an artificial item without function name.
+    yield 'NULL, bar, foo' => [
+      [
+        self::createBacktraceItem(NULL, line: 77, file: 'bar.php'),
+        self::createBacktraceItem('bar', file: 'foo.php'),
+        self::createBacktraceItem('foo', file: 'index.php'),
+      ],
+      self::createBacktraceItem('bar()', line: 77, file: 'bar.php'),
+    ];
+
+    // Prepend ignored functions to backtrace. They should get removed.
     foreach (['debug', '_drupal_error_handler', '_drupal_exception_handler'] as $function) {
-      $two_items = $single_item;
-      // Push to the start of the backtrace.
-      array_unshift($two_items, self::createBacktraceItem($function));
-      $data[] = [$single_item, self::createBacktraceItem('main()')];
+      yield "NULL, $function, bar, foo" => [
+        [
+          self::createBacktraceItem(NULL),
+          self::createBacktraceItem($function, file: 'bar.php'),
+          self::createBacktraceItem('bar', file: 'foo.php'),
+          self::createBacktraceItem('foo', file: 'index.php'),
+        ],
+        self::createBacktraceItem('bar()', file: 'bar.php'),
+      ];
     }
 
-    return $data;
+    // Test removal of multiple ignored functions.
+    yield 'NULL, debug, debug' => [
+      [
+        self::createBacktraceItem(NULL),
+        self::createBacktraceItem('debug'),
+        self::createBacktraceItem('_drupal_exception_handler'),
+        self::createBacktraceItem('foo'),
+      ],
+      self::createBacktraceItem('foo()'),
+    ];
+  }
+
+  /**
+   * Tests the getLastCaller() method with a real stack trace.
+   */
+  public function testGetLastCallerReal(): void {
+    $namespace = self::class;
+    $exception_class = \RuntimeException::class;
+    $this->defineTestFunctions([
+      'foo900' => 900,
+      'foo300' => 300,
+      'foo600' => 600,
+      'foo500' => 500,
+    ], $namespace, $exception_class);
+
+    $exception = "$namespace\\foo300"();
+    $this->assertInstanceOf($exception_class, $exception);
+    $this->assertInstanceOf(\Throwable::class, $exception);
+    $this->assertSame(501, $exception->getLine());
+
+    $file_template = __FILE__ . "(%s) : eval()'d code(%s) : eval()'d code";
+    $this->assertGreaterThan(0, preg_match(
+      '@^' . sprintf(preg_quote($file_template, '@'), '(\d+)', '(\d+)') . '$@',
+      $exception->getFile(),
+      $matches,
+    ));
+    $this->assertSame('1500', $matches[2]);
+    $get_file = fn (int $line) => sprintf($file_template, $matches[1], $line);
+    $this->assertSame($get_file(1500), $exception->getFile());
+
+    // The exception is thrown in the first line of foo500().
+    $this->assertSame(501, $exception->getLine());
+    // The stack trace is as expected.
+    $this->assertSame("$namespace\\foo500", $exception->getTrace()[0]['function']);
+    $this->assertSame($get_file(1600), $exception->getTrace()[0]['file']);
+    $this->assertSame("$namespace\\foo600", $exception->getTrace()[1]['function']);
+    $this->assertSame("$namespace\\foo300", $exception->getTrace()[2]['function']);
+
+    // The top item is skipped with ::getLastCaller().
+    $backtrace = $exception->getTrace();
+    $this->assertEqualsCanonicalizing([
+      'file' => $get_file(1600),
+      'line' => 601,
+      'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo600()',
+    ], Error::getLastCaller($backtrace));
+    $this->assertSame($exception->getTrace(), $backtrace);
+
+    // Prepend the additional item as in Error::decodeException().
+    $get_enhanced_backtrace = fn () => [
+      ['line' => $exception->getLine(), 'file' => $exception->getFile()],
+      ...$exception->getTrace(),
+    ];
+    $enhanced_backtrace = $get_enhanced_backtrace();
+    // The extra item is skipped, and we get the first "real" item.
+    $this->assertEqualsCanonicalizing([
+      'file' => $exception->getFile(),
+      'line' => 501,
+      'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo500()',
+    ], Error::getLastCaller($enhanced_backtrace));
+    $this->assertSame($get_enhanced_backtrace(), $enhanced_backtrace);
+
+    // Simulate ignored functions.
+    $ignored_functions_property = new \ReflectionProperty(Error::class, 'ignoredFunctions');
+    $original_ignored_functions = $ignored_functions_property->getValue();
+    try {
+      $ignored_functions_property->setValue(NULL, [
+        ...$original_ignored_functions,
+        "$namespace\\foo500",
+        "$namespace\\foo600",
+      ]);
+
+      $backtrace = $exception->getTrace();
+      $this->assertEqualsCanonicalizing([
+        'file' => $get_file(1300),
+        'line' => 301,
+        'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo300()',
+      ], Error::getLastCaller($backtrace));
+      $this->assertSame(array_slice($exception->getTrace(), 1), $backtrace);
+
+      $enhanced_backtrace = $get_enhanced_backtrace();
+      $this->assertEqualsCanonicalizing([
+        'file' => $get_file(1300),
+        'line' => 301,
+        'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo300()',
+      ], Error::getLastCaller($enhanced_backtrace));
+      $this->assertSame(array_slice($exception->getTrace(), 1), $enhanced_backtrace);
+    }
+    finally {
+      $ignored_functions_property->setValue(NULL, $original_ignored_functions);
+    }
   }
 
   /**
@@ -125,13 +256,15 @@ class ErrorTest extends UnitTestCase {
    *   (optional) An array of function arguments to add to the backtrace item.
    * @param int $line
    *   (optional) The line where the function was called.
+   * @param string|null $file
+   *   (optional) The file where the function was called.
    *
    * @return array
    *   A backtrace array item.
    */
-  protected static function createBacktraceItem(?string $function = 'test_function', ?string $class = NULL, array $args = [], int $line = 10): array {
+  protected static function createBacktraceItem(?string $function = 'test_function', ?string $class = NULL, array $args = [], int $line = 10, ?string $file = 'test_file'): array {
     $backtrace = [
-      'file' => 'test_file',
+      'file' => $file,
       'line' => $line,
       'function' => $function,
       'args' => [],
@@ -147,6 +280,48 @@ class ErrorTest extends UnitTestCase {
     }
 
     return $backtrace;
+  }
+
+  /**
+   * Defines a number of functions with guaranteed line numbers.
+   *
+   * Each of the functions will call the next function in the list, except the
+   * last one, which will throw an exception.
+   *
+   * @param array<string, int> $functions_lines
+   *   Line numbers by function name without namespace.
+   * @param string $namespace
+   *   Namespace to prepend to the function names, without leading or trailing
+   *   namespace separator.
+   * @param string $exception_class
+   *   Exception class to throw in the last function.
+   */
+  protected function defineTestFunctions(array $functions_lines, string $namespace, string $exception_class): void {
+    $next_function = NULL;
+    assert($functions_lines !== []);
+    foreach (array_reverse($functions_lines) as $function => $line) {
+      $newlines = str_repeat("\n", $line - 1);
+      $return_expression = ($next_function !== NULL)
+        ? "$next_function()"
+        : "new \\$exception_class('Something went wrong.')";
+      // Use eval() to get fixed line numbers.
+      // This is safe, because all values are hard-coded in this class.
+      $php = <<<PHP
+namespace $namespace;{$newlines}function $function(): \Exception {
+  return $return_expression;
+}
+PHP;
+      $wrapper_line = $line + 1000;
+      $eval_newlines = str_repeat("\n", $wrapper_line - 1);
+      // Use a second layer of eval() to get distinguishable file names.
+      // phpcs:ignore Drupal.Functions.DiscouragedFunctions.Discouraged
+      eval($eval_newlines . 'eval(' . var_export($php, TRUE) . ');');
+      $eval_line = __LINE__ - 1;
+      $reflection_function = new \ReflectionFunction("$namespace\\$function");
+      $this->assertSame($line, $reflection_function->getStartLine());
+      $this->assertSame(__FILE__ . "($eval_line) : eval()'d code($wrapper_line) : eval()'d code", $reflection_function->getFileName());
+      $next_function = $function;
+    }
   }
 
 }
