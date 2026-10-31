@@ -5,7 +5,8 @@
  * The treegrid spine — lazy expand, row windowing, WAI-ARIA navigation, and the
  * roving-tabindex focus model — lives in the treegrid module's <drupal-treegrid>
  * element. Rows come from the server's menu_tree_ui_row template, on the first
- * page and in every loaded level. This file wires the menu-specific features onto an upgraded element:
+ * page and in every loaded level. This file wires the menu-specific features
+ * onto an upgraded element:
  *  - reorder, through treegrid_reorder's attach();
  *  - search jump-to and dismiss;
  *  - the "Keyboard commands" dialog.

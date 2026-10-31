@@ -37,7 +37,7 @@ final class MenuTreeUiLoadedRowsTest extends MenuTreeUiJavascriptTestBase {
 
     $toggle->click();
 
-    $this->assertSession()->waitForElement('css', sprintf('tr[data-id="%s"] .dropbutton-wrapper.open', $this->linkIds['C1']));
+    $this->assertNotNull($this->assertSession()->waitForElement('css', sprintf('tr[data-id="%s"] .dropbutton-wrapper.open', $this->linkIds['C1'])));
   }
 
 }

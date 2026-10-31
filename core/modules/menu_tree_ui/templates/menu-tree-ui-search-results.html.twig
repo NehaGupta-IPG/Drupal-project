@@ -10,9 +10,10 @@
  * - results: list of { id, title, enabled, edit_url, breadcrumb: string[], breadcrumb_ids: string[] }
  * - query:   the search string
  *
- * UX contract: an empty query renders an empty wrapper. The popover (which targets
- * #menu-tree-ui-search-results) hides itself via `:not(:has(*))` when there
- * are no element children, so the input is "closed" until the user types.
+ * UX contract: an empty query renders an empty wrapper. The popover (which
+ * targets #menu-tree-ui-search-results) hides itself via `:not(:has(*))` when
+ * there are no element children, so the input is "closed" until the user
+ * types.
  *
  * Each result's title is rendered as a button that dispatches a "jump to"
  * action to the tree: walk the ancestor chain (breadcrumb_ids), expand each
