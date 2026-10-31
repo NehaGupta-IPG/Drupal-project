@@ -213,4 +213,21 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
     $this->assertEquals('14:30:00', $result['object']->format('H:i:s'));
   }
 
+  /**
+   * Verifies re-validation with DrupalDateTime objects does not cause errors.
+   */
+  public function testNoFatalOnDoubleValidation(): void {
+    $form_state = new FormState();
+    $form_state->setValue('datetime_local_picker', ['date' => '2025-02-18T12:00']);
+    $form_state->setValue('datetime_time_only', ['time' => '12:00']);
+    $this->formBuilder->submitForm($this, $form_state);
+    $this->assertEmpty($form_state->getErrors());
+
+    $processed_values = $form_state->getValues();
+    $form_state2 = new FormState();
+    $form_state2->setValues($processed_values);
+    $this->formBuilder->submitForm($this, $form_state2);
+    $this->assertEmpty($form_state2->getErrors());
+  }
+
 }
