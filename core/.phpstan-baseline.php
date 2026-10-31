@@ -1658,36 +1658,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Version/Constraint.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\AccessResult\\:\\:andIf\\(\\) should return static\\(Drupal\\\\Core\\\\Access\\\\AccessResult\\) but returns Drupal\\\\Core\\\\Access\\\\AccessResultAllowed\\|Drupal\\\\Core\\\\Access\\\\AccessResultForbidden\\|Drupal\\\\Core\\\\Access\\\\AccessResultNeutral\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/AccessResult.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\AccessResult\\:\\:orIf\\(\\) should return static\\(Drupal\\\\Core\\\\Access\\\\AccessResult\\) but returns Drupal\\\\Core\\\\Access\\\\AccessResultAllowed\\|Drupal\\\\Core\\\\Access\\\\AccessResultForbidden\\|Drupal\\\\Core\\\\Access\\\\AccessResultNeutral\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/AccessResult.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$permission might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/AccessResult.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Routing\\\\Access\\\\AccessInterface\\:\\:applies\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/CheckProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Psr\\\\Container\\\\ContainerInterface\\:\\:getParameter\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/CheckProvider.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\CheckProvider\\:\\:addCheckService\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3488,10 +3458,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Checkpoint/CheckpointStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\:\\:createCollection\\(\\) should return \\$this\\(Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\) but returns Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\.$#',
-	'identifier' => 'return.type',
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Command\\\\ConfigExportCommand\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Checkpoint/CheckpointStorage.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Command/ConfigExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\Core\\\\Config\\\\Config\\:\\:\\$overriddenData because it might have hooks in a subclass\\.$#',
@@ -4134,18 +4104,6 @@ $ignoreErrors[] = [
 	'identifier' => 'argument.type',
 	'count' => 2,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityUpdater.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$entity in PHPDoc tag @var does not match assigned variable \\$entities\\.$#',
-	'identifier' => 'varTag.differentVariable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityUpdater.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/DraggableListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Entity\\\\DraggableListBuilder\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -5030,28 +4988,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Transaction.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Default value of the parameter \\#2 \\$abbr \\(true\\) of method Drupal\\\\Core\\\\Datetime\\\\DateHelper\\:\\:dayOfWeekName\\(\\) is incompatible with type string\\.$#',
-	'identifier' => 'parameter.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Datetime\\\\DateHelper\\:\\:dayOfWeek\\(\\) should return int\\|null but returns string\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Datetime\\\\DateHelper\\:\\:daysInMonth\\(\\) should return int but returns null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Datetime\\\\DateHelper\\:\\:daysInMonth\\(\\) should return int but returns string\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateHelper.php',
+	'message' => '#^Parameter \\#1 \\$count of method Drupal\\\\Core\\\\Datetime\\\\DateFormatter\\:\\:formatPlural\\(\\) expects int, float given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateFormatter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -5435,12 +5375,6 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$container might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$container_definition might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
@@ -8108,84 +8042,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$dataTable \\(string\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$defaultLangcodeKey \\(string\\) does not accept default value of type false\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$revisionDataTable \\(string\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$revisionKey \\(string\\) does not accept default value of type false\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$revisionKey \\(string\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$revisionTable \\(string\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:\\$tableMapping \\(Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 4,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityFieldManagerInterface\\:\\:getActiveFieldStorageDefinitions\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getRevisionMetadataKey\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getActiveDefinition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:allowsSharedTableStorage\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:requiresDedicatedTableStorage\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStorageDirectInjection',
 	'count' => 1,
@@ -9422,28 +9278,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/Entity/BaseFieldOverride.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Field\\\\Entity\\\\BaseFieldOverride\\:\\:\\$baseFieldDefinition \\(Drupal\\\\Core\\\\Field\\\\BaseFieldDefinition\\) does not accept Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface\\.$#',
-	'identifier' => 'assign.propertyType',
+	'message' => '#^Constructor of class Drupal\\\\Core\\\\Field\\\\FallbackFieldTypeCategory has an unused parameter \\$plugin_id\\.$#',
+	'identifier' => 'constructor.unusedParameter',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Entity/BaseFieldOverride.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$deleted\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldConfigBase\\:\\:createFromDataType\\(\\) should return static\\(Drupal\\\\Core\\\\Field\\\\FieldConfigBase\\) but returns Drupal\\\\Core\\\\Field\\\\BaseFieldDefinition\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldConfigBase\\:\\:createFromItemType\\(\\) should return static\\(Drupal\\\\Core\\\\Field\\\\FieldConfigBase\\) but returns Drupal\\\\Core\\\\Field\\\\BaseFieldDefinition\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldConfigBase.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Field/FallbackFieldTypeCategory.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldConfigBase\\:\\:postCreate\\(\\) has no return type specified\\.$#',
@@ -9890,52 +9728,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/EntityReferenceFormatterBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldFormatter\\\\EntityReferenceLabelFormatter\\:\\:checkAccess\\(\\) should return Drupal\\\\Core\\\\Access\\\\AccessResult but returns Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/EntityReferenceLabelFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getNativeLanguages\\(\\) invoked with 1 parameter, 0 required\\.$#',
-	'identifier' => 'arguments.count',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/LanguageFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/MailToFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/NumericFormatterBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/NumericUnformattedFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
+	'message' => '#^Variable \\$url in isset\\(\\) always exists and is not nullable\\.$#',
+	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/StringFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/TimestampAgoFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldFormatter/TimestampFormatter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$dateFormatStorage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -11912,12 +11708,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorageInterface\\:\\:delete\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13234,18 +13024,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\MatcherDumper\\:\\:addRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/MatcherDumper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Routing\\\\MatcherDumper\\:\\:\\$routes \\(Symfony\\\\Component\\\\Routing\\\\RouteCollection\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/MatcherDumper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/MatcherDumper.php',
 ];
@@ -15262,12 +15040,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/src/BlockForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/src/BlockListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block\\\\BlockListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -16984,12 +16756,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/CommentTypeForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/CommentTypeListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentTypeListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -17270,12 +17036,6 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/comment/src/Plugin/Validation/Constraint/CommentNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/migrate/destination/EntityComment.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\migrate\\\\destination\\\\EntityComment\\:\\:processStubRow\\(\\) has no return type specified\\.$#',
@@ -18322,36 +18082,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/config_translation/src/ConfigNamesMapper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getPlugin\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationBlockListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getTheme\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationBlockListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationBlockListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationFieldListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationFieldListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\config_translation\\\\Form\\\\ConfigTranslationDeleteForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -18836,84 +18566,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/src/Form/EntityModerationForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\workflows\\\\WorkflowTypeInterface\\:\\:appliesToEntityTypeAndBundle\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\workflows\\\\WorkflowTypeInterface\\:\\:removeEntityTypeAndBundle\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\content_moderation\\\\ModerationInformationInterface\\:\\:getWorkflowForEntity\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\content_moderation\\\\StateTransitionValidation\\:\\:getValidTransitions\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/Hook/ContentModerationHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModeratedNodeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModeratedNodeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface&Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModerationInformation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModerationInformation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\RevisionableInterface\\:\\:\\$moderation_state\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModerationInformation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\RevisionableStorageInterface\\:\\:getLatestTranslationAffectedRevisionId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModerationInformation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\workflows\\\\StateInterface\\:\\:isPublishedState\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/content_moderation/src/ModerationInformation.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_moderation\\\\ModerationInformation\\:\\:getAffectedRevisionTranslation\\(\\) should return Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface but return statement is missing\\.$#',
@@ -22984,66 +22636,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Access/ViewModeAccessCheck.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\EntityListBuilderInterface\\:\\:render\\(\\) invoked with 2 parameters, 0 required\\.$#',
-	'identifier' => 'arguments.count',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Controller/FieldConfigListController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldTypeCategoryInterface\\:\\:getPluginId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Controller/FieldStorageAddController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Plugin\\\\CategorizingPluginManagerInterface\\:\\:getGroupedDefinitions\\(\\) invoked with 3 parameters, 0\\-2 required\\.$#',
-	'identifier' => 'arguments.count',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Controller/FieldStorageAddController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Plugin\\\\Factory\\\\FactoryInterface\\:\\:createInstance\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#',
-	'identifier' => 'arguments.count',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Controller/FieldStorageAddController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Core\\\\Entity\\\\EntityInterface supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getDescription\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getTargetType\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\field_ui\\\\EntityDisplayModeListBuilder\\:\\:load\\(\\) should return array\\<Drupal\\\\Core\\\\Entity\\\\EntityInterface\\> but returns array\\<list\\<Drupal\\\\Core\\\\Entity\\\\EntityInterface\\>\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldStorageDefinitionInterface\\:\\:isLocked\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/FieldConfigListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\FieldConfigListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -23588,18 +23180,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldStorageReuseForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getEntity\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/field_ui/src/Hook/FieldUiHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_field_ui_field_storage_add_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/Hook/FieldUiHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\Hook\\\\FieldUiHooks\\:\\:entityOperation\\(\\) implements hook_entity_operation but is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to include \\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability as the second parameter\\.$#',
@@ -24208,22 +23788,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/Plugin/Field/FieldWidget/FileWidget.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to method getFileUri\\(\\) on an unknown class Drupal\\\\file\\\\Entity\\\\FileInterface\\.$#',
-	'identifier' => 'class.notFound',
+	'message' => '#^Parameter \\#2 \\$arguments of class Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup constructor expects array\\<string, bool\\|float\\|int\\|string\\|Stringable\\>, array\\<string, array\\> given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Plugin/Validation/Constraint/FileEncodingConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var for variable \\$file contains unknown class Drupal\\\\file\\\\Entity\\\\FileInterface\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Plugin/Validation/Constraint/FileEncodingConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var with type Drupal\\\\file\\\\Entity\\\\FileInterface is not subtype of native type Drupal\\\\file\\\\FileInterface\\.$#',
-	'identifier' => 'varTag.nativeType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Plugin/Validation/Constraint/FileEncodingConstraintValidator.php',
+	'path' => __DIR__ . '/modules/file/src/Plugin/Field/FieldWidget/FileWidget.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\Plugin\\\\Validation\\\\Constraint\\\\FileExtensionSecureConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -24994,30 +24562,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/src/FilterFormatInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRoles\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/FilterFormatListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isFallbackFormat\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/filter/src/FilterFormatListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:status\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/filter/src/FilterFormatListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/FilterFormatListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\FilterFormatListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -25106,72 +24650,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/filter/src/Form/FilterDisableForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:enable\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Form/FilterEnableForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\filter\\\\Plugin\\\\DataType\\\\FilterFormat\\:\\:getFormatsAsOptions\\(\\) should return array\\<string, Drupal\\\\filter\\\\FilterFormatInterface\\> but returns array\\<string, Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\|string\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/DataType/FilterFormat.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$logger of static method Drupal\\\\Core\\\\Utility\\\\Error\\:\\:logException\\(\\) expects Psr\\\\Log\\\\LoggerInterface, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/EntityLinks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method DOMNameSpaceNode\\|DOMNode\\:\\:getAttribute\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterAlign.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method DOMNameSpaceNode\\|DOMNode\\:\\:removeAttribute\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterAlign.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method DOMNameSpaceNode\\|DOMNode\\:\\:setAttribute\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterAlign.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property DOMNameSpaceNode\\|DOMNode\\:\\:\\$tagName\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterCaption.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property DOMNode\\:\\:\\$tagName\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterCaption.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method DOMNameSpaceNode\\|DOMNode\\:\\:getAttribute\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterCaption.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method DOMNameSpaceNode\\|DOMNode\\:\\:removeAttribute\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterCaption.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property DOMNameSpaceNode\\|DOMNode\\:\\:\\$tagName\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterHtml.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Plugin\\\\Filter\\\\FilterHtml\\:\\:filterElementAttributes\\(\\) has no return type specified\\.$#',
@@ -25604,12 +25082,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/src/Form/ImageStyleDeleteForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$image_style_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/src/Form/ImageStyleEditForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\image\\\\Form\\\\ImageStyleEditForm\\:\\:effectSave\\(\\) has no return type specified\\.$#',
@@ -27310,194 +26782,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\JsonApiFunctionalTestBase\\:\\:\\$adminUser \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\JsonApiFunctionalTestBase\\:\\:\\$user \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\JsonApiFunctionalTestBase\\:\\:\\$userCanViewProfiles \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\node\\\\Entity\\\\Node\\:\\:\\$field_link \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept array\\<string, string\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiFunctionalTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/JsonApiRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldStorageDefinitionInterface\\:\\:save\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/MediaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Static property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\MediaTest\\:\\:\\$patchProtectedFieldNames \\(array\\<string\\>\\) does not accept default value of type array\\<string, null\\>\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/MediaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Static property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\MenuLinkContentTest\\:\\:\\$patchProtectedFieldNames \\(array\\<string\\>\\) does not accept default value of type array\\<string, null\\>\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/MenuLinkContentTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Cache\\\\VariationCacheInterface\\:\\:reset\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/NodeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$data on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/NodeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Static property Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\NodeTest\\:\\:\\$patchProtectedFieldNames \\(array\\<string\\>\\) does not accept default value of type array\\<string, string\\|null\\>\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/NodeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\user\\\\RoleInterface\\:\\:getRevisionId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/PathAliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$entity\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Behat\\\\Mink\\\\Driver\\\\DriverInterface\\:\\:getClient\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:addCacheableDependency\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 7,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getFieldDefinition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getOwner\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRevisionCreationTime\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRevisionId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 12,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 9,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:getRevisionId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\jsonapi\\\\JsonApiResource\\\\JsonApiDocumentTopLevel\\:\\:uuid\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\jsonapi\\\\ResourceResponse\\:\\:getCacheableMetadata\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 17,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\workflows\\\\WorkflowTypeInterface\\:\\:addEntityTypeAndBundle\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method getNormalization\\(\\) on array\\<mixed\\>\\|ArrayObject\\<\\(int\\|string\\), mixed\\>\\|bool\\|float\\|int\\|string\\.$#',
-	'identifier' => 'method.nonObject',
+	'message' => '#^Anonymous function has an unused use \\$resource_type\\.$#',
+	'identifier' => 'closure.unusedUse',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
@@ -28404,12 +27690,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/src/LanguageAccessControlHandler.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/src/LanguageListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\LanguageListBuilder\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -28508,12 +27788,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\LanguageNegotiator\\:\\:updateConfiguration\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/src/LanguageNegotiator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$method_id might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/language/src/LanguageNegotiator.php',
 ];
@@ -31786,54 +31060,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/src/Controller/OEmbedIframeController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getFieldMap\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getFileUri\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getSource\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:thumbnailDownloadsAreQueued\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface\\:\\:setDisplayOptions\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface\\:\\:setLabel\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:getOwner\\(\\) should return Drupal\\\\user\\\\UserInterface but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:getRequestTime\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Entity/Media.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Entity\\\\Media\\:\\:postSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31895,12 +31121,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$image_style_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/MediaListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStorageDirectInjection',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/MediaListBuilder.php',
@@ -32084,18 +31304,6 @@ $ignoreErrors[] = [
 	'identifier' => 'nullCoalesce.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/OEmbed/UrlResolver.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$image_style_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Plugin/Field/FieldFormatter/MediaThumbnailFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Plugin\\\\Field\\\\FieldFormatter\\\\MediaThumbnailFormatter\\:\\:checkAccess\\(\\) should return Drupal\\\\Core\\\\Access\\\\AccessResult but returns Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Plugin/Field/FieldFormatter/MediaThumbnailFormatter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Logger assigned from LoggerChannelFactory in a class using DependencySerializationTrait will break serialization\\. Inject a named logger channel service directly \\(e\\.g\\. @logger\\.channel\\.my_channel\\) instead\\.$#',
@@ -33324,18 +32532,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_link_content/src/MenuLinkContentInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getRevisionMetadataKey\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/src/MenuLinkContentStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/src/MenuLinkListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_link_content\\\\MenuLinkListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -33346,30 +32542,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_link_content/src/Plugin/Menu/MenuLinkContent.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$uuid might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/src/Plugin/Menu/MenuLinkContent.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$parent\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/menu_link_content/src/Plugin/Validation/Constraint/MenuTreeHierarchyConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$weight\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/src/Plugin/Validation/Constraint/MenuTreeHierarchyConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$message\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/menu_link_content/src/Plugin/Validation/Constraint/MenuTreeHierarchyConstraintValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_link_content\\\\Plugin\\\\Validation\\\\Constraint\\\\MenuTreeHierarchyConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -34284,30 +33456,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/Entity.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\destination\\\\EntityConfigBase\\:\\:rollback\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34318,42 +33466,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$config might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface&Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface\\:\\:setSyncing\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:addTranslation\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getTranslation\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:hasTranslation\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\destination\\\\EntityContentBase\\:\\:isTranslationDestination\\(\\) has no return type specified\\.$#',
@@ -34384,24 +33496,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityFieldStorageConfig.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isDefaultRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityRevision.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityRevision.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityRevision.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\destination\\\\EntityViewMode\\:\\:rollback\\(\\) has no return type specified\\.$#',
@@ -35916,66 +35010,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Form/NodeRevisionRevertForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$node_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeRevisionRevertTranslationForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeRevisionRevertTranslationForm\\:\\:getDescription\\(\\) should return Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup but returns string\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeRevisionRevertTranslationForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:displaySubmitted\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getDescription\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getHelp\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getPreviewMode\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:shouldCreateNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/Form/NodeTypeForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Form\\\\NodeTypeForm\\:\\:form\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -36156,12 +35190,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeGrantDatabaseStorageInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeServiceProvider\\:\\:register\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -36280,12 +35308,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeViewBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage_controller is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeViewsData.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$node_type_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -37290,13 +36312,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/package_manager/src/Plugin/QueueWorker/Cleaner.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\package_manager\\\\SandboxManagerBase\\:\\:isDirectWrite\\(\\) should return bool but returns string\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/package_manager/src/SandboxManagerBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\)\\: mixed\\)\\|null, Closure\\(string, array\\=, array\\=\\)\\: Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.$#',
+	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\)\\: mixed\\)\\|null, Closure\\(string, array\\<string, bool\\|float\\|int\\|string\\|Stringable\\>\\=, array\\<string, mixed\\>\\=\\)\\: Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/package_manager/src/Validator/SandboxDatabaseUpdatesValidator.php',
@@ -37660,42 +36676,6 @@ $ignoreErrors[] = [
 	'identifier' => 'return.missing',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/src/PathAliasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method getAlias\\(\\) on an unknown class Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method getPath\\(\\) on an unknown class Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method language\\(\\) on an unknown class Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var for variable \\$entity contains unknown class Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var with type Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias is not subtype of native type Drupal\\\\Core\\\\Entity\\\\EntityInterface\\.$#',
-	'identifier' => 'varTag.nativeType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\EntityListBuilder\\:\\:buildOperations\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias given\\.$#',
@@ -40068,36 +39048,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Controller/SystemInfoController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$requires\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/ThemeController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$status\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/ThemeController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:addCacheableDependency\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/DateFormatAccessControlHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/DateFormatAccessControlHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/DateFormatListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Element\\\\StatusReportPage\\:\\:preRenderCounters\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40180,18 +39130,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/CronForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getPattern\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/DateFormatEditForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$date_format_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/DateFormatEditForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Form\\\\DateFormatEditForm\\:\\:form\\(\\) has no return type specified\\.$#',
@@ -40522,66 +39460,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeUninstallConfirmForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Render\\\\BareHtmlPageRendererInterface\\:\\:systemPageAttachments\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/PageAttachmentsHook.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$message of method Drupal\\\\Core\\\\Messenger\\\\MessengerInterface\\:\\:addError\\(\\) expects Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string, Drupal\\\\Core\\\\Link given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$message of method Drupal\\\\Core\\\\Messenger\\\\MessengerInterface\\:\\:addWarning\\(\\) expects Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string, Drupal\\\\Core\\\\Link given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$requires\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemRequirementsHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$status\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Hook/SystemRequirementsHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Install/Requirements/SystemRequirements.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:addCacheableDependency\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/MenuAccessControlHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/MenuAccessControlHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$menuTree in PHPDoc tag @var does not match assigned variable \\$cacheItem\\.$#',
-	'identifier' => 'varTag.differentVariable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/ModuleAdminLinksHelper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\PathBasedBreadcrumbBuilder\\:\\:getRequestForPath\\(\\) should return Symfony\\\\Component\\\\HttpFoundation\\\\Request but returns null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/system/src/PathBasedBreadcrumbBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\PhpStorage\\\\MockPhpStorage\\:\\:getConfiguration\\(\\) has no return type specified\\.$#',
@@ -41136,16 +40014,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/default_format_test/src/DefaultFormatTestController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$origin\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/deprecated_module_test/src/Hook/DeprecatedModuleTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to deprecated function deprecation_test_function\\(\\)\\:
+	'message' => '#^Call to deprecated method testDeprecation\\(\\) of class Drupal\\\\deprecation_test\\\\DeprecatedController\\:
 in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-  the deprecation message for deprecated_test_function\\(\\)\\.$#',
-	'identifier' => 'function.deprecated',
+  the deprecation message for testDeprecation\\(\\)\\.$#',
+	'identifier' => 'staticMethod.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
 ];
@@ -41394,66 +40266,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/EntityTestForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$_attributes\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\AlterableInterface\\:\\:condition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setThirdPartySetting\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:loadMultipleRevisions\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getFormLangcode\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_entity_test_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$entity_types in PHPDoc tag @var does not match any variable in the foreach loop\\: \\$entity_type$#',
-	'identifier' => 'varTag.differentVariable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Hook/EntityTestHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\entity_test\\\\Plugin\\\\Field\\\\ComputedReferenceTestFieldItemList\\:\\:computeValue\\(\\) has no return type specified\\.$#',
@@ -43904,24 +42716,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Token/TokenReplaceKernelTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$status\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Unit/Menu/SystemLocalTasksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_install_configure_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/test_installer_theme/src/Hook/TestInstallerThemeHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_install_select_language_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/themes/test_installer_theme/src/Hook/TestInstallerThemeHooks.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function test_theme_depending_on_modules_post_update_module_install\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -45731,30 +44525,6 @@ $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$role_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStorageDirectInjection',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Form/EntityPermissionsForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\user\\\\Form\\\\EntityPermissionsForm\\:\\:permissionsByProvider\\(\\) has invalid return type Drupal\\\\user\\\\Form\\\\PermissionInfoList\\.$#',
-	'identifier' => 'class.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Form/EntityPermissionsForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\user\\\\Form\\\\EntityPermissionsForm\\:\\:permissionsByProvider\\(\\) should return array\\<string, Drupal\\\\user\\\\Form\\\\PermissionInfoList\\> but returns array\\<array\\<string, mixed\\>\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Form/EntityPermissionsForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setIsAdmin\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/src/Form/RoleSettingsForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$role_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Form/RoleSettingsForm.php',
 ];
 $ignoreErrors[] = [
@@ -46087,54 +44857,6 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserMailRequiredValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$emptyMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$invalidMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$multipleSpacesMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$spaceBeginMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$spaceEndMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$tooLongMessage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserNameConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/migrate/destination/EntityUser.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Plugin\\\\migrate\\\\destination\\\\EntityUser\\:\\:processStubRow\\(\\) has no return type specified\\.$#',
@@ -46587,12 +45309,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/RoleForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/RoleListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\RoleListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -46657,42 +45373,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/UserFloodControl.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getCreatedTime\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getLastAccessedTime\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRoles\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isActive\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface\\:\\:isAnonymous\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserNameItem.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\UserStorage\\:\\:deleteRoleReferences\\(\\) has no return type specified\\.$#',
@@ -57493,36 +56173,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/ViewFormBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Core\\\\Entity\\\\EntityInterface supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getExecutable\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:status\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -58225,24 +56875,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workflows/src/Plugin/WorkflowTypeTransitionFormBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\workflows\\\\Plugin\\\\WorkflowTypeTransitionFormBase\\:\\:\\$workflowType \\(Drupal\\\\workflows\\\\WorkflowTypeInterface\\) does not accept Drupal\\\\Component\\\\Plugin\\\\PluginInspectionInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/src/Plugin/WorkflowTypeTransitionFormBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workflows\\\\Transition\\:\\:weight\\(\\) should return string but returns int\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/src/Transition.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/src/WorkflowListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workflows\\\\WorkflowListBuilder\\:\\:getFormId\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -58673,30 +57305,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspacePublisherInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:limit\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:loadMultipleRevisions\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getRevisionMetadataKey\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspacesServiceProvider\\:\\:alter\\(\\) has no return type specified\\.$#',
@@ -59747,18 +58355,6 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceSwitcherForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Comparison operation "\\>" between Drupal\\\\Core\\\\Field\\\\FieldItemListInterface and 0 results in an error\\.$#',
-	'identifier' => 'greater.invalid',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces_ui\\\\WorkspaceListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
@@ -60987,442 +59583,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityUnitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getPropertiesToExport\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityValidationTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
-	'identifier' => 'assign.propertyType',
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEntityValidationTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Offset \'event_name\' does not exist on array\\{\\}\\.$#',
-	'identifier' => 'offsetAccess.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigEventsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getConfigPrefix\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigImportRecreateTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getDependencies\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigInstallTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigInstallTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 9,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigLanguageOverrideTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigOverridesPriorityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface\\<int\\|string, Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\>\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 20,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigSchemaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\Type\\\\StringInterface\\:\\:getDataDefinition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigSchemaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getDependencies\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/Entity/ConfigEntityUpdaterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/SchemaCheckTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Config\\\\StorageInterface\\:\\:getFilePath\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/Storage/FileStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:getDefinition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Console/ConsoleTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column2 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column3 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column4 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column5 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column6 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$column7 on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificSchemaTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Transaction\\\\TransactionManagerInterface\\:\\:__destruct\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificTransactionTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Transaction\\\\TransactionManagerInterface\\:\\:stackDepth\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 27,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificTransactionTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#3 \\$a2 of method Drupal\\\\Core\\\\Database\\\\StatementInterface\\:\\:setFetchMode\\(\\) expects list\\<mixed\\>, array\\{fakeArg\\: 10\\} given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/FetchTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Offset \'function\' does not exist on string\\.$#',
-	'identifier' => 'offsetAccess.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/LoggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$age on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/MergeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$id on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/MergeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$job on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/MergeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/MergeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$update on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/MergeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$update on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/QueryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$age on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/ReservedWordTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$function on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/ReservedWordTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/ReservedWordTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:groupBy\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$job on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$other_job on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$other_name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$t1_name on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$t2_name on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#3 \\$condition of method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\:\\:innerJoin\\(\\) expects string\\|null, Drupal\\\\Core\\\\Database\\\\Query\\\\Condition given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#3 \\$condition of method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\:\\:join\\(\\) expects string\\|null, Drupal\\\\Core\\\\Database\\\\Query\\\\Condition given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Offset \'length\' does not exist on null\\.$#',
-	'identifier' => 'offsetAccess.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectGetRangeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Offset \'start\' does not exist on null\\.$#',
-	'identifier' => 'offsetAccess.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectGetRangeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectSubqueryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:fields\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\:\\:comment\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$age on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$id on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$job on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/SelectTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:addField\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TaggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:addTag\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TaggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:hasAllTags\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TaggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:hasAnyTag\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TaggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:hasTag\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TaggingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Connection\\:\\:queryTemporary\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TemporaryQueryTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Database\\\\Transaction\\\\TransactionManagerInterface\\:\\:\\$triggerWarningWhenUnpilingOnVoidTransaction\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TransactionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Transaction\\\\TransactionManagerInterface\\:\\:__destruct\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TransactionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Transaction\\\\TransactionManagerInterface\\:\\:stackDepth\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 33,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/TransactionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$age on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpdateComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$job on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpdateComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpdateComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$expression of method Drupal\\\\Core\\\\Database\\\\Query\\\\Update\\:\\:expression\\(\\) expects string, Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpdateComplexTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$age on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$job on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$update on array\\|object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Core\\\\Form\\\\FormStateInterface supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Datetime/Element/TimezoneTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var with type Drupal\\\\Core\\\\Session\\\\AccountInterface is not subtype of native type Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'varTag.nativeType',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/DefaultContent/AdminAccountSwitcherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\DrupalKernelInterface\\:\\:terminate\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/DrupalKernel/DrupalKernelRequestStackTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:getParameterBag\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/DrupalKernel/DrupalKernelTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\DrupalKernelInterface\\:\\:terminate\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/DrupalKernel/ServiceDestructionTest.php',
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/ConfigImporterTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -66557,90 +64721,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/bootstrap.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_oembed_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_upload_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_menu_link_content_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_menu_link_edit_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_node_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_node_preview_form_select_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_system_modules_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_system_theme_settings_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_user_admin_permissions_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_views_ui_add_handler_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\:\\:hasClass\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\default_admin\\\\Hook\\\\PreprocessHooks\\:\\:toolbarUserPicture\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$array of function array_key_first expects array, Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\|null given\\.$#',
