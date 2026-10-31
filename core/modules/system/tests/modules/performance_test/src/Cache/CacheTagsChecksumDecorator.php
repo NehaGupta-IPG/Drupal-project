@@ -100,4 +100,22 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     ]);
   }
 
+  /**
+   * Post-commit invalidation of deferred cache tags.
+   *
+   * @see CacheTagsDeferredInvalidationSubscriber::onTransactionCommit()
+   */
+  public function invalidateDelayedTags(): void {
+    $this->checksumInvalidator->invalidateDelayedTags();
+  }
+
+  /**
+   * Reset deferred cache tags in case of unsuccessful transaction.
+   *
+   * @see CacheTagsDeferredInvalidationSubscriber::onUnsuccessfulTransaction()
+   */
+  public function resetDelayedTags(): void {
+    $this->checksumInvalidator->resetDelayedTags();
+  }
+
 }

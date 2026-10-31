@@ -814,6 +814,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
   /**
    * Tests that adding a post-transaction callback fails with no transaction.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackAddedWithoutTransaction(): void {
     $this->expectException(\LogicException::class);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -838,6 +839,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
   /**
    * Tests post-transaction callback executes after transaction rollback.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledAfterRollbackAndDestruction(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -901,6 +903,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
    * For database servers that support transactional DDL, a rollback of a
    * transaction including DDL statements is possible.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledAfterDdlAndRollbackForTransactionalDdlDatabase(): void {
     if (!$this->connection->supportsTransactionalDDL()) {
       $this->markTestSkipped('This test only works for database supporting transactional DDL.');
@@ -949,6 +952,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
    * happened already. We cannot decide what should be the status of the
    * callback, an exception is thrown.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackFailureUponDdlAndRollbackForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {
       $this->markTestSkipped('This test only works for database that do not support transactional DDL.');

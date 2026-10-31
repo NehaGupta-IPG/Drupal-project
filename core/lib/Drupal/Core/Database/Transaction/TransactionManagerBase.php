@@ -5,6 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Core\Database\Transaction;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Event\TransactionAutoCommitEvent;
+use Drupal\Core\Database\Event\TransactionBeginEvent;
+use Drupal\Core\Database\Event\TransactionBeginFailureEvent;
+use Drupal\Core\Database\Event\TransactionCommitEvent;
+use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
+use Drupal\Core\Database\Event\TransactionEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackEvent;
+use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
+use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
+use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use Drupal\Core\Database\Event\TransactionSavepointFailureEvent;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\Database\TransactionException;
@@ -90,6 +104,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @var callable[]
    *
    * @see \Drupal\Core\Database\Transaction\TransactionManagerInterface::addPostTransactionCallback()
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   event subscribers responding to transaction events instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   private array $postTransactionCallbacks = [];
 
@@ -194,6 +213,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     if ($this->stackDepth() !== 0) {
       @trigger_error('Committing transactions via ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     }
+    $this->connection->disableEvents(TransactionEvent::all());
     foreach (array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
     }
@@ -265,12 +285,23 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     if ($this->stack() === []) {
       return '*** empty ***';
     }
+    return implode(' > ', $this->stackItemsAsArray());
+  }
 
-    $temp = [];
-    foreach ($this->stack() as $id => $item) {
-      $temp[] = $id . '\\' . $item->name;
-    }
-    return implode(' > ', $temp);
+  /**
+   * Produces an array representation of the stack items.
+   *
+   * Drivers should not override this method unless they also override the
+   * $stack property.
+   *
+   * @return list<string>
+   *   The array of stack items represented like id\name.
+   */
+  protected function stackItemsAsArray(): array {
+    return array_map(fn(string $id, StackItem $item): string => $id . '\\' . $item->name,
+      array_keys($this->stack()),
+      array_values($this->stack()),
+    );
   }
 
   /**
@@ -278,6 +309,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function inTransaction(): bool {
     return (bool) $this->stackDepth() && $this->getConnectionTransactionState() === ClientConnectionTransactionState::Active;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function currentTransactionId(): ?string {
+    return $this->inTransaction() ? array_key_last($this->stack) : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function currentTransactionName(): ?string {
+    return $this->inTransaction() ? array_last($this->stack)->name : NULL;
   }
 
   /**
@@ -317,9 +362,31 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           $this->rootId = $id;
           $this->isAutoCommitted = FALSE;
         }
+        if ($this->connection->isEventEnabled(TransactionBeginEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionBeginEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+          ));
+        }
       }
       catch (TransactionException $e) {
         $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
+        if ($this->connection->isEventEnabled(TransactionBeginFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionBeginFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+          ));
+        }
         throw $e;
       }
     }
@@ -330,10 +397,32 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       try {
         $this->addClientSavepoint($name);
         $this->addStackItem($id, new StackItem($name, StackItemType::Savepoint));
+        if ($this->connection->isEventEnabled(TransactionSavepointEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionSavepointEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+          ));
+        }
       }
       catch (TransactionException $e) {
         $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
         $this->voidClientTransaction();
+        if ($this->connection->isEventEnabled(TransactionSavepointFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionSavepointFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+          ));
+        }
         throw $e;
       }
     }
@@ -353,8 +442,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // can process the post transaction callbacks.
     if (!isset($this->stack()[$id]) && isset($this->voidedItems[$id]) && $this->rootId === $id) {
       if ($this->isAutoCommitted) {
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            CommitType::AutomaticUponDDL,
+          ));
+        }
         $this->isAutoCommitted = FALSE;
       }
+      // @phpstan-ignore method.deprecated
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
       unset($this->voidedItems[$id]);
@@ -385,6 +486,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $this->commit($name, $id, CommitType::ImplicitOnDestruct);
     $this->removeStackItem($id);
     if ($this->rootId === $id) {
+      // @phpstan-ignore method.deprecated
       $this->processPostTransactionCallbacks();
       $this->rootId = NULL;
     }
@@ -395,12 +497,24 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function unpile(string $name, string $id): void {
     // If the transaction was voided, we cannot unpile. Skip but trigger a user
-    // warning if requested.
+    // warning if requested. If an autocommit happened, emit the
+    // TransactionCommitEvent.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
         trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
       }
       if ($this->isAutoCommitted) {
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            CommitType::AutomaticUponDDL,
+          ));
+        }
         $this->isAutoCommitted = FALSE;
       }
       return;
@@ -466,10 +580,34 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           throw new TransactionCommitFailedException("Release savepoint $name failed");
         }
         $this->removeStackItem($id);
+        if ($this->connection->isEventEnabled(TransactionReleaseSavepointEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionReleaseSavepointEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            $commitType,
+          ));
+        }
       }
       catch (TransactionCommitFailedException $e) {
         $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
         $this->voidClientTransaction();
+        if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+            $commitType,
+          ));
+        }
         throw $e;
       }
     }
@@ -479,9 +617,33 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       try {
         $this->processRootCommit();
         $this->voidStackItem($id);
+        if ($this->connection->isEventEnabled(TransactionCommitEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            $commitType,
+          ));
+        }
       }
       catch (TransactionCommitFailedException $e) {
         $this->voidClientTransaction();
+        if ($this->connection->isEventEnabled(TransactionCommitFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionCommitFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+            $commitType,
+          ));
+        }
         throw $e;
       }
     }
@@ -501,6 +663,18 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
       $message = 'Transaction::rollBack() failed because of a prior execution of a DDL statement.';
+      if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
+        $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
+          $this->connection->getKey(),
+          $this->connection->getTarget(),
+          $id,
+          $name,
+          $this->getConnectionTransactionState(),
+          $this->stackItemsAsArray(),
+          get_class($this),
+          $message,
+        ));
+      }
       trigger_error($message, E_USER_WARNING);
       return;
     }
@@ -517,19 +691,55 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
         try {
-          if (!$this->rollbackClientSavepoint($name)) {
-            throw new TransactionException("Rollback to savepoint $name failed");
-          }
-          if (!$this->releaseClientSavepoint($name)) {
-            throw new TransactionException("Release savepoint $name failed");
-          }
+          $this->rollbackClientSavepoint($name);
+          $this->releaseClientSavepoint($name);
           // The Transaction object remains open, and when it will get
           // destructed no commit should happen. Void the stack item.
           $this->voidStackItem($id);
+          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackToSavepointEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+            ));
+          }
+        }
+        catch (TransactionCommitFailedException $e) {
+          $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
+          $this->voidClientTransaction();
+          if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionReleaseSavepointFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+              get_class($e),
+              $e->getMessage(),
+              CommitType::Explicit,
+            ));
+          }
+          throw $e;
         }
         catch (TransactionException $e) {
           $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
           $this->voidClientTransaction();
+          if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackToSavepointFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+              get_class($e),
+              $e->getMessage(),
+            ));
+          }
           throw $e;
         }
       }
@@ -541,9 +751,31 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           // The Transaction object remains open, and when it will get
           // destructed no commit should happen. Void the stack item.
           $this->voidStackItem($id);
+          if ($this->connection->isEventEnabled(TransactionRollbackEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+            ));
+          }
         }
         catch (TransactionException $e) {
           $this->voidClientTransaction();
+          if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
+            $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
+              $this->connection->getKey(),
+              $this->connection->getTarget(),
+              $id,
+              $name,
+              $this->getConnectionTransactionState(),
+              $this->stackItemsAsArray(),
+              get_class($e),
+              $e->getMessage(),
+            ));
+          }
           throw $e;
         }
       }
@@ -564,6 +796,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function addPostTransactionCallback(callable $callback): void {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use event subscribers responding to transaction events instead. See https://www.drupal.org/node/7654123", E_USER_DEPRECATED);
     if (!$this->inTransaction()) {
       $this->exceptionThrown = TRUE;
       throw new \LogicException('Root transaction end callbacks can only be added when there is an active transaction.');
@@ -655,8 +888,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
 
   /**
    * Processes the post-transaction callbacks.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   event subscribers responding to transaction events instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected function processPostTransactionCallbacks(): void {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use event subscribers responding to transaction events instead. See https://www.drupal.org/node/7654123", E_USER_DEPRECATED);
     if (!empty($this->postTransactionCallbacks)) {
       $callbacks = $this->postTransactionCallbacks;
       $this->postTransactionCallbacks = [];
@@ -798,6 +1037,18 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function handleAutomaticCommit(): void {
+    if ($this->connection->isEventEnabled(TransactionAutoCommitEvent::class)) {
+      $i = array_key_first($this->stack);
+      assert($this->stack[$i]->type === StackItemType::Root);
+      $this->connection->dispatchEvent(new TransactionAutoCommitEvent(
+        $this->connection->getKey(),
+        $this->connection->getTarget(),
+        $i,
+        $this->stack[$i]->name,
+        $this->getConnectionTransactionState(),
+        $this->stackItemsAsArray(),
+      ));
+    }
     $this->voidClientTransaction();
     $this->isAutoCommitted = TRUE;
   }
