@@ -96,10 +96,10 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    // Trim the alias value of whitespace and slashes. Ensure to not trim the
-    // slash on the left side.
-    $alias = rtrim(trim($this->getAlias()), "\\/");
-    $this->setAlias($alias);
+    // Trim the alias and path values of whitespace and slashes. Ensure to not
+    // trim the slash on the left side, but only the trailing slash.
+    $path = rtrim(trim($this->getPath()), "\\/");
+    $this->setPath($path);
   }
 
   /**

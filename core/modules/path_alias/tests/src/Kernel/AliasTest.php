@@ -378,6 +378,9 @@ class AliasTest extends KernelTestBase {
     $entities = $path_alias_storage->loadByProperties(['langcode' => 'en']);
     $path_alias_storage->delete($entities);
     $this->assertEquals('/bar', $aliasManager->getAliasByPath($path_alias->getPath()), 'Path lookup falls back to recently created language-neutral alias.');
+    // Create a system path with trailing slash.
+    $path_alias = $this->createPathAlias('/node/1/', '/node-foo');
+    $this->assertEquals('/node/1', $aliasManager->getPathByAlias($path_alias->getAlias()), 'Basic source with slash lookup works.');
 
     // Test the situation where the alias and language are the same, but
     // the source differs. The newer alias record should be returned.
