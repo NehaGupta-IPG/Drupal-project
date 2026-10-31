@@ -395,6 +395,10 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *   Thrown when the user tried to access an action without access to it.
    */
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+    // Ensure this is for us:
+    if ($form_state->getTriggeringElement()['#parents'][0] ?? '' !== 'submit') {
+      return;
+    }
     if ($form_state->get('step') == 'views_form_views_form') {
       // Filter only selected checkboxes. Use the actual user input rather than
       // the raw form values array, since the site data may change before the
@@ -476,6 +480,11 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    * {@inheritdoc}
    */
   public function viewsFormValidate(&$form, FormStateInterface $form_state) {
+    // Ensure this is for us:
+    if ($form_state->getTriggeringElement()['#parents'][0] ?? '' !== 'submit') {
+      return;
+    }
+
     $ids = $form_state->getValue($this->options['id']);
     if (empty($ids) || empty(array_filter($ids))) {
       $form_state->setErrorByName('', $this->emptySelectedMessage());
