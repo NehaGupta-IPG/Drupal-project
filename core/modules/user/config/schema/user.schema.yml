@@ -60,10 +60,9 @@ user.settings:
     password_reset_timeout:
       type: integer
       label: 'Password reset timeout'
-      # @todo Increase min in https://www.drupal.org/i/3441772
       constraints:
         Range:
-          min: 1
+          min: 300
     password_strength:
       type: boolean
       label: 'Enable password strength indicator'
