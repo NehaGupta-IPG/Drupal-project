@@ -3,3 +3,11 @@ admin:
   css:
     theme:
       css/image.admin.css: {}
+
+validate:
+  version: VERSION
+  js:
+    js/image.style.validate.js: {}
+  dependencies:
+    - core/drupal.message
+    - core/once

@@ -103,6 +103,15 @@ class ImageStyleDownloadController extends FileDownloadController {
    *   Thrown when the file is still being generated.
    */
   public function deliver(Request $request, $scheme, ImageStyleInterface $image_style, string $required_derivative_scheme) {
+    // Support HEAD requests for server configuration validation. If the
+    // request reached this controller, the web server is correctly configured
+    // to forward image style requests to PHP.
+    if ($request->isMethod('HEAD')) {
+      return new Response('', 200, [
+        'Cache-Control' => 'no-store',
+      ]);
+    }
+
     $target = $request->query->get('file');
     $image_uri = $scheme . '://' . $target;
     $image_uri = $this->streamWrapperManager->normalizeUri($image_uri);
