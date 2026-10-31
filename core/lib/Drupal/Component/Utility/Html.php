@@ -331,6 +331,7 @@ class Html {
     // Normalize all newlines.
     $html = str_replace(["\r\n", "\r"], "\n", $html);
 
+    $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     return $html;
   }
 
