@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests Drupal\Core\Form\FormBuilder.
@@ -508,6 +509,33 @@ class FormBuilderTest extends FormTestBase {
     $form_state->setUserInput($input);
     $this->formBuilder->buildForm($form_arg, $form_state);
     $this->assertEmpty($form_state->getErrors());
+  }
+
+  /**
+   * Tests that a non-string form_build_id is rejected as a bad request.
+   */
+  public function testBuildFormWithNonStringFormBuildId(): void {
+    $this->setUpMockFormCacheInterface();
+    $form_id = 'test_form_id';
+
+    $form_arg = $this->createMock(FormInterface::class);
+    $form_arg->expects($this->once())
+      ->method('getFormId')
+      ->willReturn($form_id);
+    $form_arg->expects($this->never())
+      ->method('buildForm');
+
+    $form_state = (new FormState())
+      ->setUserInput([
+        'form_id' => $form_id,
+        'form_build_id' => ['x'],
+      ]);
+
+    $this->formCache->expects($this->never())
+      ->method('getCache');
+
+    $this->expectException(BadRequestHttpException::class);
+    $this->formBuilder->buildForm($form_arg, $form_state);
   }
 
   /**

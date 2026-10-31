@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -284,6 +285,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // the form to proceed. In addition, if there is stored form_state data from
     // a previous step, we'll retrieve it so it can be passed on to the form
     // processing code.
+    // The form_build_id is used as a cache key and must be a string.
+    if (isset($input['form_build_id']) && !is_string($input['form_build_id'])) {
+      throw new BadRequestHttpException('Invalid form build ID.');
+    }
     $check_cache = isset($input['form_id']) && $input['form_id'] == $form_id && !empty($input['form_build_id']);
     if ($check_cache) {
       $form = $this->getCache($input['form_build_id'], $form_state);
