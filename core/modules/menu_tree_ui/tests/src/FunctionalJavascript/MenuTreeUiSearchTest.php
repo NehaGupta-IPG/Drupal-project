@@ -165,6 +165,24 @@ final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * Stored markup in a result's title and breadcrumb is escaped.
+   */
+  public function testStoredMarkupInResultsIsEscaped(): void {
+    $parent = $this->createLink('Trail <i>part</i>', '', 3);
+    $this->createLink('Findable <b>entry</b>', $parent, 0);
+
+    $this->searchFor('Findable');
+
+    $results = $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-results');
+    $this->assertFalse($results->has('css', 'b'), 'The result title prints no element.');
+    $this->assertFalse($results->has('css', 'i'), 'The breadcrumb prints no element.');
+    $title = $results->find('css', '.menu-tree-ui-search-results__title');
+    $this->assertStringContainsString('<b>entry</b>', $title->getText());
+    $breadcrumb = $results->find('css', '.menu-tree-ui-search-results__breadcrumb');
+    $this->assertStringContainsString('<i>part</i>', $breadcrumb->getText());
+  }
+
+  /**
    * A refused response empties the results and loads none of its assets.
    */
   public function testRefusedResponseEmptiesResultsAndLoadsNoAssets(): void {

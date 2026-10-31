@@ -70,6 +70,20 @@ final class MenuTreeUiRowLabelTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
+   * A stored title with markup is escaped on page rows and loaded rows.
+   */
+  public function testStoredMarkupInTitleIsEscaped(): void {
+    $this->expandRow('P');
+
+    foreach (['T', 'C'] as $label) {
+      $title = $this->row($label)->find('css', '.menu-tree-ui-row__title');
+      $this->assertNotNull($title, "Row $label shows its title.");
+      $this->assertFalse($title->has('css', 'b'), "Row $label prints no element from its title.");
+      $this->assertStringContainsString('<b>', $title->getText(), "Row $label shows the markup as text.");
+    }
+  }
+
+  /**
    * A loaded locked row names the title as plain text.
    */
   public function testLoadedLockedRowNameIsPlainText(): void {
