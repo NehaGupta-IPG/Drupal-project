@@ -223,6 +223,14 @@ class Datetime extends DateElementBase {
     $date_format = $formats['html_date']->getPattern();
     $time_format = $formats['html_time']->getPattern();
 
+    // Check if the element is a date range.
+    $is_range = FALSE;
+    $end = FALSE;
+    if (isset($element['#is_range']) && $element['#is_range'] === TRUE) {
+      $is_range = TRUE;
+      $end = isset($element['#id']) && str_contains($element['#id'], 'end-value');
+    }
+
     $element += [
       '#date_date_format' => $date_format,
       '#date_time_format' => $time_format,
@@ -267,7 +275,7 @@ class Datetime extends DateElementBase {
 
       $element['date'] = [
         '#type' => 'date',
-        '#title' => t('Date'),
+        '#title' => $is_range ? ($end ? t('End Date') : t('Start Date')) : t('Date'),
         '#title_display' => 'invisible',
         '#value' => $date_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,
@@ -298,7 +306,7 @@ class Datetime extends DateElementBase {
       ];
       $element['time'] = [
         '#type' => 'date',
-        '#title' => t('Time'),
+        '#title' => $is_range ? ($end ? t('End Time') : t('Start Time')) : t('Time'),
         '#title_display' => 'invisible',
         '#value' => $time_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,

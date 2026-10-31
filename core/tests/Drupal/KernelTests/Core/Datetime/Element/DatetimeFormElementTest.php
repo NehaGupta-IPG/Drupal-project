@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\EntityViewTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -139,29 +140,66 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
   }
 
   /**
+   * Data provider for testDatetimeLocalProcessDatetime().
+   *
+   * @return array
+   *   Test cases with element overrides and expected date title.
+   */
+  public static function providerProcessDatetime(): array {
+    return [
+      'no range' => [
+        [],
+        'Date',
+      ],
+      'is_range TRUE without id' => [
+        ['#is_range' => TRUE],
+        'Start Date',
+      ],
+      'is_range TRUE with non-end id' => [
+        ['#is_range' => TRUE, '#id' => 'test-picker-start-value'],
+        'Start Date',
+      ],
+      'is_range TRUE with end id' => [
+        ['#is_range' => TRUE, '#id' => 'test-picker-end-value'],
+        'End Date',
+      ],
+      'is_range FALSE' => [
+        ['#is_range' => FALSE],
+        'Date',
+      ],
+      'is_range NULL' => [
+        ['#is_range' => NULL],
+        'Date',
+      ],
+    ];
+  }
+
+  /**
    * Checks expected values are returned by ::processDatetime().
    *
    * Test only applied to 'datetime-local' date element.
    *
    * @legacy-covers ::processDatetime
    */
-  public function testDatetimeLocalProcessDatetime(): void {
-    $form = [
-      'datetime_local_picker' => [
-        '#type' => 'datetime',
-        '#date_date_element' => 'datetime-local',
-        '#date_date_format' => 'Y-m-d',
-        '#date_time_element' => 'none',
-        '#date_time_format' => 'H:i:s',
-        '#value' => [
-          'object' => new DrupalDateTime('2025-02-18T12:00'),
-          'date' => '2025-02-18',
-          'time' => '12:00:00',
-        ],
-        '#date_year_range' => '1900:2050',
-        '#attributes' => [],
-        '#required' => TRUE,
+  #[DataProvider('providerProcessDatetime')]
+  public function testDatetimeLocalProcessDatetime(array $overrides, string $expected_title): void {
+    $base_element = [
+      '#type' => 'datetime',
+      '#date_date_element' => 'datetime-local',
+      '#date_date_format' => 'Y-m-d',
+      '#date_time_element' => 'none',
+      '#date_time_format' => 'H:i:s',
+      '#value' => [
+        'object' => new DrupalDateTime('2025-02-18T12:00'),
+        'date' => '2025-02-18',
+        'time' => '12:00:00',
       ],
+      '#date_year_range' => '1900:2050',
+      '#attributes' => [],
+      '#required' => TRUE,
+    ];
+    $form = [
+      'datetime_local_picker' => array_merge($base_element, $overrides),
       'submit' => [
         '#type' => 'submit',
         '#value' => 'Submit',
@@ -182,6 +220,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
     $this->assertArrayHasKey('max', $result['date']['#attributes']);
     $this->assertEquals('2050-12-31T23:59:59', $result['date']['#attributes']['max']);
     $this->assertArrayNotHasKey('time', $result);
+    $this->assertEquals($expected_title, $result['date']['#title']);
   }
 
   /**

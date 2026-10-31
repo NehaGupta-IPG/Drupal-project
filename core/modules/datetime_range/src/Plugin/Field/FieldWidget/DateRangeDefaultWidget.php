@@ -82,6 +82,7 @@ class DateRangeDefaultWidget extends DateRangeWidgetBase {
       '#date_time_format' => $time_format,
       '#date_time_element' => $time_type,
       '#date_time_callbacks' => [],
+      '#is_range' => TRUE,
     ];
 
     $element['end_value'] += [
@@ -91,6 +92,7 @@ class DateRangeDefaultWidget extends DateRangeWidgetBase {
       '#date_time_format' => $time_format,
       '#date_time_element' => $time_type,
       '#date_time_callbacks' => [],
+      '#is_range' => TRUE,
     ];
 
     return $element;
