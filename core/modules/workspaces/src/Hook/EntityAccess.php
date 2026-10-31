@@ -75,6 +75,12 @@ class EntityAccess {
    *   The result of the access check.
    */
   protected function bypassAccessResult(AccountInterface $account): AccessResultInterface {
+    // Anonymous users can never own a workspace, so the bypass can never apply
+    // to them. Short-circuit before cachePerUser() poisons page cacheability.
+    if ($account->isAnonymous()) {
+      return AccessResult::neutral();
+    }
+
     // This approach assumes that the current "global" active workspace is
     // correct, i.e. if you're "in" a given workspace then you get ALL THE PERMS
     // to ALL THE THINGS! That's why this is a dangerous permission.
