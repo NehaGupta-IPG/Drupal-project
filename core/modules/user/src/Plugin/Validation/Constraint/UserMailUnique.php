@@ -24,4 +24,11 @@ class UserMailUnique extends UniqueFieldConstraint {
     parent::__construct($caseSensitive, $message, $groups, $payload);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldIgnoreCase(): bool {
+    return TRUE;
+  }
+
 }

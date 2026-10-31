@@ -75,6 +75,12 @@ class UserRegistrationTest extends BrowserTestBase {
     $accounts = $storage->loadByProperties(['name' => $name, 'mail' => $mail]);
     $new_user = reset($accounts);
     $this->assertFalse($new_user->isActive(), 'New account is blocked until approved by an administrator.');
+    $edit['name'] = $uppercase_name = mb_strtoupper($edit['name']);
+    $edit['mail'] = $uppercase_mail = $edit['name'] . '@example.com';
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains("The username $uppercase_name is already taken.");
+    $this->assertSession()->pageTextContains("The email address $uppercase_mail is already taken.");
   }
 
   /**

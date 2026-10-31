@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates that a field is unique for the given entity type.
@@ -42,6 +43,10 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
     if (!$items->first()) {
       return;
     }
+    if (!$constraint instanceof UniqueFieldConstraint) {
+      throw new UnexpectedTypeException($constraint, UniqueFieldConstraint::class);
+    }
+    $ignore_case = $constraint->shouldIgnoreCase();
 
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $items->getEntity();
@@ -89,6 +94,14 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       // property name. Pop the column key from the first result to be sure.
       $column_key = key(reset($results));
       $other_entity_values = array_column($results, $column_key);
+      if ($ignore_case) {
+        // These values from the database area always strings, so we can change
+        // the case of all of them.
+        $other_entity_values = array_map(fn(string $value) => mb_strtoupper($value), $other_entity_values);
+        // Item values could be of any type, only change the case of string
+        // values.
+        $item_values = array_map(fn(mixed $value) => is_string($value) ? mb_strtoupper($value) : $value, $item_values);
+      }
 
       // If our entity duplicates field values in any other entity, the query
       // will return all field values that belong to those entities. Narrow
