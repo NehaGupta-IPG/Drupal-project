@@ -115,6 +115,55 @@ class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
       'region' => 'content',
     ])->save();
 
+    // Create additional view mode and enable it only on bundle 1.
+    EntityViewMode::create([
+      'id' => "{$entity_type}.only1",
+      'targetEntityType' => $entity_type,
+      'status' => TRUE,
+      'enabled' => TRUE,
+      'label' => 'Only on 1',
+    ])->save();
+    $view_display_only1 = EntityViewDisplay::create([
+      'id' => "{$entity_type}.{$bundle1['id']}.only1",
+      'targetEntityType' => $entity_type,
+      'status' => TRUE,
+      'bundle' => $bundle1['id'],
+      'mode' => 'only1',
+    ]);
+    $view_display_only1->setComponent("field_{$field_name}", [
+      'type' => 'field_test_default',
+      'region' => 'content',
+    ]);
+    $view_display_only1->save();
+
+    // Create additional view mode and enable it on both, this will later be disabled
+    EntityViewMode::create([
+      'id' => "{$entity_type}.disabled",
+      'targetEntityType' => $entity_type,
+      'status' => TRUE,
+      'enabled' => TRUE,
+      'label' => 'Disabled',
+    ])->save();
+    $view_display_disabled = EntityViewDisplay::create([
+      'id' => "{$entity_type}.{$bundle1['id']}.disabled",
+      'targetEntityType' => $entity_type,
+      'status' => FALSE,
+      'bundle' => $bundle1['id'],
+      'mode' => 'disabled',
+    ]);
+    $view_display_disabled->setComponent("field_{$field_name}", [
+      'type' => 'field_test_default',
+      'region' => 'content',
+    ]);
+    $view_display_disabled->save();
+    EntityViewDisplay::create([
+      'id' => "{$entity_type}.{$bundle2['id']}.disabled",
+      'targetEntityType' => $entity_type,
+      'status' => TRUE,
+      'bundle' => $bundle2['id'],
+      'mode' => 'disabled',
+    ])->save();
+
     $new_label = $this->randomMachineName();
     $this->fieldUIAddExistingField($bundle2['path'], "field_{$field_name}", $new_label);
 
@@ -133,6 +182,14 @@ class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
     // Ensure that the additional view display has correct settings.
     $view_display = $display_repository->getViewDisplay($entity_type, $bundle2['id'], $view_display->getMode());
     $this->assertEquals('field_test_default', $view_display->getComponent("field_{$field_name}")['type']);
+
+    // Ensure that new new form display was created for only_1.
+    $view_display = $display_repository->getViewDisplay($entity_type, $bundle2['id'], $view_display_only1->getMode());
+    $this->assertTrue($view_display->isNew());
+
+    // Ensure that the component is not configured on the disabled view display.
+    $view_display = $display_repository->getViewDisplay($entity_type, $bundle2['id'], $view_display_only1->getMode());
+    $this->assertNull($view_display->getComponent('field_test_default'));
   }
 
   /**

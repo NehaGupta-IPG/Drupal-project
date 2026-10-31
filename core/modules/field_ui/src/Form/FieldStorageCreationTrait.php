@@ -2,6 +2,8 @@
 
 namespace Drupal\field_ui\Form;
 
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+
 /**
  * Provides common functionality for adding or re-using a field.
  */
@@ -24,13 +26,15 @@ trait FieldStorageCreationTrait {
     // in other form modes until it is explicitly configured.
     foreach ($widget_settings as $mode => $options) {
       $form_display = $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $this->bundle, $mode);
-      if ($form_display->status()) {
+      // Do not copy over the widget settings if the display is not enabled, or
+      // if the display is new and not the default display mode.
+      if ($form_display->status() && (!$form_display->isNew() || $form_display->getMode() === EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE)) {
         $form_display->setComponent($field_name, $options)->save();
       }
     }
 
     if (empty($widget_settings)) {
-      $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $this->bundle, 'default')
+      $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $this->bundle)
         ->setComponent($field_name, [])
         ->save();
     }
@@ -54,7 +58,9 @@ trait FieldStorageCreationTrait {
     // for other view modes until it is explicitly configured.
     foreach ($formatter_settings as $mode => $options) {
       $view_display = $this->entityDisplayRepository->getViewDisplay($this->entityTypeId, $this->bundle, $mode);
-      if ($view_display->status()) {
+      // Do not copy over the formatter settings if the display is not enabled,
+      // or if the display is new and not the default display mode.
+      if ($view_display->status() && (!$view_display->isNew() || $view_display->getMode() === EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE)) {
         $view_display->setComponent($field_name, $options)->save();
       }
     }

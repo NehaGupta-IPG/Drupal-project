@@ -330,6 +330,7 @@ class FieldStorageReuseForm extends FormBase {
     $properties = [
       'targetEntityType' => $this->entityTypeId,
       'bundle' => $existing_bundle,
+      'status' => TRUE,
     ];
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $existing_forms */
     $existing_forms = $this->entityTypeManager->getStorage('entity_form_display')->loadByProperties($properties);
