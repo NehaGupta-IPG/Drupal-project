@@ -193,6 +193,7 @@ class UrlHelper {
     $options = [
       'path' => NULL,
       'query' => [],
+      'query_raw' => NULL,
       'fragment' => '',
     ];
 
@@ -220,7 +221,8 @@ class UrlHelper {
       }
       // If there is a query string, transform it into keyed query parameters.
       if (isset($parts[1])) {
-        parse_str($parts[1], $options['query']);
+        $options['query_raw'] = $parts[1];
+        $options['query'] = static::parseQueryString($parts[1]);
       }
     }
     // Internal URLs.
@@ -231,7 +233,8 @@ class UrlHelper {
       // Strip the leading slash that was just added.
       $options['path'] = substr($parts['path'], 1);
       if (isset($parts['query'])) {
-        parse_str($parts['query'], $options['query']);
+        $options['query_raw'] = $parts['query'];
+        $options['query'] = static::parseQueryString($parts['query']);
       }
       if (isset($parts['fragment'])) {
         $options['fragment'] = $parts['fragment'];
@@ -239,6 +242,98 @@ class UrlHelper {
     }
 
     return $options;
+  }
+
+  /**
+   * A wrapper for parse_str() that restores original parameter names.
+   *
+   * The parse_str() function can be used to set variables in the current scope,
+   * although this is deprecated. Because variables in PHP cannot have periods
+   * and spaces in their names, parse_str() converts them to underscores. This
+   * breaks external links and front end libraries that require specific
+   * parameter names. It can also cause name collisions.
+   *
+   * @param string $query
+   *   A query string to parse.
+   *
+   * @return array
+   *   The result of parse_str() with original parameter names restored.
+   */
+  public static function parseQueryString($query) {
+    // This will hold our final parsed data
+    $parsed = [];
+
+    // Iterate over each key=value pair in the query string
+    foreach (explode('&', $query) as $param) {
+
+      // Split the key=value pair into separate variables
+      list($name, $value) = explode('=', $param, 2) + ['', ''];
+
+      // Decode the URL-encoded string for the parameter name and value
+      $name = rawurldecode($name);
+      $value = rawurldecode($value);
+
+      // Get the potential nested keys from the parameter name
+      $keys = self::extractKeys($name);
+
+      // Initialize a temporary variable which will be used to drill down into the $parsed array
+      // Linter not be able to detect the indirect & changes made to $parsed via $temp. The code does actually use $temp in the $parsed array.
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $temp = &$parsed;
+
+      // Drill down into the $parsed array based on the nested keys (if any)
+      foreach ($keys as $key) {
+        $key = rawurldecode($key);
+        $temp = &$temp[$key];
+      }
+
+      // If the current key in $parsed already has a value, convert it to an array and append the new value
+      // This handles multiple values for a single key, like: key[]=value1&key[]=value2
+      if (isset($temp)) {
+        if (!is_array($temp)) {
+          $temp = [$temp];
+        }
+        $temp[] = $value;
+      }
+      else {
+        // If the key doesn't have a value yet, simply assign the value to it
+        $temp = $value;
+      }
+    }
+
+    // Return the fully parsed array
+    return $parsed;
+  }
+
+  /**
+   * Extracts the nested keys from a query parameter string.
+   *
+   * Given a string in the form of 'key[subkey1][subkey2]', this function
+   * will return an array containing 'key', 'subkey1', and 'subkey2'.
+   * It handles both square-bracketed and non-bracketed parts of the string.
+   *
+   * @param string $str
+   *   The query parameter string containing potential nested keys.
+   *
+   * @return array
+   *   An array of keys extracted from the input string.
+   *
+   * @example
+   *   Input:  'key[subkey1][subkey2]'
+   *   Output: ['key', 'subkey1', 'subkey2']
+   */
+  private static function extractKeys($str) {
+    preg_match_all('/\[([^\]]*)\]|[^[\]]+/', $str, $matches);
+    $keys = [];
+    foreach ($matches[0] as $match) {
+      if (strpos($match, '[') === 0) {
+        $keys[] = trim($match, '[]');
+      }
+      else {
+        $keys[] = $match;
+      }
+    }
+    return $keys;
   }
 
   /**

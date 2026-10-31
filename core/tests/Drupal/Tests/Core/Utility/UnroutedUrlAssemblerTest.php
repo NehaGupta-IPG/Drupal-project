@@ -140,6 +140,7 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
         'https://example.com/test?foo=1#baz',
       ],
       ['//www.drupal.org', [], '//www.drupal.org'],
+      ['https://example.com/test?foo=1&bar=2&foo=3', [], 'https://example.com/test?foo=1&bar=2&foo=3'],
     ];
   }
 

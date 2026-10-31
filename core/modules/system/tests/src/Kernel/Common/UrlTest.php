@@ -289,6 +289,7 @@ class UrlTest extends KernelTestBase {
           $expected = [
             'path' => $absolute . $script . $path,
             'query' => ['foo' => 'bar', 'bar' => 'baz', 'baz' => ''],
+            'query_raw' => 'foo=bar&bar=baz&baz',
             'fragment' => 'foo',
           ];
           $this->assertEquals($expected, UrlHelper::parse($url), 'URL parsed correctly.');
@@ -301,6 +302,7 @@ class UrlTest extends KernelTestBase {
     $result = [
       'path' => 'foo/bar:1',
       'query' => [],
+      'query_raw' => NULL,
       'fragment' => '',
     ];
     $this->assertEquals($result, UrlHelper::parse($url), 'Relative URL parsed correctly.');
