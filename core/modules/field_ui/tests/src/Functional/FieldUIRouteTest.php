@@ -40,10 +40,27 @@ class FieldUIRouteTest extends BrowserTestBase {
    * Ensures that entity types with bundles do not break following entity types.
    */
   public function testFieldUIRoutes(): void {
+    // Verify the view mode route keeps view_mode_name as a required path
+    // parameter (not a default, so it cannot match /display without a segment).
+    $view_mode_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.view_mode');
+    $this->assertNotNull($view_mode_route);
+    $this->assertNull($view_mode_route->getDefault('view_mode_name'));
+    $this->assertSame('default', $view_mode_route->getDefault('active_tab'));
+
+    // Verify the dedicated /default route has view_mode_name default.
+    $default_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_view_display.user.default');
+    $this->assertNotNull($default_route);
+    $this->assertSame('default', $default_route->getDefault('view_mode_name'));
+
+    // Verify form display routes are unaffected.
+    $form_mode_route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_form_display.user.form_mode');
+    $this->assertNotNull($form_mode_route);
+    $this->assertNull($form_mode_route->getDefault('form_mode_name'));
+    $this->assertNull($form_mode_route->getDefault('active_tab'));
+
     $route = \Drupal::service('router.route_provider')->getRouteByName('entity.entity_test.field_ui_fields');
     $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
-    // Asserts that admin routes are correctly marked as such.
-    $this->assertTrue($is_admin, 'Admin route correctly marked for "Manage fields" page.');
+    $this->assertTrue($is_admin);
 
     $this->drupalLogin($this->drupalCreateUser([
       'administer account settings',
@@ -119,6 +136,10 @@ class FieldUIRouteTest extends BrowserTestBase {
     $this->drupalGet('admin/config/people/accounts/form-display');
     $this->submitForm($edit, 'Save');
     $this->assertSession()->linkExists('Test');
+
+    $this->drupalGet('admin/config/people/accounts/display/default');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Manage display | Drupal');
   }
 
   /**

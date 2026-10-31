@@ -198,12 +198,14 @@ class RouteSubscriber extends RouteSubscriberBase {
         );
         $collection->add("entity.entity_view_display.{$entity_type_id}.default", $route);
 
-        // Other view mode routes.
+        // Other view mode routes ('active_tab' default ensures the active tab
+        // is 'default' when a user navigates to a non-default view mode route).
         $route = new Route(
           "$path/display/{view_mode_name}",
           [
             '_entity_form' => 'entity_view_display.edit',
             '_title' => 'Manage display',
+            'active_tab' => 'default',
           ] + $defaults,
           ['_field_ui_view_mode_access' => 'administer ' . $entity_type_id . ' display'],
           $options
