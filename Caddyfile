@@ -1,0 +1,71 @@
+# Caddyfile for Drupal with FrankenPHP.
+# https://frankenphp.dev/
+#
+# This configuration works for both root and subdirectory installs.
+#
+# == Running from a subdirectory ==
+# If your hosting does not allow running from the document root, you can
+# serve Drupal from a subdirectory (e.g. https://example.com/drupal/).
+#
+# For a Composer-based project layout (vendor/, web/):
+#
+# 1. Set your document root to the parent directory:
+#        root * /var/www/html
+# 2. Place (or symlink) the project's web/ directory into a subdirectory:
+#        ln -s /path/to/project/web /var/www/html/drupal
+# 3. Access your site at https://example.com/drupal/
+#
+# No additional Caddyfile changes are needed — subdirectory routing is
+# handled automatically by the @subdir block below.
+
+{
+	frankenphp
+	order php_server before file_server
+	order php before file_server
+}
+
+:80 {
+	root * /var/www/html
+	encode zstd br gzip
+
+	@hiddenPhpFilesRegexp path_regexp \..*/.*\.php$
+	error @hiddenPhpFilesRegexp 403
+
+	@notFoundPhpFiles path_regexp /vendor/.*\.php$
+	error @notFoundPhpFiles 404
+
+	@notFoundPhpFilesRegexp path_regexp ^/sites/[^/]+/files/.*\.php$
+	error @notFoundPhpFilesRegexp 404
+
+	@privateDirRegexp path_regexp ^/sites/.*/private/
+	error @privateDirRegexp 403
+
+	@protectedFilesRegexp {
+		not path /.well-known*
+		path_regexp \.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|/\..*|/(Entries.*|Repository|Root|Tag|Template|composer\.(json|lock)|web\.config|yarn\.lock|package\.json)$|/#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$
+	}
+	error @protectedFilesRegexp 403
+
+	@static {
+		file
+		path *.avif *.css *.eot *.gif *.gz *.ico *.jpg *.jpeg *.js *.otf *.pdf *.png *.svg *.ttf *.webp *.woff *.woff2
+	}
+	header @static Cache-Control "max-age=31536000,public,immutable"
+
+	# Rewrite clean URLs to the nearest index.php.
+	# Supports both root installs and subdirectory installs
+	# (e.g. /subdirectory/) as used by DrupalCI.
+	@subdir path_regexp subdir ^(/[^/]+)
+	handle @subdir {
+		try_files {path} {path}/index.php {re.subdir.1}/index.php /index.php
+		@phpFiles path *.php
+		php @phpFiles
+		file_server
+	}
+	handle {
+		try_files {path} {path}/index.php /index.php
+		@phpFiles path *.php
+		php @phpFiles
+		file_server
+	}
+}

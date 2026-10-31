@@ -62,6 +62,7 @@ workflow:
 ################
 
 variables:
+  _TARGET_WEBSERVER: "apache"
   FF_USE_FASTZIP: 1
   FF_NETWORK_PER_BUILD: 1
   _CONFIG_DOCKERHUB_ROOT: "registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments"
@@ -118,7 +119,7 @@ default:
       - runner_system_failure
       - scheduler_failure
   image:
-    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-apache:production
+    name: $_CONFIG_DOCKERHUB_ROOT/php-$_TARGET_PHP-${_TARGET_WEBSERVER}:production
 
 #############
 # Templates #
@@ -532,6 +533,15 @@ default:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
         _TARGET_DB: [sqlite-3]
+
+'FrankenPHP (PHP 8.5 MySQL 8.4)':
+  <<: [ *recursive-trigger, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
+    _TARGET_DB: "mysql-8.4"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
+    _TARGET_WEBSERVER: "frankenphp"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.

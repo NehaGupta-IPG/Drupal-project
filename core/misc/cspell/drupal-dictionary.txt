@@ -4,6 +4,7 @@ bartik
 bubbleable
 buytaert
 buytaert's
+caddyfile
 daterange
 dbtng
 dependee
@@ -23,6 +24,8 @@ exin
 exun
 fapi
 fieldable
+franken
+frankenphp
 fulldate
 groupby
 groupwise
