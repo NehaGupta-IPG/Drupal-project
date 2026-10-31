@@ -1221,6 +1221,21 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       if ($this instanceof MultiItemsFieldHandlerInterface) {
         $items = [];
         foreach ($raw_items as $count => $item) {
+          // If a link is being rendered via the "Link from the content"
+          // checkbox, we need to move that information to the alter settings
+          // so we can manipulate the original value before rendering the link.
+          if (
+            isset($this->options['settings']['link_to_entity']) && $this->options['settings']['link_to_entity'] &&
+            isset($item['rendered']['#type']) && ($item['rendered']['#type'] == 'link')
+          ) {
+            $item['url'] = $item['rendered']['#url'];
+            $item['make_link'] = TRUE;
+            $item['rendered'] = [
+              '#plain_text' => $item['rendered']['#title']['#context']['value'] ?? $item['rendered']['#title'],
+              '#cache' => $item['rendered']['#cache'],
+              '#attached' => $item['rendered']['#attached'],
+            ];
+          }
           $value = $this->render_item($count, $item);
           if (is_array($value)) {
             $value = (string) $this->getRenderer()->render($value);
