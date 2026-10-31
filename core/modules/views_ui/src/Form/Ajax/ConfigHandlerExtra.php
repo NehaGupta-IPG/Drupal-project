@@ -65,7 +65,7 @@ class ConfigHandlerExtra extends ViewsFormBase {
       $form['markup'] = ['#markup' => $this->t('Invalid display id @display', ['@display' => $display_id])];
       return $form;
     }
-    $item = $executable->getHandler($display_id, $type, $id);
+    $item = $executable->getHandlerConfiguration($display_id, $type, $id);
 
     if ($item) {
       $handler = $executable->display_handler->getHandler($type, $id);

@@ -257,7 +257,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
     // Therefore add one item without any options and one item with some
     // options.
     $id1 = $view->addHandler($display_id, 'field', 'views_test_data', 'id');
-    $item1 = $view->getHandler($display_id, 'field', 'id');
+    $item1 = $view->getHandlerConfiguration($display_id, 'field', 'id');
     $expected_items[$id1] = $expected_item = [
       'id' => 'id',
       'table' => 'views_test_data',
@@ -272,7 +272,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
       ],
     ];
     $id2 = $view->addHandler($display_id, 'field', 'views_test_data', 'name', $options);
-    $item2 = $view->getHandler($display_id, 'field', 'name');
+    $item2 = $view->getHandlerConfiguration($display_id, 'field', 'name');
     $expected_items[$id2] = $expected_item = [
       'id' => 'name',
       'table' => 'views_test_data',
@@ -293,7 +293,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
     ] + $item1;
     $expected_items[$id1] = $item;
     $view->setHandler($display_id, 'field', $id1, $item);
-    $this->assertEquals($item, $view->getHandler($display_id, 'field', 'id'));
+    $this->assertEquals($item, $view->getHandlerConfiguration($display_id, 'field', 'id'));
     $this->assertEquals($expected_items, $view->getHandlers('field', $display_id));
 
     // Test removeItem method.

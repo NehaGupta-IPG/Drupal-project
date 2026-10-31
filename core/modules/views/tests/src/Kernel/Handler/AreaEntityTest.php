@@ -158,7 +158,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
 
     // Change the view mode of the area handler.
     $view = Views::getView('test_entity_area');
-    $item = $view->getHandler('default', 'header', 'entity_entity_test');
+    $item = $view->getHandlerConfiguration('default', 'header', 'entity_entity_test');
     $item['view_mode'] = 'test';
     $view->setHandler('default', 'header', 'entity_entity_test', $item);
 

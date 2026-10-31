@@ -68,7 +68,7 @@ class ConfigHandlerGroup extends ViewsFormBase {
 
     $executable->initQuery();
 
-    $item = $executable->getHandler($display_id, $type, $id);
+    $item = $executable->getHandlerConfiguration($display_id, $type, $id);
 
     if ($item) {
       $handler = $executable->display_handler->getHandler($type, $id);
