@@ -81,7 +81,13 @@ class JsCollectionRenderer implements AssetCollectionRendererInterface {
           break;
 
         default:
-          throw new \Exception('Invalid JS asset type.');
+          $valid_types = ['setting', 'file', 'external'];
+          throw new \Exception(sprintf(
+            'Invalid JS asset type "%s". Valid types are: "%s". Asset data: %s',
+            $js_asset['type'],
+            implode('", "', $valid_types),
+            $js_asset['data']
+          ));
       }
 
       // Attributes may only be set if this script is output independently.
