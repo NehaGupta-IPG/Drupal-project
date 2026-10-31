@@ -519,4 +519,51 @@ class SettingsTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests initialization from environment variables.
+   */
+  public function testFromEnvironment(): void {
+    $hash_salt = $this->randomString();
+    $_ENV['DRUPAL_HASH_SALT'] = $hash_salt;
+    $config_sync_directory = vfsStream::url('root/config');
+    $_ENV['DRUPAL_CONFIG_SYNC_DIR'] = $config_sync_directory;
+
+    $_ENV['DRUPAL_DB_DRIVER'] = 'sqlite';
+    $_ENV['DRUPAL_DB_NAME'] = vfsStream::url('root/db.sqlite');
+
+    Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
+    self::assertEquals($hash_salt, Settings::getHashSalt());
+    self::assertEquals($config_sync_directory, Settings::get('config_sync_directory'));
+    self::assertEquals([
+      'default' => [
+        'driver' => 'sqlite',
+        'database' => 'vfs://root/db.sqlite',
+        'prefix' => '',
+        'namespace' => 'Drupal\sqlite\Driver\Database\sqlite',
+        'autoload' => 'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+    ], Database::getConnectionInfo());
+    Database::removeConnection('default');
+
+    $_ENV['DRUPAL_DB_DRIVER'] = 'mysql';
+    $_ENV['DRUPAL_DB_NAME'] = 'db_name';
+    $_ENV['DRUPAL_DB_USERNAME'] = 'db_user';
+    $_ENV['DRUPAL_DB_PASSWORD'] = 'db_pass';
+    $_ENV['DRUPAL_DB_HOST'] = 'db_host';
+    Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
+    self::assertEquals([
+      'default' => [
+        'driver' => 'mysql',
+        'database' => 'db_name',
+        'prefix' => '',
+        'namespace' => 'Drupal\mysql\Driver\Database\mysql',
+        'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+        'username' => 'db_user',
+        'password' => 'db_pass',
+        'host' => 'db_host',
+        'port' => '',
+      ],
+    ], Database::getConnectionInfo());
+  }
+
 }

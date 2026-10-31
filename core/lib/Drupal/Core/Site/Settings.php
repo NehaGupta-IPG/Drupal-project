@@ -150,6 +150,46 @@ final class Settings {
 
     self::handleDeprecations($settings);
 
+    $hash_salt = $settings['hash_salt'] ?? '';
+    if ($hash_salt === '') {
+      $env_hash_salt = $_ENV['DRUPAL_HASH_SALT'] ?? '';
+      if ($env_hash_salt !== '') {
+        $settings['hash_salt'] = $env_hash_salt;
+      }
+    }
+
+    $config_sync_directory = $settings['config_sync_directory'] ?? '';
+    if ($config_sync_directory === '') {
+      $env_config_sync_dir = $_ENV['DRUPAL_CONFIG_SYNC_DIR'] ?? '';
+      if ($env_config_sync_dir !== '') {
+        $settings['config_sync_directory'] = $env_config_sync_dir;
+      }
+    }
+
+    if (count($databases) === 0) {
+      $default_db_driver = $_ENV['DRUPAL_DB_DRIVER'] ?? '';
+      if ($default_db_driver !== '') {
+        if ($default_db_driver === 'sqlite') {
+          $databases['default']['default'] = [
+            'driver' => $_ENV['DRUPAL_DB_DRIVER'],
+            'database' => $_ENV['DRUPAL_DB_NAME'],
+            'prefix' => '',
+          ];
+        }
+        else {
+          $databases['default']['default'] = [
+            'driver' => $_ENV['DRUPAL_DB_DRIVER'],
+            'database' => $_ENV['DRUPAL_DB_NAME'],
+            'username' => $_ENV['DRUPAL_DB_USERNAME'],
+            'password' => $_ENV['DRUPAL_DB_PASSWORD'],
+            'host' => $_ENV['DRUPAL_DB_HOST'] ?? '',
+            'port' => $_ENV['DRUPAL_DB_PORT'] ?? '',
+            'prefix' => $_ENV['DRUPAL_DB_PREFIX'] ?? '',
+          ];
+        }
+      }
+    }
+
     // Initialize databases.
     Database::setMultipleConnectionInfo($databases, $class_loader, $app_root);
 
