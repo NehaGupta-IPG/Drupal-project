@@ -6,6 +6,7 @@ use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Datetime\DateFormatInterface;
 use Drupal\Core\Utility\NaturalSort;
 use Drupal\system\DateFormatAccessControlHandler;
@@ -99,6 +100,24 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
    */
   public function getCacheTagsToInvalidate() {
     return ['rendered'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities): void {
+    parent::postDelete($storage, $entities);
+    \Drupal::token()->resetInfo();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
+    parent::postSave($storage, $update);
+    if (!$update) {
+      \Drupal::token()->resetInfo();
+    }
   }
 
 }

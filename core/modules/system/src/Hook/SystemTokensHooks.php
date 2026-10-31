@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Hook;
 
-use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -58,26 +57,21 @@ class SystemTokensHooks {
     ];
     /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
-    // Date related tokens.
     $request_time = \Drupal::time()->getRequestTime();
-    $date['short'] = [
-      'name' => $this->t("Short format"),
-      'description' => $this->t("The current date in 'short' format. (%date)", [
-        '%date' => $date_formatter->format($request_time, 'short'),
-      ]),
-    ];
-    $date['medium'] = [
-      'name' => $this->t("Medium format"),
-      'description' => $this->t("The current date in 'medium' format. (%date)", [
-        '%date' => $date_formatter->format($request_time, 'medium'),
-      ]),
-    ];
-    $date['long'] = [
-      'name' => $this->t("Long format"),
-      'description' => $this->t("The current date in 'long' format. (%date)", [
-        '%date' => $date_formatter->format($request_time, 'long'),
-      ]),
-    ];
+
+    // Date related tokens.
+    /** @var \Drupal\Core\Datetime\DateFormatInterface[] $date_formats */
+    $date_formats = \Drupal::entityTypeManager()->getStorage('date_format')->loadMultiple();
+    foreach ($date_formats as $date_format) {
+      $date[$date_format->id()] = [
+        'name' => $date_format->label(),
+        'description' => $this->t('A date in the %name format. (%date)', [
+          '%name' => $date_format->label(),
+          '%date' => $date_formatter->format($request_time, $date_format->id()),
+        ]),
+      ];
+    }
+
     $date['custom'] = [
       'name' => $this->t("Custom format"),
       'description' => $this->t('The current date in a custom format. See <a href="https://www.php.net/manual/datetime.format.php#refsect1-datetime.format-parameters">the PHP documentation</a> for details.'),
@@ -180,16 +174,19 @@ class SystemTokensHooks {
       else {
         $date = $data['date'];
       }
-      foreach ($tokens as $name => $original) {
-        switch ($name) {
-          case 'short':
-          case 'medium':
-          case 'long':
-            $date_format = DateFormat::load($name);
-            $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($date, $name, '', NULL, $langcode);
-            break;
 
+      /** @var \Drupal\Core\Entity\EntityStorageInterface $date_format_storage */
+      $date_format_storage = \Drupal::entityTypeManager()->getStorage('date_format');
+      foreach ($tokens as $name => $original) {
+        // Date type token replacement.
+        $date_format = $date_format_storage->load($name);
+        if ($date_format) {
+          $bubbleable_metadata->addCacheableDependency($date_format);
+          $replacements[$original] = \Drupal::service('date.formatter')->format($date, $name, '', NULL, $langcode);
+          continue;
+        }
+
+        switch ($name) {
           case 'since':
             $replacements[$original] = \Drupal::service('date.formatter')->formatTimeDiffSince($date, ['langcode' => $langcode]);
             $bubbleable_metadata->setCacheMaxAge(0);

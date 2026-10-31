@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Kernel\Token;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use PHPUnit\Framework\Attributes\Group;
@@ -170,10 +171,20 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
 
     // Generate and test tokens.
     $tests = [];
+    /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
     $date_formatter = \Drupal::service('date.formatter');
-    $tests['[date:short]'] = $date_formatter->format($date, 'short', '', NULL, $this->interfaceLanguage->getId());
-    $tests['[date:medium]'] = $date_formatter->format($date, 'medium', '', NULL, $this->interfaceLanguage->getId());
-    $tests['[date:long]'] = $date_formatter->format($date, 'long', '', NULL, $this->interfaceLanguage->getId());
+
+    // Test standard date format tokens.
+    $date_formats = array_keys(\Drupal::entityTypeManager()->getStorage('date_format')->loadMultiple());
+    $this->assertCount(11, $date_formats);
+    $this->assertTrue(in_array('short', $date_formats));
+    $this->assertTrue(in_array('medium', $date_formats));
+    $this->assertTrue(in_array('long', $date_formats));
+    $this->assertTrue(in_array('html_date', $date_formats));
+    foreach ($date_formats as $date_format) {
+      $tests['[date:' . $date_format . ']'] = $date_formatter->format($date, $date_format, '', NULL, $this->interfaceLanguage->getId());
+    }
+
     $tests['[date:custom:m/j/Y]'] = $date_formatter->format($date, 'custom', 'm/j/Y', NULL, $this->interfaceLanguage->getId());
     $tests['[date:since]'] = $date_formatter->formatTimeDiffSince($date, ['langcode' => $this->interfaceLanguage->getId()]);
     $tests['[date:raw]'] = Xss::filter($date);
@@ -185,6 +196,32 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
       $output = $this->tokenService->replace($input, ['date' => $date], ['langcode' => $this->interfaceLanguage->getId()]);
       $this->assertEquals($expected, $output, "Date token $input replaced.");
     }
+  }
+
+  /**
+   * Tests the generation of all system date format tokens when formats change.
+   */
+  public function testSystemDateTokenGetInfo(): void {
+    $tokens = \Drupal::token()->getInfo();
+    $this->assertArrayNotHasKey('y2k', $tokens['tokens']['date']);
+
+    // Add new formats.
+    $date_format = DateFormat::create([
+      'id' => 'y2k',
+      'label' => 'Y2K',
+      'pattern' => 'y',
+    ]);
+    $date_format->save();
+
+    $tokens = \Drupal::token()->getInfo();
+    $this->assertArrayHasKey('y2k', $tokens['tokens']['date']);
+
+    // Delete the new format.
+    DateFormat::load('y2k')->delete();
+
+    // Verify the token was removed.
+    $tokens = \Drupal::token()->getInfo();
+    $this->assertArrayNotHasKey('y2k', $tokens['tokens']['date']);
   }
 
 }
