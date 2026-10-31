@@ -745,9 +745,11 @@ class MediaTest extends MediaTestBase {
     $page->pressButton('Source');
     $textarea = $page->find('css', '.ck-source-editing-area > textarea');
     $textarea->setValue($editor_dom->C14N());
-    // Switch back to rich text editing for changes to take effect. This seems
-    // to be necessary only for this test and not in actual usage.
-    // @todo WHY?
+    // Switch back to rich text editing for changes to take effect in the
+    // CKEditor data model, so that the next assertion passes. This seems to be
+    // necessary only for the purposes of this test and not in actual usage,
+    // where changes in source editing are saved without switching back to rich
+    // text editing.
     $page->pressButton('Source');
 
     // Ensure that the `layercake-side` class is retained.
