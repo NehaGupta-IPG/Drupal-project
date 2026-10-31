@@ -6,6 +6,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\FileExists;
@@ -241,6 +242,29 @@ class FileUploadResource extends ResourceBase {
     }
 
     return $field_definition;
+  }
+
+  /**
+   * Retrieves the upload validators for a field definition.
+   *
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition for which to get validators.
+   *
+   * @return array
+   *   An array suitable for passing to file_save_upload() or the file field
+   *   element's '#upload_validators' property.
+   */
+  protected function getUploadValidators(FieldDefinitionInterface $field_definition) {
+    $item_definition = $field_definition->getItemDefinition();
+    $class = $item_definition->getClass();
+    /** @var \Drupal\file\Plugin\Field\FieldType\FileItem $item */
+    $item = new $class($item_definition);
+
+    $validators = $item->getUploadValidators();
+    // Add in our check of the file name length.
+    $validators['FileNameLength'] = [];
+
+    return $validators;
   }
 
   /**
