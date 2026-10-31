@@ -175,6 +175,10 @@ class FormattableMarkup implements MarkupInterface, \Countable {
   protected static function placeholderFormat($string, array $args) {
     // Transform arguments before inserting them.
     foreach ($args as $key => $value) {
+      // If value is NULL, replace it with a default value (empty string).
+      if (is_null($value)) {
+        $value = '';
+      }
       switch ($key[0]) {
         case '@':
           // Escape if the value is not an object from a class that implements
