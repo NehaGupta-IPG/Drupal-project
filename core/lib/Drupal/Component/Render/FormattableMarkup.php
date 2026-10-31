@@ -228,14 +228,14 @@ class FormattableMarkup implements MarkupInterface, \Countable {
   /**
    * Escapes a placeholder replacement value if needed.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $value
+   * @param string|\Drupal\Component\Render\MarkupInterface|null $value
    *   A placeholder replacement value.
    *
    * @return string
    *   The properly escaped replacement value.
    */
   protected static function placeholderEscape($value) {
-    return $value instanceof MarkupInterface ? (string) $value : Html::escape($value);
+    return $value instanceof MarkupInterface ? (string) $value : Html::escape((string) $value);
   }
 
 }
