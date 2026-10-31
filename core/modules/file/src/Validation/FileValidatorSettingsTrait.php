@@ -36,6 +36,9 @@ trait FileValidatorSettingsTrait {
       $maxFilesize = min($maxFilesize, Bytes::toNumber($settings['max_filesize']));
     }
 
+    // Restrict empty file.
+    $validators['FileZeroByte'] = [];
+
     // There is always a file size limit due to the PHP server limit.
     $validators['FileSizeLimit'] = ['fileLimit' => (int) $maxFilesize];
 
