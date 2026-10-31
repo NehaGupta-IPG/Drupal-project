@@ -14,6 +14,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Tests Goto Action.
@@ -55,6 +59,15 @@ class GotoActionTest extends KernelTestBase {
 
     $this->assertSame(302, $response->getStatusCode());
     $this->assertSame($expected, $location);
+
+    // Verify that the next request is not redirected by this action.
+    $kernel = $this->container->get('http_kernel');
+    $dispatcher = $this->container->get('event_dispatcher');
+    $response = new Response();
+    $event = new ResponseEvent($kernel, Request::create(''), HttpKernelInterface::MAIN_REQUEST, $response);
+    $dispatcher->dispatch($event, KernelEvents::RESPONSE);
+    $this->assertSame($response, $event->getResponse());
+    $this->assertFalse($response->headers->has('Location'));
   }
 
   /**
