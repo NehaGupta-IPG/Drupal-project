@@ -122,6 +122,25 @@ class TermTranslationTest extends TaxonomyTestBase {
   }
 
   /**
+   * Tests the language of the parent term options.
+   */
+  public function testParentTermsTranslation() {
+
+    $this->drupalLogin($this->drupalCreateUser(['administer taxonomy']));
+    // Test current language terms are listed(en)
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->get('vid') . '/add');
+    $this->assertSession()->pageTextContains('one');
+    $this->assertSession()->pageTextContains('two');
+    $this->assertSession()->pageTextContains('three');
+
+    // Test current language terms are listed(hu)
+    $this->drupalGet('hu/admin/structure/taxonomy/manage/' . $this->vocabulary->get('vid') . '/add');
+    $this->assertSession()->pageTextContains('translatedOne');
+    $this->assertSession()->pageTextContains('translatedTwo');
+    $this->assertSession()->pageTextContains('translatedThree');
+  }
+
+  /**
    * Setup translated terms in a hierarchy.
    */
   protected function setUpTerms(): void {

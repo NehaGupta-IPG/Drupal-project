@@ -56,8 +56,15 @@ class TermForm extends ContentEntityForm {
       if (empty($parent)) {
         $parent = [0];
       }
-
+      /**
+       * @var \Drupal\Core\Language\LanguageManager
+       */
+      $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
       foreach ($tree as $item) {
+        $current_term = $taxonomy_storage->load($item->tid);
+        if ($current_term->hasTranslation($langcode)) {
+          $item->name = $current_term->getTranslation($langcode)->label();
+        }
         if (!in_array($item->tid, $exclude)) {
           $options[$item->tid] = str_repeat('-', $item->depth) . $item->name;
         }
