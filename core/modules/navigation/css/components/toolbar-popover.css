@@ -49,7 +49,7 @@
       transform: translateX(0);
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       --admin-toolbar-z-index-popover: var(--drupal-admin-z-index-popover, -1);
 
       block-size: calc(100vh - var(--drupal-displace-offset-top, 0px));
@@ -69,7 +69,7 @@
     transform: translateX(0);
     opacity: 1;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       transform: translateX(var(--admin-toolbar-sidebar-width));
 
       &:dir(rtl) {

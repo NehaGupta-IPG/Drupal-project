@@ -15,7 +15,7 @@
     overflow: clip;
   }
 
-  @media (min-width: 64rem) {
+  @media (min-width: 1024px) {
     overflow: initial;
 
     body {

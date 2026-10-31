@@ -19,7 +19,7 @@
     background-color: white;
     font-family: var(--admin-toolbar-font-family);
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: none;
     }
   }
@@ -27,7 +27,7 @@
   .admin-toolbar-control-bar__burger {
     align-self: start;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: none;
     }
   }

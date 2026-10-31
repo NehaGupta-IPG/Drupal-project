@@ -6,8 +6,8 @@
  */
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
   [data-has-safe-triangle] {
-    --safe-triangle-cursor-y: 6.25rem;
-    --safe-triangle-cursor-x: 6.25rem;
+    --safe-triangle-cursor-y: 100px;
+    --safe-triangle-cursor-x: 100px;
     --safe-triangle-submenu-start-x: var(--admin-toolbar-sidebar-width);
     --safe-triangle-submenu-start-y: 5vh;
     --safe-triangle-submenu-end-x: var(--admin-toolbar-sidebar-width);

@@ -17,11 +17,11 @@ body {
   --admin-toolbar-sidebar-width: 80vw;
   --admin-toolbar-sidebar-header: calc(3.75 * var(--admin-toolbar-rem));
 
-  @media (min-width: 35rem) {
+  @media (min-width: 560px) {
     --admin-toolbar-sidebar-width: calc(16.5 * var(--admin-toolbar-rem));
   }
 
-  @media (min-width: 64rem) {
+  @media (min-width: 1024px) {
     --admin-toolbar-sidebar-width: calc(4.5 * var(--admin-toolbar-rem));
 
     [data-admin-toolbar="expanded"] & {
@@ -38,11 +38,11 @@ body {
         visibility var(--admin-toolbar-transition),
         transform var(--admin-toolbar-transition);
 
-      @media not (min-width: 64rem) {
+      @media not (min-width: 1024px) {
         visibility: hidden;
       }
 
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         transition: width var(--admin-toolbar-transition);
 
         ~ .dialog-off-canvas-main-canvas {
@@ -64,7 +64,7 @@ body {
     inset-block-start: 0;
     inset-inline-start: 0;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       width: var(--admin-toolbar-sidebar-width);
     }
   }
@@ -91,13 +91,13 @@ body {
       right: 0;
       transform: translateX(100%);
 
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         transform: none;
       }
     }
 
     & ~ .dialog-off-canvas-main-canvas {
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         margin-inline-start: var(--drupal-displace-offset-left, var(--admin-toolbar-sidebar-width));
 
         [dir="rtl"] & {
@@ -111,12 +111,12 @@ body {
       transform: none;
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       transform: none;
       inset-block-start: 0;
     }
 
-    @media only screen and (max-height: 18.75rem) {
+    @media only screen and (max-height: 300px) {
       min-height: 20rem;
     }
   }
@@ -130,7 +130,7 @@ body {
     .admin-toolbar__back-button {
       display: flex;
 
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         display: none;
       }
     }
@@ -138,7 +138,7 @@ body {
     .admin-toolbar__logo {
       display: none;
 
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         display: inline-flex;
       }
     }
@@ -149,7 +149,7 @@ body {
     justify-self: end;
     margin-inline-start: auto;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: none;
     }
   }
@@ -171,7 +171,7 @@ body {
       color: var(--admin-toolbar-color-gray-990);
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: flex;
     }
   }
@@ -216,12 +216,12 @@ body {
     background-color: var(--admin-toolbar-color-white);
 
     &:not(:has(.admin-toolbar__logo)) {
-      @media (min-width: 64rem) {
+      @media (min-width: 1024px) {
         display: none;
       }
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       position: static;
       align-items: start;
       margin-block-start: revert;
@@ -257,12 +257,12 @@ body {
     background-color: var(--admin-toolbar-color-white);
     background-repeat: no-repeat;
     background-attachment: local, scroll;
-    background-position-y: 3rem;
+    background-position-y: 48px;
     background-size:
-      100% 2.5rem,
-      100% 1rem;
+      100% 40px,
+      100% 16px;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: contents;
       overflow-y: unset;
       background: none;
@@ -280,7 +280,7 @@ body {
     padding-inline: var(--admin-toolbar-space-16);
     border-inline-end: 1px solid var(--admin-toolbar-color-gray-100);
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: flex;
       overflow-x: hidden;
       overflow-y: auto;
@@ -296,10 +296,10 @@ body {
       background-repeat: no-repeat;
       background-attachment: local, local, scroll, scroll;
       background-size:
-        100% 2.5rem,
-        100% 2.5rem,
-        100% 1rem,
-        100% 1rem;
+        100% 40px,
+        100% 40px,
+        100% 16px,
+        100% 16px;
     }
   }
 
@@ -322,7 +322,7 @@ body {
       }
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       --admin-toolbar-z-index-footer: -1;
 
       position: sticky;
@@ -337,7 +337,7 @@ body {
   .admin-toolbar__toggle {
     display: none;
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: flex;
     }
   }
@@ -374,7 +374,7 @@ body {
       background-color: canvasText;
     }
 
-    @media (min-width: 64rem) {
+    @media (min-width: 1024px) {
       display: none;
     }
   }

@@ -29,7 +29,7 @@
     display: none;
   }
 
-  @media (min-width: 64rem) {
+  @media (min-width: 1024px) {
     [data-drupal-tooltip]:hover + .toolbar-tooltip,
     [data-drupal-tooltip]:focus + .toolbar-tooltip {
       display: block;
