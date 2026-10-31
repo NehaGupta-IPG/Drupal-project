@@ -140,7 +140,7 @@ class DataFieldRow extends RowPluginBase {
     foreach ($this->view->field as $id => $field) {
       // If the raw output option has been set, just get the raw value.
       if (!empty($this->rawOutputOptions[$id])) {
-        $value = $field->getValue($row);
+        $value = $field->getValue($row) ?? $field->getValue($row) ?: '';
       }
       // Otherwise, get rendered field.
       else {
