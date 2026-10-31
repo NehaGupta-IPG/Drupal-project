@@ -186,6 +186,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     $result_data = $this->serializer->decode((string) $response->getBody(), $format);
     $this->assertEquals($name, $result_data['current_user']['name']);
     $this->assertEquals($account->id(), $result_data['current_user']['uid']);
+    $this->assertEquals($account->uuid(), $result_data['current_user']['uuid']);
     $this->assertEquals($account->getRoles(), $result_data['current_user']['roles']);
     $logout_token = $result_data['logout_token'];
 

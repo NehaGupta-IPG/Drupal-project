@@ -202,6 +202,9 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         if ($account->get('uid')->access('view', $account)) {
           $response_data['current_user']['uid'] = $account->id();
         }
+        if ($account->get('uuid')->access('view', $account)) {
+          $response_data['current_user']['uuid'] = $account->uuid();
+        }
         if ($account->get('roles')->access('view', $account)) {
           $response_data['current_user']['roles'] = $account->getRoles();
         }
