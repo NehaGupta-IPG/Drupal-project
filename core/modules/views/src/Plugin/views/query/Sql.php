@@ -826,8 +826,9 @@ class Sql extends QueryPluginBase {
     }
 
     // In rare cases we might *only* have aliased versions of the table.
-    if (!empty($this->tables[$this->view->storage->get('base_table')][$table])) {
-      $alias = $this->tables[$this->view->storage->get('base_table')][$table]['alias'];
+    $base_table = $this->view->storage->get('base_table');
+    if (!empty($this->tables[$base_table][$table])) {
+      $alias = $this->tables[$base_table][$table]['alias'];
       if (!empty($this->tableQueue[$alias])) {
         return $this->tableQueue[$alias];
       }

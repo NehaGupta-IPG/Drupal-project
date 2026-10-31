@@ -51,9 +51,10 @@ class ViewsExposedFilterBlock extends ViewsBlockBase {
     $this->addContextualLinks($output, 'exposed_filter');
 
     // Set the blocks title.
-    if (!empty($this->configuration['label_display']) && ($this->view->getTitle() || !empty($this->configuration['views_label']))) {
+    $title = $this->configuration['views_label'] ?: $this->view->getTitle();
+    if (!empty($this->configuration['label_display']) && $title) {
       $output['#title'] = [
-        '#markup' => empty($this->configuration['views_label']) ? $this->view->getTitle() : $this->configuration['views_label'],
+        '#markup' => $title,
         '#allowed_tags' => Xss::getHtmlTagList(),
       ];
     }

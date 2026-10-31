@@ -357,8 +357,8 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
 
     $executable = $this->getExecutable();
     $original_executable = NULL;
-    if ($this->getOriginal()) {
-      $original_executable = $this->getOriginal()->getExecutable();
+    if ($original = $this->getOriginal()) {
+      $original_executable = $original->getExecutable();
       $original_executable->initDisplay();
     }
     $executable->initDisplay();

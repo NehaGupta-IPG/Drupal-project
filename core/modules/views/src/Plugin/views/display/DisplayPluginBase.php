@@ -738,8 +738,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       return $link_url;
     }
 
-    if ($display_id && $this->view->displayHandlers->has($display_id) && is_object($this->view->displayHandlers->get($display_id))) {
-      return $this->view->displayHandlers->get($display_id)->getPath();
+    if ($display_id && $this->view->displayHandlers->has($display_id)) {
+      $display = $this->view->displayHandlers->get($display_id);
+      if (is_object($display)) {
+        return $display->getPath();
+      }
     }
   }
 
@@ -755,8 +758,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     // If the display does not have a route (e.g. a block display), get the
     // route for the linked display.
     $display_id = $this->getLinkDisplay();
-    if ($display_id && $this->view->displayHandlers->has($display_id) && is_object($this->view->displayHandlers->get($display_id))) {
-      return $this->view->displayHandlers->get($display_id)->getRoutedDisplay();
+    if ($display_id && $this->view->displayHandlers->has($display_id)) {
+      $display = $this->view->displayHandlers->get($display_id);
+      if (is_object($display)) {
+        return $display->getRoutedDisplay();
+      }
     }
 
     // No routed display exists, so return NULL.
@@ -1900,13 +1906,14 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'display_id':
-        if ($form_state->getValue('display_id')) {
-          if (preg_match('/[^a-z0-9_]/', $form_state->getValue('display_id'))) {
+        $display_id = $form_state->getValue('display_id');
+        if ($display_id) {
+          if (preg_match('/[^a-z0-9_]/', $display_id)) {
             $form_state->setError($form['display_id'], $this->t('Display machine name must contain only lowercase letters, numbers, or underscores.'));
           }
 
           foreach ($this->view->displayHandlers as $id => $display) {
-            if ($id != $this->view->current_display && ($form_state->getValue('display_id') == $id || (isset($display->new_id) && $form_state->getValue('display_id') == $display->new_id))) {
+            if ($id != $this->view->current_display && ($display_id == $id || (isset($display->new_id) && $display_id == $display->new_id))) {
               $form_state->setError($form['display_id'], $this->t('Display id should be unique.'));
             }
           }
