@@ -198,6 +198,23 @@ class SystemRequirementsHooks {
           'severity' => RequirementSeverity::Warning,
         ];
       }
+
+      // Check that the required cache backends exist.
+      $cache_default_bin_backends = \Drupal::getContainer()->getParameter('cache_default_bin_backends');
+      if (!empty($cache_default_bin_backends)) {
+        foreach ($cache_default_bin_backends as $bin => $backend) {
+          if (!\Drupal::getContainer()->has($backend)) {
+            $requirements['cache_backend_bin_' . $bin] = [
+              'title' => $this->t('Cache Backend'),
+              'value' => $this->t('Missing'),
+              'severity' => RequirementSeverity::Warning,
+              'description' => new TranslatableMarkup(
+                'The configured cache backend %backend is not available for the bin %bin.',
+                ['%backend' => $backend, '%bin' => $bin]),
+            ];
+          }
+        }
+      }
       SystemRequirements::systemAdvisoriesRequirements($requirements);
     }
 

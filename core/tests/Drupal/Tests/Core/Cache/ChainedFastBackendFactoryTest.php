@@ -29,6 +29,11 @@ class ChainedFastBackendFactoryTest extends UnitTestCase {
     $testCacheFactory = $this->createMock(CacheFactoryInterface::class);
     $testCacheBackend = $this->createStub(CacheBackendInterface::class);
 
+    $container
+      ->method('has')
+      ->with('cache.backend.test')
+      ->willReturn(TRUE);
+
     $container->expects($this->once())
       ->method('get')
       ->with('cache.backend.test')
@@ -57,32 +62,52 @@ class ChainedFastBackendFactoryTest extends UnitTestCase {
     $testFastCacheFactory = $this->createMock(CacheFactoryInterface::class);
     $testConsistentCacheBackend = $this->createStub(CacheBackendInterface::class);
     $testFastCacheBackend = $this->createStub(CacheBackendInterface::class);
+    $testDefaultCacheFactory = $this->createMock(CacheFactoryInterface::class);
+    $testDefaultCacheBackend = $this->createMock(CacheBackendInterface::class);
 
-    $container->expects($this->exactly(2))
+    $container->expects($this->exactly(4))
       ->method('get')
       ->willReturnCallback(
-        function ($service) use ($testFastCacheFactory, $testConsistentCacheFactory): MockObject {
+        function ($service) use ($testFastCacheFactory, $testConsistentCacheFactory, $testDefaultCacheFactory): MockObject {
           return match ($service) {
             'cache.backend.test_consistent' => $testConsistentCacheFactory,
             'cache.backend.test_fast' => $testFastCacheFactory,
+            'cache.backend.database' => $testDefaultCacheFactory,
           };
         }
       );
+
+    $container->expects($this->exactly(2))
+      ->method('has')
+      ->willReturn(TRUE, FALSE);
 
     // The same bin should be retrieved from both backends.
     $testConsistentCacheFactory->expects($this->once())
       ->method('get')
       ->with('test_bin')
       ->willReturn($testConsistentCacheBackend);
-    $testFastCacheFactory->expects($this->once())
+    $testFastCacheFactory->expects($this->exactly(2))
       ->method('get')
       ->with('test_bin')
       ->willReturn($testFastCacheBackend);
+
+    $testDefaultCacheFactory->expects($this->once())
+      ->method('get')
+      ->with('test_bin')
+      ->willReturn($testDefaultCacheBackend);
 
     $cacheFactory = new ChainedFastBackendFactory(NULL, 'cache.backend.test_consistent', 'cache.backend.test_fast');
     $cacheFactory->setContainer($container);
 
     // A wrapping ChainedFastBackend should be returned.
+    $cacheBackend = $cacheFactory->get('test_bin');
+    $this->assertInstanceOf(ChainedFastBackend::class, $cacheBackend);
+
+    // Test without cache service in container.
+    $cacheFactory = new ChainedFastBackendFactory(NULL, 'cache.backend.test_consistent', 'cache.backend.test_fast');
+    $cacheFactory->setContainer($container);
+
+    // The same ChainedFastBackend should be returned.
     $cacheBackend = $cacheFactory->get('test_bin');
     $this->assertInstanceOf(ChainedFastBackend::class, $cacheBackend);
   }
