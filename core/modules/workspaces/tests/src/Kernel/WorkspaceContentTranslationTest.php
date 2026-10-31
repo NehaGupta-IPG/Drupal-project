@@ -134,4 +134,21 @@ class WorkspaceContentTranslationTest extends KernelTestBase {
     $this->assertEquals('live - 2 - unpublished - RO', $translation->get('name')->value);
   }
 
+  /**
+   * Tests that deleting a workspace removes the translations it added.
+   */
+  public function testTranslationRemovedOnWorkspaceDelete(): void {
+    $storage = $this->entityTypeManager->getStorage('entity_test_mulrevpub');
+    $entity = $storage->create(['name' => 'live', 'status' => TRUE]);
+    $entity->save();
+
+    $this->switchToWorkspace('stage');
+    $entity->addTranslation('ro', ['name' => 'stage - RO'])->save();
+    $this->switchToLive();
+    $this->assertTrue($storage->loadUnchanged($entity->id())->hasTranslation('ro'));
+
+    Workspace::load('stage')->delete();
+    $this->assertFalse($storage->loadUnchanged($entity->id())->hasTranslation('ro'));
+  }
+
 }
