@@ -501,4 +501,29 @@ class DisplayTest extends ViewTestBase {
     $this->assertSession()->pageTextNotContains($supported_text);
   }
 
+  /**
+   * Tests view with external page url should throw error.
+   */
+  public function testViewUrlAsExternal(): void {
+    $this->drupalGet('admin/structure/views/add');
+    $this->assertSession()->statusCodeEquals(200);
+    // Create a view that sorts oldest first.
+    $view1 = [];
+    $view1['label'] = $this->randomMachineName(16);
+    $view1['id'] = strtolower($this->randomMachineName(16));
+    $view1['description'] = $this->randomMachineName(16);
+    $view1['page[create]'] = 1;
+    $view1['page[title]'] = $this->randomMachineName(16);
+    $view1['page[path]'] = 'https://www.' . $this->randomMachineName(16) . '.com';
+    $this->drupalGet('admin/structure/views/add');
+    $this->submitForm($view1, 'Save and edit');
+    $this->assertSession()->responseContains('Path component <em class="placeholder">' . $view1['page[path]'] . '</em> is external. External URL is not accepted as view path.');
+
+    // Saving view with internal url.
+    $view1['page[path]'] = 'admin/' . $this->randomMachineName(16);
+    $this->drupalGet('admin/structure/views/add');
+    $this->submitForm($view1, 'Save and edit');
+    $this->assertSession()->responseContains('The view <em class="placeholder">' . $view1['label'] . '</em> has been saved.');
+  }
+
 }

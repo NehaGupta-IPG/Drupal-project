@@ -500,6 +500,10 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
       $errors[] = $this->t('Invalid path. Valid characters are alphanumerics as well as "-", ".", "_" and "~".');
     }
 
+    if (UrlHelper::isExternal($path)) {
+      $errors[] = $this->t('Path component %path is external. External URL is not accepted as view path.', ['%path' => $path]);
+    }
+
     $path_sections = explode('/', $path);
     // Symfony routing does not allow to use numeric placeholders.
     // @see \Symfony\Component\Routing\RouteCompiler
