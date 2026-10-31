@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -34,6 +35,39 @@ class UserRoleEntityTest extends KernelTestBase {
     $container
       ->register(BufferingLogger::class)
       ->addTag('logger');
+  }
+
+  /**
+   * Tests that role descriptions are optional in configuration.
+   */
+  public function testExistingRoleDescription(): void {
+    $this->installConfig('user');
+    foreach ([RoleInterface::ANONYMOUS_ID, RoleInterface::AUTHENTICATED_ID] as $role_id) {
+      $role = Role::load($role_id);
+      $this->assertNotNull($role);
+      $this->assertSame('', $role->getDescription());
+      $this->assertArrayNotHasKey('description', $this->config('user.role.' . $role_id)->getRawData());
+    }
+
+    /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager */
+    $typed_config_manager = \Drupal::service('config.typed');
+    $config_data = $this->config('user.role.' . RoleInterface::ANONYMOUS_ID)->getRawData();
+    $this->assertCount(0, $typed_config_manager->createFromNameAndData('user.role.' . RoleInterface::ANONYMOUS_ID, $config_data)->validate());
+    $config_data['description'] = '';
+    $violations = $typed_config_manager->createFromNameAndData('user.role.' . RoleInterface::ANONYMOUS_ID, $config_data)->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame('This value should not be blank.', (string) $violations->get(0)->getMessage());
+    $this->assertSame('description', $violations->get(0)->getPropertyPath());
+
+    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
+    $role->save();
+    $this->assertArrayNotHasKey('description', $this->config('user.role.test_role')->getRawData());
+
+    $role->setDescription('Lorem ipsum.')->save();
+    $this->assertSame('Lorem ipsum.', $this->config('user.role.test_role')->get('description'));
+
+    $role->setDescription('')->save();
+    $this->assertArrayNotHasKey('description', $this->config('user.role.test_role')->getRawData());
   }
 
   /**

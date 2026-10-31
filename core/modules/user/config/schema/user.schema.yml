@@ -143,6 +143,12 @@ user.role.*:
     label:
       type: required_label
       label: 'Label'
+    description:
+      type: text
+      label: 'Description'
+      requiredKey: false
+      constraints:
+        NotBlank: []
     weight:
       type: weight
       label: 'User role weight'
