@@ -48,15 +48,15 @@ class WorkAllocatorTest extends UnitTestCase {
     ];
     $grouped = ['group' => $tests, '#slow' => [$e => $tests[$e]]];
 
-    // The #slow test weighs 1 × 8, so the order is e (8), a (3), b (3), c (2),
+    // The #slow test weighs 1 × 8 + 8/1, so the order is e (8), a (3), b (3), c (2),
     // d (1), with ties broken by class name. e goes to bin 1, a to bin 2, b
-    // to bin 2 (3 < 8), c to bin 2 (6 < 8), then d to bin 1 (8 = 8, the first
+    // to bin 2 (3 < 8), c to bin 2 (6 < 8), then d to bin 2 (8 = 8, the first
     // bin wins).
     $bin1 = new WorkAllocator($grouped, 2, 1);
-    $this->assertSame([$e, $d], array_keys($bin1->getAllocatedList()));
-    $this->assertSame([1, 2], array_column($bin1->getAllocatedList(), 'worker_sequence'));
+    $this->assertSame([$e], array_keys($bin1->getAllocatedList()));
+    $this->assertSame([1], array_column($bin1->getAllocatedList(), 'worker_sequence'));
     $bin2 = new WorkAllocator($grouped, 2, 2);
-    $this->assertSame([$a, $b, $c], array_keys($bin2->getAllocatedList()));
+    $this->assertSame([$a, $b, $c, $d], array_keys($bin2->getAllocatedList()));
     $this->assertSame([$e, $a, $b, $c, $d], array_keys($bin1->getSortedList()));
   }
 
