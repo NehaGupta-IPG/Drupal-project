@@ -31,6 +31,10 @@ class ControllerResolver implements ControllerResolverInterface {
    * {@inheritdoc}
    */
   public function getControllerFromDefinition($controller, $path = '') {
+    if (is_string($controller) && str_starts_with($controller, '\\')) {
+      $controller = ltrim($controller, '\\');
+    }
+    
     try {
       $callable = $this->callableResolver->getCallableFromDefinition($controller);
     }
