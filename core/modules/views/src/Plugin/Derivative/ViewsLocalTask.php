@@ -134,7 +134,7 @@ class ViewsLocalTask extends DeriverBase implements ContainerDeriverInterface {
         array_pop($split);
         $path = implode('/', $split);
 
-        $pattern = '/' . str_replace('%', '{}', $path);
+        $pattern = '/' . preg_replace('#%[^\./]*#', '%', $path);
         if ($routes = $this->routeProvider->getRoutesByPattern($pattern)) {
           foreach ($routes->all() as $name => $route) {
             $local_tasks['views_view:' . $plugin_id]['base_route'] = $name;
