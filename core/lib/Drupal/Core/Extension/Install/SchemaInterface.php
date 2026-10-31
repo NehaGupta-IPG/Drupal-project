@@ -21,7 +21,7 @@ interface SchemaInterface {
    *
    * The tables declared by this hook will be automatically created when the
    * module is installed, and removed when the module is uninstalled. This
-   * happens before InstallInterace is invoked, and after UninstallInterface is
+   * happens before InstallInterface is invoked, and after UninstallInterface is
    * invoked, respectively.
    *
    * By declaring the tables used by your module via an implementation of
