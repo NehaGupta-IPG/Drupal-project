@@ -438,6 +438,58 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
       $table_data[$schema_field_name] = NestedArray::mergeDeep($table_data[$schema_field_name], $this->mapSingleFieldViewsData($table, $field_name, $field_definition_type, $field_column_name, $field_schema['columns'][$field_column_name]['type'], $first, $field_definition));
       $table_data[$schema_field_name]['entity field'] = $field_name;
       $first = FALSE;
+      // @todo The below is copied from views_field_default_views_data(), which
+      //   only works for FieldConfig fields. Ideally, that code works for both
+      //   base fields and config fields so that this whole block can be deleted.
+      // Expose additional fields for multi-value base fields.
+      if ($field_definition->getFieldStorageDefinition()->isMultiple()) {
+        // Build the list of additional fields to add to queries.
+        $field_storage = $field_definition->getFieldStorageDefinition();
+        $field_columns = $field_storage->getColumns();
+        $add_fields = ['delta', 'langcode', 'bundle'];
+        foreach (array_keys($field_columns) as $column) {
+          $add_fields[] = $table_mapping->getFieldColumnName($field_storage, $column);
+        }
+        $table_data[$schema_field_name]['field']['additional fields'] = $add_fields;
+
+        // Load all the fields from the table by default.
+        $additional_fields = $table_mapping->getAllColumns($table);
+
+        $label = $field_definition->getLabel();
+        $table_data['delta'] = [
+          'title' => $this->t('@label (@name:delta)', ['@label' => $label, '@name' => $field_name]),
+          'title short' => $this->t('@label:delta', ['@label' => $label]),
+        ];
+        $table_data['delta']['field'] = [
+          'id' => 'numeric',
+        ];
+        $table_data['delta']['argument'] = [
+          'field' => 'delta',
+          'table' => $table,
+          'id' => 'numeric',
+          'additional fields' => $additional_fields,
+          'empty field name' => $this->t('- No value -'),
+          'field_name' => $field_name,
+          'entity_type' => $this->entityType->id(),
+        ];
+        $table_data['delta']['filter'] = [
+          'field' => 'delta',
+          'table' => $table,
+          'id' => 'numeric',
+          'additional fields' => $additional_fields,
+          'field_name' => $field_name,
+          'entity_type' => $this->entityType->id(),
+          'allow empty' => TRUE,
+        ];
+        $table_data['delta']['sort'] = [
+          'field' => 'delta',
+          'table' => $table,
+          'id' => 'standard',
+          'additional fields' => $additional_fields,
+          'field_name' => $field_name,
+          'entity_type' => $this->entityType->id(),
+        ];
+      }
     }
   }
 
