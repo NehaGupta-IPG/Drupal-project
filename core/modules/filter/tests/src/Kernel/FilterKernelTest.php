@@ -491,8 +491,8 @@ class FilterKernelTest extends KernelTestBase {
       '<drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media>' => [
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
-      // Bug 3083786, duplicate br tags after a line ending in a break tag that
-      // doesn't exactly match <br />
+      // Ensure existing <br> tags are detected and not duplicated, including
+      // those with attributes or a closing slash.
       'aaa<br>
       bbb<br class="ccc" />
       ddd<br/>' => [
