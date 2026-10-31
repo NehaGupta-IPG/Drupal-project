@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Installs a Drupal site for local testing/development.
@@ -53,7 +54,7 @@ class InstallCommand extends Command {
   protected function configure(): void {
     $this->setName('install')
       ->setDescription('Install Drupal using an install profile or recipe.')
-      ->setHelp('This is not meant for production and might be too simple for custom development. It is a quick and easy way to get Drupal running.')
+      ->setHelp('This will install Drupal using an existing database connection or fallback to using a SQLite database not mean for production.')
       ->addArgument('install-profile-or-recipe', InputArgument::OPTIONAL, 'Install profile or recipe directory from which to install the site.')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in.', 'en')
       ->addOption('password', NULL, InputOption::VALUE_OPTIONAL, 'The password to use for the site. Defaults to random password.')
@@ -70,19 +71,26 @@ class InstallCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
-    if (!extension_loaded('pdo_sqlite')) {
-      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
-      return 1;
-    }
 
     // Change the directory to the Drupal root.
     chdir(dirname(__DIR__, 5));
+
+    // The pdo_sqlite extension is only required when the installation will
+    // actually use SQLite: either because no database connection is configured
+    // (the command then falls back to creating a SQLite database) or because
+    // the configured connection is itself a SQLite connection. When another
+    // database driver is configured, pdo_sqlite is not needed and may
+    // legitimately be absent.
+    if ($this->willUseSqlite() && !extension_loaded('pdo_sqlite')) {
+      $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
+      return 1;
+    }
 
     // Check whether there is already an installation.
     if ($this->isDrupalInstalled()) {
       // Do not fail if the site is already installed so this command can be
       // chained with ServerCommand.
-      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, remove sites/default/files and sites/default/settings.php.');
+      $output->writeln('<info>Drupal is already installed.</info> If you want to reinstall, you must empty the database defined in settings.php.');
       return 0;
     }
 
@@ -142,7 +150,51 @@ class InstallCommand extends Command {
     catch (ConnectionNotDefinedException) {
       return FALSE;
     }
-    return !empty(Database::getConnectionInfo());
+    // Mirror core's install_verify_database_ready() to determine if a database
+    // contains an install.
+    if (empty(Database::getConnectionInfo())) {
+      return FALSE;
+    }
+    try {
+      return Database::getConnection()->schema()->tableExists('key_value');
+    }
+    catch (\Exception) {
+      // The connection is defined but the database is unreachable or empty
+      // (for example, it does not exist yet), so Drupal is not installed and
+      // the install can proceed.
+      return FALSE;
+    }
+  }
+
+  /**
+   * Returns whether the installation will use a SQLite database.
+   *
+   * This is the case when no database connection is configured, because the
+   * command then falls back to creating a SQLite database, or when the
+   * configured connection is itself a SQLite connection.
+   *
+   * @return bool
+   *   TRUE if the installation will use SQLite, FALSE otherwise.
+   */
+  protected function willUseSqlite(): bool {
+    try {
+      $kernel = new DrupalKernel('prod', $this->classLoader, FALSE);
+      $kernel::bootEnvironment();
+      $kernel->setSitePath($this->getSitePath());
+      Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classLoader);
+    }
+    catch (\Exception) {
+      // Settings could not be read, so the SQLite fallback will be used.
+      return TRUE;
+    }
+    $connection_info = Database::getConnectionInfo();
+    if (empty($connection_info['default'])) {
+      // No connection is configured, so the SQLite fallback will be used.
+      return TRUE;
+    }
+    $default = $connection_info['default'];
+    return strtolower($default['driver'] ?? '') === 'sqlite'
+      || str_contains($default['namespace'] ?? '', '\\sqlite\\');
   }
 
   /**
@@ -232,24 +284,42 @@ class InstallCommand extends Command {
 
     require_once 'core/includes/install.core.inc';
 
+    // Seed the request host for the installer, remembering the previous values
+    // so they can be restored afterwards. The superglobals are process-global
+    // state; leaving them changed would pollute any command chained after this
+    // one in the same process, such as the server command run by 'quick-start'.
+    $original_server = $this->setRequestHost();
+
     $progress_bar = $io->createProgressBar();
-    install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
-      static $started = FALSE;
-      if (!$started) {
-        $started = TRUE;
-        // We've already done 1.
-        $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
-        $progress_bar->setMessage((string) $this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
-        $tasks = install_tasks($install_state);
-        $progress_bar->start(count($tasks) + 1);
+    try {
+      install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
+        static $started = FALSE;
+        if (!$started) {
+          $started = TRUE;
+          // We've already done 1.
+          $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
+          $progress_bar->setMessage((string) $this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
+          $tasks = install_tasks($install_state);
+          $progress_bar->start(count($tasks) + 1);
+        }
+        $tasks_to_perform = install_tasks_to_perform($install_state);
+        $task = current($tasks_to_perform);
+        if (isset($task['display_name'])) {
+          $progress_bar->setMessage((string) $task['display_name']);
+        }
+        $progress_bar->advance();
+      });
+    }
+    finally {
+      foreach ($original_server as $key => $value) {
+        if ($value === NULL) {
+          unset($_SERVER[$key]);
+        }
+        else {
+          $_SERVER[$key] = $value;
+        }
       }
-      $tasks_to_perform = install_tasks_to_perform($install_state);
-      $task = current($tasks_to_perform);
-      if (isset($task['display_name'])) {
-        $progress_bar->setMessage((string) $task['display_name']);
-      }
-      $progress_bar->advance();
-    });
+    }
     $success_message = $this->t('Congratulations, you installed @drupal!', [
       '@drupal' => drupal_install_profile_distribution_name(),
       '@name' => 'admin',
@@ -262,6 +332,43 @@ class InstallCommand extends Command {
     $io->writeln("<info>Password:</info> $password");
 
     return 0;
+  }
+
+  /**
+   * Seeds the request host used by the installer.
+   *
+   * The installer creates its request with Request::createFromGlobals(), which
+   * relies on the HTTP host being present in $_SERVER. On the command line that
+   * host is empty, so any absolute URL generated during installation is
+   * invalid. Populate the superglobals from the base URL that the application
+   * resolved (from the --url option, the DRUPAL_URI environment variable, or
+   * the default) so the installer builds a request with a valid host.
+   *
+   * @return array
+   *   The original values of any $_SERVER keys that were changed, keyed by key
+   *   name. A value of NULL indicates the key was not previously set. Pass this
+   *   to restore the superglobals once the installer has run.
+   */
+  protected function setRequestHost(): array {
+    $application = $this->getApplication();
+    $uri = $application instanceof DrupalApplication ? $application->getUri() : 'http://localhost';
+    $request = Request::create($uri);
+    $original = [];
+    // Only add the host if the request does not already have one, so an
+    // explicitly configured environment is left untouched.
+    if (empty($_SERVER['HTTP_HOST'])) {
+      $original['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? NULL;
+      $_SERVER['HTTP_HOST'] = $request->getHttpHost();
+    }
+    if (empty($_SERVER['SERVER_NAME'])) {
+      $original['SERVER_NAME'] = $_SERVER['SERVER_NAME'] ?? NULL;
+      $_SERVER['SERVER_NAME'] = $request->getHost();
+    }
+    if ($request->isSecure() && empty($_SERVER['HTTPS'])) {
+      $original['HTTPS'] = $_SERVER['HTTPS'] ?? NULL;
+      $_SERVER['HTTPS'] = 'on';
+    }
+    return $original;
   }
 
   /**
