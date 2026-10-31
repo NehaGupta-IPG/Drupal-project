@@ -481,7 +481,7 @@ abstract class EntityBase implements EntityInterface {
    * @return string[]
    *   Set of list cache tags.
    */
-  protected function getListCacheTagsToInvalidate() {
+  public function getListCacheTagsToInvalidate() {
     $tags = $this->getEntityType()->getListCacheTags();
     if ($this->getEntityType()->hasKey('bundle')) {
       $tags = Cache::mergeTags(
