@@ -2013,24 +2013,48 @@
  * Annotations for class discovery and metadata description.
  *
  * The Drupal plugin system has a set of reusable components that developers
- * can use, override, and extend in their modules. Most of the plugins use
- * annotations, which let classes register themselves as plugins and describe
- * their metadata. (Annotations can also be used for other purposes, though
- * at the moment, Drupal only uses them for the plugin system.)
+ * can use, override, and extend in their modules. Historically, plugins were
+ * registered with annotations, which let classes register themselves as
+ * plugins and describe their metadata. (Annotations can also be used for
+ * other purposes, though Drupal only uses them for the plugin system.)
+ *
+ * New plugins should use PHP attributes instead of annotations; see the
+ * official @link https://www.php.net/manual/en/language.attributes.php PHP
+ * attributes documentation @endlink for syntax, and the @link plugin_api
+ * Plugin API topic @endlink for Drupal's overall plugin system. The
+ * information below applies to existing annotation-based plugins, which are
+ * still supported.
  *
  * To annotate a class as a plugin, add code similar to the following to the
- * end of the documentation block immediately preceding the class declaration:
+ * end of the documentation block immediately preceding the class declaration.
+ * The example below shows several of the data types commonly used in
+ * annotations: strings, booleans, translatable strings, arrays, and class
+ * references.
  * @code
  * * @ContentEntityType(
  * *   id = "comment",
  * *   label = @Translation("Comment"),
- * *   ...
- * *   base_table = "comment"
+ * *   base_table = "comment",
+ * *   data_table = "comment_field_data",
+ * *   translatable = TRUE,
+ * *   entity_keys = {
+ * *     "id" = "cid",
+ * *     "bundle" = "comment_type",
+ * *     "label" = "subject",
+ * *     "uuid" = "uuid",
+ * *   },
+ * *   handlers = {
+ * *     "access" = "\Drupal\comment\CommentAccessControlHandler",
+ * *     "storage" = "\Drupal\comment\CommentStorage",
+ * *   },
  * * )
  * @endcode
  *
  * Note that you must use double quotes; single quotes will not work in
  * annotations.
+ *
+ * Class references must be fully-qualified and start with a leading
+ * backslash, for example "\Drupal\comment\CommentStorage".
  *
  * Some annotation types, which extend the "@ PluginID" annotation class, have
  * only a single 'id' key in their annotation. For these, it is possible to use
