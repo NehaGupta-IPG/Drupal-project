@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -343,6 +344,61 @@ class QueryGroupByTest extends ViewsKernelTestBase {
     $this->assertCount(6, $view->result);
     $this->assertEquals('3', $view->getStyle()->getField(5, 'id'));
     $this->assertEquals('6', $view->getStyle()->getField(5, 'field_test'));
+  }
+
+  /**
+   * Tests aggregate functions on a configurable field.
+   *
+   * @param string $group_type
+   *   The aggregation function.
+   * @param int $expected
+   *   The expected aggregated value.
+   */
+  #[DataProvider('providerAggregateConfigurableField')]
+  public function testAggregateConfigurableField(string $group_type, int $expected): void {
+    FieldStorageConfig::create([
+      'type' => 'integer',
+      'field_name' => 'field_test',
+      'cardinality' => 4,
+      'entity_type' => 'entity_test_mul',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_test',
+      'entity_type' => 'entity_test_mul',
+      'bundle' => 'entity_test_mul',
+    ])->save();
+
+    EntityTestMul::create(['field_test' => [1, 3]])->save();
+    EntityTestMul::create(['field_test' => [1, 3]])->save();
+
+    $view = Views::getView('test_group_by_count_multicardinality');
+    $view->setDisplay();
+    $display = $view->displayHandlers->get('default');
+    unset($display->options['fields']['id']);
+    $display->options['sorts'] = [];
+    $display->options['fields']['field_test']['group_type'] = $group_type;
+    $this->executeView($view);
+
+    $this->assertCount(1, $view->result);
+    // PostgreSQL returns the average as a numeric with trailing zeros.
+    $this->assertEquals($expected, (float) (string) $view->getStyle()->getField(0, 'field_test'));
+    // The additional fields of the configurable field, such as langcode, are
+    // not added to the query. PostgreSQL cannot SUM() string columns.
+    $this->assertSame([], $view->field['field_test']->aliases);
+  }
+
+  /**
+   * Data provider for testAggregateConfigurableField().
+   */
+  public static function providerAggregateConfigurableField(): array {
+    return [
+      'count' => ['count', 4],
+      'count distinct' => ['count_distinct', 2],
+      'sum' => ['sum', 8],
+      'average' => ['avg', 2],
+      'minimum' => ['min', 1],
+      'maximum' => ['max', 3],
+    ];
   }
 
   /**
