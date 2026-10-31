@@ -71,7 +71,10 @@ class CommentWidget extends WidgetBase {
         '#open' => ($items->status != $field_default_values[0]['status']),
         '#group' => 'advanced',
         '#attributes' => [
-          'class' => ['comment-' . Html::getClass($entity->getEntityTypeId()) . '-settings-form'],
+          'class' => [
+            'comment-settings-form',
+            'comment-' . Html::getClass($entity->getEntityTypeId()) . '-settings-form',
+          ],
         ],
         '#attached' => [
           'library' => ['comment/drupal.comment'],
