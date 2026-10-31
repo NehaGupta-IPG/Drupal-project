@@ -79,6 +79,10 @@ services:
     class: Drupal\serialization\Normalizer\MarkupNormalizer
     tags:
       - { name: normalizer }
+  serializer.normalizer.any:
+    class: Drupal\serialization\Normalizer\AnyNormalizer
+    tags:
+      - { name: normalizer }
   serializer.normalizer.typed_data:
     class: Drupal\serialization\Normalizer\TypedDataNormalizer
     tags:
