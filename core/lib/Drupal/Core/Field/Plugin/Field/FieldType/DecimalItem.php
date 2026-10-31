@@ -110,7 +110,7 @@ class DecimalItem extends NumericItemBase {
    * {@inheritdoc}
    */
   public function preSave() {
-    $this->value = round($this->value, $this->getSetting('scale'));
+    $this->value = round((float) $this->value, $this->getSetting('scale'));
   }
 
   /**
