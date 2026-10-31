@@ -64,15 +64,16 @@ final class EnabledColumn extends TreegridColumnBase implements ContainerFactory
   /**
    * {@inheritdoc}
    */
-  public function getCellData(object $context): array {
+  public function buildCell(object $context): array {
     assert($context instanceof MenuTreeRowContext);
     $link = $context->element->link;
 
     return [
-      'type' => 'checkbox',
-      'value' => $link->isEnabled(),
-      'label' => (string) $this->t('Enabled'),
-      'interactive' => MenuLinkMovability::isMovable($link),
+      '#theme' => 'treegrid_cell_checkbox',
+      '#value' => $link->isEnabled(),
+      '#label' => (string) $this->t('Enabled'),
+      '#interactive' => MenuLinkMovability::isMovable($link),
+      '#column_id' => $this->getPluginId(),
     ];
   }
 

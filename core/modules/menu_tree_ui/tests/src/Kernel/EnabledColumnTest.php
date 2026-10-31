@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests EnabledColumn cell data shape and persistence in isolation.
+ * Tests EnabledColumn cell and persistence in isolation.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -78,43 +78,58 @@ final class EnabledColumnTest extends KernelTestBase {
   }
 
   /**
-   * GetCellData() returns a checkbox for every link, including leaves.
+   * BuildCell() returns a checkbox for every link, including leaves.
    */
-  public function testGetCellDataAppliesToLeaves(): void {
+  public function testBuildCellAppliesToLeaves(): void {
     $entity = $this->createMenuLinkContent(enabled: TRUE);
     $element = $this->elementFromEntity($entity, hasChildren: FALSE);
 
-    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
+    $cell = $this->column->buildCell(new MenuTreeRowContext($element, $entity));
 
-    $this->assertSame('checkbox', $cell['type']);
-    $this->assertTrue($cell['value']);
-    $this->assertIsString($cell['label']);
-    $this->assertNotEmpty($cell['label']);
-    $this->assertTrue($cell['interactive']);
+    $this->assertSame('treegrid_cell_checkbox', $cell['#theme']);
+    $this->assertTrue($cell['#value']);
+    $this->assertNotEmpty($cell['#label']);
+    $this->assertTrue($cell['#interactive']);
+    $this->assertSame('enabled', $cell['#column_id']);
   }
 
   /**
-   * GetCellData() must reflect value=false for a disabled link.
+   * BuildCell() must reflect the disabled state of a disabled link.
    */
-  public function testGetCellDataReflectsCurrentValue(): void {
+  public function testBuildCellReflectsCurrentValue(): void {
     $entity = $this->createMenuLinkContent(enabled: FALSE);
     $element = $this->elementFromEntity($entity, hasChildren: FALSE);
 
-    $cell = $this->column->getCellData(new MenuTreeRowContext($element, $entity));
+    $cell = $this->column->buildCell(new MenuTreeRowContext($element, $entity));
 
-    $this->assertFalse($cell['value']);
+    $this->assertFalse($cell['#value']);
   }
 
   /**
    * A static MenuLinkDefault link's checkbox is interactive.
    */
-  public function testGetCellDataInteractiveForStaticLink(): void {
+  public function testBuildCellInteractiveForStaticLink(): void {
     $link = $this->container->get('plugin.manager.menu.link')->createInstance('user.logout');
     $element = new MenuLinkTreeElement($link, FALSE, 1, FALSE, []);
 
-    $cell = $this->column->getCellData(new MenuTreeRowContext($element, NULL));
+    $cell = $this->column->buildCell(new MenuTreeRowContext($element, NULL));
 
-    $this->assertTrue($cell['interactive']);
+    $this->assertTrue($cell['#interactive']);
+  }
+
+  /**
+   * The cell renders as the checkbox the column-update client reads.
+   */
+  public function testBuildCellRendersCheckbox(): void {
+    $entity = $this->createMenuLinkContent(enabled: TRUE);
+    $element = $this->elementFromEntity($entity, hasChildren: FALSE);
+
+    $cell = $this->column->buildCell(new MenuTreeRowContext($element, $entity));
+    $this->setRawContent((string) $this->container->get('renderer')->renderRoot($cell));
+
+    $inputs = $this->cssSelect('input[type="checkbox"].treegrid-cell-checkbox[data-treegrid-control][data-column-id="enabled"]');
+    $this->assertCount(1, $inputs);
+    $this->assertTrue(isset($inputs[0]['checked']));
   }
 
   /**

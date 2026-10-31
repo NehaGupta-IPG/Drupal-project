@@ -10,19 +10,14 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Interface for TreegridColumn plugins.
  *
- * A column plugin contributes one column to a treegrid admin UI. The same cell
- * data shape must be renderable by both the Twig template (server-rendered top
- * level) and a JS cell renderer (lazy-loaded children). Cells declare a 'type'
- * key naming the widget; a matching JS renderer is registered with
- * Drupal.treegrid.registerCellRenderer(type, fn), and the Twig template draws
- * the same markup. treegrid ships these cell types:
- *   - 'checkbox': a boolean control, optionally interactive.
- *   - 'markup': an opaque server-rendered HTML string, injected verbatim. It
- *     MUST be trusted server-rendered markup — it is written through |raw and
- *     innerHTML, so user-supplied input in a markup cell is an XSS vector.
+ * A column plugin contributes one column to a treegrid admin UI. Each cell is a
+ * render array, so the first page of rows and rows loaded later render it the
+ * same way, with its attached assets. treegrid ships the
+ * 'treegrid_cell_checkbox' theme hook for a boolean control, optionally
+ * interactive.
  *
- * A cell's 'label' is plain text (it becomes an aria-label). A column-update
- * response's 'message' is safe HTML, escaped by the server, announced as is.
+ * A column-update response's 'message' is safe HTML, escaped by the server,
+ * announced as is.
  *
  * Read-only columns return FALSE from handleUpdate().
  *
@@ -36,23 +31,7 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
   public function getHeader(): TranslatableMarkup;
 
   /**
-   * Returns structured cell data for a given row.
-   *
-   * Return an empty array to indicate that this column has no cell for the
-   * given row (e.g. a column that only applies to parent items should return
-   * [] for leaves). Callers filter empty returns and do not render a cell at
-   * all — no wrapper is emitted.
-   *
-   * When a non-empty array is returned it MUST contain a 'type' key naming the
-   * cell widget. All other keys are type-specific. Example for type 'checkbox':
-   * @code
-   * [
-   *   'type'        => 'checkbox',
-   *   'value'       => bool,
-   *   'label'       => string,   // aria-label for the control
-   *   'interactive' => bool,     // FALSE → render disabled
-   * ]
-   * @endcode
+   * Builds the render array for this column's cell in a row.
    *
    * @param object $context
    *   The row context. Its concrete type is defined by the consumer module
@@ -60,10 +39,11 @@ interface TreegridColumnInterface extends PluginInspectionInterface {
    *   through opaquely (e.g. a consumer editing taxonomy terms would pass a
    *   term tree element).
    *
-   * @return array<string, mixed>
-   *   Cell data array with a 'type' key, or [] to skip this cell entirely.
+   * @return array
+   *   A render array for the cell's content, or an empty array for an empty
+   *   cell.
    */
-  public function getCellData(object $context): array;
+  public function buildCell(object $context): array;
 
   /**
    * Applies a value change to the row identified by $row_id.

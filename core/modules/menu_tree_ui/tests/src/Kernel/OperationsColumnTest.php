@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests OperationsColumn cell data: a markup dropbutton, read-only, depth cap.
+ * Tests OperationsColumn: an operations cell, read-only, depth cap.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
@@ -63,24 +63,41 @@ final class OperationsColumnTest extends KernelTestBase {
   }
 
   /**
-   * GetCellData() returns a markup cell whose html holds the row operations.
+   * BuildCell() returns an operations element with Delete and Add child.
    *
-   * The Delete and Add child operations are asserted because their URLs resolve
-   * from entity and route definitions present in this kernel environment; the
-   * Edit operation depends on the link plugin's edit route (exercised on the
-   * full page by the functional suite, and the no-edit-route path by
+   * These operations are asserted because their URLs resolve from entity and
+   * route definitions present in this kernel environment; the Edit operation
+   * depends on the link plugin's edit route (exercised on the full page by the
+   * functional suite, and the no-edit-route path by
    * MenuTreeControllerColumnUpdateTest::testOrphanedLinkDoesNotFatalPage).
    */
-  public function testRendersOperationsMarkup(): void {
+  public function testBuildsOperationsElement(): void {
     $entity = $this->createMenuLinkContent();
     $context = new MenuTreeRowContext($this->elementFromEntity($entity, depth: 1), $entity);
 
-    $cell = $this->column->getCellData($context);
+    $cell = $this->column->buildCell($context);
 
-    $this->assertSame('markup', $cell['type']);
-    $this->assertStringContainsString('dropbutton', $cell['html']);
-    $this->assertStringContainsString('Delete', $cell['html']);
-    $this->assertStringContainsString('Add child', $cell['html']);
+    $this->assertSame('operations', $cell['operations']['#type']);
+    $this->assertArrayHasKey('delete', $cell['operations']['#links']);
+    $this->assertArrayHasKey('add-child', $cell['operations']['#links']);
+  }
+
+  /**
+   * The cell holds no rendered string, so the renderer processes it.
+   */
+  public function testCellHoldsNoRenderedString(): void {
+    $entity = $this->createMenuLinkContent();
+    $context = new MenuTreeRowContext($this->elementFromEntity($entity, depth: 1), $entity);
+
+    $cell = $this->column->buildCell($context);
+
+    $rendered = [];
+    array_walk_recursive($cell, function ($value, $key) use (&$rendered): void {
+      if ($key === '#markup') {
+        $rendered[] = $value;
+      }
+    });
+    $this->assertSame([], $rendered);
   }
 
   /**
@@ -90,9 +107,9 @@ final class OperationsColumnTest extends KernelTestBase {
     $entity = $this->createMenuLinkContent();
     $context = new MenuTreeRowContext($this->elementFromEntity($entity, depth: 1), NULL);
 
-    $cell = $this->column->getCellData($context);
+    $cell = $this->column->buildCell($context);
 
-    $this->assertStringNotContainsString('Delete', $cell['html']);
+    $this->assertArrayNotHasKey('delete', $cell['operations']['#links']);
   }
 
   /**
@@ -105,9 +122,9 @@ final class OperationsColumnTest extends KernelTestBase {
       $entity,
     );
 
-    $cell = $this->column->getCellData($context);
+    $cell = $this->column->buildCell($context);
 
-    $this->assertStringNotContainsString('Add child', $cell['html']);
+    $this->assertArrayNotHasKey('add-child', $cell['operations']['#links']);
   }
 
   /**

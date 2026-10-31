@@ -1189,7 +1189,7 @@ final class TreegridElementApiTest extends WebDriverTestBase {
    *   The row ID.
    */
   private function markupCell(string $id): NodeElement {
-    $cell = $this->getSession()->getPage()->find('css', sprintf('tr[role="row"][data-id="%s"] .treegrid-cell-markup', $id));
+    $cell = $this->getSession()->getPage()->find('css', sprintf('tr[role="row"][data-id="%s"] td[data-column="mark"]', $id));
     $this->assertNotNull($cell, "Row $id should render a markup cell.");
     return $cell;
   }

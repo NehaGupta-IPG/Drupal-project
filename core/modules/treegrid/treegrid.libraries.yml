@@ -2,7 +2,6 @@ treegrid:
   version: VERSION
   js:
     js/tree-nav.js: {}
-    js/cells.js: {}
     js/queue.js: {}
     js/csrf-token.js: {}
     js/column-update.js: {}

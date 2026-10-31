@@ -9,7 +9,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
@@ -21,11 +20,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Column plugin for a menu link's row operations (Edit, Delete, Add child, …).
  *
- * Operations render as a 'markup' cell. The dropbutton's appearance is owned by
- * the active admin theme's CSS, and themes expect different markup, so the
- * server renders the dropbutton — exactly as the classic menu
- * admin does — and the client injects the finished HTML verbatim (see the
- * markup renderer in treegrid/js/cells.js). The column is read-only and last.
+ * The cell is an 'operations' render element, so the active admin theme draws
+ * the dropbutton exactly as it does on the classic menu admin, and its
+ * libraries and behaviors reach rows loaded later. The column is read-only and
+ * last.
  *
  * @internal
  */
@@ -40,7 +38,6 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
     array $configuration,
     string $plugin_id,
     mixed $plugin_definition,
-    private readonly RendererInterface $renderer,
     private readonly ModuleHandlerInterface $moduleHandler,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -54,7 +51,6 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('renderer'),
       $container->get('module_handler'),
     );
   }
@@ -62,14 +58,14 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function getCellData(object $context): array {
+  public function buildCell(object $context): array {
     assert($context instanceof MenuTreeRowContext);
     $links = $this->buildOperationsLinks($context->element, $context->entity);
     if (!$links) {
       return [];
     }
 
-    $build = [
+    return [
       '#type' => 'container',
       '#attributes' => [
         'class' => ['menu-tree-ui-row__operations'],
@@ -81,15 +77,6 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
         '#type' => 'operations',
         '#links' => $links,
       ],
-    ];
-    // The dropbutton is theme-owned markup, so render it here and ship the
-    // finished HTML; renderInIsolation keeps this row's render out of the
-    // page's bubbling, matching how the lazy-loaded children are built.
-    $html = (string) $this->renderer->renderInIsolation($build);
-
-    return [
-      'type' => 'markup',
-      'html' => $html,
     ];
   }
 
@@ -158,10 +145,9 @@ final class OperationsColumn extends TreegridColumnBase implements ContainerFact
 
     // Every row action returns to this menu-tree page, regardless of how deep
     // the row is nested. Operation URLs otherwise inherit the *current request*
-    // as their destination: harmless for the server-rendered top level, but a
-    // row from the children endpoint would send the user back to its JSON
-    // response after saving. Setting the destination explicitly keeps all
-    // levels consistent.
+    // as their destination: harmless for the first page, but a row from the
+    // children endpoint would send the user back to the rows response after
+    // saving. Setting the destination explicitly keeps all levels consistent.
     $destination = Url::fromRoute('menu_tree_ui.edit', ['menu' => $link->getMenuName()])->toString();
     foreach ($operations as &$operation) {
       if (($operation['url'] ?? NULL) instanceof Url) {

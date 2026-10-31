@@ -75,9 +75,9 @@ final class MenuTreeUiThemeHooks {
           // Whether the row can be dragged / keyboard-reordered. See
           // \Drupal\menu_tree_ui\MenuLinkMovability.
           'movable' => FALSE,
-          // Keyed by column plugin ID, each entry is a cell data array as
-          // returned by TreegridColumnInterface::getCellData(). The operations
-          // dropbutton is one such column (a 'markup' cell), sorted last.
+          // Keyed by column plugin ID, each entry is a cell render array as
+          // returned by TreegridColumnInterface::buildCell(). The operations
+          // dropbutton is one such column, sorted last.
           'columns' => [],
         ],
       ],

@@ -21,8 +21,8 @@ final class TestColumnB extends TreegridColumnBase {
   /**
    * {@inheritdoc}
    */
-  public function getCellData(object $context): array {
-    return ['type' => 'markup', 'html' => 'B'];
+  public function buildCell(object $context): array {
+    return ['#markup' => 'B'];
   }
 
 }

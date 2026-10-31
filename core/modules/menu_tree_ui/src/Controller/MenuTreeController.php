@@ -552,7 +552,7 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Builds cell data arrays for all active columns for one row.
+   * Builds the cell render arrays of all active columns for one row.
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
    *   The tree element whose cells to build.
@@ -562,7 +562,7 @@ final class MenuTreeController extends ControllerBase {
    *   The active column plugins keyed by plugin ID.
    *
    * @return array
-   *   Cell data arrays keyed by column plugin ID.
+   *   Cell render arrays keyed by column plugin ID.
    */
   private function buildColumnCells(MenuLinkTreeElement $element, ?MenuLinkContentInterface $entity, array $columns): array {
     // A cell per active column, empty when there is no data for this row, so
@@ -570,7 +570,7 @@ final class MenuTreeController extends ControllerBase {
     $context = new MenuTreeRowContext($element, $entity);
     $cells = [];
     foreach ($columns as $col_id => $column) {
-      $cells[$col_id] = $column->getCellData($context) ?: [];
+      $cells[$col_id] = $column->buildCell($context);
     }
     return $cells;
   }

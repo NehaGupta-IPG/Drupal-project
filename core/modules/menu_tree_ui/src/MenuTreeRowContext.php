@@ -10,7 +10,7 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
 /**
  * The per-row context menu_tree_ui hands to its TreegridColumn plugins.
  *
- * TreegridColumnInterface::getCellData() receives a consumer-defined row
+ * TreegridColumnInterface::buildCell() receives a consumer-defined row
  * context (typed as a generic `object`). menu_tree_ui's columns need the tree
  * element, and the operations column also needs the row's content entity —
  * which the controller batch-loads once per level so columns never query per

@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the interactive column checkbox end-to-end.
  *
- * The "Enabled" column renders a treegrid 'checkbox' cell — a native
+ * The "Enabled" column renders the treegrid checkbox cell — a native
  * <input type="checkbox">. Clicking it flips the checkbox immediately (no
  * preventDefault) and POSTs the new value to the column-update endpoint, which
  * writes it to the menu_link_content entity. This drives a real click and
@@ -85,12 +85,47 @@ final class MenuTreeUiColumnToggleTest extends WebDriverTestBase {
   }
 
   /**
-   * The Enabled column checkbox for the seeded link.
+   * The Enabled checkbox of a row in a loaded level stores the new value.
    */
-  private function enabledCheckbox(): NodeElement {
+  public function testToggleInLoadedRowPersists(): void {
+    $parent = $this->createLink('P', '');
+    $child = $this->createLink('C', $parent);
+    $this->createLink('Q', '');
+    $this->createLink('R', '');
+    $this->drupalGet('/admin/structure/menu/manage/test/tree');
+    $toggle = $this->assertSession()->waitForElement('css', sprintf('tr[data-id="%s"] [data-treegrid-toggle]', $parent));
+    $toggle->click();
+    $this->assertSession()->waitForElement('css', sprintf('tr[data-id="%s"]', $child));
+
+    $checkbox = $this->enabledCheckbox($child);
+    $this->assertTrue($checkbox->isChecked());
+    $checkbox->click();
+
+    $this->assertEnabledPersistsAs(FALSE, 'C');
+  }
+
+  /**
+   * Creates an enabled link in the test menu and returns its plugin ID.
+   */
+  private function createLink(string $title, string $parent): string {
+    $entity = MenuLinkContent::create([
+      'menu_name' => 'test',
+      'title' => $title,
+      'link' => ['uri' => 'route:<nolink>'],
+      'parent' => $parent,
+      'enabled' => TRUE,
+    ]);
+    $entity->save();
+    return $entity->getPluginId();
+  }
+
+  /**
+   * The Enabled column checkbox of a link, the seeded one by default.
+   */
+  private function enabledCheckbox(?string $link_id = NULL): NodeElement {
     $selector = sprintf(
       'tr[role="row"][data-id="%s"] input.treegrid-cell-checkbox[data-column-id="enabled"]',
-      $this->linkId,
+      $link_id ?? $this->linkId,
     );
     $checkbox = $this->getSession()->getPage()->find('css', $selector);
     $this->assertNotNull($checkbox, 'The Enabled checkbox should be present.');
@@ -98,7 +133,7 @@ final class MenuTreeUiColumnToggleTest extends WebDriverTestBase {
   }
 
   /**
-   * Polls storage until the seeded link's enabled flag matches, or fails.
+   * Polls storage until a link's enabled flag matches, or fails.
    *
    * The persistence POST is a plain fetch with no DOM-visible completion
    * signal, so the write is observed by re-reading the entity rather than
@@ -106,14 +141,16 @@ final class MenuTreeUiColumnToggleTest extends WebDriverTestBase {
    *
    * @param bool $expected
    *   The enabled value the link should settle on.
+   * @param string $title
+   *   The link's title.
    */
-  private function assertEnabledPersistsAs(bool $expected): void {
+  private function assertEnabledPersistsAs(bool $expected, string $title = 'A'): void {
     $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
     for ($i = 0; $i < 50; $i++) {
       $storage->resetCache();
       $ids = $storage->getQuery()
         ->accessCheck(FALSE)
-        ->condition('title', 'A')
+        ->condition('title', $title)
         ->execute();
       $entity = $storage->load(reset($ids));
       assert($entity instanceof MenuLinkContentInterface);

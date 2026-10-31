@@ -197,7 +197,7 @@ final class TreegridTestUiController extends ControllerBase {
    *   The item ID.
    *
    * @return array<string, mixed>
-   *   The item data, matching the JSON shape the spine consumes.
+   *   The item data.
    */
   private function item(string $id): array {
     $tree = $this->tree();
@@ -223,13 +223,10 @@ final class TreegridTestUiController extends ControllerBase {
       'depth' => $depth,
       'columns' => [
         'check' => [
-          'type' => 'checkbox',
           'value' => $checked,
           'label' => 'Toggle ' . $id,
-          'interactive' => TRUE,
         ],
         'mark' => [
-          'type' => 'markup',
           'html' => '<span class="tgu-mark">m-' . Html::escape($id) . '</span>',
         ],
       ],
@@ -271,7 +268,7 @@ final class TreegridTestUiController extends ControllerBase {
     $checkbox = '<input type="checkbox" class="treegrid-cell-checkbox" aria-label="'
       . Html::escape($check['label']) . '" data-column-id="check" data-treegrid-control'
       . ($check['value'] ? ' checked' : '') . '>';
-    $markup = '<div class="treegrid-cell-markup">' . $item['columns']['mark']['html'] . '</div>';
+    $markup = $item['columns']['mark']['html'];
 
     return '<tr role="row" data-id="' . $id . '" data-parent-id="' . Html::escape($item['parent_id'])
       . '" data-has-children="' . ($has_children ? 'true' : 'false') . '"'

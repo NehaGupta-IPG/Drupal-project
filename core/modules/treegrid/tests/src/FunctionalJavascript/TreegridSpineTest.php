@@ -128,7 +128,7 @@ final class TreegridSpineTest extends WebDriverTestBase {
 
     $markup = $this->getSession()->getPage()->find(
       'css',
-      'tr[data-id="c1a"] .treegrid-cell-markup',
+      'tr[data-id="c1a"] td[data-column="mark"]',
     );
     $this->assertNotNull($markup, 'The loaded row has a mark cell.');
     $this->assertStringContainsString('m-c1a', $markup->getText());
@@ -140,7 +140,7 @@ final class TreegridSpineTest extends WebDriverTestBase {
   public function testClickToFocusRow(): void {
     $markup = $this->getSession()->getPage()->find(
       'css',
-      'tr[role="row"][data-id="p2"] .treegrid-cell-markup',
+      'tr[role="row"][data-id="p2"] td[data-column="mark"]',
     );
     $this->assertNotNull($markup, 'Row p2 should render a markup cell.');
     $markup->click();

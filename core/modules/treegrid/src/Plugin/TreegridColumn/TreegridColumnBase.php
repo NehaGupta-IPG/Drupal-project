@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Base class for TreegridColumn plugins.
  *
- * Concrete columns must implement getCellData(). handleUpdate() defaults to
+ * Concrete columns must implement buildCell(). handleUpdate() defaults to
  * FALSE (read-only) — override it for interactive columns.
  *
  * @api
@@ -30,7 +30,7 @@ abstract class TreegridColumnBase extends PluginBase implements TreegridColumnIn
   /**
    * {@inheritdoc}
    */
-  abstract public function getCellData(object $context): array;
+  abstract public function buildCell(object $context): array;
 
   /**
    * {@inheritdoc}
