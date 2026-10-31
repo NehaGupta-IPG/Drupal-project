@@ -354,6 +354,15 @@
 }
 
 /*
+ * Every row renders both the toggle and the spacer; data-has-children decides
+ * which one shows.
+ */
+.menu-tree-ui-row[data-has-children="true"] .menu-tree-ui-row__toggle--spacer,
+.menu-tree-ui-row[data-has-children="false"] button.menu-tree-ui-row__toggle {
+  display: none;
+}
+
+/*
  * CSS-drawn chevron (font-size:0 hides the ▸ glyph; borders form the arrow).
  * Collapsed: rotate(45deg) → right.  Expanded: rotate(135deg) → down.
  */

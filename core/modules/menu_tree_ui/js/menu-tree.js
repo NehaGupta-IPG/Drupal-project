@@ -4,8 +4,8 @@
  *
  * The treegrid spine — lazy expand, row windowing, WAI-ARIA navigation, and the
  * roving-tabindex focus model — lives in the treegrid module's <drupal-treegrid>
- * element. The menu row renderer is registered as a provider in row-builder.js.
- * This file wires the menu-specific features onto an upgraded element:
+ * element. Rows come from the server's menu_tree_ui_row template, on the first
+ * page and in every loaded level. This file wires the menu-specific features onto an upgraded element:
  *  - reorder, through treegrid_reorder's attach();
  *  - search jump-to and dismiss;
  *  - the "Keyboard commands" dialog.
@@ -18,58 +18,42 @@
   const ns = Drupal.menuTreeUi;
 
   const ROW = 'tr[role="row"]';
+
   /**
-   * Syncs a parent row's "parent or leaf" attributes to its current children.
+   * Creates the callback that syncs a parent row's open state for one tree.
    *
-   * The treegrid_reorder commit pipeline calls this (as a configured callback)
-   * after a move refresh: /children?parent=X returns X's children, not X's own
-   * metadata, so this is the one piece of state derived client-side. It is
-   * menu-specific — it rebuilds the disclosure toggle and reads menu row markup
-   * — so it stays here rather than in the generic module. Skipped when parentId
-   * is '' (root has no enclosing row) or the row isn't in the DOM.
+   * The treegrid_reorder commit pipeline calls it (as a configured callback)
+   * after a move refresh: the children endpoint returns X's children, not X's
+   * own metadata, so whether X is still a parent is the one piece of state
+   * derived client-side. The row's data-has-children follows its level, and the
+   * stylesheet shows the toggle or the spacer from it. Skipped when parentId is
+   * '' (root has no enclosing row) or the row isn't in the tree.
    *
-   * @param {string} parentId
-   *   The parent plugin ID.
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element the callback serves.
+   *
+   * @return {function(string): void}
+   *   The callback, taking the parent plugin ID.
    */
-  function applyParentMetadata(parentId) {
-    if (parentId === '') {
-      return;
-    }
-    const row = document.querySelector(
-      `${ROW}[data-id="${CSS.escape(parentId)}"]`,
-    );
-    if (!row) {
-      return;
-    }
-    const hasChildrenNow = row.dataset.hasChildren === 'true';
-
-    const name = row.querySelector('.menu-tree-ui-row__name');
-    if (!name) {
-      return;
-    }
-    const existing = name.querySelector(':scope > .menu-tree-ui-row__toggle');
-
-    if (hasChildrenNow) {
-      row.setAttribute('aria-expanded', 'true');
-      if (!existing || existing.tagName.toLowerCase() !== 'button') {
-        const title =
-          name.querySelector('.menu-tree-ui-row__title')?.textContent?.trim() ??
-          '';
-        const button = ns.buildToggle({ has_children: true, title });
-        if (existing) {
-          existing.replaceWith(button);
-        } else {
-          name.prepend(button);
-        }
+  function createParentMetadataUpdater(element) {
+    return (parentId) => {
+      if (parentId === '') {
+        return;
       }
-    } else {
-      row.removeAttribute('aria-expanded');
-      if (existing && existing.tagName.toLowerCase() === 'button') {
-        existing.replaceWith(ns.buildToggle({ has_children: false }));
+      const row = element.tree.querySelector(
+        `${ROW}[data-id="${CSS.escape(parentId)}"]`,
+      );
+      if (!row) {
+        return;
       }
-      // On becoming a leaf, remove any stale descendant rows left behind.
-      row.closest('drupal-treegrid')?.clearChildren(row);
-    }
+      if (row.dataset.hasChildren === 'true') {
+        row.setAttribute('aria-expanded', 'true');
+      } else {
+        row.removeAttribute('aria-expanded');
+        // On becoming a leaf, remove any stale descendant rows left behind.
+        element.clearChildren(row);
+      }
+    };
   }
 
   /**
@@ -160,29 +144,12 @@
         addPageListeners();
       }
     };
-    // A level that came back empty turns a parent that had a disclosure button
-    // into a leaf, so the button goes. A leaf opened for a child drop has no
-    // button and is left alone.
-    const onLevelLoaded = (event) => {
-      const { parentId } = event.detail;
-      const row = element.tree.querySelector(
-        `${ROW}[data-id="${CSS.escape(parentId)}"]`,
-      );
-      const toggle = row?.querySelector(
-        '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
-      );
-      if (toggle && row.dataset.hasChildren === 'false') {
-        applyParentMetadata(parentId);
-      }
-    };
     addPageListeners();
     element.addEventListener('treegrid:disconnected', removePageListeners);
     element.addEventListener('treegrid:connected', onConnected);
-    element.addEventListener('treegrid:level-loaded', onLevelLoaded);
 
     return () => {
       removePageListeners();
-      element.removeEventListener('treegrid:level-loaded', onLevelLoaded);
       element.removeEventListener('treegrid:disconnected', removePageListeners);
       element.removeEventListener('treegrid:connected', onConnected);
     };
@@ -199,7 +166,7 @@
         // any other adds its own. A press outside the whole component cancels
         // a move; searching for a destination keeps it.
         const reorder = Drupal.treegridReorder.attach(element, {
-          applyParentMetadata,
+          applyParentMetadata: createParentMetadataUpdater(element),
           container: element.closest('.menu-tree-ui'),
         });
         features.set(element, { reorder, teardown: null });

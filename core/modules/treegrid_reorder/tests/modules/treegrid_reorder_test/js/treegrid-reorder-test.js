@@ -87,39 +87,35 @@
   }
 
   /**
-   * Syncs a parent row's toggle and open state to its current children.
+   * Creates the callback that syncs a parent row's open state for one tree.
    *
-   * @param {string} parentId
-   *   The parent id, or '' for the top level.
+   * The row's data-has-children decides which of the toggle and the spacer
+   * shows (see the stylesheet).
+   *
+   * @param {HTMLElement} element
+   *   The <drupal-treegrid> element the callback serves.
+   *
+   * @return {function(string): void}
+   *   The callback, taking the parent id.
    */
-  function applyParentMetadata(parentId) {
-    if (parentId === '') {
-      return;
-    }
-    const row = document.querySelector(
-      `tr[role="row"][data-id="${CSS.escape(parentId)}"]`,
-    );
-    if (!row) {
-      return;
-    }
-    const hasChildren = row.dataset.hasChildren === 'true';
-    const cell = row.querySelector('[data-treegrid-name-cell]');
-    const toggle = cell.querySelector(
-      '.reorder-test-toggle, .reorder-test-spacer',
-    );
-    const isButton = toggle.tagName === 'BUTTON';
-    if (hasChildren) {
-      row.setAttribute('aria-expanded', 'true');
-      if (!isButton) {
-        toggle.replaceWith(buildToggle(true));
+  function createParentMetadataUpdater(element) {
+    return (parentId) => {
+      if (parentId === '') {
+        return;
       }
-    } else {
-      row.removeAttribute('aria-expanded');
-      if (isButton) {
-        toggle.replaceWith(buildToggle(false));
+      const row = element.tree.querySelector(
+        `tr[role="row"][data-id="${CSS.escape(parentId)}"]`,
+      );
+      if (!row) {
+        return;
       }
-      row.closest('drupal-treegrid').clearChildren(row);
-    }
+      if (row.dataset.hasChildren === 'true') {
+        row.setAttribute('aria-expanded', 'true');
+      } else {
+        row.removeAttribute('aria-expanded');
+        element.clearChildren(row);
+      }
+    };
   }
 
   const reorders = new WeakMap();
@@ -147,7 +143,7 @@
         reorders.set(
           element,
           Drupal.treegridReorder.attach(element, {
-            applyParentMetadata,
+            applyParentMetadata: createParentMetadataUpdater(element),
             container: element.closest('.reorder-test-container'),
           }),
         );

@@ -120,8 +120,8 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
   /**
    * Drop B in the middle of leaf L → L is promoted to a parent containing B.
    *
-   * The leaf should pick up a real toggle button so the new subtree can be
-   * collapsed/expanded after the drop — not a placeholder spacer span. Also
+   * The leaf should show its toggle button instead of its spacer so the new
+   * subtree can be collapsed/expanded after the drop. Also
    * checks the groups reconcile to 4 top-level rows and 1 child of L, with no
    * duplicate, blank, or virtualized rows left behind.
    */
@@ -173,8 +173,8 @@ final class MenuTreeUiDragDropTest extends MenuTreeUiJavascriptTestBase {
    *
    * After A2a is moved, A2 has no remaining children. The UI should reflect
    * that — `data-has-children` flipping to "false", `aria-expanded` cleared,
-   * and the toggle button swapped back to a spacer — otherwise the chevron
-   * stays clickable on an empty subtree. Also checks the groups reconcile to
+   * and the spacer showing again in place of the toggle button — otherwise
+   * the chevron stays clickable on an empty subtree. Also checks the groups reconcile to
    * 6 top-level rows, 2 remaining children of A, and 0 children of A2, with
    * no duplicate, blank, or virtualized rows left behind.
    */

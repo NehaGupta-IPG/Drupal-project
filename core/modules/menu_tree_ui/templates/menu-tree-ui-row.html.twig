@@ -85,19 +85,21 @@
         </span>
       {% endif %}
 
-      {% if has_children %}
-        <button
-          type="button"
-          class="menu-tree-ui-row__toggle"
-          aria-label="{{ 'Toggle children of @title'|t({'@title': title}) }}"
-          data-treegrid-toggle
-          tabindex="-1"
-        >
-          <span aria-hidden="true" class="menu-tree-ui-row__chevron">▸</span>
-        </button>
-      {% else %}
-        <span class="menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer" aria-hidden="true"></span>
-      {% endif %}
+      {#
+        Both are always rendered; the row's data-has-children decides which one
+        shows (see the stylesheet), so a row that gains or loses children needs
+        no markup change.
+      #}
+      <button
+        type="button"
+        class="menu-tree-ui-row__toggle"
+        aria-label="{{ 'Toggle children of @title'|t({'@title': title}) }}"
+        data-treegrid-toggle
+        tabindex="-1"
+      >
+        <span aria-hidden="true" class="menu-tree-ui-row__chevron">▸</span>
+      </button>
+      <span class="menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer" aria-hidden="true"></span>
 
       {% if linked %}
         <a href="{{ url }}" class="menu-tree-ui-row__title" data-treegrid-control data-treegrid-reorder-title>{{ title }}</a>

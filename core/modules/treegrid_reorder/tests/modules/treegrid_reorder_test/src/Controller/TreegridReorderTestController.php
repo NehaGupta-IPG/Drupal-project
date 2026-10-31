@@ -329,9 +329,8 @@ final class TreegridReorderTestController extends ControllerBase {
     $movable = $item['movable'] === NULL ? '' : ' data-movable="' . ($item['movable'] ? 'true' : 'false') . '"';
     $expanded = $item['has_children'] ? ' aria-expanded="false"' : '';
     $tabindex = ($item['parent'] === '' && $pos_in_set === 1) ? '0' : '-1';
-    $toggle = $item['has_children']
-      ? '<button type="button" class="reorder-test-toggle" data-treegrid-toggle tabindex="-1"></button>'
-      : '<span class="reorder-test-spacer" aria-hidden="true"></span>';
+    $toggle = '<button type="button" class="reorder-test-toggle" data-treegrid-toggle tabindex="-1"></button>'
+      . '<span class="reorder-test-spacer" aria-hidden="true"></span>';
 
     return '<tr role="row" data-id="' . $id . '" data-parent-id="' . Html::escape($item['parent'])
       . '" data-has-children="' . ($item['has_children'] ? 'true' : 'false') . '"' . $movable

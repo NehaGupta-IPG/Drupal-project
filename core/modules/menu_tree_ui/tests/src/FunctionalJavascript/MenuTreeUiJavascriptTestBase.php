@@ -260,10 +260,14 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
       'css',
       '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
     );
-    $this->assertNotNull(
-      $toggle,
-      "Row $label should have a real <button> toggle (not a spacer).",
+    $this->assertNotNull($toggle, "Row $label should render its toggle button.");
+    $this->assertTrue($toggle->isVisible(), "Row $label's toggle button should show.");
+    $spacer = $row->find(
+      'css',
+      '.menu-tree-ui-row__name > span.menu-tree-ui-row__toggle--spacer',
     );
+    $this->assertNotNull($spacer, "Row $label should render its spacer.");
+    $this->assertFalse($spacer->isVisible(), "Row $label's spacer should be hidden.");
     // The toggle is operated from the row (Left/Right/Enter), not via Tab, so it
     // sits outside the page tab order — including when a move promotes a leaf to
     // a parent and the toggle is built client-side. Expand/collapse stays
@@ -276,7 +280,7 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
   }
 
   /**
-   * Asserts a row presents as a leaf (spacer toggle + no has-children).
+   * Asserts a row presents as a leaf (spacer showing, no has-children).
    */
   protected function assertIsLeafRow(string $label): void {
     $row = $this->row($label);
@@ -286,21 +290,18 @@ abstract class MenuTreeUiJavascriptTestBase extends WebDriverTestBase {
       $row->getAttribute('data-has-children'),
       "Row $label should advertise data-has-children=\"false\".",
     );
-    $this->assertNull(
-      $row->find(
-        'css',
-        '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
-      ),
-      "Row $label should no longer have a <button> toggle.",
+    $toggle = $row->find(
+      'css',
+      '.menu-tree-ui-row__name > button.menu-tree-ui-row__toggle',
     );
+    $this->assertNotNull($toggle, "Row $label should render its toggle button.");
+    $this->assertFalse($toggle->isVisible(), "Row $label's toggle button should be hidden.");
     $spacer = $row->find(
       'css',
       '.menu-tree-ui-row__name > span.menu-tree-ui-row__toggle--spacer',
     );
-    $this->assertNotNull(
-      $spacer,
-      "Row $label should have a spacer in its toggle slot.",
-    );
+    $this->assertNotNull($spacer, "Row $label should render its spacer.");
+    $this->assertTrue($spacer->isVisible(), "Row $label's spacer should show.");
   }
 
   /**

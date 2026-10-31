@@ -25,6 +25,12 @@
   vertical-align: middle;
 }
 
+/* The inactive one of the toggle and spacer is hidden by the row's state. */
+tr[data-has-children="true"] .reorder-test-spacer,
+tr[data-has-children="false"] .reorder-test-toggle {
+  display: none;
+}
+
 .reorder-test-field {
   display: block;
   margin-block: 0.5rem;

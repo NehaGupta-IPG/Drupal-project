@@ -74,7 +74,7 @@ final class MenuTreeUiLazyLoadTest extends MenuTreeUiJavascriptTestBase {
   }
 
   /**
-   * A parent whose children are gone loses its toggle once the level loads.
+   * A parent whose children are gone shows its spacer once the level loads.
    */
   public function testEmptyLoadRemovesTheToggle(): void {
     $uuid = substr($this->linkIds['E1'], strlen('menu_link_content:'));
