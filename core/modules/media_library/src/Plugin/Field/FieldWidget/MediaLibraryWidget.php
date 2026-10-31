@@ -8,7 +8,7 @@ use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AnnounceCommand;
 use Drupal\Core\Ajax\InvokeCommand;
-use Drupal\Core\Ajax\OpenModalDialogCommand;
+use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -495,6 +495,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       'entity_type_id' => $entity->getEntityTypeId(),
       'bundle' => $entity->bundle(),
       'field_name' => $field_name,
+      // Open in a dedicated modal element rather than the shared
+      // '#drupal-modal'. The field widget can be rendered inside another modal
+      // (for example, the field creation/edit modal when setting a default
+      // value), and reusing '#drupal-modal' would overwrite that modal.
+      'dialog_selector' => '#media-library-modal',
     ];
     // Only add the entity ID when we actually have one. The entity ID needs to
     // be a string to ensure that the media library state generates its
@@ -817,10 +822,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public static function openMediaLibrary(array $form, FormStateInterface $form_state) {
     $triggering_element = $form_state->getTriggeringElement();
-    $library_ui = \Drupal::service('media_library.ui_builder')->buildUi($triggering_element['#media_library_state']);
+    $state = $triggering_element['#media_library_state'];
+    $library_ui = \Drupal::service('media_library.ui_builder')->buildUi($state);
     $dialog_options = MediaLibraryUiBuilder::dialogOptions();
     return (new AjaxResponse())
-      ->addCommand(new OpenModalDialogCommand($dialog_options['title'], $library_ui, $dialog_options));
+      ->addCommand(new OpenDialogCommand($state->getDialogSelector(), $dialog_options['title'], $library_ui, ['modal' => TRUE] + $dialog_options));
   }
 
   /**

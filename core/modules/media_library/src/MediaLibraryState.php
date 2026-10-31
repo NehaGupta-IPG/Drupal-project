@@ -275,6 +275,21 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
   }
 
   /**
+   * Returns the selector of the dialog the media library is opened in.
+   *
+   * Openers can request a dedicated dialog element by setting a
+   * 'dialog_selector' opener parameter. This lets the library open as a modal
+   * on top of another modal (for example, the field creation/edit modal)
+   * without the two sharing, and overwriting, the same '#drupal-modal' element.
+   *
+   * @return string
+   *   The dialog selector. Defaults to '#drupal-modal'.
+   */
+  public function getDialogSelector(): string {
+    return $this->getOpenerParameters()['dialog_selector'] ?? '#drupal-modal';
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getCacheContexts() {
