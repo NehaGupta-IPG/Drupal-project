@@ -266,6 +266,8 @@ class ExposedFormTest extends ViewTestBase {
    */
   #[DataProvider('providerTestExposedBlock')]
   public function testExposedBlock(string $display): void {
+    $this->container->get('module_installer')->install(['contextual']);
+    $this->drupalLogin($this->drupalCreateUser(['access content', 'access contextual links', 'administer views']));
     $view = Views::getView('test_exposed_block');
     $view->setDisplay($display);
     $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-' . $display);
@@ -280,6 +282,7 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->elementContains('css', 'title', $view->getTitle());
     $this->assertSession()->elementExists('xpath', '//h2[text()="' . $view->getTitle() . '"]');
     $this->assertSession()->pageTextMatchesCount(2, '/' . $view->getTitle() . '/');
+    $this->assertSession()->elementsCount('css', '#block-' . $block->id() . ' [data-contextual-id*="entity.view.edit_form:"]', 1);
 
     // Set a custom label on the exposed filter form block.
     $block->getPlugin()->setConfigurationValue('views_label', '<strong>Custom</strong> title <script>alert("hacked!");</script>');
@@ -300,6 +303,7 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertSession()->responseNotContains('<strong>Custom</strong> title alert("hacked!");');
     $this->assertSession()->elementContains('css', 'title', $view->getTitle());
     $this->assertSession()->pageTextMatchesCount(1, '/' . $view->getTitle() . '/');
+    $this->assertSession()->elementsCount('css', '#block-' . $block->id() . ' [data-contextual-id*="entity.view.edit_form:"]', 1);
 
     // Test there is an exposed form in a block.
     $this->assertSession()->elementsCount('xpath', '//div[@id="' . Html::getUniqueId('block-' . $block->id()) . '"]/form/@id', 1);

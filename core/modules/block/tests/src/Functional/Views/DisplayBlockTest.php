@@ -419,8 +419,13 @@ class DisplayBlockTest extends ViewTestBase {
       'administer blocks',
     ]));
     $block = $this->drupalPlaceBlock('views_block:test_view_block-block_1');
-    $cached_block = $this->drupalPlaceBlock('views_block:test_view_block-block_1');
+    $cached_block = $this->drupalPlaceBlock('views_block:test_view_block-block_1', ['label_display' => '0']);
+    // Each block has one View contextual link, with or without a title.
+    // Check both the initial response and the response using the render cache.
     $this->drupalGet('test-page');
+    $this->assertSession()->elementsCount('css', '[data-contextual-id*="entity.view.edit_form:"]', 2);
+    $this->drupalGet('test-page');
+    $this->assertSession()->elementsCount('css', '[data-contextual-id*="entity.view.edit_form:"]', 2);
 
     $id = 'block:block=' . $block->id() . ':langcode=en|entity.view.edit_form:view=test_view_block:location=block&name=test_view_block&display_id=block_1&langcode=en';
     $id_token = Crypt::hmacBase64($id, Settings::getHashSalt() . $this->container->get('private_key')->get());
@@ -450,6 +455,22 @@ class DisplayBlockTest extends ViewTestBase {
     $json = Json::decode($this->getSession()->getPage()->getContent());
     $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'admin/structure/block/manage/' . $block->id() . '">Configure block</a></li><li><a href="' . base_path() . 'admin/structure/block/manage/' . $block->id() . '/delete">Remove block</a></li><li><a href="' . base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$id]);
     $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '">Configure block</a></li><li><a href="' . base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '/delete">Remove block</a></li><li><a href="' . base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$cached_id]);
+
+    // Reuse the same block while changing contextual link visibility.
+    $plugin = $block->getPlugin();
+    foreach ([TRUE, FALSE, TRUE] as $show_admin_links) {
+      $plugin->getViewExecutable()->setShowAdminLinks($show_admin_links);
+      $build = $plugin->build();
+      $this->assertSame($show_admin_links, isset($build['#contextual_links']['entity.view.edit_form']));
+    }
+
+    // Hiding View links must leave the block's own contextual links available.
+    $view = Views::getView('test_view_block');
+    $view->getDisplay()->setOption('show_admin_links', FALSE);
+    $view->save();
+    $this->drupalGet('test-page');
+    $this->assertSession()->elementNotExists('css', '[data-contextual-id*="entity.view.edit_form:"]');
+    $this->assertSession()->elementsCount('css', '[data-contextual-id^="block:block="]', 2);
   }
 
 }
