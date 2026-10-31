@@ -702,11 +702,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
 
     // Explicitly configure all cache bins to use the memory backend.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
-      $definition = $container->getDefinition($id);
-      $tags = $definition->getTags();
-      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
-      $definition->setTags($tags);
+    if (!static::sharesEnvironment()) {
+      foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+        $definition = $container->getDefinition($id);
+        $tags = $definition->getTags();
+        $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+        $definition->setTags($tags);
+      }
     }
 
     // Disable the super user access policy so that we are sure our tests check
@@ -1070,6 +1072,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
     $active_storage->write('core.extension', $extension_config);
 
+    // Clear plugin definitions.
+    $this->container->get('plugin.cache_clearer')->clearCachedDefinitions();
     // Update the kernel to make their services available.
     $this->container->get('kernel')->updateModules($extensions, $extensions);
     $this->container = $this->container->get('kernel')->getContainer();
@@ -1265,6 +1269,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    */
   protected function checkNoTableWasLeftBehind(): void {
     $added_tables = array_diff($this->getSharedStateTables(), $this->environmentTables ?? [], static::INFRASTRUCTURE_TABLES);
+    // Allow cache tables to be left behind because they're ephemeral.
+    $added_tables = array_filter($added_tables, fn($table) => !str_starts_with($table, 'cache_'));
     if ($added_tables !== []) {
       throw new \RuntimeException(sprintf('%s left %s behind. A test method that adds to the database schema must remove what it added, in ::resetEnvironment().', static::class, implode(', ', $added_tables)));
     }
