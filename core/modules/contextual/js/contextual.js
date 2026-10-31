@@ -344,10 +344,16 @@
 
         this.$contextual.find('.contextual-links').prop('hidden', !isOpen);
         const trigger = this.$contextual.find('.trigger').get(0);
-        trigger.textContent = Drupal.t('@action @title configuration options', {
+        const newText = Drupal.t('@action @title configuration options', {
           '@action': !isOpen ? this.strings.open : this.strings.close,
           '@title': this.title,
         });
+        // Only update when the label actually changes. Replacing the text node
+        // between mousedown and mouseup (e.g. when focus moves onto the
+        // trigger) cancels the click event in Chromium.
+        if (trigger.textContent !== newText) {
+          trigger.textContent = newText;
+        }
         trigger.setAttribute('aria-pressed', isOpen);
       }
 
