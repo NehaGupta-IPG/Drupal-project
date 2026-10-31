@@ -1,0 +1,21 @@
+action.configuration.file_image_styles_generate_action:
+  type: mapping
+  label: 'Configuration for "File Image Styles Generate" action'
+  mapping:
+    image_styles:
+      type: sequence
+      label: 'The image styles to generate image derivatives for.'
+      sequence:
+        type: string
+        label: 'Image style'
+    regenerate:
+      type: boolean
+      label: 'Regenerate image derivatives'
+
+action.configuration.file_original_image_style_action:
+  type: mapping
+  label: 'Configuration for "File Original Image Style" action'
+  mapping:
+    image_style:
+      type: string
+      label: 'The image style to be applied to an image file entity.'
