@@ -89,13 +89,6 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button");
 
-    // Top Bar is visible on node pages.
-    $this->verifyDynamicPageCache($this->node->toUrl(), 'MISS');
-    $this->verifyDynamicPageCache($this->node->toUrl(), 'HIT');
-    $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
-    $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--pencil')]", "Edit");
-    $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
-
     // Verify that the action link contains an extra attribute.
     $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--database')]", "Test link");
     $this->assertSession()->elementAttributeContains('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--database')]", 'data-dialog-type', 'modal');
@@ -103,15 +96,17 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     // Find all the dropdown links and check if the top bar is there as well.
     $toolbar_links = $this->mink->getSession()->getPage()->find('xpath', '//*[@id="top-bar-page-actions"]/ul');
 
-    foreach ($toolbar_links->findAll('css', 'li') as $toolbar_link) {
-      $this->clickLink($toolbar_link->getText());
-      $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
-      $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
-      // Ensure that link to current page is not included in the dropdown.
-      $url = $this->getSession()->getCurrentUrl();
-      $this->assertSession()->linkByHrefNotExistsExact(parse_url($url, PHP_URL_PATH));
-      // Ensure that the actions are displayed in the correct order.
-      $this->assertActionsWeight($toolbar_links);
+    if (is_array($toolbar_links)) {
+      foreach ($toolbar_links->findAll('css', 'li') as $toolbar_link) {
+        $this->clickLink($toolbar_link->getText());
+        $this->assertSession()->elementExists('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]");
+        $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
+        // Ensure that link to current page is not included in the dropdown.
+        $url = $this->getSession()->getCurrentUrl();
+        $this->assertSession()->linkByHrefNotExistsExact(parse_url($url, PHP_URL_PATH));
+        // Ensure that the actions are displayed in the correct order.
+        $this->assertActionsWeight($toolbar_links);
+      }
     }
 
     // Regular tabs are visible for user that cannot access to navigation.

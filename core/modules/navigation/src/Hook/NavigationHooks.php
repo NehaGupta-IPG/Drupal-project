@@ -3,7 +3,6 @@
 namespace Drupal\navigation\Hook;
 
 use Drupal\Component\Plugin\PluginBase;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -97,18 +96,6 @@ class NavigationHooks {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->addMenuLinks($links);
-  }
-
-  /**
-   * Implements hook_block_build_BASE_BLOCK_ID_alter().
-   */
-  #[Hook('block_build_local_tasks_block_alter')]
-  public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
-    if ($this->currentUser->hasPermission('access navigation') &&
-      array_key_exists('page_actions', $this->topBarItemManager->getDefinitions())
-    ) {
-      $this->navigationRenderer->removeLocalTasks($build, $block);
-    }
   }
 
   /**
