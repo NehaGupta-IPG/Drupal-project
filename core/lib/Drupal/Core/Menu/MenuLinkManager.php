@@ -299,8 +299,11 @@ class MenuLinkManager implements MenuLinkManagerInterface {
     $instance = $this->createInstance($id);
     if ($instance) {
       $new_definition_values['id'] = $id;
-      $changed_definition = $instance->updateLink($new_definition_values, $persist);
+      $changed_definition = $instance->updateLink($new_definition_values, FALSE);
       $this->treeStorage->save($changed_definition);
+      if ($persist === TRUE) {
+        $instance->updateLink($new_definition_values, TRUE);
+      }
     }
     return $instance;
   }
