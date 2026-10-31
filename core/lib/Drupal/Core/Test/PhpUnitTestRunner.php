@@ -254,7 +254,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // Setup an environment variable containing the base URL, if it is
     // available. This allows functional tests to browse the site under test.
     // When running tests via CLI, core/phpunit.xml.dist or
-    // core/scripts/run-tests.sh can set this variable.
+    // core/scripts/run-tests.php can set this variable.
     if ($base_url) {
       $process_environment_variables['SIMPLETEST_BASE_URL'] = $base_url;
       $process_environment_variables['BROWSERTEST_OUTPUT_DIRECTORY'] = $this->workingDirectory;

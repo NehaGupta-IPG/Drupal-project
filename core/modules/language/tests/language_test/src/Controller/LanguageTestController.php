@@ -125,8 +125,8 @@ class LanguageTestController implements ContainerInjectionInterface {
     $request = Request::createFromGlobals();
     $server = $request->server->all();
     if (basename($server['SCRIPT_FILENAME']) != basename($server['SCRIPT_NAME'])) {
-      // We need this for when the test is executed by run-tests.sh.
-      // @todo Remove this once run-tests.sh has been converted to use a Request
+      // We need this for when the test is executed by run-tests.php.
+      // @todo Remove this once run-tests.php has been converted to use a Request
       //   object.
       $server['SCRIPT_FILENAME'] = $server['SCRIPT_NAME'];
       $base_path = ltrim($server['REQUEST_URI'], '/');

@@ -23,10 +23,10 @@
   <file>.</file>
   <file>../composer</file>
   <file>scripts/drupal</file>
-  <file>scripts/password-hash.sh</file>
-  <file>scripts/rebuild_token_calculator.sh</file>
-  <file>scripts/run-tests.sh</file>
-  <file>scripts/update-countries.sh</file>
+  <file>scripts/password-hash.php</file>
+  <file>scripts/rebuild_token_calculator.php</file>
+  <file>scripts/run-tests.php</file>
+  <file>scripts/update-countries.php</file>
 
   <!-- Only include specific sniffs that pass. This ensures that, if new sniffs are added, HEAD does not fail.-->
 
@@ -101,7 +101,7 @@
   <rule ref="Drupal.NamingConventions.ValidEnumCase"/>
   <rule ref="Drupal.NamingConventions.ValidGlobal"/>
   <rule ref="Drupal.NamingConventions.ValidGlobal.GlobalUnderScore">
-    <exclude-pattern>scripts/run-tests.sh</exclude-pattern>
+    <exclude-pattern>scripts/run-tests.php</exclude-pattern>
   </rule>
   <rule ref="Drupal.NamingConventions.ValidVariableName"/>
   <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName"/>

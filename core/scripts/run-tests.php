@@ -90,7 +90,7 @@ if (Config::get('help')) {
 simpletest_script_init($autoloader);
 
 if (!class_exists(TestCase::class)) {
-  echo "\nrun-tests.sh requires the PHPUnit testing framework. Use 'composer install' to ensure that it is present.\n\n";
+  echo "\nrun-tests.php requires the PHPUnit testing framework. Use 'composer install' to ensure that it is present.\n\n";
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 

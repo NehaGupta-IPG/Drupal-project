@@ -275,7 +275,7 @@ trait FunctionalTestSetupTrait {
    *
    * This is used to manipulate how the generator generates paths during tests.
    * It also ensures that calls to $this->drupalGet() will work when running
-   * from run-tests.sh because the URL generator no longer looks at the global
+   * from run-tests.php because the URL generator no longer looks at the global
    * variables that are set there but relies on getting this information from a
    * request object.
    *
