@@ -153,7 +153,10 @@ class EntityRepository implements EntityRepositoryInterface {
     foreach ($entities as $id => $entity) {
       // Retrieve the fittest revision, if needed.
       if ($entity instanceof RevisionableInterface && $entity->getEntityType()->isRevisionable()) {
-        $entity = $this->getLatestTranslationAffectedRevision($entity, $langcode);
+        $latest_revision = $this->getLatestTranslationAffectedRevision($entity, $langcode);
+        if ($latest_revision instanceof RevisionableInterface && ($latest_revision->getRevisionId() > $entity->getRevisionId() || $entity->hasTranslation($langcode))) {
+          $entity = $latest_revision;
+        }
       }
 
       // Retrieve the fittest translation, if needed.
