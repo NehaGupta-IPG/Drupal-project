@@ -3,6 +3,7 @@
 namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -103,6 +104,9 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
         else {
           $elements[$delta]['#plain_text'] = $label;
         }
+      }
+      elseif ($label instanceof MarkupInterface) {
+        $elements[$delta] = ['#markup' => $label];
       }
       else {
         $elements[$delta]['#plain_text'] = $label;
