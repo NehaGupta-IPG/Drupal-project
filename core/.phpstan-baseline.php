@@ -33082,6 +33082,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workflows/src/Form/WorkflowTransitionEditForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:preSave\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\Field\\\\FieldType\\\\WorkflowStateItem\\:\\:setValue\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/src/Plugin/Field/FieldType/WorkflowStateItem.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workflows\\\\Plugin\\\\WorkflowTypeConfigureFormBase\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

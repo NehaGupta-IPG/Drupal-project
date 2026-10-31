@@ -19,6 +19,10 @@ workflow.type_settings.workflow_type_required_state_test:
   type: workflow_type_test.ignore_schema
   label: 'Workflow test type required state'
 
+workflow.type_settings.workflow_type_entity_test:
+  type: workflow_type_test.ignore_schema
+  label: 'Entity test workflow type'
+
 workflow.type_settings.workflow_custom_access_type:
   type: workflow_type_test.ignore_schema
   label: 'Workflow custom access type'
