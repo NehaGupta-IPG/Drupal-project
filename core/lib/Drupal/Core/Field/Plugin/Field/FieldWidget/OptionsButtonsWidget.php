@@ -13,6 +13,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[FieldWidget(
   id: 'options_buttons',
   label: new TranslatableMarkup('Check boxes/radio buttons'),
+  description: new TranslatableMarkup('This widget uses radio buttons if the "Allowed number of values" is set to 1. If the number of allowed values is more than 1 or unlimited, checkboxes will be used.'),
   field_types: [
     'boolean',
     'entity_reference',
@@ -66,6 +67,15 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
     if (!$this->required && !$this->multiple) {
       return $this->t('N/A');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary(): array {
+    $summary = [];
+    $summary[] = $this->t('This widget uses radio buttons if the "Allowed number of values" is set to 1. If the number of allowed values is more than 1 or unlimited, checkboxes will be used.');
+    return $summary;
   }
 
 }
