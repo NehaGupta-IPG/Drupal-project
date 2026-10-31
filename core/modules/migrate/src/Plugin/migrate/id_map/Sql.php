@@ -644,7 +644,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     }
 
     $query = $this->getDatabase()->select($this->mapTableName(), 'map')
-      ->fields('map', $this->destinationIdFields());
+      ->fields('map', $this->destinationIdFields())
+      ->condition('source_row_status', [MigrateIdMapInterface::STATUS_IMPORTED, MigrateIdMapInterface::STATUS_NEEDS_UPDATE], 'in');
     if (count($this->sourceIdFields()) === count($conditions)) {
       // Optimization: Use the primary key.
       $query->condition($this::SOURCE_IDS_HASH, $this->getSourceIdsHash(array_values($conditions)));
