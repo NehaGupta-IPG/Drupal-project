@@ -108,6 +108,14 @@ table {
       width: max-content;
     }
   }
+
+  /* Above this width, size the table to its content instead of always
+   * filling 100% of the container, so sparse/empty columns (e.g. an unused
+   * Description column) don't create excessive horizontal whitespace. */
+  @media (min-width: 61em) {
+    width: auto;
+    max-width: 100%;
+  }
 }
 
 table.sticky-header {
