@@ -1132,8 +1132,12 @@ interface FormStateInterface {
   /**
    * Adds a key to the array of form values that will be cleaned.
    *
-   * @param string $key
-   *   The form value key to be cleaned.
+   * @param string|array $key
+   *   The form value key to be cleaned. Values are stored as a multi-dimensional
+   *   associative array. The behavior differs based on the type of $key:
+   *   - If $key is a string, it will clean $values[$key].
+   *   - If $key is an array, each element of the array will be used as a nested key.
+   *     For example, if $key = ['foo', 'bar'], it will clean $values['foo']['bar'].
    *
    * @return $this
    */
