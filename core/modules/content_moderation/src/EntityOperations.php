@@ -2,7 +2,6 @@
 
 namespace Drupal\content_moderation;
 
-use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -166,7 +165,7 @@ class EntityOperations implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity_revision_id = $entity->getRevisionId();
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
-    $content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($entity);
+    $content_moderation_state = $this->moderationInfo->loadFromModeratedEntity($entity);
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage('content_moderation_state');
 
@@ -212,7 +211,7 @@ class EntityOperations implements ContainerInjectionInterface {
 
     $content_moderation_state->set('content_entity_revision_id', $entity_revision_id);
     $content_moderation_state->set('moderation_state', $moderation_state);
-    ContentModerationStateEntity::updateOrCreateFromEntity($content_moderation_state);
+    $content_moderation_state->realSave();
   }
 
   /**
@@ -222,7 +221,7 @@ class EntityOperations implements ContainerInjectionInterface {
    * @see hook_entity_delete()
    */
   public function entityDelete(EntityInterface $entity) {
-    $content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($entity);
+    $content_moderation_state = $this->moderationInfo->loadFromModeratedEntity($entity);
     if ($content_moderation_state) {
       $content_moderation_state->delete();
     }
@@ -235,7 +234,7 @@ class EntityOperations implements ContainerInjectionInterface {
    * @see hook_entity_revision_delete()
    */
   public function entityRevisionDelete(EntityInterface $entity) {
-    if ($content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($entity)) {
+    if ($content_moderation_state = $this->moderationInfo->loadFromModeratedEntity($entity)) {
       if ($content_moderation_state->isDefaultRevision()) {
         $content_moderation_state->delete();
       }
@@ -257,10 +256,10 @@ class EntityOperations implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $translation */
     if (!$translation->isDefaultTranslation()) {
       $langcode = $translation->language()->getId();
-      $content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($translation);
+      $content_moderation_state = $this->moderationInfo->loadFromModeratedEntity($translation);
       if ($content_moderation_state && $content_moderation_state->hasTranslation($langcode)) {
         $content_moderation_state->removeTranslation($langcode);
-        ContentModerationStateEntity::updateOrCreateFromEntity($content_moderation_state);
+        $content_moderation_state->realSave();
       }
     }
   }

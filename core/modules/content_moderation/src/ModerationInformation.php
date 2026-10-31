@@ -2,12 +2,14 @@
 
 namespace Drupal\content_moderation;
 
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -227,6 +229,39 @@ class ModerationInformation implements ModerationInformationInterface {
       }
     }
     return $state ?: $workflow_type->getInitialState($entity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadFromModeratedEntity(EntityInterface|RevisionableInterface $entity): ?ContentModerationStateInterface {
+    $content_moderation_state = NULL;
+
+    if ($this->isModeratedEntity($entity)) {
+      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+      $storage = $this->entityTypeManager->getStorage('content_moderation_state');
+
+      // New entities may not have a loaded revision ID at this point, but the
+      // creation of a content moderation state entity may have already been
+      // triggered elsewhere. In this case we have to match on the revision ID
+      // (instead of the loaded revision ID).
+      $revision_id = $entity->getLoadedRevisionId() ?: $entity->getRevisionId();
+      $ids = $storage->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('content_entity_type_id', $entity->getEntityTypeId())
+        ->condition('content_entity_id', $entity->id())
+        ->condition('workflow', $this->getWorkflowForEntity($entity)->id())
+        ->condition('content_entity_revision_id', $revision_id)
+        ->allRevisions()
+        ->execute();
+
+      if ($ids) {
+        /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */
+        $content_moderation_state = $storage->loadRevision(key($ids));
+      }
+    }
+
+    return $content_moderation_state;
   }
 
   /**

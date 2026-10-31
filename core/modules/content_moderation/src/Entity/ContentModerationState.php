@@ -112,8 +112,14 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    * @internal
    *   This method should only be called as a result of saving the related
    *   content entity.
+   *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3341126
    */
   public static function updateOrCreateFromEntity(ContentModerationState $content_moderation_state) {
+    @trigger_error("updateOrCreateFromEntity() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3341126", E_USER_DEPRECATED);
     $content_moderation_state->realSave();
   }
 
@@ -129,36 +135,15 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    * @internal
    *   This method should only be called by code directly handling the
    *   ContentModerationState entity objects.
+   *
+   * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3341126
    */
-  public static function loadFromModeratedEntity(EntityInterface $entity) {
-    $content_moderation_state = NULL;
-    $moderation_info = \Drupal::service('content_moderation.moderation_information');
-
-    if ($moderation_info->isModeratedEntity($entity)) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-      $storage = \Drupal::entityTypeManager()->getStorage('content_moderation_state');
-
-      // New entities may not have a loaded revision ID at this point, but the
-      // creation of a content moderation state entity may have already been
-      // triggered elsewhere. In this case we have to match on the revision ID
-      // (instead of the loaded revision ID).
-      $revision_id = $entity->getLoadedRevisionId() ?: $entity->getRevisionId();
-      $ids = $storage->getQuery()
-        ->accessCheck(FALSE)
-        ->condition('content_entity_type_id', $entity->getEntityTypeId())
-        ->condition('content_entity_id', $entity->id())
-        ->condition('workflow', $moderation_info->getWorkflowForEntity($entity)->id())
-        ->condition('content_entity_revision_id', $revision_id)
-        ->allRevisions()
-        ->execute();
-
-      if ($ids) {
-        /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */
-        $content_moderation_state = $storage->loadRevision(key($ids));
-      }
-    }
-
-    return $content_moderation_state;
+  public static function loadFromModeratedEntity(EntityInterface $entity): ?ContentModerationStateInterface {
+    @trigger_error("loadFromModeratedEntity() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3341126", E_USER_DEPRECATED);
+    return \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
   }
 
   /**
@@ -178,18 +163,9 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
   }
 
   /**
-   * Saves an entity permanently.
-   *
-   * When saving existing entities, the entity is assumed to be complete,
-   * partial updates of entities are not supported.
-   *
-   * @return int
-   *   Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   *   In case of failures an exception is thrown.
+   * {@inheritdoc}
    */
-  protected function realSave() {
+  public function realSave() {
     return parent::save();
   }
 

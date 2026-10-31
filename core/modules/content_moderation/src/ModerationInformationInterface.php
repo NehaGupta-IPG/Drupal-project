@@ -2,9 +2,11 @@
 
 namespace Drupal\content_moderation;
 
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 
 /**
  * Interface for moderation_information service.
@@ -179,5 +181,20 @@ interface ModerationInformationInterface {
    *   The original or default moderation state.
    */
   public function getOriginalState(ContentEntityInterface $entity);
+
+  /**
+   * Loads a content moderation state entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface|\Drupal\Core\Entity\RevisionableInterface $entity
+   *   A moderated entity object.
+   *
+   * @return \Drupal\content_moderation\Entity\ContentModerationStateInterface|null
+   *   The related content moderation state or NULL if none could be found.
+   *
+   * @internal
+   *   This method should only be called by code directly handling the
+   *   ContentModerationState entity objects.
+   */
+  public function loadFromModeratedEntity(EntityInterface|RevisionableInterface $entity): ?ContentModerationStateInterface;
 
 }

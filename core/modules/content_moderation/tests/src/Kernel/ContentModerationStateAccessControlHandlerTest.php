@@ -29,6 +29,13 @@ class ContentModerationStateAccessControlHandlerTest extends KernelTestBase {
   ];
 
   /**
+   * The moderation_information service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformationInterface
+   */
+  protected $moderationInformation;
+
+  /**
    * The content_moderation_state access control handler.
    *
    * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface
@@ -43,6 +50,7 @@ class ContentModerationStateAccessControlHandlerTest extends KernelTestBase {
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('user');
     $this->accessControlHandler = $this->container->get('entity_type.manager')->getAccessControlHandler('content_moderation_state');
+    $this->moderationInformation = $this->container->get('content_moderation.moderation_information');
   }
 
   /**

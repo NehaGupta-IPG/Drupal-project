@@ -14,5 +14,4 @@ use Drupal\user\EntityOwnerInterface;
  * @internal
  */
 interface ContentModerationStateInterface extends ContentEntityInterface, EntityOwnerInterface {
-
 }

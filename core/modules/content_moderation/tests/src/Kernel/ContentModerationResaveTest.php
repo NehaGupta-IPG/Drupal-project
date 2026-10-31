@@ -74,7 +74,7 @@ class ContentModerationResaveTest extends KernelTestBase {
     $entity = $this->entityStorage->create();
     $this->assertSame('draft', $entity->get('moderation_state')->value);
     $this->assertNull(\Drupal::state()->get('content_moderation_test_resave'));
-    $this->assertNull(ContentModerationState::loadFromModeratedEntity($entity));
+    $this->assertNull(\Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity));
     $content_moderation_state_query = $this->contentModerationStateStorage
       ->getQuery()
       ->accessCheck(FALSE)
@@ -94,7 +94,7 @@ class ContentModerationResaveTest extends KernelTestBase {
     $entity->save();
     $this->assertSame('draft', $entity->get('moderation_state')->value);
     $this->assertTrue(\Drupal::state()->get('content_moderation_test_resave'));
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity);
+    $content_moderation_state = \Drupal::service('content_moderation.moderation_information')->loadFromModeratedEntity($entity);
     $this->assertInstanceOf(ContentModerationState::class, $content_moderation_state);
     $this->assertSame(1, (int) $content_moderation_state_query->execute());
     $this->assertSame(1, (int) $content_moderation_state_revision_query->execute());
