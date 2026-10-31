@@ -137,7 +137,7 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
    *   The method name.
    */
   private function addDerivative(string $action_id, ConfigEntityTypeInterface $entity_type, array $derivative, string $methodName): void {
-    $id = $entity_type->getConfigPrefix() . PluginBase::DERIVATIVE_SEPARATOR . $action_id;
+    $id = $entity_type->getConfigPrefix() . PluginBase::getSeparator($derivative) . $action_id;
     if (isset($this->derivatives[$id])) {
       throw new EntityMethodException(sprintf('Duplicate action can not be created for ID \'%s\' for %s::%s(). The existing action is for the ::%s() method', $id, $entity_type->getClass(), $methodName, $this->derivatives[$id]['constructor_args']['method']));
     }

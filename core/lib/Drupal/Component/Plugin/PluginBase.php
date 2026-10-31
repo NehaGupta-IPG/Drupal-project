@@ -9,6 +9,8 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
 
   /**
    * A string which is used to separate base plugin IDs from the derivative ID.
+   *
+   * @final
    */
   const DERIVATIVE_SEPARATOR = ':';
 
@@ -73,10 +75,10 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   public function getBaseId() {
     $plugin_id = $this->getPluginId();
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [$plugin_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if ($parts = $this->splitPluginIdByConstant($plugin_id)) {
+      return $parts[0];
     }
-    return $plugin_id;
+    return explode(static::getSeparator($this->pluginDefinition), $plugin_id, 2)[0];
   }
 
   /**
@@ -84,11 +86,39 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   public function getDerivativeId() {
     $plugin_id = $this->getPluginId();
-    $derivative_id = NULL;
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [, $derivative_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if ($parts = $this->splitPluginIdByConstant($plugin_id)) {
+      return $parts[1];
     }
-    return $derivative_id;
+    return explode(static::getSeparator($this->pluginDefinition), $plugin_id, 2)[1];
+  }
+
+  /**
+   * Gets the separator to split plugin ids from.
+   *
+   * @param array $plugin_definition
+   *   The plugin definition to get the derivative_separator from.
+   *
+   * @return string
+   *   The separator string for plugin ids.
+   */
+  public static function getSeparator(array $plugin_definition): string {
+    return $plugin_definition['derivative_separator'] ?? self::DERIVATIVE_SEPARATOR;
+  }
+
+  /**
+   * Splits the plugin id by the separator constant.
+   *
+   * @param string $plugin_id
+   *   The plugin id to separate.
+   */
+  protected function splitPluginIdByConstant(string $plugin_id): array {
+    if (static::DERIVATIVE_SEPARATOR !== self::DERIVATIVE_SEPARATOR) {
+      @trigger_error('Overriding the DERIVATIVE_SEPARATOR constant is deprecated in drupal:12.0.1 and removed in drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3633174.', E_USER_DEPRECATED);
+      if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
+        return explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+      }
+    }
+    return [];
   }
 
   /**
