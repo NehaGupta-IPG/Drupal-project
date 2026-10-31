@@ -1,0 +1,161 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\views\Unit;
+
+use Drupal\Tests\UnitTestCase;
+use Drupal\views\ManyToOneHelper;
+use Drupal\views\Plugin\views\filter\ManyToOne;
+use Drupal\views\Plugin\views\join\JoinPluginBase;
+use Drupal\views\Plugin\views\query\Sql;
+use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
+/**
+ * Tests the many to one helper.
+ */
+#[CoversClass(ManyToOneHelper::class)]
+#[Group('views')]
+class ManyToOneHelperTest extends UnitTestCase {
+
+  /**
+   * Creates a mocked filter handler usable by the helper.
+   *
+   * @param mixed $join
+   *   The value that the handler's getJoin() should return. Use NULL to
+   *   simulate a handler whose table is not reached through a relationship and
+   *   therefore has no join definition.
+   *
+   * @return \Drupal\views\Plugin\views\filter\ManyToOne|\PHPUnit\Framework\MockObject\Stub
+   *   The handler test stub.
+   */
+  protected function createHandler($join) {
+    // A stub (not a mock): the helper only reads the handler's public
+    // properties and its getJoin() return value, so no call expectations apply.
+    $handler = $this->createStub(ManyToOne::class);
+    $handler->method('getJoin')->willReturn($join);
+
+    $handler->table = 'test_table';
+    $handler->field = 'status_id';
+    $handler->realField = 'status_id';
+    $handler->relationship = NULL;
+    $handler->operator = 'or';
+    $handler->options = [];
+    $handler->value = ['1' => '1', '2' => '2'];
+    $handler->definition = ['numeric' => TRUE];
+    $handler->tableAlias = NULL;
+
+    // A stub: only used to carry the many_to_one_tables property.
+    $handler->view = $this->createStub(ViewExecutable::class);
+    $handler->view->many_to_one_tables = [];
+
+    return $handler;
+  }
+
+  /**
+   * The lookup key the helper builds for a handler.
+   *
+   * @see \Drupal\views\ManyToOneHelper::ensureMyTable()
+   */
+  protected function fieldKey($handler): string {
+    return $handler->relationship . '_' . $handler->table . '.' . $handler->field;
+  }
+
+  /**
+   * Tests that an already-resolved table alias is returned untouched.
+   *
+   * @legacy-covers ::ensureMyTable
+   */
+  public function testEnsureMyTableReturnsExistingAlias(): void {
+    $handler = $this->createHandler(NULL);
+    $handler->tableAlias = 'existing_alias';
+    // The query should never be consulted when an alias already exists.
+    $handler->query = $this->createMock(Sql::class);
+    $handler->query->expects($this->never())->method('ensureTable');
+
+    $helper = new ManyToOneHelper($handler);
+    $this->assertSame('existing_alias', $helper->ensureMyTable());
+  }
+
+  /**
+   * Tests the first filter on a field: a simple INNER join is added.
+   *
+   * @legacy-covers ::ensureMyTable
+   */
+  public function testEnsureMyTableFirstFilterAddsInnerJoin(): void {
+    // A stub: only its public 'type' property is read and written.
+    $join = $this->createStub(JoinPluginBase::class);
+
+    $handler = $this->createHandler($join);
+    $handler->query = $this->createMock(Sql::class);
+    $handler->query->expects($this->once())
+      ->method('ensureTable')
+      ->with('test_table', NULL, $join)
+      ->willReturn('test_table');
+
+    $helper = new ManyToOneHelper($handler);
+    $this->assertSame('test_table', $helper->ensureMyTable());
+    // The join is converted to INNER and the used values are recorded.
+    $this->assertSame('INNER', $join->type);
+    $this->assertSame($handler->value, $handler->view->many_to_one_tables[$this->fieldKey($handler)]);
+  }
+
+  /**
+   * Tests a second filter on a field whose table has no join definition.
+   *
+   * This is the regression test for the bug where a view has two "is one of"
+   * filters on the same many-to-one field (for example a fixed filter plus an
+   * exposed group filter). The first filter populates
+   * $view->many_to_one_tables for the field, which pushes the second filter
+   * into the "else" branch of ensureMyTable(). When the field's table is not
+   * reached via a relationship, getJoin() returns NULL and the old code
+   * crashed while trying to operate on the missing join. The handler must now
+   * fall back to ensureTable() instead.
+   *
+   * @legacy-covers ::ensureMyTable
+   */
+  public function testEnsureMyTableSecondFilterWithoutJoin(): void {
+    $handler = $this->createHandler(NULL);
+    // Simulate the first filter having already registered the field.
+    $handler->view->many_to_one_tables[$this->fieldKey($handler)] = ['9' => '9'];
+
+    $handler->query = $this->createMock(Sql::class);
+    $handler->query->expects($this->once())
+      ->method('ensureTable')
+      ->with('test_table', NULL, NULL)
+      ->willReturn('test_table');
+
+    $helper = new ManyToOneHelper($handler);
+    // Must not throw and must resolve to the table alias.
+    $this->assertSame('test_table', $helper->ensureMyTable());
+    // The handler records its own values for the field key.
+    $this->assertSame($handler->value, $handler->view->many_to_one_tables[$this->fieldKey($handler)]);
+  }
+
+  /**
+   * Tests the "add_table" option with a table that has no join definition.
+   *
+   * The "add_table" option also routes ensureMyTable() into the "else" branch.
+   * Combined with a NULL join it must fall back to ensureTable() rather than
+   * fail.
+   *
+   * @legacy-covers ::ensureMyTable
+   */
+  public function testEnsureMyTableAddTableWithoutJoin(): void {
+    $handler = $this->createHandler(NULL);
+    $handler->options = ['add_table' => TRUE];
+
+    $handler->query = $this->createMock(Sql::class);
+    $handler->query->expects($this->once())
+      ->method('ensureTable')
+      ->with('test_table', NULL, NULL)
+      ->willReturn('test_table');
+
+    $helper = new ManyToOneHelper($handler);
+    $this->assertSame('test_table', $helper->ensureMyTable());
+    $this->assertSame($handler->value, $handler->view->many_to_one_tables[$this->fieldKey($handler)]);
+  }
+
+}

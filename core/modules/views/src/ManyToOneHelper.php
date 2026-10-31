@@ -195,21 +195,27 @@ class ManyToOneHelper {
         }
         else {
           $join = $this->getJoin();
-          $join->type = 'LEFT';
-          if (!empty($this->handler->view->many_to_one_tables[$field])) {
-            foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
-              $join->extra = [
-                [
-                  'field' => $this->handler->realField,
-                  'operator' => '!=',
-                  'value' => $value,
-                  'numeric' => !empty($this->handler->definition['numeric']),
-                ],
-              ];
-            }
-          }
+          if (isset($join)) {
+            $join->type = 'LEFT';
+            if (!empty($this->handler->view->many_to_one_tables[$field])) {
+              foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
+                $join->extra = [
+                  [
+                    'field' => $this->handler->realField,
+                    'operator' => '!=',
+                    'value' => $value,
+                    'numeric' => !empty($this->handler->definition['numeric']),
+                  ],
+                ];
 
-          $this->handler->tableAlias = $this->addTable($join);
+              }
+            }
+            $this->handler->tableAlias = $this->addTable($join);
+          }
+          else {
+            $this->handler->tableAlias = $this->handler->query->ensureTable($this->handler->table, $this->handler->relationship, $join);
+            $this->handler->view->many_to_one_tables[$field] = $this->handler->value;
+          }
         }
 
         return $this->handler->tableAlias;
