@@ -1117,6 +1117,11 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function setErrorByName($name, $message = '') {
+    if ($name === NULL || trim($name) === '') {
+      @trigger_error('Calling ' . __METHOD__ . '() with empty $name argument is deprecated in drupal:10.2.0 and will throw an error from drupal:11.0.0. Use ' . __CLASS__ . '::setErrorMessage() instead.', E_USER_DEPRECATED);
+      $this->setErrorMessage($message);
+      return $this;
+    }
     if ($this->isValidationComplete()) {
       throw new \LogicException('Form errors cannot be set after form validation has finished.');
     }
@@ -1148,6 +1153,22 @@ class FormState implements FormStateInterface {
       }
     }
 
+    return $this;
+  }
+
+
+  /**
+   * Sets the error message to the form without highlighting any fields.
+   *
+   * @param string $message
+   *   The error message to set.
+   *
+   * @return $this
+   *   The current form state object.
+   */
+  public function setErrorMessage(string $message) {
+    $this->errors = [$message];
+    static::setAnyErrors();
     return $this;
   }
 
