@@ -1,0 +1,6 @@
+name: Amazing Forms
+type: module
+description: 'Drupal 8 custom forms in modal with send email.'
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10
+configure: amazing_forms.form

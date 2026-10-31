@@ -1,0 +1,28 @@
+<?php
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * @file
+ * Contains amazing_forms.module.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function amazing_forms_help($route_name, RouteMatchInterface $arg) {
+  switch ($route_name) {
+    case 'help.page.amazing_forms':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module provide custom form in modal using Drupals FormBuilder and AJAX API.') . '</p>';
+
+            // Add a link to the Drupal.org project.
+      $output .= '<p>';
+      $output .= t('Visit the <a href=":project_link">LaTeX toolbar project pages</a> on Drupal.org for more information.',[
+        ':project_link' => 'https://www.drupal.org/project/amazing_forms'
+        ]);
+      $output .= '</p>';
+
+      return $output;
+  }
+}

@@ -1,0 +1,11 @@
+loggy:
+  js:
+    js/amazing.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal.ajax
+
+css:
+  theme:
+    css/amazing.css: {}
