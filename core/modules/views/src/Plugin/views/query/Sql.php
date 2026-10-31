@@ -19,6 +19,7 @@ use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Views query plugin for an SQL query.
@@ -1724,7 +1725,9 @@ class Sql extends QueryPluginBase {
     // Add cache tags for each row, if there is an entity associated with it.
     if (!$this->hasAggregate) {
       foreach ($this->getAllEntities() as $entity) {
-        $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
+        if ($entity instanceof EntityInterface) {
+          $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
+        }
       }
     }
 
@@ -1737,7 +1740,9 @@ class Sql extends QueryPluginBase {
   public function getCacheMaxAge() {
     $max_age = parent::getCacheMaxAge();
     foreach ($this->getAllEntities() as $entity) {
-      $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
+      if ($entity instanceof EntityInterface) {
+        $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
+      }
     }
 
     return $max_age;
