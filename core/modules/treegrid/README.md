@@ -27,17 +27,18 @@ other modules build on.
   weight, deriver)]`. `TreegridColumnManager::getSortedColumns()` discovers and
   sorts them by weight; `hook_treegrid_column_info_alter()` lets other modules
   alter the discovered definitions.
-- **JS cell-renderer registry.** A column's `getCellData()` returns an array
-  with a `type` key (plus type-specific keys); the type is drawn client-side by
-  a renderer registered with `Drupal.treegrid.registerCellRenderer(type, fn)`.
-  Shipped types: `checkbox` (a boolean control, optionally interactive) and
-  `markup` (an opaque, trusted, server-rendered HTML string injected verbatim
-  — never put user-supplied input in a `markup` cell).
+- **A rows response.** `TreegridRows::build()` wraps a level's rendered rows
+  with the headers the client reads, and treegrid loads them through core's
+  htmx pipeline, so a row's attached libraries, settings and behaviors work on
+  every page of rows.
+- **Cells as render arrays.** A column's `buildCell()` returns a render array.
+  treegrid ships the `treegrid_cell_checkbox` theme hook for a boolean control,
+  optionally interactive.
 
 ## DOM contract
 
 ```html
-<drupal-treegrid data-provider="…" data-children-url="…">
+<drupal-treegrid data-children-url="…">
   <table role="treegrid">
     <tbody>
       <tr role="row" data-id="…" data-parent-id="…" aria-level="1" data-has-children="true">…</tr>
@@ -52,35 +53,61 @@ and `data-parent-id`; a row's children are the sibling `<tr>` elements
 immediately following it whose `data-parent-id` matches its `data-id`. The
 disclosure toggle inside a row carries `data-treegrid-toggle`.
 
-`data-provider` names the renderer registered for this element (see below).
-`data-children-url` is the endpoint the element fetches one level of children
-from, on first expand of a row.
+`data-children-url` is the endpoint the element loads one level of rows from,
+on first expand of a row. `data-provider` is optional and treegrid doesn't read
+it: a consumer can set its own name there to select its behaviors.
 
 ## Plugging in a consumer
 
-**Register a row renderer.** Call
-`Drupal.treegrid.registerProvider(name, { buildRow })` before (or after,
-pending elements are adopted once their provider arrives) the element
-upgrades. `buildRow(item, depth)` returns the `<tr>` for one item of a fetched
-level; treegrid loops it over the level and sets `aria-posinset` and
-`aria-setsize` on every row it inserts. The provider has no lifecycle hooks:
-set up each tree from a behavior (see below). The provider is selected by the
-element's `data-provider` attribute.
+**The rows endpoint.** `data-children-url` must answer a GET (with `parent`
+set for a child level) with a rows response. Build it with
+`TreegridRows::build(array $rows, ?int $total = NULL, ?string $next_id =
+NULL)` from the controller, where `$rows` holds one render array per row,
+through the consumer's own row template. The build wraps the rows in
+`<table><tbody data-treegrid-rows>` (the HTML parser drops `<tr>` outside a
+table) and sets these headers:
 
-**The children endpoint.** `data-children-url` must return JSON shaped
-`{ parent, items: [...] }`, where each item at minimum carries enough for the
-generic engine to place it (an id, a parent id, whether it has children) plus
-whatever consumer-specific fields its row renderer and column plugins expect.
-The consumer defines and controls this shape; treegrid does not validate it.
+| Header | Set | Meaning |
+| --- | --- | --- |
+| `X-Treegrid-Rows` | always | The marker. A response without it is refused. |
+| `X-Treegrid-Total` | when `$total` is given | The number of rows in the level. Without it the response is the whole level. |
+| `X-Treegrid-Next-Id` | when `$next_id` is given | The id of the first row after this page, URL-encoded. Without it the response reaches the end of the level. |
+
+The route needs these options, and no `_title`:
+
+```yaml
+options:
+  _htmx_route: TRUE
+  no_cache: TRUE
+  _no_big_pipe: TRUE
+```
+
+`_htmx_route` makes core send the render array as a whole HTML document, with
+the assets its rows attach. `no_cache` keeps the page cache from storing the
+response. `_no_big_pipe` makes placeholders in a row (a lazy builder, say)
+resolve in the response instead of streaming after the content, where the
+client would drop them. The endpoint sets no status messages: a failed load is
+a status code. A request for rows takes any status messages queued in the
+session, as every htmx response does. The marker header must reach the
+browser: a proxy that strips unknown response headers makes every load fail.
+
+treegrid loads a level with one `htmx.ajax()` call into a hidden table it
+owns, refuses a response with a status of 400 or more or without the marker,
+and places the rows itself, setting each one's `aria-posinset`, `aria-setsize`,
+`aria-level`, indent and `tabindex`. The values the server renders for those
+on a loaded row aren't used. A behavior attaches to a loaded row while the row
+sits in that hidden table, so one that reads the row's position during attach
+sees the hidden table, not the tree.
 
 **Column plugins.** Implement `TreegridColumnInterface`
-(`getHeader()`, `getCellData(object $context)`, `handleUpdate(string $row_id,
+(`getHeader()`, `buildCell(object $context)`, `handleUpdate(string $row_id,
 mixed $value)`) or extend `TreegridColumnBase`, which supplies a read-only
-default `handleUpdate()`. `getCellData()` receives an opaque row context object
-whose concrete type is defined by the consumer; return `[]` to render no cell
-for a row (for example, a column that only applies to parent rows). A
-non-empty return must include a `type` key naming the cell widget so the
-matching JS renderer can draw it. `handleUpdate()` is called by the consumer's
+default `handleUpdate()`. `buildCell()` receives an opaque row context object
+whose concrete type is defined by the consumer, and returns the cell's render
+array; return `[]` for an empty cell (for example, a column that only applies
+to parent rows). The `treegrid_cell_checkbox` theme hook takes `#value`
+(bool), `#label` (plain text, the control's `aria-label`), `#interactive`
+(bool) and `#column_id`. `handleUpdate()` is called by the consumer's
 own update endpoint, which receives `{ column_id, row_id, value }` from
 treegrid's column-update client (see below). `$row_id` is the row's `data-id`.
 treegrid defines the contract but ships no route or controller for it.
@@ -93,8 +120,8 @@ Public members are kept stable. Members marked internal may change.
 
 | Attribute | Written by | Meaning |
 | --- | --- | --- |
-| `data-provider` | consumer | The provider name. Required. |
-| `data-children-url` | consumer | The children endpoint. Required. |
+| `data-provider` | consumer | Optional, and not read by treegrid: the consumer's own name for its behavior selectors. |
+| `data-children-url` | consumer | The rows endpoint. Required. |
 | `data-auto-expand-threshold` | consumer | A tree with at most this many top-level rows opens a bounded extra level on load. Default 2. |
 | `data-treegrid-csrf-token` | consumer | The CSRF header token, empty when none is needed. |
 | `data-treegrid-column-update-url` | consumer | The column-update endpoint. |
@@ -103,8 +130,10 @@ Public members are kept stable. Members marked internal may change.
 ### Element properties and methods
 
 - `element.tree`: the `<table role="treegrid">` (read-only).
-- `element.ready`: a promise that resolves once the element has its provider
-  and has initialized.
+- `element.ready`: a promise that resolves once the element has initialized.
+  An element initializes once the document has been parsed (one added later
+  initializes as it connects), so behaviors a consumer attaches on page load
+  run while `ready` is pending.
 - `element.addClickHandler(fn)` and `element.addKeyHandler(fn)`: handlers run
   in registration order before the built-in navigation, and return `true` to
   consume the event. Each returns a function that removes the handler. They
@@ -123,8 +152,7 @@ Public members are kept stable. Members marked internal may change.
 - `element.clearChildren(row)`: removes a row's descendant rows, detaching
   their behaviors, and forgets they were loaded. DOM only, never queued.
 
-`element.rowWindow` is internal. So are `Drupal.treegrid.providers`,
-`handleKeyDown`, `ExpandManager`, `RowWindow`, `Queue`,
+`element.rowWindow` is internal. So are `handleKeyDown`, `ExpandManager`, `RowWindow`, `Queue`,
 `attachColumnUpdates` and the `treeNav` helpers `firstVisibleRow`,
 `lastVisibleRow`, `nextVisibleRow`, `previousVisibleRow`,
 `setRowControlsActive` and `initRovingTabindex`.
@@ -223,8 +251,9 @@ and collapse; the announcement escapes it. Markers:
 element that indents (by `--treegrid-indent`, default `1.25rem` per level), and
 `data-treegrid-control` on controls that join the active row's tab order.
 `data-treegrid-keep-visible="true"` on a row stops any ancestor from
-collapsing. treegrid calls `Drupal.attachBehaviors()` on every row it inserts
-and `Drupal.detachBehaviors()` on every row it removes.
+collapsing. Behaviors attach to loaded rows through core's htmx integration,
+with the hidden table's `tbody` as the context, before treegrid places the
+rows. treegrid calls `Drupal.detachBehaviors()` on every row it removes.
 
 State attributes treegrid writes on rows: `data-treegrid-hidden`,
 `data-treegrid-loaded`, `data-treegrid-loading` and
@@ -252,10 +281,10 @@ announced. The endpoint answers `{ ok, code?, message? }`; `message` is safe
 HTML, escaped by the server, and the client announces it unchanged. Without the
 attribute a checkbox changes on screen only and nothing is sent. The checkbox
 markup is `<input type="checkbox" class="treegrid-cell-checkbox"
-aria-label="…" data-column-id="…" data-treegrid-control>`; a consumer that
-renders its first page in Twig must emit the same markup.
+aria-label="…" data-column-id="…" data-treegrid-control>`, which the
+`treegrid_cell_checkbox` theme hook renders.
 
 ## No UI of its own
 
 Tree grid ships no admin pages, forms, or routes. Enabling it does nothing
-visible until a consumer module registers a provider and requests the element.
+visible until a consumer module renders the element and serves its rows.

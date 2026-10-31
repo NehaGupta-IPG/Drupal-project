@@ -120,9 +120,9 @@ Options:
 - `moveUrl`: the move endpoint. Wins over the element's
   `data-treegrid-reorder-move-url` attribute.
 - `applyParentMetadata(parentId)`: called with the old and the new parent after
-  a move's refresh, so the consumer can update a parent's toggle and open
-  state. The element's `data-has-children` on the parent row is already
-  current.
+  a move's refresh, so the consumer can update a parent's open state and
+  anything else it derives from the parent's children. The element's
+  `data-has-children` on the parent row is already current.
 - `container`: a pointer press outside it cancels an active move. Defaults to
   the element. A page that searches for a destination outside the tree passes
   an element around both.

@@ -16,7 +16,7 @@ The classic UI stays available as the no-JS fallback while this module matures.
 - Full WAI-ARIA tree keyboard navigation (Up/Down/Left/Right/Home/End/Enter, roving `tabindex`).
 - Pointer drag-and-drop reorder and re-parent, plus two keyboard equivalents: Shift+Up / Shift+Down for a quick sibling reorder, and a grab/select move mode (Space to pick up, arrows to choose a before/after/child position, Enter to drop, Escape to cancel) that steps through the same drop-intent space as drag and commits through the same path.
 - A "Keyboard commands" dialog, linked at the top of the page so assistive-technology users meet it early.
-- htmx-driven search panel returning HTML partials, with jump-to-result.
+- htmx-driven search panel with jump-to-result.
 - Edits delegated to core's existing per-link form.
 - Save / Cancel working copy: reorders (drag and keyboard) are recorded in a
   per-user shared tempstore rather than written immediately, and the tree
@@ -33,14 +33,15 @@ extracted from it:
 
 - **Tree grid** (`treegrid`) — the reusable spine: the `<drupal-treegrid>`
   custom element, one-level-at-a-time lazy loading, row windowing, WAI-ARIA
-  keyboard navigation with a roving `tabindex`, and a column-plugin system with
-  a client-side cell-renderer registry.
+  keyboard navigation with a roving `tabindex`, a rows response loaded through
+  core's htmx pipeline, and a column-plugin system whose cells are render
+  arrays.
 - **Tree grid reorder** (`treegrid_reorder`) — the drag-and-drop and keyboard
   reordering layer: gesture handling, universal move validation (a node cannot
   be dropped onto itself or into one of its own descendants), and the per-user
   Save/Cancel working copy.
 
-Menu tree UI supplies the menu-specific pieces on top: the row renderer, the
+Menu tree UI supplies the menu-specific pieces on top: the row template, the
 `Enabled` / `Operations` column plugins, the move handler (which
 links may move, the 9-level depth cap, and the write through the menu link
 manager), and the routes below.
@@ -50,8 +51,8 @@ Routes, by intent:
 | Route | Returns | Used by |
 | --- | --- | --- |
 | `/admin/structure/menu/manage/{menu}/tree` | Full HTML page with top level rendered | Direct browser visit (the "Edit links" operation / "Links" tab on a menu) |
-| `/admin/structure/menu/manage/{menu}/tree/children?parent={id}` | JSON `{ parent, items[] }` | `<drupal-treegrid>` element on expand |
-| `/admin/structure/menu/manage/{menu}/tree/search?q=…` | HTML fragment | htmx swap from the search input |
+| `/admin/structure/menu/manage/{menu}/tree/children?parent={id}` | A rows response (`TreegridRows::build()`), with the paging headers | `<drupal-treegrid>` element on expand, and top-level paging |
+| `/admin/structure/menu/manage/{menu}/tree/search?q=…` | A whole htmx document; the search input keeps the results with `hx-select` | htmx swap from the search input |
 | `/admin/structure/menu/manage/{menu}/tree/move` | JSON `{ ok, … }` | Drag/keyboard reorder — records to the working copy (POST) |
 | `/admin/structure/menu/manage/{menu}/tree/column-update` | JSON `{ ok, … }` | Column switch toggle (POST) |
 | `/admin/structure/menu/manage/{menu}/tree/save` | JSON `{ ok, … }` | Commit the working copy's moves to storage (POST) |
@@ -81,8 +82,7 @@ and `Drupal.treegridReorder` namespaces:
 - `treegrid/js/` — `treegrid-element.js` (the custom element), `tree-nav.js`
   (row walking + roving-tabindex focus), `expand.js` (lazy load + collapse,
   `ExpandManager`), `windowing.js` (`IntersectionObserver` virtualization,
-  `RowWindow`), `keyboard.js` (WAI-ARIA navigation keys), `cells.js` (the
-  cell-renderer registry).
+  `RowWindow`), `keyboard.js` (WAI-ARIA navigation keys).
 - `treegrid_reorder/js/` — `attach.js` (the entry point), `controller.js` /
   `intent.js` / `indicator.js` / `commit.js` (pointer drag), `move-mode.js`
   (keyboard grab/select), `reorder-keys.js` (Shift+Arrow) and `request.js`
@@ -97,9 +97,8 @@ is generic), under the `Drupal.menuTreeUi` namespace:
   reorder on and wires search jump-to and the keyboard-help dialog through the
   element's events. The column controls are persisted by treegrid's
   column-update client.
-- `js/row-builder.js` — turns the children JSON into row DOM (`buildRow`) and
-  registers the menu row renderer as a `<drupal-treegrid>` provider.
-- `js/search.js` — the htmx search panel behavior.
+- `js/search.js` (the htmx search panel behavior, and the gate that refuses a
+  response that isn't search results).
 - `js/jump-to.js` — document-level jump-from-search-result.
 - `js/working-copy.js` — the Save / Cancel action bar, the unsaved notice (it
   follows the `dirty` flag the move, Save and Cancel responses carry) and the
@@ -111,10 +110,11 @@ The element upgrades the server-rendered top level (from
 
 - First paint is the real tree, not a loading spinner.
 - No-JS users see at least the top level.
-- Row markup for children built in JS mirrors
-  `templates/menu-tree-ui-row.html.twig`, and the cell widgets mirror the
-  renderers in `treegrid/js/cells.js`. They must be kept in sync — see the
-  `NB:` comment in `js/row-builder.js`.
+- Rows loaded later come from the same `templates/menu-tree-ui-row.html.twig`,
+  through the children route, so the first page and every loaded level render
+  the same markup.
+- Requests for rows and for search results take any status messages queued in
+  the session, as every htmx response does.
 
 ## Constraints inherited from core
 
@@ -154,13 +154,14 @@ drush mtu:purge main --prefix=""             # nuke ALL menu_link_content links 
 The seeder batches saves and resets entity storage statics every 500 writes to
 keep peak memory bounded.
 
-## Why the duplication between Twig and JS row rendering?
+## Why loaded rows are rendered by Twig
 
-`templates/menu-tree-ui-row.html.twig` renders the initial top level.
-`js/row-builder.js` renders children fetched at runtime. They produce identical DOM
-from different sources.
+`templates/menu-tree-ui-row.html.twig` renders every row: the first page of the
+top level and every level loaded after it. The children route returns rows
+rendered through that template, and core's htmx integration attaches the
+libraries, settings and behaviors a row brings (a dropbutton, say). The client
+sets only what depends on where a row ends up: its position in its level, its
+`aria-level` and indent, and its tab stop.
 
-The alternative — returning HTML partials from the children endpoint instead of
-JSON — was rejected because the client needs the structured data for drag-and-drop,
-optimistic updates, and ordering arithmetic. Building that on top of an
-HTML-partial endpoint is harder than living with a small render duplication.
+A row's toggle and spacer are both rendered, and `data-has-children` decides
+which one shows, so a row that gains or loses children changes no markup.
