@@ -180,8 +180,8 @@ class ResponsiveImageThemeHooks {
     // them to img tag so browser can do aspect ratio calculation and prevent
     // recalculation of layout on image load.
     $dimensions = $this->responsiveImageBuilder->getImageDimensions($responsive_image_style->getFallbackImageStyle(), [
-      'width' => $variables['width'],
-      'height' => $variables['height'],
+      'width' => $variables['width'] ?? NULL,
+      'height' => $variables['height'] ?? NULL,
     ],
       $variables['uri']
     );
