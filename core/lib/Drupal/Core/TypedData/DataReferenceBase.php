@@ -44,6 +44,7 @@ abstract class DataReferenceBase extends TypedData implements DataReferenceInter
    */
   public function setValue($value, $notify = TRUE) {
     $this->target = $this->getTypedDataManager()->create($this->definition->getTargetDefinition(), $value);
+    $this->target->setContext('value', $this->parent);
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
       $this->parent->onChange($this->name);
