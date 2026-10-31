@@ -166,7 +166,7 @@ function hook_modules_installed($modules, $is_syncing): void {
  *
  * Only procedural implementations are supported for this hook.
  *
- * For OOP replacments see Drupal\Core\Extension\Install\InstallInterface.
+ * For OOP replacements see Drupal\Core\Extension\Install\InstallInterface.
  * This hook will not run if an OOP implementation is present.
  *
  * If the module implements hook_schema(), the database tables will
@@ -266,7 +266,7 @@ function hook_modules_uninstalled($modules, $is_syncing): void {
  *
  * Only procedural implementations are supported for this hook.
  *
- * For OOP replacments see Drupal\Core\Extension\Install\UninstallInterface.
+ * For OOP replacements see Drupal\Core\Extension\Install\UninstallInterface.
  * This hook will not run if an OOP implementation is present.
  *
  * The information that the module should remove includes:
@@ -970,7 +970,7 @@ function hook_update_dependencies() {
  *
  * Only procedural implementations are supported for this hook.
  *
- * For OOP replacments see Drupal\Core\Extension\Install\LastRemovedInterface.
+ * For OOP replacements see Drupal\Core\Extension\Install\LastRemovedInterface.
  * This hook will not run if an OOP implementation is present.
  *
  * If you remove some update functions from your my_module.install file, you

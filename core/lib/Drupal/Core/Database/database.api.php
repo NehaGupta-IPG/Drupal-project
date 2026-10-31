@@ -592,7 +592,7 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  *
  * Only procedural implementations are supported for this hook.
  *
- * For OOP replacments see Drupal\Core\Extension\Install\SchemaInterface.
+ * For OOP replacements see Drupal\Core\Extension\Install\SchemaInterface.
  * This hook will not run if an OOP implementation is present.
  *
  * A Drupal schema definition is a structure of value objects representing one
