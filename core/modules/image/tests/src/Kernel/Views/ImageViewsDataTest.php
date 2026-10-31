@@ -62,6 +62,21 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
     $this->assertEquals('file_managed', $relationship['base']);
     $this->assertEquals('fid', $relationship['base field']);
     $this->assertEquals('file', $relationship['entity type']);
+
+    $properties = [
+      'width' => 'numeric',
+      'height' => 'numeric',
+      'alt' => 'standard',
+      'title' => 'standard',
+    ];
+    foreach ($properties as $property => $type) {
+      $field_data = $views_data['field_base_image_' . $property]['field'];
+      $this->assertEquals($type, $field_data['id']);
+      $this->assertEquals('field_base_image', $field_data['field_name']);
+      $this->assertEquals('entity_test', $field_data['entity_type']);
+      $this->assertEquals('field_base_image_' . $property, $field_data['real field']);
+    }
+
     // Check the backwards reference.
     $views_data = Views::viewsData()->get('file_managed');
     $relationship = $views_data['reverse_field_base_image_entity_test']['relationship'];
@@ -92,6 +107,21 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
     $this->assertEquals('file_managed', $relationship['base']);
     $this->assertEquals('fid', $relationship['base field']);
     $this->assertEquals('file', $relationship['entity type']);
+
+    $properties = [
+      'width' => 'numeric',
+      'height' => 'numeric',
+      'alt' => 'standard',
+      'title' => 'standard',
+    ];
+    foreach ($properties as $property => $type) {
+      $field_data = $views_data['field_base_image_' . $property]['field'];
+      $this->assertEquals($type, $field_data['id']);
+      $this->assertEquals('field_base_image', $field_data['field_name']);
+      $this->assertEquals('entity_test', $field_data['entity_type']);
+      $this->assertEquals('field_base_image_' . $property, $field_data['real field']);
+    }
+
     // Check the backwards reference.
     $views_data = Views::viewsData()->get('file_managed');
     $relationship = $views_data['reverse_field_data_image_entity_test_mul']['relationship'];
