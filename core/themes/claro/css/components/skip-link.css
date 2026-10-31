@@ -42,6 +42,10 @@
   &.visually-hidden.focusable:focus {
     position: absolute !important;
   }
+  @media (forced-colors: active) {
+    border: solid 1px transparent;
+    background: linktext;
+  }
 }
 
 [dir="rtl"] .skip-link {
