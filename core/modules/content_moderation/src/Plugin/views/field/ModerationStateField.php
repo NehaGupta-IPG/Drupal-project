@@ -29,6 +29,10 @@ class ModerationStateField extends EntityField {
     $storage_definition = $this->entityFieldManager->getActiveFieldStorageDefinitions('content_moderation_state')['moderation_state'];
     $column_name = $storage->getTableMapping()->getFieldColumnName($storage_definition, 'value');
     $this->aliases[$column_name] = $this->tableAlias . '.' . $column_name;
+    // If the query uses distinct we need to add the column too.
+    if (!empty($this->view->getQuery()->options['distinct'])) {
+      $this->query->addField($this->tableAlias, $column_name);
+    }
 
     $this->query->addOrderBy(NULL, NULL, $order, $this->aliases[$column_name]);
   }
