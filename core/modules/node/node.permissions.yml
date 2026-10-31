@@ -11,7 +11,7 @@ administer nodes:
   description: 'Promote, change ownership, edit revisions, and perform other tasks across all content types.'
   restrict access: true
 access content overview:
-  title: 'Access the Content overview page'
+  title: 'Access the content overview page'
 view own unpublished content:
   title: 'View own unpublished content'
 view all revisions:

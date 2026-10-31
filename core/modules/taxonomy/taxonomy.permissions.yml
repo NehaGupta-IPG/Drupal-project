@@ -3,7 +3,6 @@ administer taxonomy:
 
 access taxonomy overview:
   title: 'Access the taxonomy vocabulary overview page'
-  description: 'Get an overview of all taxonomy vocabularies.'
 
 revert all taxonomy revisions:
   title: 'Revert all term revisions'

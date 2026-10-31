@@ -2,8 +2,7 @@ permission_callbacks:
   - \Drupal\block_content\BlockContentPermissions::blockTypePermissions
 
 access block library:
-  title: 'Access the Content blocks overview page'
-  description: 'Get an overview of all content blocks.'
+  title: 'Access the content block overview page'
 
 administer block types:
   title: 'Administer block types'

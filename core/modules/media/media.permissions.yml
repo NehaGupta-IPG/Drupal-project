@@ -30,8 +30,7 @@ view all media revisions:
   description: 'To view a revision, you also need permission to view the media item.'
 
 access media overview:
-  title: 'Access media overview'
-  description: 'Users with this permission can access the media overview page.'
+  title: 'Access the media overview page'
 
 permission_callbacks:
   - \Drupal\media\MediaPermissions::mediaTypePermissions
