@@ -224,6 +224,10 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     if (isset($values) && !is_array($values)) {
       $values = [static::mainPropertyName() => $values];
     }
+    // Clear the title value if the visibility is disabled.
+    if ($this->getSetting('title') === LinkTitleVisibility::Disabled->value) {
+      $values['title'] = NULL;
+    }
     if (isset($values)) {
       $values += [
         'options' => [],

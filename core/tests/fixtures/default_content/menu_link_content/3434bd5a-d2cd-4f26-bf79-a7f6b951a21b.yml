@@ -19,7 +19,7 @@ default:
   link:
     -
       target_uuid: e1714f23-70c0-4493-8e92-af1901771921
-      title: ''
+      title: NULL
       options: {  }
   external:
     -
