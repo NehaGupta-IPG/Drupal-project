@@ -427,7 +427,10 @@ class UserController extends ControllerBase {
       '_user_is_logged_in' => 'TRUE',
       '_csrf_token' => 'TRUE',
     ],
-    options: ['_csrf_confirm_form_route' => 'user.logout.confirm'],
+    options: [
+      '_csrf_confirm_form_route' => 'user.logout.confirm',
+      '_maintenance_access' => TRUE,
+    ],
   )]
   public function logout() {
     if ($this->currentUser()->isAuthenticated()) {

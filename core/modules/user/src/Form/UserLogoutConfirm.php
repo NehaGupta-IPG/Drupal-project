@@ -24,6 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
   defaults: [
     '_title' => new TranslatableMarkup('Log out'),
   ],
+  options: ['_maintenance_access' => TRUE],
 )]
 class UserLogoutConfirm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 

@@ -24588,12 +24588,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Entity/User.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\user\\\\EventSubscriber\\\\MaintenanceModeSubscriber\\:\\:onMaintenanceModeRequest\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/EventSubscriber/MaintenanceModeSubscriber.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\EventSubscriber\\\\UserFloodSubscriber\\:\\:blockedIp\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
