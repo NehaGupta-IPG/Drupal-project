@@ -8,7 +8,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\menu_link_content\MenuLinkContentInterface;
@@ -26,7 +25,6 @@ use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -35,7 +33,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Five actions:
  *   - page():         full admin page, server-rendered top level + JS shell.
  *   - children():     rows for one level (called on expand and for paging).
- *   - search():       HTML partial swapped in by htmx.
+ *   - search():       search results, swapped in by htmx.
  *   - move():         drag-and-drop / keyboard reorder.
  *   - columnUpdate(): interactive column toggle (e.g. "enabled").
  *
@@ -46,7 +44,6 @@ final class MenuTreeController extends ControllerBase {
   public function __construct(
     private readonly MenuTreeLoader $loader,
     private readonly MenuTreeMover $mover,
-    private readonly RendererInterface $renderer,
     private readonly TreegridColumnManager $columnManager,
     private readonly TreegridWorkingCopy $workingCopy,
     private readonly MenuLinkManagerInterface $menuLinkManager,
@@ -60,7 +57,6 @@ final class MenuTreeController extends ControllerBase {
     return new static(
       $container->get('menu_tree_ui.loader'),
       $container->get('menu_tree_ui.mover'),
-      $container->get('renderer'),
       $container->get('plugin.manager.treegrid_column'),
       $container->get('menu_tree_ui.working_copy'),
       $container->get('plugin.manager.menu.link'),
@@ -186,26 +182,23 @@ final class MenuTreeController extends ControllerBase {
   }
 
   /**
-   * Returns search results as an HTML partial (htmx-swappable).
+   * Returns search results for htmx to swap in.
    *
-   * Note: any #attached assets in the render array are discarded here —
-   * keep the menu_tree_ui_search_results theme hook asset-free.
+   * The X-Menu-Tree-Ui-Search header marks the response as search results, so
+   * the client can refuse anything else (an error page, a login redirect).
    */
-  public function search(MenuInterface $menu, Request $request): Response {
+  public function search(MenuInterface $menu, Request $request): array {
     $query = (string) $request->query->get('q', '');
-    $results = $this->loader->search($menu->id(), $query);
 
-    $build = [
+    return [
       '#theme' => 'menu_tree_ui_search_results',
-      '#results' => $results,
+      '#results' => $this->loader->search($menu->id(), $query),
       '#query' => $query,
+      '#cache' => ['max-age' => 0],
+      '#attached' => [
+        'http_header' => [['X-Menu-Tree-Ui-Search', '1']],
+      ],
     ];
-    $html = (string) $this->renderer->renderRoot($build);
-
-    $response = new Response($html);
-    $response->headers->set('Content-Type', 'text/html; charset=utf-8');
-    $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
-    return $response;
   }
 
   /**

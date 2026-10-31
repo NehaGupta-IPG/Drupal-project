@@ -1,13 +1,16 @@
 {#
 /**
  * @file
- * Search results partial — swapped into the popover by htmx.
+ * Search results — swapped into the popover by htmx.
+ *
+ * The response is a whole page, and htmx keeps only what the input's hx-select
+ * picks: the children of the element marked data-mtu-search-results.
  *
  * Variables:
  * - results: list of { id, title, enabled, edit_url, breadcrumb: string[], breadcrumb_ids: string[] }
  * - query:   the search string
  *
- * UX contract: an empty query renders nothing. The popover (which targets
+ * UX contract: an empty query renders an empty wrapper. The popover (which targets
  * #menu-tree-ui-search-results) hides itself via `:not(:has(*))` when there
  * are no element children, so the input is "closed" until the user types.
  *
@@ -18,6 +21,7 @@
  * [data-mtu-jump-id] so it works even though search results are htmx-injected.
  */
 #}
+<div data-mtu-search-results>
 {% if query is not empty %}
   {% if results is empty %}
     <p class="menu-tree-ui-search-results__empty">
@@ -54,3 +58,4 @@
     </ul>
   {% endif %}
 {% endif %}
+</div>

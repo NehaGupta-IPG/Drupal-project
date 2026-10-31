@@ -1,17 +1,23 @@
 /**
  * @file
- * Dismissal behavior for the htmx-driven search results popover.
+ * Gate and dismissal behavior for the htmx-driven search results popover.
  *
  * htmx swaps results into #menu-tree-ui-search-results on keyup; the popover
- * self-hides when empty (CSS `:not(:has(*))`). This module empties it - without
- * touching the typed query - so the popover goes away when the user is done
- * with it: after selecting a result, on Escape, or on a click outside the
- * search box. The query text stays so the search can be resumed or refined.
+ * self-hides when empty (CSS `:not(:has(*))`).
+ *
+ * A page-load behavior refuses any response that isn't search results (an error
+ * status, or no X-Menu-Tree-Ui-Search header), so htmx loads none of its assets,
+ * and empties the popover so earlier results don't stay up.
+ *
+ * attachSearchPanel() empties the popover - without touching the typed query -
+ * so it goes away when the user is done with it: after selecting a result, on
+ * Escape, or on a click outside the search box. The query text stays so the
+ * search can be resumed or refined.
  *
  * Exposes Drupal.menuTreeUi.attachSearchPanel.
  */
 
-((Drupal) => {
+((Drupal, once) => {
   Drupal.menuTreeUi = Drupal.menuTreeUi || {};
 
   /**
@@ -75,4 +81,35 @@
   }
 
   Drupal.menuTreeUi.attachSearchPanel = attachSearchPanel;
-})(Drupal);
+
+  // The gate lives as long as the page. It has no detach: each search swaps
+  // into the popover, which makes core trigger the unload of the search
+  // container that holds the input, and a detach would drop the gate then.
+  Drupal.behaviors.menuTreeUiSearchGate = {
+    attach(context) {
+      once(
+        'menu-tree-ui-search-gate',
+        '.menu-tree-ui__search-input',
+        context,
+      ).forEach((input) => {
+        document.addEventListener('htmx:before:response', (event) => {
+          const ctx = event.detail.ctx;
+          if (ctx?.sourceElement !== input) {
+            return;
+          }
+          const { response } = ctx;
+          if (
+            response.status >= 400 ||
+            !response.headers.has('X-Menu-Tree-Ui-Search')
+          ) {
+            event.preventDefault();
+            input
+              .closest('.menu-tree-ui__search-container')
+              ?.querySelector('.menu-tree-ui__search-results')
+              ?.replaceChildren();
+          }
+        });
+      });
+    },
+  };
+})(Drupal, once);

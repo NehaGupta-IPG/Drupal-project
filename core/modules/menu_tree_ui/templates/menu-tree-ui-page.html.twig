@@ -11,7 +11,7 @@
  * - top_level:        rendered row render-arrays for the root level
  * - columns:          array of column header info keyed by plugin ID,
  *                     each entry: { id, label }
- * - search_action:    URL for the search partial endpoint
+ * - search_action:    URL for the search results endpoint
  * - children_action:  URL for the children rows endpoint
  * - csrf_token:       placeholder for the CSRF header token, replaced when the
  *                     page is rendered
@@ -110,7 +110,8 @@
       hx-get="{{ search_action }}"
       hx-trigger="keyup changed delay:250ms, search"
       hx-target="#menu-tree-ui-search-results"
-      hx-swap="innerHTML"
+      hx-select="[data-mtu-search-results] > *"
+      hx-swap="innerHTML ignoreTitle:true"
     >
     <div
       id="menu-tree-ui-search-results"

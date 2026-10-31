@@ -35,6 +35,9 @@ menu_tree_ui.search:
     _entity_access: 'menu.update'
   options:
     _admin_route: true
+    _htmx_route: TRUE
+    no_cache: TRUE
+    _no_big_pipe: TRUE
     parameters:
       menu:
         type: entity:menu

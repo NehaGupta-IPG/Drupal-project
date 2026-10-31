@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
 
+use Drupal\menu_tree_ui_test\Hook\MenuTreeUiTestHooks;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -11,12 +12,21 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the htmx-driven search popover on the menu tree page.
  *
  * Typing into the search field issues an htmx GET to the search route and
- * swaps the returned HTML partial into the results popover. Picking a result
+ * swaps the returned results into the results popover. Picking a result
  * expands its ancestors and focuses the matching row in the tree.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'menu_link_content',
+    'menu_tree_ui',
+    'menu_tree_ui_test',
+  ];
 
   /**
    * Seeds Apple, Banana and Cherry at top level, with Apricot under Banana.
@@ -141,6 +151,84 @@ final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
     $this->getSession()->getPage()->find('css', '.menu-tree-ui-search-results__title')->click();
 
     $this->assertResultsDismissedWithQuery('Apricot');
+  }
+
+  /**
+   * Clearing the input after results showed leaves the container empty.
+   */
+  public function testClearingTheInputEmptiesResults(): void {
+    $this->searchFor('Ap');
+
+    $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-input')->setValue('');
+
+    $this->assertResultsDismissedWithQuery('');
+  }
+
+  /**
+   * A refused response empties the results and loads none of its assets.
+   */
+  public function testRefusedResponseEmptiesResultsAndLoadsNoAssets(): void {
+    $this->searchFor('Ap');
+    \Drupal::state()->set(MenuTreeUiTestHooks::FORBID_UPDATE_KEY, TRUE);
+
+    $this->searchAgainAndWait('Ban');
+
+    $this->assertNoForeignLibraryAndEmptyResults();
+  }
+
+  /**
+   * The gate does not depend on the tree being on the page.
+   */
+  public function testGateWorksWithoutTheTree(): void {
+    $this->searchFor('Ap');
+    $this->getSession()->executeScript("document.querySelector('drupal-treegrid').remove();");
+    \Drupal::state()->set(MenuTreeUiTestHooks::FORBID_UPDATE_KEY, TRUE);
+
+    $this->searchAgainAndWait('Ban');
+
+    $this->assertNoForeignLibraryAndEmptyResults();
+  }
+
+  /**
+   * The gate still works after a search whose swap unloaded the container.
+   */
+  public function testGateSurvivesASearch(): void {
+    $this->searchFor('Ap');
+    $this->searchAgainAndWait('Ban');
+    \Drupal::state()->set(MenuTreeUiTestHooks::FORBID_UPDATE_KEY, TRUE);
+
+    $this->searchAgainAndWait('Che');
+
+    $this->assertNoForeignLibraryAndEmptyResults();
+  }
+
+  /**
+   * Types another query and waits for its request to finish.
+   *
+   * @param string $query
+   *   The query to type.
+   */
+  private function searchAgainAndWait(string $query): void {
+    $this->getSession()->executeScript(<<<'JS'
+      window.searchRequestDone = false;
+      document.addEventListener('htmx:finally:request', () => {
+        window.searchRequestDone = true;
+      }, { once: true });
+    JS);
+    $this->getSession()->getPage()->find('css', '#menu-tree-ui-search-input')->setValue($query);
+    $this->assertJsCondition('window.searchRequestDone === true');
+    // Assets of a swapped response load after its swap; give them the time.
+    usleep(700000);
+  }
+
+  /**
+   * Asserts the results container is empty and the foreign library never ran.
+   */
+  private function assertNoForeignLibraryAndEmptyResults(): void {
+    $this->assertSame(0, $this->getSession()->evaluateScript(
+      "return document.getElementById('menu-tree-ui-search-results').children.length;",
+    ));
+    $this->assertNull($this->getSession()->evaluateScript('return window.menuTreeUiTestForeignLibrary ?? null;'));
   }
 
   /**

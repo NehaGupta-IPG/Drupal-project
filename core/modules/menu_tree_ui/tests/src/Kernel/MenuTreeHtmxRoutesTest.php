@@ -54,6 +54,29 @@ final class MenuTreeHtmxRoutesTest extends KernelTestBase {
   }
 
   /**
+   * The search route is an htmx route that is neither cached nor streamed.
+   */
+  public function testSearchRouteOptions(): void {
+    $route = $this->container->get('router.route_provider')->getRouteByName('menu_tree_ui.search');
+
+    $this->assertTrue($route->getOption('_htmx_route'));
+    $this->assertTrue($route->getOption('no_cache'));
+    $this->assertTrue($route->getOption('_no_big_pipe'));
+  }
+
+  /**
+   * Search returns a render array that is uncached and carries its marker.
+   */
+  public function testSearchBuild(): void {
+    $menu = $this->container->get('entity_type.manager')->getStorage('menu')->load('main');
+    $build = MenuTreeController::create($this->container)->search($menu, Request::create('/search', 'GET', ['q' => 'x']));
+
+    $this->assertSame('menu_tree_ui_search_results', $build['#theme']);
+    $this->assertSame(0, $build['#cache']['max-age']);
+    $this->assertContains(['X-Menu-Tree-Ui-Search', '1'], $build['#attached']['http_header']);
+  }
+
+  /**
    * A child level's build has one row per child and the paging headers.
    */
   public function testChildLevelBuild(): void {
