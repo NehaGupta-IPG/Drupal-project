@@ -16,19 +16,17 @@ interface InstallInterface {
   /**
    * Perform setup tasks when the module is installed.
    *
-   * Only procedural implementations are supported for this hook.
-   *
-   * If the module implements hook_schema(), the database tables will
-   * be created before this hook is fired.
+   * If the module implements hook_schema() or SchemaInterface, the database
+   * tables will be created before this hook is fired.
    *
    * If the module provides a MODULE.routing.yml or alters routing information
    * these changes will not be available when this hook is fired. If up-to-date
    * router information is required, for example to use \Drupal\Core\Url, then
    * (preferably) use hook_modules_installed() or rebuild the router in the
-   * hook_install() implementation.
+   * class implementing this interface.
    *
-   * Implementations of this hook are by convention declared in the module's
-   * .install file. The implementation can rely on the .module file being
+   * Implementations of this hook must be declared in the Install\Installer
+   * namespace. The implementation can rely on the .module file being
    * loaded. The hook will only be called when a module is installed. The
    * module's schema version will be set to the module's greatest numbered
    * update hook. Because of this, any time a hook_update_N() is added to the
@@ -45,7 +43,7 @@ interface InstallInterface {
    * etc.
    *
    * Ensure that anything added or modified in this function that can be
-   * removed during uninstall should be removed with hook_uninstall().
+   * removed during uninstall should be removed with UninstallInterface.
    *
    * @param bool $isSyncing
    *   TRUE if the module is being installed as part of a configuration import.

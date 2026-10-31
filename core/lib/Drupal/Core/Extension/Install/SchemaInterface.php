@@ -15,19 +15,17 @@ interface SchemaInterface {
   /**
    * Define the current version of the database schema.
    *
-   * Only procedural implementations are supported for this hook.
-   *
    * A Drupal schema definition is a structure of value objects representing one
    * or more tables and their related keys and indexes. A schema is defined by
-   * hook_schema() which must live in your module's .install file.
+   * classes implementing this interface.
    *
    * The tables declared by this hook will be automatically created when the
    * module is installed, and removed when the module is uninstalled. This
-   * happens before hook_install() is invoked, and after hook_uninstall() is
+   * happens before InstallInterace is invoked, and after UninstallInterface is
    * invoked, respectively.
    *
    * By declaring the tables used by your module via an implementation of
-   * hook_schema(), these tables will be available on all supported database
+   * this interface, these tables will be available on all supported database
    * engines. You don't have to deal with the different SQL dialects for table
    * creation and alteration of the supported database engines.
    *

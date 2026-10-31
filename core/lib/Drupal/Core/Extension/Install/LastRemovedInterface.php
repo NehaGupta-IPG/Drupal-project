@@ -13,12 +13,11 @@ interface LastRemovedInterface {
   /**
    * Return a number which is no longer available as hook_update_N().
    *
-   * If you remove some update functions from your my_module.install file, you
-   * should notify Drupal of those missing functions. This way, Drupal can
-   * ensure that no update is accidentally skipped.
+   * If you remove some update functions you should notify Drupal of those
+   * missing functions. This way, Drupal can ensure that no update is
+   * accidentally skipped.
    *
-   * Implementations of this hook should be placed in a my_module.install file
-   * in the same directory as my_module.module.
+   * Implementations of this hook must be in the Install\LastRemoved namespace.
    *
    * @return int
    *   An integer, corresponding to hook_update_N() which has been removed from

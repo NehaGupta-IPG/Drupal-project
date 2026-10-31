@@ -15,21 +15,19 @@ interface UninstallInterface {
   /**
    * Remove any information that the module sets.
    *
-   * Only procedural implementations are supported for this hook.
-   *
    * The information that the module should remove includes:
    * - state that the module has set using \Drupal::state()
    * - modifications to existing tables
    *
    * The module should not remove its entry from the module configuration.
-   * Database tables defined by hook_schema() will be removed automatically.
+   * Database tables defined by SchemaInterface will be removed automatically.
    *
-   * The uninstall hook must be implemented in the module's .install file. It
-   * will fire when the module gets uninstalled but before the module's database
-   * tables are removed, allowing your module to query its own tables during
-   * this routine.
+   * Implementations of this hook must be declared in the Install\Uninstaller
+   * namespace. It will fire when the module gets uninstalled but before the
+   * module's database tables are removed, allowing your module to query its
+   * own tables during this routine.
    *
-   * Adding custom logic to hook_uninstall implementations to check for
+   * Adding custom logic to implementations to check for
    * criteria before uninstalling, does not take advantage of the module
    * uninstall page UI. Instead, use
    * \Drupal\Core\Extension\ModuleUninstallValidatorInterface.
