@@ -211,27 +211,35 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
     }
 
     $this->validateDefinition($definition);
+  }
 
-    // Do not include disabled definition with `enabled: false`.
-    if (!($definition['enabled'] ?? TRUE)) {
-      return;
+  /**
+   * {@inheritdoc}
+   */
+  protected function findDefinitions() {
+    $definitions = parent::findDefinitions();
+    foreach ($definitions as &$definition) {
+      // Do not include disabled definition with `enabled: false`.
+      if (!($definition['enabled'] ?? TRUE)) {
+        continue;
+      }
+
+      if (!isset($definition['provider'])) {
+        continue;
+      }
+
+      // Provide path information for extractors.
+      $relative_path = $this->moduleHandler->moduleExists($definition['provider'])
+        ? $this->moduleHandler->getModule($definition['provider'])->getPath()
+        : $this->themeHandler->getTheme($definition['provider'])->getPath();
+
+      $definition['relative_path'] = $relative_path;
+      // To avoid the need for appRoot in extractors.
+      $definition['absolute_path'] = sprintf('%s/%s', $this->appRoot, $relative_path);
+      // Load all discovered icon ids in the definition so they are cached.
+      $definition['icons'] = $this->getIconsFromDefinition($definition);
     }
-
-    if (!isset($definition['provider'])) {
-      return;
-    }
-
-    // Provide path information for extractors.
-    $relative_path = $this->moduleHandler->moduleExists($definition['provider'])
-      ? $this->moduleHandler->getModule($definition['provider'])->getPath()
-      : $this->themeHandler->getTheme($definition['provider'])->getPath();
-
-    $definition['relative_path'] = $relative_path;
-    // To avoid the need for appRoot in extractors.
-    $definition['absolute_path'] = sprintf('%s/%s', $this->appRoot, $relative_path);
-
-    // Load all discovered icon ids in the definition so they are cached.
-    $definition['icons'] = $this->getIconsFromDefinition($definition);
+    return $definitions;
   }
 
   /**
