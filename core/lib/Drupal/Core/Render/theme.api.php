@@ -1165,6 +1165,16 @@ function hook_page_bottom(array &$page_bottom): void {
 }
 
 /**
+ * Alter the full render array of a page before it gets turned into a response.
+ *
+ * @param array $build
+ *   A renderable array representing the page.
+ */
+function hook_html_rendered_alter(array &$build) {
+  // @todo Add example code.
+}
+
+/**
  * Register a module or theme's theme implementations.
  *
  * The implementations declared by this hook specify how a particular render

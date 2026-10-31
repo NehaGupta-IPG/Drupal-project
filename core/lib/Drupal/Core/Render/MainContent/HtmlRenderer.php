@@ -165,6 +165,8 @@ class HtmlRenderer implements MainContentRendererInterface {
     // stored in the render context, no need to check it conditionally.
     $bubbleable_metadata = $render_context->pop();
     $bubbleable_metadata->applyTo($html);
+    // Allow last-minute alteration of the render array before it gets cached.
+    $this->moduleHandler->alter('html_rendered', $html);
     $content = $this->renderCache->getCacheableRenderArray($html);
 
     // Also associate the required cache contexts.
