@@ -128,6 +128,7 @@ class OEmbedFormatter extends FormatterBase {
     return [
       'max_width' => 0,
       'max_height' => 0,
+      'maintain_aspect_ratio' => FALSE,
       'loading' => [
         'attribute' => 'lazy',
       ],
@@ -182,6 +183,17 @@ class OEmbedFormatter extends FormatterBase {
         ];
       }
       else {
+        // Some providers such as Youtube don't return the resource in the width
+        // or height that is requested in the resource URL. So we need to
+        // calculate the aspect ratio if:
+        // - the formatter is configured to do so (and no max height)
+        // - the resource width is not the same as the max width that was
+        // requested.
+        if ($this->getSetting('maintain_aspect_ratio') && !$max_height && $resource->getWidth() !== $max_width) {
+          $ratio = $resource->getWidth() / $resource->getHeight();
+          $max_height = round($max_width / $ratio);
+        }
+
         $url = Url::fromRoute('media.oembed_iframe', [], [
           'absolute' => TRUE,
           'query' => [
@@ -247,7 +259,14 @@ class OEmbedFormatter extends FormatterBase {
         '#maxlength' => 5,
         '#field_suffix' => $this->t('pixels'),
         '#min' => 0,
+        '#required' => TRUE,
       ],
+      'maintain_aspect_ratio' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Maintain aspect ratio'),
+        '#default_value' => $this->getSetting('maintain_aspect_ratio'),
+        '#description' => $this->t('With some providers we may need to calculate the embedded height depending on the aspect ratio of the original resource.'),
+       ],
       'max_height' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum height'),
@@ -256,6 +275,14 @@ class OEmbedFormatter extends FormatterBase {
         '#maxlength' => 5,
         '#field_suffix' => $this->t('pixels'),
         '#min' => 0,
+        '#states' => [
+          'visible' => [
+            'input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][maintain_aspect_ratio]"]' => ['checked' => FALSE],
+          ],
+          'required' => [
+            'input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][maintain_aspect_ratio]"]' => ['checked' => FALSE],
+          ],
+        ],
       ],
       'loading' => [
         '#type' => 'details',
@@ -275,6 +302,7 @@ class OEmbedFormatter extends FormatterBase {
         ],
       ],
     ];
+    $form['#element_validate'][] = [static::class, 'validateForm'];
     $form['loading']['attribute']['lazy']['#description'] = $this->t('Delays loading the resource until that section of the page is visible in the browser. When in doubt, lazy loading is recommended.');
     $form['loading']['attribute']['eager']['#description'] = $this->t('Force browsers to download a resource as soon as possible. This is the browser default for legacy reasons. Only use this option when the resource is always expected to render.');
 
@@ -292,14 +320,9 @@ class OEmbedFormatter extends FormatterBase {
         '%max_height' => $this->getSetting('max_height'),
       ]);
     }
-    elseif ($this->getSetting('max_width')) {
-      $summary[] = $this->t('Maximum width: %max_width pixels', [
+    elseif ($this->getSetting('maintain_aspect_ratio')) {
+      $summary[] = $this->t('Maximum width: %max_width pixels and a calculated height', [
         '%max_width' => $this->getSetting('max_width'),
-      ]);
-    }
-    elseif ($this->getSetting('max_height')) {
-      $summary[] = $this->t('Maximum height: %max_height pixels', [
-        '%max_height' => $this->getSetting('max_height'),
       ]);
     }
     $summary[] = $this->t('Loading attribute: @attribute', [
@@ -307,6 +330,23 @@ class OEmbedFormatter extends FormatterBase {
     ]);
 
     return $summary;
+  }
+
+  /**
+   * Validate settings form.
+   *
+   * @param array $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public static function validateForm(array &$form, FormStateInterface $form_state): void {
+    $parents = $form['#parents'];
+    $settings = $form_state->getValue($parents);
+
+    if (empty($settings['maintain_aspect_ratio']) && empty($settings['max_height'])) {
+      $form_state->setError($form['max_height'], t('@name field is required.', ['@name' => $form['max_height']['#title']]));
+    }
   }
 
   /**

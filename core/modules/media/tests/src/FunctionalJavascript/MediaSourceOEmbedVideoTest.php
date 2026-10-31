@@ -57,6 +57,83 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
   }
 
   /**
+   * Tests the oembed media source with the aspect ratio option.
+   */
+  public function testMediaOEmbedAspectRatio() {
+    $media_type_id = 'test_media_oembed_type';
+    $provided_fields = [
+      'type',
+      'title',
+      'default_name',
+      'author_name',
+      'author_url',
+      'provider_name',
+      'provider_url',
+      'cache_age',
+      'thumbnail_uri',
+      'thumbnail_width',
+      'thumbnail_height',
+      'url',
+      'width',
+      'height',
+      'html',
+    ];
+
+    $session = $this->getSession();
+    $page = $session->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->doTestCreateMediaType($media_type_id, 'oembed:video', $provided_fields);
+
+    $this->drupalGet("admin/structure/media/manage/$media_type_id");
+    // Only accept Youtube videos.
+    $page->checkField("source_configuration[providers][YouTube]");
+    $assert_session->buttonExists('Save')->press();
+
+    // Configure the iframe without the option to maintain the aspect ratio.
+    $display = \Drupal::service('entity_display.repository')->getViewDisplay('media', $media_type_id);
+    $this->assertFalse($display->isNew());
+    $component = $display->getComponent('field_media_oembed_video');
+    $this->assertIsArray($component);
+    $component['settings']['max_width'] = 800;
+    $component['settings']['max_height'] = 0;
+    $display->setComponent('field_media_oembed_video', $component);
+    $this->assertSame(SAVED_UPDATED, $display->save());
+
+    $this->hijackProviderEndpoints();
+    $video_url = 'https://www.youtube.com/watch?v=PWjcqE3QKBg';
+    ResourceController::setResourceUrl($video_url, $this->getFixturesDirectory() . '/video_youtube.json');
+
+    // Create a media item.
+    $this->drupalGet("media/add/$media_type_id");
+    $assert_session->fieldExists('Remote video URL')->setValue($video_url);
+    $assert_session->buttonExists('Save')->press();
+    $assert_session->addressEquals('admin/content/media');
+    $this->drupalGet($this->assertLinkToCreatedMedia());
+
+    // Youtube resources come back with dimensions other than the ones requested
+    // in the URL. So without maintaining the aspect ratio, the width/height
+    // should be disproportional.
+    $iframe = $assert_session->elementExists('css', 'iframe.media-oembed-content');
+    $this->assertSame('800', $iframe->getAttribute('width'));
+    $this->assertSame('270', $iframe->getAttribute('height'));
+
+    // Configure the formatter to maintain aspect ratio.
+    $display = \Drupal::service('entity_display.repository')->getViewDisplay('media', $media_type_id);
+    $component = $display->getComponent('field_media_oembed_video');
+    $component['settings']['maintain_aspect_ratio'] = TRUE;
+    $display->setComponent('field_media_oembed_video', $component);
+    $this->assertSame(SAVED_UPDATED, $display->save());
+
+    // The height needs to correspond to aspect ratio of the resource video.
+    $media = Media::load(1);
+    $this->drupalGet($media->toUrl()->toString());
+    $iframe = $assert_session->elementExists('css', 'iframe.media-oembed-content');
+    $this->assertSame('800', $iframe->getAttribute('width'));
+    $this->assertSame('450', $iframe->getAttribute('height'));
+  }
+
+  /**
    * Tests the oembed media source.
    */
   public function testMediaOEmbedVideoSource(): void {

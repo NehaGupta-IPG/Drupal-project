@@ -69,6 +69,9 @@ field.formatter.settings.oembed:
     max_height:
       type: integer
       label: 'Maximum height'
+    maintain_aspect_ratio:
+      type: boolean
+      label: 'Whether to maintain the aspect ratio'
     loading:
       type: mapping
       label: 'oEmbed loading settings'
