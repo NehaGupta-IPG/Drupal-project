@@ -439,7 +439,13 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     ];
     foreach ($violations->getByFields($field_names) as $violation) {
       [$field_name] = explode('.', $violation->getPropertyPath(), 2);
-      $form_state->setErrorByName($field_name, $violation->getMessage());
+      if ($field_name === 'pass') {
+        $form_state->setError($form['account']['current_pass'], $violation->getMessage());
+      }
+      else {
+        $form_state->setErrorByName($field_name, $violation->getMessage());
+      }
+
     }
     parent::flagViolations($violations, $form, $form_state);
   }

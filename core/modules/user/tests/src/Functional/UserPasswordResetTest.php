@@ -678,4 +678,19 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->assertEquals('username', $field->getAttribute('autocomplete'));
   }
 
+  /**
+   * Test the focus points to correct password element.
+   */
+  public function testFocusIsSetToCorrectPasswordElement() {
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('user/1/edit');
+    $this->assertSession()->pageTextContains('Current password');
+    // Passing the empty string to current password field.
+    $edit = ['edit-current-pass' => ' ', 'pass[pass1]' => 'test', 'pass[pass2]' => 'test'];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains("Your current password is missing or incorrect; it's required to change the Password.");
+    // Asserting the correct element is having error class.
+    $this->assertTrue($this->assertSession()->fieldExists('edit-current-pass')->hasClass('error'));
+  }
+
 }
