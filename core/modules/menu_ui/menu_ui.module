@@ -40,3 +40,24 @@ function menu_ui_node_builder($entity_type, NodeInterface $entity, &$form, FormS
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use MenuUiHooks::nodeBuilder() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
   \Drupal::service(MenuUiHooks::class)->nodeBuilder($entity_type, $entity, $form, $form_state);
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function menu_ui_form_alter(&$form, FormStateInterface $form_state): void {
+
+  if (isset($form['links']['links']['#type']) && $form['links']['links']['#type'] === 'table') {
+    foreach ($form['links']['links'] as $key => &$element) {
+      // Skip table properties like #type, #header, etc.
+      if (strpos($key, '#') === 0 || !is_array($element)) {
+        continue;
+      }
+      // Target only Views-generated menu links.
+      if (str_starts_with($key, 'menu_plugin_id:views_view:')) {
+        if (isset($element['operations']['#links']['delete'])) {
+          unset($element['operations']['#links']['delete']);
+        }
+      }
+    }
+  }
+}
