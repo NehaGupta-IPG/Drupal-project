@@ -44,6 +44,14 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::forbidden();
     }
 
+    // If the entity type defines an admin permission, grant full access to it.
+    if ($admin_permission = $this->entityType->getAdminPermission()) {
+      $admin_access = AccessResult::allowedIfHasPermission($account, $admin_permission);
+      if ($admin_access->isAllowed()) {
+        return $admin_access->cachePerPermissions();
+      }
+    }
+
     if ($operation === 'view label' && $entity instanceof EntityTestLabel) {
       // Viewing the label of the 'entity_test_label' entity type is allowed.
       return AccessResult::allowed();
