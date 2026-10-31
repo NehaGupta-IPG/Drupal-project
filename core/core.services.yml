@@ -446,6 +446,16 @@ services:
     class: Drupal\Core\Config\CachedStorage
     arguments: ['@config.storage.active', '@cache.config']
   Drupal\Core\Config\StorageCacheInterface: '@config.storage'
+  Drupal\Core\Config\CsrfGuardedStorage:
+    decorates: config.storage.active
+    autowire: true
+    public: false
+  Drupal\Core\Access\CsrfStateChangeGuard:
+    autowire: true
+    public: false
+  Drupal\Core\Access\CsrfStateChangeRequestSubscriber:
+    autoconfigure: false
+    public: false
   config.storage.active:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', 'config']
@@ -961,6 +971,10 @@ services:
   Drupal\Core\Routing\RouteMatchInterface: '@current_route_match'
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
+    # Register directly so the private subscriber survives service removal.
+    # @todo Use autoconfiguration once https://www.drupal.org/node/3442353 is fixed.
+    calls:
+      - [addSubscriber, ['@Drupal\Core\Access\CsrfStateChangeRequestSubscriber']]
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'

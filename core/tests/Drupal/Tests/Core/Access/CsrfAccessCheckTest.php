@@ -9,8 +9,10 @@ use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -82,6 +84,48 @@ class CsrfAccessCheckTest extends UnitTestCase {
     $request = Request::create('/test-path/42?token=test_query');
 
     $this->assertEquals(AccessResult::allowed()->setCacheMaxAge(0), $this->accessCheck->access($route, $request, $this->routeMatch));
+  }
+
+  /**
+   * Tests that a false CSRF token requirement allows access.
+   */
+  #[AllowMockObjectsWithoutExpectations]
+  public function testFalseCsrfTokenRequirement(): void {
+    $access_check = new CsrfAccessCheck($this->createStub(CsrfTokenGenerator::class));
+    $route = new Route('/test-path', [], ['_csrf_token' => 'FALSE']);
+    $request = Request::create('/test-path');
+
+    $this->assertEquals(AccessResult::allowed(), $access_check->access($route, $request, $this->createStub(RouteMatchInterface::class)));
+  }
+
+  /**
+   * Tests that unexpected requirements still require a valid token.
+   */
+  #[DataProvider('unexpectedRequirements')]
+  public function testUnexpectedRequirement(string $requirement, bool $valid): void {
+    $this->csrfToken->expects($this->once())
+      ->method('validate')
+      ->with('test_query', 'test-path')
+      ->willReturn($valid);
+    $this->parameterBag->method('all')->willReturn([]);
+    $this->routeMatch->expects($this->once())->method('getRawParameters')->willReturn($this->parameterBag);
+    $route = new Route('/test-path', [], ['_csrf_token' => $requirement]);
+    $result = $this->accessCheck->access($route, Request::create('/test-path?token=test_query'), $this->routeMatch);
+    $this->assertSame($valid, $result->isAllowed());
+    $this->assertSame(0, $result->getCacheMaxAge());
+  }
+
+  /**
+   * Provides malformed requirements and token validation results.
+   */
+  public static function unexpectedRequirements(): array {
+    $cases = [];
+    foreach (['false', '0', 'unexpected'] as $requirement) {
+      foreach ([TRUE, FALSE] as $valid) {
+        $cases[] = [$requirement, $valid];
+      }
+    }
+    return $cases;
   }
 
   /**
