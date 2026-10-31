@@ -243,8 +243,10 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for this row of the list.
    *
-   * @return array
-   *   A render array structure of fields for this entity.
+   * @return mixed
+   *   The value to be added to the table render element's #rows property.
+   *   This can either be a string representing a cell, or an array with a
+   *   'data' key.
    *
    * @see \Drupal\Core\Entity\EntityListBuilder::render()
    */
