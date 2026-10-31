@@ -12,7 +12,6 @@ use Drupal\treegrid\TreegridCsrfToken;
 use Drupal\treegrid\TreegridRows;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Serves a minimal treegrid for exercising the spine JS in isolation.
@@ -147,7 +146,7 @@ final class TreegridTestUiController extends ControllerBase {
   /**
    * Returns one level of children as a rows response.
    */
-  public function children(Request $request): array|Response {
+  public function children(Request $request): array {
     $delay = (int) $this->state()->get(self::CHILDREN_DELAY_KEY, 0);
     if ($delay > 0) {
       usleep($delay * 1000);
@@ -161,21 +160,16 @@ final class TreegridTestUiController extends ControllerBase {
       $html[] = $this->renderRow($this->item($id), $i + 1, $set_size, $wrong);
     }
 
-    $failing = (int) $this->state()->get(self::CHILDREN_FAIL_KEY, 0);
-    if ($failing > 0) {
-      $this->state()->set(self::CHILDREN_FAIL_KEY, $failing - 1);
-      return new Response(
-        '<table><tbody data-treegrid-rows>' . implode('', $html) . '</tbody></table>',
-        500,
-        ['X-Treegrid-Rows' => '1'],
-      );
-    }
-
     $rows = array_map(fn(string $row): array => ['#markup' => Markup::create($row)], $html);
     $build = TreegridRows::build($rows, $set_size);
     $build['#attached']['library'][] = 'treegrid_test_ui/row_asset';
     if ($this->state()->get(self::CHILDREN_NO_MARKER_KEY, FALSE)) {
       $build['#attached']['http_header'] = [];
+    }
+    $failing = (int) $this->state()->get(self::CHILDREN_FAIL_KEY, 0);
+    if ($failing > 0) {
+      $this->state()->set(self::CHILDREN_FAIL_KEY, $failing - 1);
+      $build['#attached']['http_header'][] = ['Status', '500'];
     }
     return $build;
   }

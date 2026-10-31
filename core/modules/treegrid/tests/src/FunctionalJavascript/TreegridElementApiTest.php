@@ -668,11 +668,16 @@ final class TreegridElementApiTest extends WebDriverTestBase {
         loadedFlag: row.dataset.treegridLoaded ?? null,
         children: element.tree.querySelectorAll('tr[data-parent-id="p1"]').length,
         staged: element.querySelector('[data-treegrid-staging] > tbody').children.length,
+        assetRuns: window.treegridTestUiRowAssetRuns ?? 0,
+        assetRequests: performance.getEntriesByType('resource')
+          .filter((entry) => entry.name.includes('treegrid-test-ui-row-asset.js')).length,
       };
     JS);
 
     $result = $this->getSession()->evaluateScript('return window.apiTest.result;');
     $this->assertFalse($result['opened']);
+    $this->assertSame(0, $result['assetRuns'], 'A refused response loads none of its assets.');
+    $this->assertSame(0, $result['assetRequests'], 'A refused response requests none of its assets.');
     $this->assertEquals([['parentId' => 'p1', 'status' => $expected_status]], $result['failures']);
     $this->assertSame([], $result['loaded']);
     $this->assertSame('false', $result['expanded']);
