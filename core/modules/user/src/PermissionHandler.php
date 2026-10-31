@@ -177,12 +177,18 @@ class PermissionHandler implements PermissionHandlerInterface {
         unset($permissions['permission_callbacks']);
       }
 
-      foreach ($permissions as &$permission) {
-        if (!is_array($permission)) {
+      foreach ($permissions as $key => &$permission) {
+        if (is_string($permission)) {
           $permission = [
             'title' => $permission,
           ];
         }
+
+        if (empty($permission['title']) || !is_string($permission['title'])) {
+          unset($permissions[$key]);
+          continue;
+        }
+
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         $permission['title'] = $this->t($permission['title']);
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString

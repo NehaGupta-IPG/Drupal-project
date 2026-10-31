@@ -42,7 +42,7 @@ class EntityTestPermissions {
    */
   protected function buildPermissions(EntityTestBundle $type) {
     $type_id = $type->id();
-    $type_params = ['%type_name' => $type->label()];
+    $type_params = ['%type_name' => $type->label() ?? $type->id()];
 
     return [
       "create $type_id entity_test_with_bundle entities" => [
