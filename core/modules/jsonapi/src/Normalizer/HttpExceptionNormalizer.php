@@ -5,6 +5,7 @@ namespace Drupal\jsonapi\Normalizer;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\jsonapi\Exception\JsonApiErrorSourceInterface;
 use Drupal\jsonapi\Normalizer\Value\HttpExceptionNormalizerValue;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -113,14 +114,15 @@ class HttpExceptionNormalizer extends NormalizerBase {
 
     $is_verbose_reporting = \Drupal::config('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE;
     $site_report_access = $this->currentUser->hasPermission('access site reports');
+    if ($exception instanceof JsonApiErrorSourceInterface && ($source = $exception->getSourceValue())) {
+      $error['source'] = $source;
+    }
     if ($site_report_access && $is_verbose_reporting) {
       // The following information may contain sensitive information. Only show
       // it to authorized users.
-      $error['source'] = [
+      $error['meta'] = [
         'file' => $exception->getFile(),
         'line' => $exception->getLine(),
-      ];
-      $error['meta'] = [
         'exception' => (string) $exception,
         'trace' => $exception->getTrace(),
       ];
