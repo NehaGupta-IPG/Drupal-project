@@ -60,9 +60,11 @@ abstract class ComponentKernelTestBase extends KernelTestBase {
     $system_theme_config
       ->set('default', $theme_name)
       ->save();
-    $theme_handler = \Drupal::service('theme_handler');
-    $this->negotiator = new ComponentNegotiator($theme_handler);
+    $theme_manager = \Drupal::service('theme.manager');
+    $active_theme = \Drupal::service('theme.initialization')->initTheme($theme_name);
+    $theme_manager->setActiveTheme($active_theme);
 
+    $this->negotiator = new ComponentNegotiator(\Drupal::service('theme_handler'));
     $this->manager = \Drupal::service('plugin.manager.sdc');
   }
 

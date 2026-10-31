@@ -8,6 +8,7 @@ use Drupal\Core\Theme\ComponentNegotiator;
 use Drupal\Core\Theme\ExtensionType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -103,6 +104,35 @@ class ComponentNegotiatorTest extends ComponentKernelTestBase {
     ];
     $crawler = $this->renderComponentRenderArray($build);
     $this->assertNotEmpty($crawler->filter('#sdc-wrapper .component--my-card--replaced__body'));
+  }
+
+  /**
+   * Tests that the default theme is used, not the active theme.
+   */
+  public function testNegotiateUsesDefaultTheme(): void {
+    // Simulate an admin theme being active, while the replacement is provided
+    // by the default theme.
+    $this->container->get('theme_installer')->install(['stark']);
+    $theme_manager = $this->container->get('theme.manager');
+    $theme_manager->setActiveTheme($this->container->get('theme.initialization')->initTheme('stark'));
+
+    $this->assertSame(
+      'sdc_theme_test_enforce_schema:my-card',
+      $this->negotiator->negotiate('sdc_theme_test:my-card', $this->manager->getDefinitions()),
+    );
+  }
+
+  /**
+   * Tests that passing the theme manager to the constructor is deprecated.
+   */
+  #[IgnoreDeprecations]
+  public function testThemeManagerDeprecation(): void {
+    $this->expectUserDeprecationMessage('Passing the theme.manager service to Drupal\Core\Theme\ComponentNegotiator::__construct() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Pass the theme_handler service instead. See https://www.drupal.org/node/3549491');
+    $negotiator = new ComponentNegotiator($this->container->get('theme.manager'));
+    $this->assertSame(
+      'sdc_theme_test_enforce_schema:my-card',
+      $negotiator->negotiate('sdc_theme_test:my-card', $this->manager->getDefinitions()),
+    );
   }
 
 }
