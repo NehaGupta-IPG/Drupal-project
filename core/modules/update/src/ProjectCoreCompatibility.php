@@ -5,6 +5,7 @@ namespace Drupal\update;
 use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Utility class to set core compatibility messages for project releases.
@@ -63,7 +64,7 @@ final class ProjectCoreCompatibility {
    */
   public function __construct(array $core_data, array $core_releases, array $supported_branches) {
     if (isset($core_data['existing_version'])) {
-      $this->existingCoreVersion = $core_data['existing_version'];
+      $this->existingCoreVersion = $core_data['existing_version'] instanceof TranslatableMarkup ? $core_data['existing_version']->getUntranslatedString() : $core_data['existing_version'];
       $this->possibleCoreUpdateVersions = $this->getPossibleCoreUpdateVersions($core_releases, $supported_branches);
     }
   }
