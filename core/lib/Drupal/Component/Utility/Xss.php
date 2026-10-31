@@ -109,6 +109,24 @@ class Xss {
   protected static $htmlTags = ['a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd'];
 
   /**
+   * Additional attribute names always removed by the filter, as keys.
+   *
+   * @var array<string, true>
+   *
+   * @see \Drupal\Component\Utility\Xss::setDisallowedAttributes()
+   */
+  protected static array $disallowedAttributes = [];
+
+  /**
+   * Additional attribute name prefixes always removed by the filter.
+   *
+   * @var string[]
+   *
+   * @see \Drupal\Component\Utility\Xss::setDisallowedAttributes()
+   */
+  protected static array $disallowedAttributePrefixes = [];
+
+  /**
    * Filters HTML to prevent cross-site-scripting (XSS) vulnerabilities.
    *
    * Based on kses by Ulf Harnhammar, see http://sourceforge.net/projects/kses.
@@ -300,6 +318,8 @@ class Xss {
               str_starts_with($attribute_name, 'data-hx') ||
               str_starts_with($attribute_name, 'hx') ||
               str_starts_with($attribute_name, '-') ||
+              isset(static::$disallowedAttributes[$attribute_name]) ||
+              static::hasDisallowedAttributePrefix($attribute_name) ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
               strlen($attribute_name) > 96
@@ -440,6 +460,66 @@ class Xss {
    */
   public static function getHtmlTagList() {
     return static::$htmlTags;
+  }
+
+  /**
+   * Sets additional attributes that are always removed by the filter.
+   *
+   * These are removed in addition to the attributes that are always
+   * disallowed, such as "style", "srcdoc" and event handlers ("on*").
+   *
+   * @param string[] $attributes
+   *   A list of attribute names, matched case-insensitively. A name ending
+   *   with "*" is treated as a prefix, e.g. "x-on*" removes every attribute
+   *   whose name starts with "x-on".
+   */
+  public static function setDisallowedAttributes(array $attributes): void {
+    static::$disallowedAttributes = [];
+    static::$disallowedAttributePrefixes = [];
+    foreach ($attributes as $attribute) {
+      $attribute = strtolower(trim((string) $attribute));
+      if ($attribute === '' || $attribute === '*') {
+        continue;
+      }
+      if (str_ends_with($attribute, '*')) {
+        static::$disallowedAttributePrefixes[] = substr($attribute, 0, -1);
+      }
+      else {
+        static::$disallowedAttributes[$attribute] = TRUE;
+      }
+    }
+    static::$disallowedAttributePrefixes = array_values(array_unique(static::$disallowedAttributePrefixes));
+  }
+
+  /**
+   * Gets the additional attributes that are always removed by the filter.
+   *
+   * @return string[]
+   *   A list of attribute names; prefixes end with "*".
+   *
+   * @see \Drupal\Component\Utility\Xss::setDisallowedAttributes()
+   */
+  public static function getDisallowedAttributes(): array {
+    $prefixes = array_map(fn (string $prefix): string => $prefix . '*', static::$disallowedAttributePrefixes);
+    return array_merge(array_keys(static::$disallowedAttributes), $prefixes);
+  }
+
+  /**
+   * Checks whether an attribute name starts with a disallowed prefix.
+   *
+   * @param string $attribute_name
+   *   The lowercase attribute name.
+   *
+   * @return bool
+   *   TRUE if the attribute name starts with a disallowed prefix.
+   */
+  protected static function hasDisallowedAttributePrefix(string $attribute_name): bool {
+    foreach (static::$disallowedAttributePrefixes as $prefix) {
+      if (str_starts_with($attribute_name, $prefix)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

@@ -1,0 +1,5 @@
+name: 'XSS Test'
+type: module
+description: 'Support module for XSS filtering tests.'
+package: Testing
+version: VERSION

@@ -1503,6 +1503,8 @@ services:
     autowire: true
   redirect_leading_slashes_subscriber:
     class: Drupal\Core\EventSubscriber\RedirectLeadingSlashesSubscriber
+  Drupal\Core\EventSubscriber\XssDisallowedAttributesSubscriber:
+    autowire: true
   config_import_subscriber:
     class: Drupal\Core\EventSubscriber\ConfigImportSubscriber
     autowire: true
