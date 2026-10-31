@@ -312,7 +312,7 @@ media_library:
       css/components/media-library-item.css: {}
       css/components/media-library-vertical-tabs.css: {}
   js:
-    js/media-library.ui.js: { weight: -1 }
+    js/media-library.ui.js: {}
   dependencies:
     - core/drupal
     - core/jquery
