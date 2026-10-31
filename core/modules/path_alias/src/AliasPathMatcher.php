@@ -13,11 +13,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
  */
 class AliasPathMatcher implements PathMatcherInterface {
 
-  /**
-   * Whether the current page is the front page.
-   */
-  protected ?bool $isCurrentFrontPage = NULL;
-
   public function __construct(
     #[AutowireDecorated]
     protected PathMatcherInterface $decorated,
@@ -37,9 +32,7 @@ class AliasPathMatcher implements PathMatcherInterface {
    * {@inheritdoc}
    */
   public function isFrontPage() {
-    // Cache the result as this is called often.
-    $this->isCurrentFrontPage ??= $this->decorated->isFrontPage() || $this->isAliasFrontPage();
-    return $this->isCurrentFrontPage;
+    return $this->decorated->isFrontPage() || $this->isAliasFrontPage();
   }
 
   /**
