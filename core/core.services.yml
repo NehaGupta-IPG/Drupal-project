@@ -1534,6 +1534,9 @@ services:
     arguments: ['@config.factory', '@cache_tags.invalidator']
   exception.enforced_form_response:
     class: Drupal\Core\EventSubscriber\EnforcedFormResponseSubscriber
+  max_input_vars:
+    class: Drupal\Core\EventSubscriber\MaxInputVarsSubscriber
+    arguments: ['@messenger']
   route_processor_manager:
     class: Drupal\Core\RouteProcessor\RouteProcessorManager
     autowire: true

@@ -159,6 +159,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     'Drupal\Core\Render\Element\Weight::valueCallback',
   ];
 
+  /**
+   * Stores whether the request has exceeded the PHP max input vars.
+   *
+   * @var bool
+   */
+  protected static $isMaxInputVars = FALSE;
+
   public function __construct(
     FormValidatorInterface $form_validator,
     FormSubmitterInterface $form_submitter,
@@ -1008,7 +1015,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // for programmed forms coming from self::submitForm(), or if the form_id
       // coming from the POST data is set and matches the current form_id.
       $input = $form_state->getUserInput();
-      if ($form_state->isProgrammed() || (!empty($input) && (isset($input['form_id']) && ($input['form_id'] == $form_id)))) {
+      if (!self::$isMaxInputVars && ($form_state->isProgrammed() || (!empty($input) && (isset($input['form_id']) && ($input['form_id'] == $form_id))))) {
         $form_state->setProcessInput();
         if (isset($element['#token'])) {
           $input = $form_state->getUserInput();
@@ -1498,6 +1505,15 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    */
   public static function trustedCallbacks() {
     return ['renderPlaceholderFormAction', 'renderFormTokenPlaceholder'];
+  }
+
+  /**
+   * Sets if this request has exceeded the PHP max input vars.
+   *
+   * @return void
+   */
+  public static function setMaxInputVars() {
+    static::$isMaxInputVars = TRUE;
   }
 
 }
