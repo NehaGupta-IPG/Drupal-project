@@ -435,7 +435,7 @@ class FilterAPITest extends EntityKernelTestBase {
 
     // Disable a plugin to ensure that disabled plugins with custom settings are
     // stored in configuration.
-    $crazy_format->setFilterConfig('filter_html_escape', ['status' => FALSE]);
+    $crazy_format->setFilterConfig('filter_html_escape', ['status' => FALSE, 'weight' => 10]);
     $crazy_format->save();
     $filters = $this->config('filter.format.crazy')->get('filters');
     $this->assertEquals(['filter_html', 'filter_html_escape'], array_keys($filters));

@@ -165,7 +165,9 @@ final class SmartDefaultSettings {
       $filter_html_restrictions = HTMLRestrictions::fromTextFormat($editor->getFilterFormat());
       $missing_fundamental_tags = $fundamental->diff($filter_html_restrictions);
       if (!$missing_fundamental_tags->allowsNothing()) {
-        $editor->getFilterFormat()->setFilterConfig('filter_html', $filter_html_restrictions->merge($fundamental)->getAllowedElements());
+        $filter_html_config = $editor->getFilterFormat()->filters('filter_html')->getConfiguration();
+        $filter_html_config['settings']['allowed_html'] = $filter_html_restrictions->merge($fundamental)->toFilterHtmlAllowedTagsString();
+        $editor->getFilterFormat()->setFilterConfig('filter_html', $filter_html_config);
         $this->logger->warning("As part of migrating the %text_format text format to CKEditor 5, the following tag(s) were added to <em>Limit allowed HTML tags and correct faulty HTML</em>, because they are needed to provide fundamental CKEditor 5 functionality : @missing_tags. The text format must be saved to make these changes active.", [
           '%text_format' => $editor->getFilterFormat()->get('name'),
           '@missing_tags' => $missing_fundamental_tags->toFilterHtmlAllowedTagsString(),
