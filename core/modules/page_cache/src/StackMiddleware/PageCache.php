@@ -365,7 +365,7 @@ class PageCache implements HttpKernelInterface {
     // will be the value during lookups for subsequent requests.
     if (!isset($this->cid)) {
       $cid_parts = [
-        $request->getSchemeAndHttpHost() . $request->getRequestUri(),
+        $request->getSchemeAndHttpHost() . rtrim($request->getRequestUri(), '/'),
         $request->getRequestFormat(NULL),
       ];
       $this->cid = implode(':', $cid_parts);
