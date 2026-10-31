@@ -257,6 +257,9 @@ collapsing. Behaviors attach to loaded rows through core's htmx integration,
 with the hidden table's `tbody` as the context, before treegrid places the
 rows. treegrid calls `Drupal.detachBehaviors()` on every row it removes.
 
+htmx GET responses don't switch on `Html::setIsAjax()`, so ids generated with
+`Html::getUniqueId()` in a rows response can repeat ids already on the page.
+
 State attributes treegrid writes on rows: `data-treegrid-hidden`,
 `data-treegrid-loaded`, `data-treegrid-loading` and
 `data-treegrid-virtualized`.
