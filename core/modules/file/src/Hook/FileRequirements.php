@@ -27,12 +27,12 @@ class FileRequirements {
 
     // Check the uploadprogress extension is loaded.
     if (extension_loaded('uploadprogress')) {
-      $value = $this->t('Enabled (<a href="https://github.com/php/pecl-php-uploadprogress#uploadprogress">PECL uploadprogress</a>)');
+      $value = $this->t('Enabled (<a href="https://github.com/php/pecl-php-uploadprogress#uploadprogress">uploadprogress extension</a>)');
       $description = NULL;
     }
     else {
       $value = $this->t('Not enabled');
-      $description = $this->t('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">PECL uploadprogress library</a>.');
+      $description = $this->t('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">uploadprogress PHP extension</a>.');
     }
 
     // Adjust the requirement depending on what the server supports.

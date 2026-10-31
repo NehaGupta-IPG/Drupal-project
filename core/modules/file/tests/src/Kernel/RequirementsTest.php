@@ -49,7 +49,7 @@ class RequirementsTest extends KernelTestBase {
     $requirements = $moduleHandler->invoke('file', 'runtime_requirements');
     $this->assertNotEmpty($requirements);
     $this->assertEquals('Not enabled', (string) $requirements['file_progress']['value']);
-    $this->assertEquals('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">PECL uploadprogress library</a>.', (string) $requirements['file_progress']['description']);
+    $this->assertEquals('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">uploadprogress PHP extension</a>.', (string) $requirements['file_progress']['description']);
 
     // Test Apache + mod_fastcgi.
     $this->setServerSoftware('Apache mod_fastcgi');
@@ -63,7 +63,7 @@ class RequirementsTest extends KernelTestBase {
     $requirements = $moduleHandler->invoke('file', 'runtime_requirements');
     $this->assertNotEmpty($requirements);
     $this->assertEquals('Not enabled', (string) $requirements['file_progress']['value']);
-    $this->assertEquals('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">PECL uploadprogress library</a>.', (string) $requirements['file_progress']['description']);
+    $this->assertEquals('Your server is capable of displaying file upload progress, but does not have the required libraries. It is recommended to install the <a href="https://github.com/php/pecl-php-uploadprogress#installation">uploadprogress PHP extension</a>.', (string) $requirements['file_progress']['description']);
 
   }
 
