@@ -470,6 +470,8 @@ condition.plugin.request_path:
   mapping:
     pages:
       type: string
+    page_options:
+      type: string
 
 condition.plugin.response_status:
   type: condition.plugin

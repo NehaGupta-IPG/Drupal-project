@@ -53,9 +53,9 @@
         '[data-drupal-selector="edit-visibility-request-path"]',
       ).drupalSetSummary((context) => {
         const $pages = $(context).find(
-          'textarea[name="visibility[request_path][pages]"]',
+          'input[name="visibility[request_path][page_options]"]:checked',
         );
-        if (!$pages.length || !$pages[0].value) {
+        if ($pages && $pages.attr('value') === 'all_pages') {
           return Drupal.t('Not restricted');
         }
 

@@ -231,6 +231,7 @@ class BlockForm extends EntityForm {
     //   https://www.drupal.org/node/2284687.
     $visibility = $this->entity->getVisibility();
     $definitions = $this->manager->getFilteredDefinitions('block_ui', $form_state->getTemporaryValue('gathered_contexts'), ['block' => $this->entity]);
+    $page_options_default_value = NULL;
     foreach ($definitions as $condition_id => $definition) {
       // Don't display the current theme condition.
       if ($condition_id == 'current_theme') {
@@ -249,6 +250,10 @@ class BlockForm extends EntityForm {
       $condition_form['#title'] = $condition->getPluginDefinition()['label'];
       $condition_form['#group'] = 'visibility_tabs';
       $form[$condition_id] = $condition_form;
+      if ($condition_id == 'request_path') {
+        $request_path_config = $condition->getConfiguration();
+        $page_options_default_value = $request_path_config['page_options'] ?? NULL;
+      }
     }
 
     // Disable negation for specific conditions.
@@ -270,14 +275,34 @@ class BlockForm extends EntityForm {
       unset($form['user_role']['roles']['#description']);
     }
     if (isset($form['request_path'])) {
-      $form['request_path']['#title'] = $this->t('Pages');
-      $form['request_path']['negate']['#type'] = 'radios';
-      $form['request_path']['negate']['#default_value'] = (int) $form['request_path']['negate']['#default_value'];
-      $form['request_path']['negate']['#title_display'] = 'invisible';
-      $form['request_path']['negate']['#options'] = [
-        $this->t('Show for the listed pages'),
-        $this->t('Hide for the listed pages'),
+      // All those if statements are necessary because the negate field is unset
+      // so we need to ensure compatibility with the request_path instances that
+      // do not have the page_options config set yet.
+      if ($page_options_default_value) {
+        $default_value = $page_options_default_value;
+      }
+      elseif ((!$form['request_path']['negate']['#default_value'] && empty($form['request_path']['pages']['#default_value'])) || empty($page_options_default_value)) {
+        $default_value = 'all_pages';
+      }
+      elseif (!$form['request_path']['negate']['#default_value'] && !empty($form['request_path']['pages']['#default_value'])) {
+        $default_value = 'specific_pages';
+      }
+      else {
+        $default_value = 'hide_on_pages';
+      }
+      $form['request_path']['page_options']['#type'] = 'radios';
+      $form['request_path']['page_options']['#default_value'] = $default_value;
+      $form['request_path']['page_options']['#title_display'] = 'invisible';
+      $form['request_path']['page_options']['#weight'] = -100;
+      $form['request_path']['page_options']['#options'] = [
+        'all_pages' => $this->t('Show on all pages'),
+        'specific_pages' => $this->t('Show on specific pages'),
+        'hide_on_pages' => $this->t('Hide on specific pages'),
       ];
+      $form['request_path']['pages']['#states']['visible'][] = [
+        ':input[name="visibility[request_path][page_options]"]' => ['!value' => 'all_pages'],
+      ];
+      unset($form['request_path']['negate']);
     }
     return $form;
   }
@@ -316,6 +341,19 @@ class BlockForm extends EntityForm {
   protected function validateVisibility(array $form, FormStateInterface $form_state) {
     // Validate visibility condition settings.
     foreach ($form_state->getValue('visibility') as $condition_id => $values) {
+      // Validate request_path condition for block form.
+      if ($condition_id == 'request_path') {
+        if ($values['page_options'] != 'all_pages' && empty($values['pages'])) {
+          $form_state->setErrorByName('visibility][request_path][pages', $this->t('Specify at least one page.'));
+        }
+      }
+      // All condition plugins use 'negate' as a Boolean in their schema.
+      // However, certain form elements may return it as 0/1. Cast here to
+      // ensure the data is in the expected type.
+      if (array_key_exists('negate', $values)) {
+        $form_state->setValue(['visibility', $condition_id, 'negate'], (bool) $values['negate']);
+      }
+
       // Allow the condition to validate the form.
       $condition = $form_state->get(['conditions', $condition_id]);
       $condition->validateConfigurationForm($form['visibility'][$condition_id], SubformState::createForSubform($form['visibility'][$condition_id], $form, $form_state));
@@ -374,6 +412,18 @@ class BlockForm extends EntityForm {
     foreach ($form_state->getValue('visibility') as $condition_id => $values) {
       // Allow the condition to submit the form.
       $condition = $form_state->get(['conditions', $condition_id]);
+
+      if ($condition_id == 'request_path') {
+        if ($values['page_options'] == 'all_pages') {
+          $this->entity->getVisibilityConditions()->removeInstanceId($condition_id);
+          continue;
+        }
+        else {
+          $values['page_options'] == 'hide_on_pages' ? $form_state->setValue(['visibility', 'request_path', 'negate'], TRUE) : $form_state->setValue(['visibility', 'request_path', 'negate'], FALSE);
+          $condition->setConfig('page_options', $values['page_options']);
+        }
+      }
+
       $condition->submitConfigurationForm($form['visibility'][$condition_id], SubformState::createForSubform($form['visibility'][$condition_id], $form, $form_state));
 
       $condition_configuration = $condition->getConfiguration();
