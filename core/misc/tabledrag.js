@@ -1193,7 +1193,13 @@
             $(siblings)
               .find(targetClass)
               .each(function () {
-                this.value = weight;
+                // If the sibling is locked, skip updating its weight and
+                // use its weight for the next siblings.
+                if (this.disabled) {
+                  weight = this.value;
+                } else {
+                  this.value = weight;
+                }
                 weight++;
               });
           }
