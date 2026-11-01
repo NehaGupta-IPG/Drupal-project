@@ -105,8 +105,12 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
         'expires' => Cache::PERMANENT,
       ];
     }
-
-    $this->cacheBackend->setMultiple($items);
+    // If a very large number of entity types are installed at once, this can
+    // exceed MySQL allowed packet with the database backend, so divide the
+    // items into chunks.
+    foreach (array_chunk($items, 50, TRUE) as $chunk) {
+      $this->cacheBackend->setMultiple($chunk);
+    }
     return $this->entityTypeDefinitions;
   }
 
