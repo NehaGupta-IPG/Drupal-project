@@ -230,12 +230,31 @@ class ThemeSettingsForm extends ConfigFormBase {
       $form['theme_settings']['#access'] = FALSE;
     }
 
+    // Logo and favicon previews preparation.
+    $app_root = \Drupal::root();
+    $logo_url = theme_get_setting('logo.url', $theme);
+    $logo_preview = '';
+    if (is_file($app_root . $logo_url)) {
+      $logo_preview = '<img src="' . $logo_url . '">';
+    }
+    $favicon_url = theme_get_setting('favicon.url', $theme);
+    $favicon_preview = '';
+    if (is_file($app_root . $favicon_url)) {
+      $favicon_preview = '<img src="' . $favicon_url . '">';
+    }
+
     // Logo settings, only available when file.module is enabled.
     if ((!$theme || in_array('logo', $features)) && $this->moduleHandler->moduleExists('file')) {
       $form['logo'] = [
         '#type' => 'details',
         '#title' => $this->t('Logo image'),
         '#open' => TRUE,
+      ];
+      $form['logo']['preview'] = [
+        '#type' => 'markup',
+        '#prefix' => '<div id="logo-preview">',
+        '#suffix' => '</div>',
+        '#markup' => $logo_preview,
       ];
       $form['logo']['default_logo'] = [
         '#type' => 'checkbox',
@@ -282,6 +301,12 @@ class ThemeSettingsForm extends ConfigFormBase {
             'input[name="toggle_favicon"]' => ['checked' => FALSE],
           ],
         ],
+      ];
+      $form['favicon']['preview'] = [
+        '#type' => 'markup',
+        '#prefix' => '<div id="favicon-preview">',
+        '#suffix' => '</div>',
+        '#markup' => $favicon_preview,
       ];
       $form['favicon']['default_favicon'] = [
         '#type' => 'checkbox',
