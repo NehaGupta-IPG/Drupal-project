@@ -286,6 +286,178 @@ class ModuleHandlerTest extends UnitTestCase {
   }
 
   /**
+   * Tests different arguments passed to invokeAll().
+   */
+  public function testInvokeAllArguments(): void {
+    $b_local = 'B';
+    $d_local = 'D';
+    $call_count = 0;
+    $this->invokeAllWithListeners(
+      [
+        function ($a, &$b, $c = NULL, &$d = NULL, ...$more_args) use (&$call_count) {
+          ++$call_count;
+          $this->assertSame(
+            ['A', 'B', NULL, 'D', ['e' => 'E']],
+            [$a, $b, $c, $d, $more_args],
+          );
+          $b = 'B modified';
+          $d = 'D modified';
+        },
+      ],
+      [
+        'A',
+        // Test by-reference arguments.
+        &$b_local,
+        // Test named arguments.
+        'd' => &$d_local,
+        'e' => 'E',
+      ],
+    );
+    // The artificially registered listener was called exactly once.
+    $this->assertSame(1, $call_count);
+    // The two local variables were modified.
+    $this->assertSame('B modified', $b_local);
+    $this->assertSame('D modified', $d_local);
+  }
+
+  /**
+   * Tests different return values in invokeAll().
+   */
+  public function testInvokeAllReturn(): void {
+    $object = new \stdClass();
+    // No implementations.
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([]),
+    );
+    // Only null/void return values.
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([
+        fn () => NULL,
+        fn () => NULL,
+      ]),
+    );
+    // Only empty array and null.
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([
+        fn () => [],
+        fn () => NULL,
+      ]),
+    );
+    // Only non-array values.
+    $this->assertSame(
+      [
+        'A',
+        $object,
+        'B',
+      ],
+      $this->invokeAllWithListeners([
+        fn () => 'A',
+        fn () => NULL,
+        fn () => $object,
+        fn () => 'B',
+      ]),
+    );
+    // Only arrays.
+    $this->assertSame(
+      [
+        'a' => 'A2',
+        'X',
+        'Y',
+        'b' => 'B',
+        'nested' => [
+          'aa' => 'AA2',
+          'bb' => 'BB',
+          'cc' => 'CC',
+        ],
+        'Z',
+      ],
+      $this->invokeAllWithListeners([
+        fn () => ['a' => 'A1'],
+        fn () => ['X', 'Y'],
+        fn () => NULL,
+        fn () => ['b' => 'B'],
+        fn () => ['a' => 'A2'],
+        fn () => ['nested' => ['aa' => 'AA1', 'bb' => 'BB']],
+        fn () => ['nested' => ['aa' => 'AA2', 'cc' => 'CC']],
+        fn () => ['Z'],
+      ]),
+    );
+    // Combination of arrays and non-array values.
+    // This is a separate execution path in ModuleHandler::invokeAll(), so it
+    // needs a separate test case.
+    $this->assertSame(
+      [
+        'a' => 'A2',
+        'X',
+        'Y',
+        'Non-array string',
+        $object,
+        'b' => 'B',
+        'nested' => [
+          'aa' => 'AA2',
+          'bb' => 'BB',
+          'cc' => 'CC',
+        ],
+        'Z',
+      ],
+      $this->invokeAllWithListeners([
+        fn () => ['a' => 'A1'],
+        fn () => ['X', 'Y'],
+        fn () => 'Non-array string',
+        fn () => NULL,
+        fn () => $object,
+        fn () => ['b' => 'B'],
+        fn () => ['a' => 'A2'],
+        fn () => ['nested' => ['aa' => 'AA1', 'bb' => 'BB']],
+        fn () => ['nested' => ['aa' => 'AA2', 'cc' => 'CC']],
+        fn () => ['Z'],
+      ]),
+    );
+    // Array-like objects are treated as non-array.
+    $array_object = new \ArrayObject(['y' => 'Y']);
+    $this->assertSame(
+      [
+        'x' => 'X',
+        $array_object,
+        'z' => 'Z',
+      ],
+      $this->invokeAllWithListeners([
+        fn () => ['x' => 'X'],
+        fn () => $array_object,
+        fn () => ['z' => 'Z'],
+      ]),
+    );
+  }
+
+  /**
+   * Calls ModuleHandler::invokeAll() with an artificial callback list.
+   *
+   * @param list<callable> $listeners
+   *   The virtual callables for hook implementations.
+   * @param array $args
+   *   The $args argument to pass to ->invokeAll().
+   *
+   * @return array
+   *   The return value from ->invokeAll().
+   */
+  protected function invokeAllWithListeners(array $listeners, array $args = []): array {
+    $this->assertIsList($listeners);
+    // Get an empty default module handler, then populate the internal
+    // implementation lists property with reflection.
+    $module_handler = $this->getModuleHandler();
+    // The module names are irrelevant for ->invokeAll(), when an artificial
+    // ImplementationList instance is used.
+    $modules = array_fill(0, count($listeners), 'test_module');
+    $implementation_list = new ImplementationList($listeners, $modules);
+    (new \ReflectionProperty($module_handler, 'hookImplementationLists'))
+      ->setValue($module_handler, ['hook' => $implementation_list]);
+    return $module_handler->invokeAll('hook', $args);
+  }
+
+  /**
    * Tests hasImplementations.
    */
   public function testHasImplementations(): void {

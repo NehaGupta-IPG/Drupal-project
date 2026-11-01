@@ -344,17 +344,54 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAll($hook, array $args = []) {
-    $return = [];
-    $this->invokeAllWith($hook, function (callable $hook, string $module) use ($args, &$return) {
-      $result = call_user_func_array($hook, $args);
-      if (isset($result) && is_array($result)) {
-        $return = NestedArray::mergeDeep($return, $result);
+    $list = $this->getHookImplementationList($hook);
+    if (!$list->listeners) {
+      return [];
+    }
+    // Avoid the performance cost of unnecessary (repeated) calls to
+    // NestedArray::mergeDeep().
+    // Instead, optimize for the two most common cases, when the result list
+    // either contains no arrays or only arrays.
+    $results = [];
+    $has_array = FALSE;
+    $has_non_array = FALSE;
+    foreach ($list->listeners as $listener) {
+      $result = call_user_func_array($listener, $args);
+      if ($result === NULL) {
+        continue;
       }
-      elseif (isset($result)) {
-        $return[] = $result;
+      if (is_array($result)) {
+        $has_array = TRUE;
       }
-    });
-    return $return;
+      else {
+        $has_non_array = TRUE;
+      }
+      $results[] = $result;
+    }
+    if (!$has_array) {
+      // The result list does not contain any arrays, or it is empty.
+      // Nothing needs to be merged.
+      return $results;
+    }
+    if (!$has_non_array) {
+      // The result list contains only arrays.
+      // Merge the results in a single call.
+      return NestedArray::mergeDeepArray($results);
+    }
+    // The result list contains arrays and non-array values.
+    // Arrays will be merged, non-arrays will be appended.
+    // This case needs to be covered for completeness, but it is rare in
+    // practice.
+    $merged_results = [];
+    foreach ($results as $result) {
+      if (is_array($result)) {
+        $merged_results = NestedArray::mergeDeep($merged_results, $result);
+      }
+      else {
+        $merged_results[] = $result;
+      }
+    }
+    return $merged_results;
   }
 
   /**
