@@ -289,7 +289,7 @@ class UserEditTest extends BrowserTestBase {
    * Tests constraint violations are triggered on the user account form.
    */
   public function testRolesValidation(): void {
-    $admin_user = $this->drupalCreateUser(['administer users']);
+    $admin_user = $this->drupalCreateUser(['administer users', 'administer permissions']);
     $this->drupalLogin($admin_user);
     $this->drupalGet("user/" . $admin_user->id() . "/edit");
     $this->submitForm([], 'Save');

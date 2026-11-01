@@ -16,6 +16,7 @@ use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
+use Drupal\system\ActionConfigEntityInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -136,8 +137,8 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
     $entity_type = $this->getEntityType();
     // Filter the actions to only include those for this entity type.
-    $this->actions = array_filter($this->actionStorage->loadMultiple(), function ($action) use ($entity_type) {
-      return $action->getType() == $entity_type;
+    $this->actions = array_filter($this->actionStorage->loadMultiple(), function (ActionConfigEntityInterface $action) use ($entity_type) {
+      return ($action->getType() === $entity_type) && $action->access('view');
     });
   }
 

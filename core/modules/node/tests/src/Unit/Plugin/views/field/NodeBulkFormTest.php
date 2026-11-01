@@ -46,6 +46,9 @@ class NodeBulkFormTest extends UnitTestCase {
       $action
         ->method('getType')
         ->willReturn('node');
+      $action->expects($this->any())
+        ->method('access')
+        ->willReturn(TRUE);
       $actions[$i] = $action;
     }
 
@@ -53,6 +56,9 @@ class NodeBulkFormTest extends UnitTestCase {
     $action
       ->method('getType')
       ->willReturn('user');
+    $action->expects($this->any())
+      ->method('access')
+      ->willReturn(TRUE);
     $actions[] = $action;
 
     $entity_storage = $this->createStub(EntityStorageInterface::class);

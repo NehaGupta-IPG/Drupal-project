@@ -32,6 +32,9 @@ use Drupal\Core\Utility\NaturalSort;
     'singular' => '@count action',
     'plural' => '@count actions',
   ],
+  handlers: [
+    'access' => 'Drupal\system\ActionAccessControlHandler',
+  ],
   config_export: [
     'id',
     'label',
