@@ -118,6 +118,12 @@ class LayoutBuilderFormModeTest extends BrowserTestBase {
     // Submit the form to ensure no invalid form state retained.
     $page->pressButton('Confirm');
     $assert_session->pageTextContains('The changes to the layout have been discarded.');
+
+    // Verify Discard changes button is going to confirmation page
+    // when destination query parameter present in url.
+    $this->drupalGet('entity_test/1/layout', ['query' => ['destination' => '/admin/content']]);
+    $page->pressButton('Discard changes');
+    $this->assertSession()->addressEquals('/entity_test/1/layout/discard-changes');
   }
 
 }

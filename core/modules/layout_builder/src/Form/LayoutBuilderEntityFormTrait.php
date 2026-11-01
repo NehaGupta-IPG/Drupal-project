@@ -55,6 +55,7 @@ trait LayoutBuilderEntityFormTrait {
    * Form submission handler.
    */
   public function redirectOnSubmit(array $form, FormStateInterface $form_state) {
+    $this->getRequest()->query->remove('destination');
     $form_state->setRedirectUrl($this->sectionStorage->getLayoutBuilderUrl($form_state->getTriggeringElement()['#redirect']));
   }
 
