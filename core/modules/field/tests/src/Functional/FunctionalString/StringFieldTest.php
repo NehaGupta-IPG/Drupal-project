@@ -56,6 +56,7 @@ class StringFieldTest extends BrowserTestBase {
    */
   public function testTextfieldWidgets(): void {
     $this->_testTextfieldWidgets('string', 'string_textfield');
+    $this->_testTextfieldWidgets('string', 'string_textarea');
     $this->_testTextfieldWidgets('string_long', 'string_textarea');
   }
 
@@ -97,6 +98,11 @@ class StringFieldTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
     $this->assertSession()->fieldNotExists("{$field_name}[0][format]");
     $this->assertSession()->responseContains('placeholder="A placeholder on ' . $widget_type . '"');
+    // Verify string fields' maxlength setting is an attribute.
+    if ($field_type == 'string') {
+      $element = $this->assertSession()->elementExists('css', "[name='{$field_name}[0][value]']");
+      $this->assertEquals(255, $element->getAttribute('maxlength'));
+    }
 
     // Submit with some value.
     $value = $this->randomMachineName();

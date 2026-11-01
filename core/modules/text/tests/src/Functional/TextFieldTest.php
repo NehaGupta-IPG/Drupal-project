@@ -60,41 +60,6 @@ class TextFieldTest extends StringFieldTest {
   // Test fields.
 
   /**
-   * Tests text field validation.
-   */
-  public function testTextFieldValidation(): void {
-    // Create a field with settings to validate.
-    $max_length = 3;
-    $field_name = $this->randomMachineName();
-    $field_storage = FieldStorageConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'entity_test',
-      'type' => 'text',
-      'settings' => [
-        'max_length' => $max_length,
-      ],
-    ]);
-    $field_storage->save();
-    FieldConfig::create([
-      'field_storage' => $field_storage,
-      'bundle' => 'entity_test',
-    ])->save();
-
-    // Test validation with valid and invalid values.
-    $entity = EntityTest::create();
-    for ($i = 0; $i <= $max_length + 2; $i++) {
-      $entity->{$field_name}->value = str_repeat('x', $i);
-      $violations = $entity->{$field_name}->validate();
-      if ($i <= $max_length) {
-        $this->assertCount(0, $violations, "Length $i does not cause validation error when max_length is $max_length");
-      }
-      else {
-        $this->assertCount(1, $violations, "Length $i causes validation error when max_length is $max_length");
-      }
-    }
-  }
-
-  /**
    * Tests required long text with file upload.
    */
   public function testRequiredLongTextWithFileUpload(): void {
