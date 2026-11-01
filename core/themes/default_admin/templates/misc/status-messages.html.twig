@@ -13,7 +13,7 @@
  * user agents announce it appropriately: "alert" for errors and warnings
  * (assertive) and "status" for other message types (polite). This matches the
  * role assignment used by Drupal.theme.message() for messages added by
- * JavaScript. The "contentinfo" landmark role is reserved for the page footer
+ * Ajax API. The "contentinfo" landmark role is reserved for the page footer
  * and is intentionally not used here, which avoids duplicate landmark and
  * non-unique landmark accessibility violations.
  *
@@ -44,7 +44,7 @@
         set is_message_with_icon = type in ['error', 'status', 'warning']
       %}
 
-      <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-labelledby="{{ title_ids[type] }}"{{ attributes.addClass(classes)|without('role', 'aria-label') }}>
+      <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-labelledby="{{ title_ids[type] }}"{{ attributes.addClass(classes)|without('role', 'aria-label') }} data-drupal-message-set>
         {% if is_message_with_title or is_message_with_icon %}
           <div class="messages__header">
             {% if is_message_with_title %}
@@ -55,15 +55,11 @@
           </div>
         {% endif %}
         <div class="messages__content">
-          {% if messages|length > 1 %}
-            <ul class="messages__list">
-              {% for message in messages %}
-                <li class="messages__item">{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            {{ messages|first }}
-          {% endif %}
+          <ul class="messages__list" data-drupal-message-list-type="{{ type }}">
+              {%- for message in messages %}
+                {{ message }}
+              {%- endfor -%}
+          </ul>
         </div>
         <button type="button" class="button button--dismiss js-message-button-hide" title="{{ 'Hide'|t }}">
           <span class="icon-close"></span>

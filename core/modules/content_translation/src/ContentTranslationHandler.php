@@ -587,7 +587,10 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
 
     if ($display_warning) {
       $url = $entity->getUntranslated()->toUrl('edit-form')->toString();
-      $message['warning'][] = $this->t('Fields that apply to all languages are hidden to avoid conflicting changes. <a href=":url">Edit them on the original language form</a>.', [':url' => $url]);
+      $message['warning'][] = [
+        '#theme' => 'status_message_item',
+        '#message' => $this->t('Fields that apply to all languages are hidden to avoid conflicting changes. <a href=":url">Edit them on the original language form</a>.', [':url' => $url]),
+      ];
       // Explicitly renders this warning message. This prevents repetition on
       // AJAX operations or form submission. Other messages will be rendered in
       // the default location.
@@ -597,6 +600,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#message_list' => $message,
         '#weight' => -100,
         '#status_headings' => [
+          'status' => $this->t('Status message'),
+          'error' => $this->t('Error message'),
           'warning' => $this->t('Warning message'),
         ],
       ];

@@ -13,7 +13,7 @@
  * user agents announce it appropriately: "alert" for errors and warnings
  * (assertive) and "status" for other message types (polite). This matches the
  * role assignment used by Drupal.theme.message() for messages added by
- * JavaScript. The "contentinfo" landmark role is reserved for the page footer
+ * Ajax API. The "contentinfo" landmark role is reserved for the page footer
  * and is intentionally not used here, which avoids duplicate landmark and
  * non-unique landmark accessibility violations.
  *
@@ -28,19 +28,15 @@
 #}
 <div data-drupal-messages>
 {% for type, messages in message_list %}
-  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }}>
+  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }} data-drupal-message-set>
     {% if status_headings[type] %}
       <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
     {% endif %}
-    {% if messages|length > 1 %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
+      <ul data-drupal-message-list-type="{{ type }}">
+        {%- for message in messages %}
+          {{ message }}
+        {%- endfor -%}
       </ul>
-    {% else %}
-      {{ messages|first }}
-    {% endif %}
   </div>
 {% endfor %}
 </div>

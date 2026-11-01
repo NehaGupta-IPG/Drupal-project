@@ -192,3 +192,12 @@
 .messages__item + .messages__item {
   margin-block-start: var(--admin-space-s);
 }
+
+[data-drupal-message-set]:has([data-drupal-message-list-type]:empty) {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  word-wrap: normal;
+}

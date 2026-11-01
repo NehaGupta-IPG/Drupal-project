@@ -63,6 +63,12 @@ class ThemeCommonElements {
           'message_list' => NULL,
         ],
       ],
+      'status_message_item' => [
+        'variables' => [
+          'message' => NULL,
+          'attributes' => [],
+        ],
+      ],
       'links' => [
         'variables' => [
           'links' => [],

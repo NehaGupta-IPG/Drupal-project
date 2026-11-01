@@ -30,19 +30,15 @@
           'messages--' ~ type,
         ]
       %}
-      <drupal-umami-messages aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }}>
+            <drupal-umami-messages aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }} data-drupal-message-set>
         {% if status_headings[type] %}
           <span slot="title">{{ status_headings[type] }}</span>
         {% endif %}
-        {% if messages|length > 0 %}
-          <ul class="messages__list" slot="content">
-            {% for message in messages %}
-              <li class="messages__item">{{ message }}</li>
-            {% endfor %}
+          <ul class="messages__list" slot="content" data-drupal-message-list-type="{{ type }}">
+            {%- for message in messages %}
+              {{ message }}
+            {%- endfor -%}
           </ul>
-        {% else %}
-          <span class="messages__item" slot="content">{{ messages|first }}</span>
-        {% endif %}
       </drupal-umami-messages>
       {# Remove type specific classes. #}
       {% set attributes = attributes.removeClass(classes) %}
