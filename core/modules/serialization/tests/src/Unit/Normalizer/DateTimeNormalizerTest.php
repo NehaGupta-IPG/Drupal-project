@@ -195,20 +195,23 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * Tests the JSON Schema for optional and required data.
    */
   #[DataProvider('providerTestJsonSchemaNullable')]
-  public function testJsonSchemaNullable(bool $required, array $expected): void {
-    $date = new DateTimeIso8601(DataDefinition::createFromDataType('datetime_iso8601')->setRequired($required));
-
-    $this->assertSame($expected, $this->normalizer->normalize($date, 'json_schema'));
+  public function testJsonSchemaNullable(mixed $object, array $expected): void {
+    $this->assertSame($expected, $this->normalizer->normalize($object, 'json_schema'));
   }
 
   /**
    * Data provider for ::testJsonSchemaNullable().
    */
   public static function providerTestJsonSchemaNullable(): array {
-    $schema = ['type' => 'string', 'format' => 'date-time'];
+    $optional = DataDefinition::createFromDataType('datetime_iso8601')->setRequired(FALSE);
+    $required = DataDefinition::createFromDataType('datetime_iso8601')->setRequired(TRUE);
+    $not_nullable = ['type' => 'string', 'format' => 'date-time'];
+    $nullable = ['oneOf' => [$not_nullable, ['type' => 'null']]];
     return [
-      'optional' => [FALSE, ['oneOf' => [$schema, ['type' => 'null']]]],
-      'required' => [TRUE, $schema],
+      'optional typed data: nullable' => [new DateTimeIso8601($optional), $nullable],
+      'required typed data: not nullable' => [new DateTimeIso8601($required), $not_nullable],
+      'class name: nullable' => [DateTimeInterface::class, $nullable],
+      'plain object: not nullable' => [new \stdClass(), $not_nullable],
     ];
   }
 
