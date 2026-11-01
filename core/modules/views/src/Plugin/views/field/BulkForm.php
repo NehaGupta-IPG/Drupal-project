@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\field;
 
+use Drupal\Core\Action\ProcessedCountActionInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -434,6 +435,12 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
       $action->execute($entities);
 
+      // Actions may skip items and report how many they actually processed.
+      $plugin = $action->getPlugin();
+      if ($plugin instanceof ProcessedCountActionInterface) {
+        $count = max(0, min($count, $plugin->getProcessedCount()));
+      }
+
       $operation_definition = $action->getPluginDefinition();
       if (!empty($operation_definition['confirm_form_route_name'])) {
         $options = [
@@ -445,9 +452,11 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       else {
         // Don't display the message unless there are some elements affected and
         // there is no confirmation form.
-        $this->messenger->addStatus($this->formatPlural($count, '%action was applied to @count item.', '%action was applied to @count items.', [
-          '%action' => $action->label(),
-        ]));
+        if ($count) {
+          $this->messenger->addStatus($this->formatPlural($count, '%action was applied to @count item.', '%action was applied to @count items.', [
+            '%action' => $action->label(),
+          ]));
+        }
       }
     }
   }
