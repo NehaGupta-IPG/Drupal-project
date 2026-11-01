@@ -328,6 +328,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // written to config.
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $default_settings = $field_type_manager->getDefaultStorageSettings($this->type);
+    $default_settings['column_changes_handled'] = FALSE;
     $this->settings = array_intersect_key($this->settings, $default_settings) + $default_settings;
 
     if ($this->isNew()) {
