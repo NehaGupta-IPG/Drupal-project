@@ -281,7 +281,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
 
     $limit = $this->options['items_per_page'];
-    $offset = $this->current_page * $this->options['items_per_page'] + $this->options['offset'];
+    $offset = $this->current_page * $this->options['items_per_page'] + (int) $this->options['offset'];
     if (!empty($this->options['total_pages'])) {
       if ($this->current_page >= $this->options['total_pages']) {
         $limit = $this->options['items_per_page'];
@@ -290,7 +290,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     }
 
     $this->view->query->setLimit($limit);
-    $this->view->query->setOffset($offset);
+    $this->view->query->setOffset((int) $offset);
   }
 
   /**

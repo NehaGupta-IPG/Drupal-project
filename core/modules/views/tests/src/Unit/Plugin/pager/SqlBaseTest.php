@@ -100,4 +100,26 @@ class SqlBaseTest extends UnitTestCase {
     $this->assertSame(0, $this->pager->options['items_per_page']);
   }
 
+  /**
+   * Tests the query() method when the offset option is not an integer.
+   *
+   * @see \Drupal\views\Plugin\views\pager\SqlBase::query()
+   */
+  public function testQueryNonIntOffset(): void {
+    $request = new Request([
+      'items_per_page' => 'All',
+    ]);
+    $this->view
+      ->method('getRequest')
+      ->willReturn($request);
+
+    $options = [
+      'offset' => '',
+    ];
+    $this->pager->init($this->view, $this->display, $options);
+    $this->pager->query();
+    // We're just asserting that an error isn't thrown.
+    $this->addToAssertionCount(1);
+  }
+
 }
