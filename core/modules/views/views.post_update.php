@@ -124,6 +124,18 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
 }
 
 /**
+ * Fix views containing entity fields with an empty group column value set.
+ */
+function views_post_update_empty_entity_field_group_column(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) use ($view_config_updater) {
+    return $view_config_updater->needsFixForEmptyGroupColumn($view);
+  });
+}
+
+/**
  * Clear cache to add new date default arguments.
  */
 function views_post_update_add_date_default_arguments(): void {
