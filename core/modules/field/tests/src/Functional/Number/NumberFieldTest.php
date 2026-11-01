@@ -50,11 +50,13 @@ class NumberFieldTest extends BrowserTestBase {
   public function testNumberDecimalField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
+    // Having precision = 10 and scale = 4 means 6 numbers before the decimal
+    // point and 4 after.
     FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'decimal',
-      'settings' => ['precision' => 8, 'scale' => 4],
+      'settings' => ['precision' => 10, 'scale' => 4],
     ])->save();
     FieldConfig::create([
       'field_name' => $field_name,
@@ -84,16 +86,30 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
     $this->assertSession()->responseContains('placeholder="0.00"');
 
-    // Submit a signed decimal value within the allowed precision and scale.
-    $value = '-1234.5678';
-    $edit = [
-      "{$field_name}[0][value]" => $value,
+    // Submit decimal values within the allowed precision and scale.
+    $valid_entries = [
+      '-1234.5678',
+      '19999.0000',
+      '99999.0000',
+      '909888.96',
+      '909888.99',
+      '988999.0096',
+      '988999.0099',
     ];
-    $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
-    $id = $match[1];
-    $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-    $this->assertSession()->responseContains($value);
+
+    foreach ($valid_entries as $valid_entry) {
+      $this->drupalGet('entity_test/add');
+      $edit = [
+        "{$field_name}[0][value]" => $valid_entry,
+      ];
+      $this->submitForm($edit, 'Save');
+      preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+      $id = $match[1];
+      $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
+      // SQLite does not preserve trailing zeros in stored decimal values.
+      $this->assertEquals((float) $valid_entry, (float) $this->assertSession()->fieldExists("{$field_name}[0][value]")->getValue());
+      $this->assertSession()->responseNotContains("{$field_name} is not a valid number.");
+    }
 
     // Try to create entries with more than one decimal separator; assert fail.
     $wrong_entries = [
@@ -130,6 +146,93 @@ class NumberFieldTest extends BrowserTestBase {
       $this->submitForm($edit, 'Save');
       $this->assertSession()->pageTextContains("{$field_name} must be a number.");
     }
+  }
+
+  /**
+   * Tests a decimal field with a minimum value, which offsets the step.
+   */
+  public function testNumberDecimalFieldMinimum(): void {
+    $field_name = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'decimal',
+      'settings' => ['precision' => 10, 'scale' => 2],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'settings' => ['min' => '10'],
+    ])->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, ['type' => 'number'])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSame('0.01', $this->assertSession()->fieldExists("{$field_name}[0][value]")->getAttribute('step'));
+
+    // Subtracting the minimum from these values must not introduce floating
+    // point rounding errors that cause them to be rejected.
+    foreach (['10.00', '10.01', '10.02', '123.45', '99999999.99'] as $valid_entry) {
+      $this->drupalGet('entity_test/add');
+      $this->submitForm(["{$field_name}[0][value]" => $valid_entry], 'Save');
+      $this->assertSession()->pageTextNotContains("{$field_name} is not a valid number.");
+      $this->assertSession()->pageTextContains('has been created.');
+    }
+
+    // Values with more decimals than the scale allows are not valid.
+    $this->drupalGet('entity_test/add');
+    $this->submitForm(["{$field_name}[0][value]" => '10.015'], 'Save');
+    $this->assertSession()->pageTextContains("{$field_name} is not a valid number.");
+  }
+
+  /**
+   * Tests a decimal field with a scale of 0.
+   *
+   * A scale of 0 is the documented minimum for decimal fields, and must not
+   * break the field settings form or the widget form element.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2230909
+   */
+  public function testNumberDecimalFieldZeroScale(): void {
+    $field_name = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'decimal',
+      'settings' => ['precision' => 10, 'scale' => 0],
+    ])->save();
+    $field = FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ]);
+    $field->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, ['type' => 'number'])
+      ->save();
+
+    $this->assertSetMinimumValue($field, 0);
+    $this->assertSame('1', $this->assertSession()->fieldExists('settings[min]')->getAttribute('step'));
+    $this->assertSame('1', $this->assertSession()->fieldExists('settings[max]')->getAttribute('step'));
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSame('1', $this->assertSession()->fieldExists("{$field_name}[0][value]")->getAttribute('step'));
+
+    $edit = ["{$field_name}[0][value]" => '42'];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('has been created.');
+
+    $this->drupalGet('entity_test/add');
+    $this->submitForm(["{$field_name}[0][value]" => '0.5'], 'Save');
+    $this->assertSession()->pageTextContains("{$field_name} is not a valid number.");
   }
 
   /**
