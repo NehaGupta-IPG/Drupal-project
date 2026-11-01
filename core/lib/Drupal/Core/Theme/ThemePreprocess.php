@@ -403,6 +403,25 @@ class ThemePreprocess {
    * @see \Drupal\Core\Theme\ThemePreprocess::preprocessMaintenancePage()
    */
   public function preprocessInstallPage(array &$variables): void {
+    // Expose the filesystem path and resolved site directory so the
+    // installer can display them. This helps administrators verify which
+    // site is being installed, particularly in multisite setups and on
+    // servers hosting multiple Drupal codebases.
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $site_dir = 'default';
+    if ($host !== '' && is_dir(DRUPAL_ROOT . '/sites/' . $host)) {
+      $site_dir = $host;
+    }
+    elseif (function_exists('conf_path')) {
+      $conf = conf_path();
+      if ($conf && $conf !== 'sites/default') {
+        $site_dir = basename($conf);
+      }
+    }
+    $variables['install_app_root']  = DRUPAL_ROOT;
+    $variables['install_site_path'] = 'sites/' . $site_dir;
+    $variables['install_host']      = $host;
+
     $installer_active_task = NULL;
     if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
       $installer_active_task = $GLOBALS['install_state']['active_task'];

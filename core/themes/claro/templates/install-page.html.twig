@@ -22,6 +22,21 @@
     {% endif %}
   </header>
 
+<<<<<<< Updated upstream
+=======
+  {% if install_app_root %}
+  <div class="install-location-banner" style="background:#e7f5ff;border:1px solid #74c0fc;padding:1em;margin:1em 0;border-radius:4px;font-family:monospace;font-size:0.9em;">
+    <div><strong>Installing into:</strong> {{ install_app_root }}</div>
+    {% if install_site_path %}
+      <div><strong>Site directory:</strong> {{ install_site_path }}</div>
+    {% endif %}
+    {% if install_host %}
+      <div><strong>Hostname:</strong> {{ install_host }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+>>>>>>> Stashed changes
   {% if page.sidebar_first %}
     <aside class="layout-sidebar-first">
       {{ page.sidebar_first }}
