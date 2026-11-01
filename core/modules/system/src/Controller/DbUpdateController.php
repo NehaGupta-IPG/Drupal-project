@@ -356,18 +356,17 @@ class DbUpdateController extends ControllerBase {
       if (!$data['allowed']) {
         $incompatible_updates_exist = TRUE;
         $incompatible_count++;
-        $module_update_key = $data['module'] . '_updates';
-        if (isset($build['start'][$module_update_key]['#items'][$data['number']])) {
+        if (isset($build['start'][$data['module']]['#items'][$data['number']])) {
           if ($data['missing_dependencies']) {
             $text = $this->t('This update will been skipped due to the following missing dependencies:') . '<em>' . implode(', ', $data['missing_dependencies']) . '</em>';
           }
           else {
             $text = $this->t("This update will be skipped due to an error in the module's code.");
           }
-          $build['start'][$module_update_key]['#items'][$data['number']] .= '<div class="warning">' . $text . '</div>';
+          $build['start'][$data['module']]['#items'][$data['number']] .= '<div class="warning">' . $text . '</div>';
         }
         // Move the module containing this update to the top of the list.
-        $build['start'] = [$module_update_key => $build['start'][$module_update_key]] + $build['start'];
+        $build['start'] = [$data['module'] => $build['start'][$data['module']]] + $build['start'];
       }
     }
 
