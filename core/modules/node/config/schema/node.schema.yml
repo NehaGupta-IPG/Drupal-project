@@ -32,15 +32,13 @@ node.type.*:
       label: 'Description'
       nullable: true
       constraints:
-        NotBlank:
-          allowNull: true
+        NotBlank: {}
     help:
       type: text
       label: 'Explanation or submission guidelines'
       nullable: true
       constraints:
-        NotBlank:
-          allowNull: true
+        NotBlank: {}
     new_revision:
       type: boolean
       label: 'Whether a new revision should be created by default'

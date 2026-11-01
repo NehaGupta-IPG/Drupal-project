@@ -263,15 +263,17 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
     $constraints += $this->getTypedDataManager()->getDefaultConstraints($this);
     // If either the constraints defined on this data definition or the default
     // constraints for this data definition's type contain the `NotBlank`
-    // constraint, then prevent a validation error from `NotBlank` if `NotNull`
-    // already would generate one. (When both are present, `NotBlank` should
-    // allow a NULL value, otherwise there will be two validation errors with
-    // distinct messages for the exact same problem. Automatically configuring
-    // `NotBlank`'s `allowNull: true` option mitigates that.)
+    // constraint, then automatically set `allowNull: true`, because:
+    // 1. when a value is required, the `NotNull` constraint is added
+    //    automatically, and then both the `NotNull` and `NotBlank` constraints
+    //    would generate a a different message for the same problem.
+    // 2. when a value is explicitly optional (i.e. `nullable: true` is set),
+    //    then NULL is a valid value and `NotBlank` should not trigger a
+    //    validation error.
     // @see ::isRequired()
     // @see \Drupal\Core\TypedData\TypedDataManager::getDefaultConstraints()
-    if (array_key_exists('NotBlank', $constraints) && $this->isRequired()) {
-      assert(array_key_exists('NotNull', $constraints));
+    // @see \Drupal\Core\Config\TypedConfigManager::buildDataDefinition()
+    if (array_key_exists('NotBlank', $constraints) && ($this->isRequired() || isset($this->definition['nullable']) ?? FALSE === TRUE)) {
       $constraints['NotBlank']['allowNull'] = TRUE;
     }
     return $constraints;
