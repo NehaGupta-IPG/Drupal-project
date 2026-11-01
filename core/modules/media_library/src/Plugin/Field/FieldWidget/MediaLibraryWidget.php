@@ -10,6 +10,7 @@ use Drupal\Core\Ajax\AnnounceCommand;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
@@ -66,6 +67,13 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   protected $moduleHandler;
 
   /**
+   * The entity display repository.
+   *
+   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   */
+  protected $entityDisplayRepository;
+
+  /**
    * Constructs a MediaLibraryWidget widget.
    *
    * @param string $plugin_id
@@ -84,12 +92,15 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The current active user.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   *   The entity display repository.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler, EntityDisplayRepositoryInterface $entity_display_repository) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
+    $this->entityDisplayRepository = $entity_display_repository;
   }
 
   /**
@@ -104,7 +115,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
       $container->get('current_user'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('entity_display.repository')
     );
   }
 
@@ -121,6 +133,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public static function defaultSettings() {
     return [
       'media_types' => [],
+      'form_mode' => MediaLibraryState::DEFAULT_FORM_MODE,
     ] + parent::defaultSettings();
   }
 
@@ -175,8 +188,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = [];
-    $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
+    $elements['form_mode'] = [
+      '#type' => 'select',
+      '#options' => $this->entityDisplayRepository->getFormModeOptions('media'),
+      '#title' => $this->t('Media Form mode'),
+      '#default_value' => $this->getSetting('form_mode'),
+      '#required' => TRUE,
+    ];
+
+    // Return $elements early if there aren't at least two types, as otherwise
+    // there's no selection to be made.
+    $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
     if (count($media_type_ids) <= 1) {
       return $elements;
     }
@@ -262,6 +285,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public function settingsSummary() {
     $summary = [];
     $media_type_labels = [];
+
+    $form_modes = $this->entityDisplayRepository->getFormModeOptions('media');
+    $mode = $this->getSetting('form_mode');
+    $summary[] = $this->t('Form mode: @mode', ['@mode' => $form_modes[$mode]]);
+
     $media_types = $this->entityTypeManager->getStorage('media_type')->loadMultiple($this->getAllowedMediaTypeIdsSorted());
     if (count($media_types) !== 1) {
       foreach ($media_types as $media_type) {
@@ -506,7 +534,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         $opener_parameters['revision_id'] = (string) $entity->getRevisionId();
       }
     }
-    $state = MediaLibraryState::create('media_library.opener.field_widget', $allowed_media_type_ids, $selected_type_id, $remaining, $opener_parameters);
+
+    $form_mode = $this->getSetting('form_mode') ?? MediaLibraryState::DEFAULT_FORM_MODE;
+    $state = MediaLibraryState::create('media_library.opener.field_widget', $allowed_media_type_ids, $selected_type_id, $remaining, $opener_parameters, $form_mode);
 
     // Add a button that will load the Media library in a modal using AJAX.
     $element['open_button'] = [

@@ -116,7 +116,10 @@ class MediaLibraryAddFormTest extends KernelTestBase {
    *   The render array for the media library.
    */
   protected function buildLibraryUi($selected_type_id) {
-    $state = MediaLibraryState::create('test', ['image', 'remote_video'], $selected_type_id, -1);
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
+    $state = MediaLibraryState::create('test', ['image', 'remote_video'], $selected_type_id, -1, [], $form_mode);
     return \Drupal::service('media_library.ui_builder')->buildUi($state);
   }
 
@@ -134,7 +137,7 @@ class MediaLibraryAddFormTest extends KernelTestBase {
    * Tests the validation of the selected type in the media library add form.
    */
   public function testSelectedTypeValidation(): void {
-    $state = MediaLibraryState::create('test', ['image', 'remote_video', 'header_image'], 'header_image', -1);
+    $state = MediaLibraryState::create('test', ['image', 'remote_video', 'header_image'], 'header_image', -1, $form_mode);
     $form_state = new FormState();
     $form_state->set('media_library_state', $state);
     $this->expectException(\InvalidArgumentException::class);

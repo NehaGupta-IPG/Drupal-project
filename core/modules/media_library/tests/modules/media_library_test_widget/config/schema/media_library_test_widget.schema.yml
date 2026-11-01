@@ -8,3 +8,6 @@ field.widget.settings.media_library_inception_widget:
       sequence:
         type: string
         label: 'Media type ID'
+    form_mode:
+      type: string
+      label: 'Form mode'

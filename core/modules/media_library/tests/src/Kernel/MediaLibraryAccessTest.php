@@ -95,12 +95,16 @@ class MediaLibraryAccessTest extends KernelTestBase {
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Create a media library state to test access.
+      'entity_type_id' => 'entity_test',
     $state = MediaLibraryState::create('media_library.opener.field_widget', ['file', 'image'], 'file', 2, [
       'entity_type_id' => 'entity_test_with_bundle',
       'bundle' => 'test',
       'field_name' => 'field_test_media',
-    ]);
+    ], $form_mode);
 
     $access_result = $ui_builder->checkAccess($this->createUser(), $state);
     $this->assertAccess(
@@ -164,12 +168,16 @@ class MediaLibraryAccessTest extends KernelTestBase {
       $permissions[] = $format->getPermissionName();
     }
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     $state = MediaLibraryState::create(
       'media_library.opener.editor',
       ['image'],
       'image',
       1,
-      ['filter_format_id' => $format->id()]
+      ['filter_format_id' => $format->id()],
+      $form_mode
     );
 
     $access_result = $this->container
@@ -219,13 +227,23 @@ class MediaLibraryAccessTest extends KernelTestBase {
     ]);
     $forbidden_entity->save();
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Create a media library state to test access.
-    $state = MediaLibraryState::create('media_library.opener.field_widget', ['file', 'image'], 'file', 2, [
-      'entity_type_id' => $forbidden_entity->getEntityTypeId(),
-      'bundle' => $forbidden_entity->bundle(),
-      'field_name' => 'field_test_media',
-      'entity_id' => $forbidden_entity->id(),
-    ]);
+    $state = MediaLibraryState::create(
+      'media_library.opener.field_widget',
+      ['file', 'image'],
+      'file',
+      2,
+      [
+        'entity_type_id' => $forbidden_entity->getEntityTypeId(),
+        'bundle' => $forbidden_entity->bundle(),
+        'field_name' => 'field_test_media',
+        'entity_id' => $forbidden_entity->id(),
+      ],
+      $form_mode
+    );
 
     $access_result = $ui_builder->checkAccess($this->createUser(), $state);
     $this->assertAccess($access_result, FALSE, NULL, [], ['url.query_args']);
@@ -245,7 +263,8 @@ class MediaLibraryAccessTest extends KernelTestBase {
       $state->getAllowedTypeIds(),
       $state->getSelectedTypeId(),
       $state->getAvailableSlots(),
-      $parameters
+      $parameters,
+      $state->getFormModeId()
     );
 
     $access_result = $ui_builder->checkAccess($this->createUser(), $state);
@@ -313,12 +332,15 @@ class MediaLibraryAccessTest extends KernelTestBase {
     // so that we can be certain that field access is checked.
     $account = $this->createUser(['administer entity_test content']);
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Test that access is denied even without an entity to work with.
     $state = MediaLibraryState::create('media_library.opener.field_widget', ['file', 'image'], 'file', 2, [
       'entity_type_id' => 'entity_test_with_bundle',
       'bundle' => 'test',
       'field_name' => $field_storage->getName(),
-    ]);
+    ], $form_mode);
     $access_result = $ui_builder->checkAccess($account, $state);
     $this->assertAccess(
       $access_result,
@@ -343,7 +365,8 @@ class MediaLibraryAccessTest extends KernelTestBase {
       $state->getAllowedTypeIds(),
       $state->getSelectedTypeId(),
       $state->getAvailableSlots(),
-      $parameters
+      $parameters,
+      $state->getFormModeId()
     );
     $access_result = $ui_builder->checkAccess($account, $state);
     $this->assertAccess(
@@ -364,12 +387,15 @@ class MediaLibraryAccessTest extends KernelTestBase {
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     // Create a media library state to test access.
     $state = MediaLibraryState::create('media_library.opener.field_widget', ['file', 'image'], 'file', 2, [
       'entity_type_id' => 'entity_test_with_bundle',
       'bundle' => 'test',
       'field_name' => 'field_test_media',
-    ]);
+    ], $form_mode);
 
     // Create a clone of the view so we can reset the original later.
     $view_original = clone Views::getView('media_library');
@@ -439,17 +465,20 @@ class MediaLibraryAccessTest extends KernelTestBase {
       $this->createMediaType('image')->id(),
     ];
 
+    // @todo where should this be pulled from? The field widget specifies.
+    $form_mode = MediaLibraryState::DEFAULT_FORM_MODE;
+
     $account = $this->createUser(['create media']);
     $this->setCurrentUser($account);
 
     /** @var \Drupal\media_library\MediaLibraryUiBuilder $ui_builder */
     $ui_builder = $this->container->get('media_library.ui_builder');
 
-    $state = MediaLibraryState::create('test', $media_types, $media_types[0], 1);
+    $state = MediaLibraryState::create('test', $media_types, $media_types[0], 1, [], $form_mode);
     $build = $ui_builder->buildUi($state);
     $this->assertEmpty($build['content']['form']);
 
-    $state = MediaLibraryState::create('test', $media_types, $media_types[1], 1);
+    $state = MediaLibraryState::create('test', $media_types, $media_types[1], 1, [], $form_mode);
     $build = $ui_builder->buildUi($state);
     $this->assertNotEmpty($build['content']['form']);
   }

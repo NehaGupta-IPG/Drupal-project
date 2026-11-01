@@ -241,7 +241,8 @@ class MediaLibraryUiBuilder {
 
     $selected_type_id = $state->getSelectedTypeId();
     foreach ($allowed_types as $allowed_type_id => $allowed_type) {
-      $link_state = MediaLibraryState::create($state->getOpenerId(), $state->getAllowedTypeIds(), $allowed_type_id, $state->getAvailableSlots(), $state->getOpenerParameters());
+      $link_state = MediaLibraryState::create($state->getOpenerId(), $state->getAllowedTypeIds(), $allowed_type_id, $state->getAvailableSlots(), $state->getOpenerParameters(), $state->getFormModeId());
+
       // Add the 'media_library_content' parameter so the response will contain
       // only the updated content for the tab.
       // @see self::buildUi()
@@ -308,7 +309,8 @@ class MediaLibraryUiBuilder {
       $state->remove('_media_library_form_rebuild');
     }
     $form_state->set('media_library_state', $state);
-    return $this->formBuilder->buildForm($plugin_definition['forms']['media_library_add'], $form_state);
+    $form_class = $plugin_definition['forms']['media_library_add'];
+    return $this->formBuilder->buildForm($form_class, $form_state);
   }
 
   /**

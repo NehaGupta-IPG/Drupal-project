@@ -8,6 +8,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\media\Entity\Media;
+use Drupal\media_library\MediaLibraryState;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -76,6 +77,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
         'region' => 'content',
         'settings' => [
           'media_types' => ['type_three'],
+          'form_mode' => MediaLibraryState::DEFAULT_FORM_MODE,
         ],
       ])
       ->save();
@@ -108,6 +110,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
         'region' => 'content',
         'settings' => [
           'media_types' => ['type_three'],
+          'form_mode' => MediaLibraryState::DEFAULT_FORM_MODE,
         ],
       ])
       ->save();

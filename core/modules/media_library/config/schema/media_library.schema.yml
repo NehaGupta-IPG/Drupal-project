@@ -8,6 +8,9 @@ field.widget.settings.media_library_widget:
       sequence:
         type: string
         label: 'Media type ID'
+    form_mode:
+      type: string
+      label: 'Form mode'
 
 media_library.settings:
   type: config_object
