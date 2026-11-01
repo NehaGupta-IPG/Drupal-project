@@ -138,6 +138,28 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
         '%label' => $this->getEntity()->label(),
       ]);
     }
+    /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
+    $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+    $menu_link_manager->resetDefinitions();
+    // Reset the static load cache.
+    \Drupal::entityTypeManager()->getStorage('menu_link_content')->resetCache();
+    $menu_plugin_id = $entity->getPluginId();
+
+    $entity = NULL;
+
+    // Pull the path from the menu link content.
+    if (str_starts_with($menu_plugin_id, 'menu_link_content')) {
+      [, $uuid] = explode(':', $menu_plugin_id, 2);
+      /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $entity */
+      $entity = \Drupal::service('entity.repository')
+        ->loadEntityByUuid('menu_link_content', $uuid);
+    }
+    $child_ids = array_values($menu_link_manager->getChildIds($menu_plugin_id));
+    if ($child_ids) {
+      return $this->t('This page has %number child menu links,These will be moved one page higher in the menu hierarchy', [
+        '%number' => count($child_ids),
+      ]);
+    }
 
     return $this->traitGetQuestion();
   }
