@@ -322,7 +322,7 @@ class Url implements TrustedCallbackInterface {
       $url = static::fromRouteUri($uri_parts, $uri_options, $uri);
     }
     else {
-      $url = new static($uri, [], $options);
+      $url = new static(trim(strtok($uri, '?#')), [], $uri_options);
       if ($uri_parts['scheme'] !== 'base') {
         $url->external = TRUE;
         $url->setOption('external', TRUE);

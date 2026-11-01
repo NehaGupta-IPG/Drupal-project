@@ -353,7 +353,7 @@ class UrlTest extends KernelTestBase {
     $url = $test_url . '?drupal=awesome';
     $query = ['awesome' => 'drupal'];
     $result = Url::fromUri($url, ['query' => $query])->toString();
-    $this->assertEquals('https://www.drupal.org/?drupal=awesome&awesome=drupal', $result);
+    $this->assertEquals('https://www.drupal.org/?awesome=drupal&drupal=awesome', $result);
   }
 
 }
