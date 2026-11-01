@@ -109,9 +109,12 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     }
 
     // Attach favicon.
-    if ($this->themeSettingsProvider->getSetting('features.favicon')) {
-      $favicon = $this->themeSettingsProvider->getSetting('favicon.url');
-      $type = $this->themeSettingsProvider->getSetting('favicon.mimetype');
+    if (\Drupal::service('Drupal\Core\Extension\ThemeSettingsProvider')->getS  
+    etting('features.favicon')) {
+      $config = \Drupal::config('system.theme');
+      $favicon_theme = $config->get('admin') && $config->get('favicon') ? $config->get('default') : NULL;
+      $favicon = \Drupal::service('Drupal\Core\Extension\ThemeSettingsProvider')->getSetting('favicon.url', $favicon_theme);
+      $type = \Drupal::service('Drupal\Core\Extension\ThemeSettingsProvider')->getSetting('favicon.mimetype', $favicon_theme);
       $page['#attached']['html_head_link'][][] = [
         'rel' => 'icon',
         'href' => UrlHelper::stripDangerousProtocols($favicon),
