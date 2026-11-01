@@ -216,7 +216,7 @@ class Tables implements TablesInterface {
             $propertyDefinitions = $field_storage->getPropertyDefinitions();
 
             // Prepare the next index prefix.
-            $next_index_prefix = "$relationship_specifier.$column";
+            $next_index_prefix = "$specifier.$relationship_specifier.$column";
           }
         }
         if ($index_prefix === '' && $field_storage->isMultiple()) {
@@ -323,7 +323,7 @@ class Tables implements TablesInterface {
         if (!$propertyDefinitions) {
           $propertyDefinitions = $field_storage->getPropertyDefinitions();
           $relationship_specifier = $specifiers[$key + 1];
-          $next_index_prefix = $relationship_specifier;
+          $next_index_prefix = "$specifier.$relationship_specifier";
         }
         $entity_type_id = NULL;
         // Relationship specifier can also contain the entity type ID, i.e.
