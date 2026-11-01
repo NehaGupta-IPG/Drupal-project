@@ -3,7 +3,6 @@
 namespace Drupal\Core\Config\Development;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
