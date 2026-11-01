@@ -42,7 +42,14 @@ trait LayoutBuilderEntityFormTrait {
       ],
       'message' => [
         '#theme' => 'status_messages',
-        '#message_list' => ['status' => [$message]],
+        '#message_list' => [
+          'status' => [
+            [
+              '#theme' => 'status_message_item',
+              '#message' => $message,
+            ],
+          ]
+        ],
         '#status_headings' => [
           'status' => t('Status message'),
           'error' => t('Error message'),
