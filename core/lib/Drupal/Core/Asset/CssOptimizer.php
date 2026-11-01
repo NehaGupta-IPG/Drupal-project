@@ -231,6 +231,9 @@ class CssOptimizer implements AssetOptimizerInterface {
         "$1",
         $contents
       );
+
+      $contents = $this->cssCustomMedia($contents);
+
       // Remove certain whitespace.
       // There are different conditions for removing leading and trailing
       // whitespace.
@@ -296,6 +299,49 @@ class CssOptimizer implements AssetOptimizerInterface {
       $path = preg_replace('`(^|/)(?!\.\./)([^/]+)/\.\./`', '$1', $path);
     }
     return 'url(' . $this->fileUrlGenerator->generateString($path) . ')';
+  }
+
+  /**
+   * Get breakpoint media queries.
+   *
+   * @return array
+   */
+  protected function getMediaQueryList() {
+    $list = [];
+    if ($cache = \Drupal::cache()->get(__FUNCTION__ . ':list')) {
+      $list = $cache->data;
+    } else {
+      $groups = \Drupal::service('breakpoint.manager')->getGroups();
+      foreach ($groups as $group => $value) {
+        $breakpoints = \Drupal::service('breakpoint.manager')->getBreakpointsByGroup($group);
+        foreach ($breakpoints as $key => $value) {
+          $id = str_replace($value->getProvider() . '.', '', $key);
+          $list["--{$group}-{$id}"] = $value->getMediaQuery();
+        }
+      }
+      \Drupal::cache()->set(__FUNCTION__ . ':list', $list);
+    }
+
+    return $list;
+  }
+
+  /**
+   * Replace custom media queries with breakpoint media queries.
+   *
+   * @param string $content
+   * @return string
+   */
+  protected function cssCustomMedia($content): string {
+    $list = $this->getMediaQueryList();
+
+    $content = preg_replace_callback('/(@media.*)(\((--.*)\))/', function ($matches) use ($list) {
+      if (isset($list[$matches[3]])) {
+        return "{$matches[1]}{$list[$matches[3]]}";
+      }
+      return '';
+    }, $content);
+
+    return $content;
   }
 
 }
