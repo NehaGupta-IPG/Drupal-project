@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Extension;
 
+use Composer\InstalledVersions;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
@@ -589,6 +590,27 @@ abstract class ExtensionList {
     foreach ($this->defaults as $key => $default_value) {
       if (!isset($info[$key])) {
         $info[$key] = $default_value;
+      }
+    }
+
+    // Try to detect version from Composer.
+    if (!isset($info['version']) || $info['version'] == NULL || empty($info['version'])) {
+      $filename = $extension->getPathname();
+      if ($filename) {
+        $package_path = dirname(realpath($filename));
+        foreach (InstalledVersions::getInstalledPackages() as $package_name) {
+          $installedPath = InstalledVersions::getInstallPath($package_name);
+          if ($installedPath) {
+            $composer_package_path = realpath($installedPath);
+            if (str_starts_with($package_path, $composer_package_path)) {
+              $info['version'] = InstalledVersions::getPrettyVersion($package_name);
+              if (str_ends_with($info['version'], '-dev')) {
+                $info['version'] .= '#' . InstalledVersions::getReference($package_name);
+              }
+              break;
+            }
+          }
+        }
       }
     }
 
