@@ -393,6 +393,7 @@ class ContentTranslationHooks {
    * Performs language fallback for inaccessible translations.
    */
   #[Hook('language_fallback_candidates_entity_view_alter')]
+  #[Hook('language_fallback_candidates_entity_upcast_alter')]
   public function languageFallbackCandidatesEntityViewAlter(&$candidates, $context): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $context['data'];
