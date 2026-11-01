@@ -109,14 +109,17 @@ class BooleanFormatterTest extends KernelTestBase {
     $data = [];
     $data[] = [0, [], 'Off'];
     $data[] = [1, [], 'On'];
+    $data[] = [NULL, [], 'Off'];
 
     $format = ['format' => 'enabled-disabled'];
     $data[] = [0, $format, 'Disabled'];
     $data[] = [1, $format, 'Enabled'];
+    $data[] = [NULL, $format, 'Disabled'];
 
     $format = ['format' => 'unicode-yes-no'];
     $data[] = [1, $format, '✔'];
     $data[] = [0, $format, '✖'];
+    $data[] = [NULL, $format, '✖'];
 
     $format = [
       'format' => 'custom',
@@ -125,6 +128,7 @@ class BooleanFormatterTest extends KernelTestBase {
     ];
     $data[] = [0, $format, 'FALSE'];
     $data[] = [1, $format, 'TRUE'];
+    $data[] = [NULL, $format, 'FALSE'];
 
     foreach ($data as $test_data) {
       [$value, $settings, $expected] = $test_data;
