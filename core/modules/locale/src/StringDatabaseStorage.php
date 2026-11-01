@@ -190,7 +190,7 @@ class StringDatabaseStorage implements StringStorageInterface {
       $this->dbDelete('locales_target', $keys)->execute();
       if ($string->isSource()) {
         $this->dbDelete('locales_source', $keys)->execute();
-        $this->dbDelete('locales_location', $keys)->execute();
+        $this->dbDelete('locales_location', ['sid' => $string->getId()])->execute();
         $string->setId(NULL);
       }
     }

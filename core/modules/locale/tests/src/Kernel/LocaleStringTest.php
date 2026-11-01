@@ -125,6 +125,16 @@ class LocaleStringTest extends KernelTestBase {
       ->fetchAllAssoc('type');
     $this->assertCount(4, $rows);
     $this->assertEquals(substr($location, 0, 255), $rows['path']->name);
+
+    // Tests that the correct locations are deleted when a string is deleted.
+    $source_string_id = $source_string->getId();
+    $source_string->delete();
+    $locations = $this->container->get('database')->select('locales_location')
+      ->fields('locales_location')
+      ->condition('sid', $source_string_id)
+      ->execute()
+      ->fetchAll();
+    $this->assertCount(0, $locations);
   }
 
   /**
