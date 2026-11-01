@@ -105,6 +105,7 @@ class PoDatabaseReader implements PoReaderInterface {
     $langcode = $this->langcode;
     $options = $this->options;
     $conditions = [];
+    $sort = ['source', 'context'];
 
     if (array_sum($options) == 0) {
       // If user asked to not include anything in the translation files,
@@ -138,11 +139,11 @@ class PoDatabaseReader implements PoReaderInterface {
         // Filter for string with translation.
         $conditions['translated'] = TRUE;
       }
-      return \Drupal::service('locale.storage')->getTranslations($conditions);
+      return \Drupal::service('locale.storage')->getTranslations($conditions, ['sort' => $sort]);
     }
     else {
       // If no language, we don't need any of the target fields.
-      return \Drupal::service('locale.storage')->getStrings($conditions);
+      return \Drupal::service('locale.storage')->getStrings($conditions, ['sort' => $sort]);
     }
   }
 

@@ -320,7 +320,8 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   protected function dbStringLoad(array $conditions, array $options, $class) {
     $strings = [];
-    $result = $this->dbStringSelect($conditions, $options)->execute();
+    $select = $this->dbStringSelect($conditions, $options);
+    $result = $select->execute();
     foreach ($result as $item) {
       /** @var \Drupal\locale\StringInterface $string */
       $string = new $class($item);
@@ -347,6 +348,7 @@ class StringDatabaseStorage implements StringStorageInterface {
    *   these additional ones:
    *   - 'translation', Whether to include translation fields too. Defaults to
    *     FALSE.
+   *   - 'sort': Array of columns to use for sorting.
    *
    * @return \Drupal\Core\Database\Query\Select
    *   Query object with all the tables, fields and conditions.
@@ -445,6 +447,12 @@ class StringDatabaseStorage implements StringStorageInterface {
 
     if (!empty($options['pager limit'])) {
       $query = $query->extend(PagerSelectExtender::class)->limit($options['pager limit']);
+    }
+
+    if (!empty($options['sort'])) {
+      foreach ($options['sort'] as $sort) {
+        $query->orderBy('s.' . $sort);
+      }
     }
 
     return $query;

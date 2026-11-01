@@ -23,6 +23,7 @@ interface StringStorageInterface {
    *   any of the following optional keys:
    *   - 'filters': Array of string filters indexed by field name.
    *   - 'pager limit': Use pager and set this limit value.
+   *   - 'sort': Array of columns to use for sorting.
    *
    * @return array
    *   Array of \Drupal\locale\StringInterface objects matching the conditions.
