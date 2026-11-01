@@ -676,6 +676,8 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     // Test as an admin.
     $admin_user = $this->createUser(['access content', 'administer taxonomy']);
     $this->setCurrentUser($admin_user);
+    // Reset the static tree cache, which does not consider the current user.
+    \Drupal::entityTypeManager()->getStorage('taxonomy_term')->resetCache([]);
     $referenceable_tests = [
       [
         'arguments' => [

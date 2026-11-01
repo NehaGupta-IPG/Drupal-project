@@ -99,21 +99,6 @@ class TermSelection extends DefaultSelection {
   /**
    * {@inheritdoc}
    */
-  protected function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
-    $query = parent::buildEntityQuery($match, $match_operator);
-
-    // Adding the 'taxonomy_term_access' tag is sadly insufficient for terms:
-    // core requires us to also know about the concept of 'published' and
-    // 'unpublished'.
-    if (!$this->currentUser->hasPermission('administer taxonomy')) {
-      $query->condition('status', 1);
-    }
-    return $query;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function createNewEntity($entity_type_id, $bundle, $label, $uid) {
     $term = parent::createNewEntity($entity_type_id, $bundle, $label, $uid);
 
