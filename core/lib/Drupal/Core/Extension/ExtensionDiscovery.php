@@ -49,6 +49,11 @@ class ExtensionDiscovery {
   const ORIGIN_SITE = 5;
 
   /**
+   * Origin directory weight: Core test modules.
+   */
+  const ORIGIN_CORE_TESTS = 6;
+
+  /**
    * Regular expression to match PHP function names.
    *
    * @see http://php.net/manual/functions.user-defined.php
@@ -198,6 +203,10 @@ class ExtensionDiscovery {
     // variable in settings.php.
     if (!isset($include_tests)) {
       $include_tests = Settings::get('extension_discovery_scan_tests') || drupal_valid_test_ua();
+    }
+
+    if ($include_tests) {
+      $searchdirs[static::ORIGIN_CORE_TESTS] = 'core/tests';
     }
 
     $files = [];
