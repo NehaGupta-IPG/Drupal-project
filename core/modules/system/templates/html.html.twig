@@ -28,10 +28,16 @@
 <!DOCTYPE html>
 <html{{ html_attributes }}>
   <head>
-    <head-placeholder token="{{ placeholder_token }}">
-    <title>{{ head_title|safe_join(' | ') }}</title>
+    {# Make sure the Content-Type comes first because the IE browser may be
+       vulnerable to XSS via encoding attacks from any content that comes
+       before this META tag, such as a TITLE tag. The charset meta tag must
+       also be present within the first 1024 bytes of an HTML document.
+    #}
+    <meta charset="utf-8" />
     <css-placeholder token="{{ placeholder_token }}">
     <js-placeholder token="{{ placeholder_token }}">
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    <head-placeholder token="{{ placeholder_token }}">
   </head>
   <body{{ attributes }}>
     {#

@@ -72,6 +72,21 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     // Add the bare minimum of attachments from the system module and the
     // current maintenance theme.
     $this->systemPageAttachments($html['page']);
+
+    // Add the charset meta attribute to the installer page. This is done
+    // outside ::systemPageAttachments() because it is added in html.html.twig.
+    $html['page']['#attached']['html_head'][] = [
+      [
+        '#tag' => 'meta',
+        '#attributes' => [
+          'charset' => 'utf-8',
+        ],
+        // Security: This always has to be output first.
+        '#weight' => -1000,
+      ],
+      'system_meta_content_type',
+    ];
+
     $this->renderer->renderRoot($html);
 
     $response = new HtmlResponse();
@@ -124,17 +139,6 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
 
     // Attach default meta tags.
     $meta_default = [
-      // Make sure the Content-Type comes first because the IE browser may be
-      // vulnerable to XSS via encoding attacks from any content that comes
-      // before this META tag, such as a TITLE tag.
-      'system_meta_content_type' => [
-        '#tag' => 'meta',
-        '#attributes' => [
-          'charset' => 'utf-8',
-        ],
-        // Security: This always has to be output first.
-        '#weight' => -1000,
-      ],
       // Show Drupal and the major version number in the META GENERATOR tag.
       'system_meta_generator' => [
         '#type' => 'html_tag',
