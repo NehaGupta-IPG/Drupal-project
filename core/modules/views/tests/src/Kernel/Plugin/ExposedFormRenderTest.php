@@ -56,6 +56,9 @@ class ExposedFormRenderTest extends ViewsKernelTestBase {
     // Make sure the description is shown.
     $result = $this->getSimpleXmlElementsByXpath('//form//div[contains(@id, "edit-type--2--description") and normalize-space(text())="Exposed description"]');
     $this->assertCount(1, $result, 'Filter description was found.');
+    // Make sure the form element is aria-describedby the description.
+    $describedby_result = $this->xpath('//form//select[@id="edit-type--2" and @aria-describedby="edit-type--2--description"]');
+    $this->assertCount(1, $describedby_result, 'The filter is aria-describedby the description.');
   }
 
   /**
