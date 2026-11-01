@@ -38,7 +38,6 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
     'label' => 'title',
     'langcode' => 'langcode',
     'uuid' => 'uuid',
-    'bundle' => 'bundle',
     'published' => 'enabled',
   ],
   handlers: [
@@ -202,13 +201,6 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage, array &$values) {
-    $values += ['bundle' => 'menu_link_content'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -294,11 +286,6 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $fields['uuid']->setDescription(t('The content menu link UUID.'));
 
     $fields['langcode']->setDescription(t('The menu link language code.'));
-
-    $fields['bundle']
-      ->setDescription(t('The content menu link bundle.'))
-      ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH)
-      ->setSetting('is_ascii', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Menu link title'))
