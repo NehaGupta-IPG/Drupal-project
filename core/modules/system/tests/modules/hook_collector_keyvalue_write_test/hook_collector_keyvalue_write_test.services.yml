@@ -1,0 +1,6 @@
+services:
+  hook_collector_keyvalue_write_test.cache_factory:
+    class: Drupal\hook_collector_keyvalue_write_test\CacheFactoryDecorator
+    public: false
+    decorates: cache_factory
+    arguments: ['@.inner', '@current_user']

@@ -1,0 +1,5 @@
+name: 'Hook collector keyvalue write test'
+type: module
+description: 'Decorates the cache factory with a service that needs the current user.'
+package: Testing
+version: VERSION
