@@ -22,6 +22,7 @@ trait JsonSchemaReflectionTrait {
    *   Fallback. Defaults to an empty array, which is a matches-all schema.
    * @param bool $nullable
    *   If a schema is returned from reflection, whether to add a null option.
+   *   The option is not added when the method already declares the null type.
    *
    * @return array
    *   JSON Schema.
@@ -35,10 +36,17 @@ trait JsonSchemaReflectionTrait {
     if (count($schemas) === 0) {
       return $fallback;
     }
-    $schemas = array_values(array_filter([
-      ...array_map(fn ($schema) => $schema->newInstance()->getJsonSchema(), $schemas),
-      $nullable ? ['type' => 'null'] : NULL,
-    ]));
+    $schemas = array_map(fn ($schema) => $schema->newInstance()->getJsonSchema(), $schemas);
+
+    // A schema's type is a single type, like 'null', or a list of types, like
+    // ['string', 'null']. It can also have none, like ['enum' => ['a', NULL]].
+    $has_null_type = fn (array $schema): bool => in_array('null', (array) ($schema['type'] ?? []), TRUE);
+
+    // A oneOf accepts a value only if exactly one option matches, so a second
+    // null option would reject NULL.
+    if ($nullable && !array_any($schemas, $has_null_type)) {
+      $schemas[] = ['type' => 'null'];
+    }
     return count($schemas) === 1
       ? current($schemas)
       : ['oneOf' => $schemas];

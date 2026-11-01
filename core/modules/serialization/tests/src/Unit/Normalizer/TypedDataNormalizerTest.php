@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\Any;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -93,6 +94,35 @@ class TypedDataNormalizerTest extends UnitTestCase {
     return [
       'stringable' => [$optional],
       'stringable, required' => [$required],
+      // #[JsonSchema] states what the method can return, so a value that says it
+      // can be NULL has to pass its own schema when it is NULL.
+      'declares a null option' => [
+        new class(DataDefinition::createFromDataType('any')) extends Any {
+
+          /**
+           * {@inheritdoc}
+           */
+          #[JsonSchema(['type' => 'string'])]
+          #[JsonSchema(['type' => 'null'])]
+          public function getValue() {
+            return NULL;
+          }
+
+        },
+      ],
+      'declares null in a list of types' => [
+        new class(DataDefinition::createFromDataType('any')) extends Any {
+
+          /**
+           * {@inheritdoc}
+           */
+          #[JsonSchema(['type' => ['string', 'null']])]
+          public function getValue() {
+            return NULL;
+          }
+
+        },
+      ],
     ];
   }
 
