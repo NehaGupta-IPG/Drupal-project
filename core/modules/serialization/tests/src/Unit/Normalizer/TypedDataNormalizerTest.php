@@ -63,23 +63,42 @@ class TypedDataNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the JSON Schema for a stringable value.
+   * Tests the JSON Schema for optional and required data.
    */
-  #[DataProvider('providerTestStringableSchema')]
-  public function testStringableSchema(bool $required, array $expected): void {
-    $typed_data = new Any(DataDefinition::createFromDataType('any')->setRequired($required));
-    $typed_data->setValue(Markup::create('<p>Text</p>'));
-
+  #[DataProvider('providerTestJsonSchemaNullable')]
+  public function testJsonSchemaNullable(TypedDataInterface $typed_data, array $expected): void {
     $this->assertSame($expected, $this->normalizer->normalize($typed_data, 'json_schema'));
   }
 
   /**
-   * Data provider for ::testStringableSchema().
+   * Data provider for ::testJsonSchemaNullable().
    */
-  public static function providerTestStringableSchema(): array {
+  public static function providerTestJsonSchemaNullable(): array {
+    $stringable = static function (bool $required): Any {
+      $typed_data = new Any(DataDefinition::createFromDataType('any')->setRequired($required));
+      $typed_data->setValue(Markup::create('<p>Text</p>'));
+      return $typed_data;
+    };
+    $declared = static function (bool $required): Any {
+      return new class(DataDefinition::createFromDataType('any')->setRequired($required)) extends Any {
+
+        /**
+         * {@inheritdoc}
+         */
+        #[JsonSchema(['type' => 'string'])]
+        public function getValue() {
+          return 'Text';
+        }
+
+      };
+    };
+    $not_nullable = ['type' => 'string'];
+    $nullable = ['oneOf' => [$not_nullable, ['type' => 'null']]];
     return [
-      'optional' => [FALSE, ['oneOf' => [['type' => 'string'], ['type' => 'null']]]],
-      'required' => [TRUE, ['type' => 'string']],
+      'optional stringable value: nullable' => [$stringable(FALSE), $nullable],
+      'required stringable value: not nullable' => [$stringable(TRUE), $not_nullable],
+      'optional declared value: nullable' => [$declared(FALSE), $nullable],
+      'required declared value: not nullable' => [$declared(TRUE), $not_nullable],
     ];
   }
 
