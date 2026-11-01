@@ -521,17 +521,26 @@ class SystemRequirementsHooks {
       $requirements['database_system_version']['description'] = $error_message;
     }
 
-    // Test database JSON support.
-    $requirements['database_support_json'] = [
-      'title' => $this->t('Database support for JSON'),
-      'severity' => RequirementSeverity::OK,
-      'value' => $this->t('Available'),
-      'description' => $this->t('Drupal requires databases that support JSON storage.'),
-    ];
-
     if (!Database::getConnection()->hasJson()) {
-      $requirements['database_support_json']['value'] = $this->t('Not available');
-      $requirements['database_support_json']['severity'] = RequirementSeverity::Error;
+
+      // Show JSON is not supported in both the runtime (status report) and
+      // update phases.
+      $requirements['database_support_json'] = [
+        'title' => $this->t('Database support for JSON'),
+        'severity' => RequirementSeverity::Error,
+        'value' => $this->t('Not available'),
+        'description' => $this->t('Drupal requires databases that support JSON storage.'),
+      ];
+    }
+    elseif ($phase === 'runtime') {
+
+      // Show JSON is supported in the runtime (status report) phase only.
+      $requirements['database_support_json'] = [
+        'title' => $this->t('Database support for JSON'),
+        'severity' => RequirementSeverity::OK,
+        'value' => $this->t('Available'),
+        'description' => $this->t('Drupal requires databases that support JSON storage.'),
+      ];
     }
 
     // Test PHP memory_limit
