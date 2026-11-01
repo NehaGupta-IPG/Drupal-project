@@ -1096,6 +1096,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     \Drupal::setContainer($this->container);
 
+    // Keep Symfony's registry current when rebuilding a prepared container.
+    if ($this->prepared) {
+      MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
+    }
+
     // Allow other parts of the codebase to react on container initialization in
     // subrequest.
     if (!empty($subrequest)) {
@@ -1406,6 +1411,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       foreach ($messages as $message) {
         $this->container->get('messenger')->addMessage($message, $type);
       }
+    }
+
+    // Refresh the MIME guesser after resetting a prepared container's services.
+    if ($this->prepared) {
+      MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
     }
 
     // Allow other parts of the codebase to react on container reset in

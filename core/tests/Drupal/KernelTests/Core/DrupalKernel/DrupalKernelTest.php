@@ -19,6 +19,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
 /**
@@ -297,6 +299,50 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, vfsStream::url('root'));
     $kernel->setSitePath(vfsStream::url('root/sites/default'));
     $kernel->boot();
+  }
+
+  /**
+   * Tests MIME registration follows container rebuilds and service resets.
+   */
+  #[TestWith(['rebuildContainer'])]
+  #[TestWith(['resetContainer'])]
+  public function testMimeGuesserContainerLifetime(string $method): void {
+    $original = MimeTypes::getDefault();
+    try {
+      $request = Request::createFromGlobals();
+      $kernel = $this->getTestKernel($request, ['system' => 'system', 'user' => 'user']);
+      $kernel->getContainer()->set('file.mime_type.guesser', new class() implements MimeTypeGuesserInterface {
+
+        /**
+         * {@inheritdoc}
+         */
+        public function isGuesserSupported(): bool {
+          return TRUE;
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        public function guessMimeType(string $path): ?string {
+          return 'application/x-old-container';
+        }
+
+      });
+      $kernel->preHandle($request);
+      $this->assertSame('application/x-old-container', MimeTypes::getDefault()->guessMimeType('missing.jpeg'));
+
+      // The lifecycle operation must refresh registration without preHandle().
+      $kernel->{$method}();
+      gc_collect_cycles();
+
+      // A missing file requires Drupal's extension-based guessing. The distinct
+      // result also rules out continued delegation to the old guesser.
+      $this->assertSame('image/jpeg', MimeTypes::getDefault()->guessMimeType('missing.jpeg'));
+      $this->assertSame('image/jpeg', MimeTypes::getDefault()->guessMimeType('public://missing.jpeg'));
+    }
+    finally {
+      MimeTypes::setDefault($original);
+    }
   }
 
   /**
