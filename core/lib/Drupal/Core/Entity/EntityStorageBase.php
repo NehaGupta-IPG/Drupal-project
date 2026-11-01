@@ -591,6 +591,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     // Track if this entity is new.
     $is_new = $entity->isNew();
 
+    // Clear the original entity so it can be reloaded.
+    if (!$is_new) {
+      $entity->setOriginal(NULL);
+    }
+
     // Execute presave logic and invoke the related hooks.
     $id = $this->doPreSave($entity);
 
