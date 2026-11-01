@@ -72,7 +72,7 @@ class MediaLibraryThemeHooks {
       /** @var \Drupal\media\MediaInterface $media */
       $media = $variables['media'];
       $variables['#cache']['contexts'][] = 'user.permissions';
-      $rel = $media->access('edit') ? 'edit-form' : 'canonical';
+      $rel = $media->access('update') ? 'edit-form' : 'canonical';
       $variables['url'] = $media->toUrl($rel, [
         'language' => $media->language(),
       ]);
