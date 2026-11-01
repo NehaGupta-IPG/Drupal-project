@@ -30040,12 +30040,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/CastedIntFieldJoin.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#3 \\$table of method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) expects array, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/CastedIntFieldJoin.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\FieldOrLanguageJoin\\:\\:joinAddExtra\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -30060,12 +30054,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#3 \\$table of method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) expects array, string given\\.$#',
-	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
 ];
