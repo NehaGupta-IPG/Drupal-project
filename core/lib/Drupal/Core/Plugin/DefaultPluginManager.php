@@ -21,6 +21,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\Site\Settings;
 
 /**
  * Base class for plugin managers.
@@ -192,6 +193,8 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   public function setCacheBackend(CacheBackendInterface $cache_backend, $cache_key, array $cache_tags = []) {
     assert(Inspector::assertAllStrings($cache_tags), 'Cache Tags must be strings.');
     $this->cacheBackend = $cache_backend;
+    $deployIdentifier = Settings::get('deployment_identifier') ? '.' . Settings::get('deployment_identifier') : '';
+    $cache_key = $cache_key . $deployIdentifier;
     $this->cacheKey = $cache_key;
     $this->cacheTags = $cache_tags;
   }
