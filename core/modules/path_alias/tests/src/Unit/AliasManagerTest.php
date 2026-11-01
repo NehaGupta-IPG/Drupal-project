@@ -320,6 +320,80 @@ class AliasManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the getAliasByPath cache with an un-preloaded path with alias.
+   *
+   * @legacy-covers ::getAliasByPath
+   * @legacy-covers ::writeCache
+   */
+  public function testGetAliasByPathUncachedMissWithAlias(): void {
+    $path_part1 = $this->randomMachineName();
+    $path_part2 = $this->randomMachineName();
+    $path = '/' . $path_part1 . '/' . $path_part2;
+    $cached_path = $this->randomMachineName();
+    $cached_no_alias_path = $this->randomMachineName();
+    $cached_alias = $this->randomMachineName();
+    $new_alias = $this->randomMachineName();
+
+    $language = $this->setUpCurrentLanguage();
+
+    $cached_paths = [$language->getId() => [$cached_path, $cached_no_alias_path]];
+    $this->cache->expects($this->once())
+      ->method('get')
+      ->with($this->cacheKey)
+      ->willReturn((object) ['data' => $cached_paths]);
+
+    // Simulate a request so that the preloaded paths are fetched.
+    $this->aliasManager->setCacheKey($this->path);
+
+    $this->aliasPrefixList->expects($this->any())
+      ->method('get')
+      ->with($path_part1)
+      ->willReturn(TRUE);
+
+    $this->aliasRepository->expects($this->once())
+      ->method('preloadPathAlias')
+      ->with($cached_paths[$language->getId()], $language->getId())
+      ->willReturn([$cached_path => $cached_alias]);
+
+    $this->aliasRepository->expects($this->once())
+      ->method('lookupBySystemPath')
+      ->with($path, $language->getId())
+      ->willReturn(['alias' => $new_alias]);
+
+    $this->assertEquals($new_alias, $this->aliasManager->getAliasByPath($path));
+    // Call it twice to test the static cache.
+    $this->assertEquals($new_alias, $this->aliasManager->getAliasByPath($path));
+
+    // There is already a cache entry, so this should not write out to the
+    // cache.
+    $this->cache->expects($this->never())
+      ->method('set');
+    $this->aliasManager->writeCache();
+  }
+
+  /**
+   * Tests getAliasByPath invalid argument exception for an invalid path.
+   *
+   * @legacy-covers ::getAliasByPath
+   */
+  public function testInvalidArgumentExceptionEmptyPath(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Source path  has to start with a slash.');
+    $this->aliasManager->getAliasByPath('');
+  }
+
+  /**
+   * Tests getAliasByPath invalid argument exception for an invalid path.
+   *
+   * @legacy-covers ::getAliasByPath
+   */
+  public function testInvalidArgumentExceptionPathNoForwardSlash(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Source path no/leading-forward-slash has to start with a slash.');
+    $this->aliasManager->getAliasByPath('no/leading-forward-slash');
+  }
+
+  /**
    * Sets up the current language.
    *
    * @return \Drupal\Core\Language\LanguageInterface
