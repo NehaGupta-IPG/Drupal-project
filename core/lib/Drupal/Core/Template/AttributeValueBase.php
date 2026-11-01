@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 
 /**
@@ -9,7 +10,7 @@ use Drupal\Component\Utility\Html;
  *
  * @see \Drupal\Core\Template\Attribute
  */
-abstract class AttributeValueBase {
+abstract class AttributeValueBase implements MarkupInterface {
 
   /**
    * Renders '$name=""' if $value is an empty string.
@@ -68,5 +69,15 @@ abstract class AttributeValueBase {
    * Implements the magic __toString() method.
    */
   abstract public function __toString();
+
+  /**
+   * Returns a representation of the object for use in JSON serialization.
+   *
+   * @return string
+   *   The safe string content.
+   */
+  public function jsonSerialize(): string {
+    return $this->__toString();
+  }
 
 }
