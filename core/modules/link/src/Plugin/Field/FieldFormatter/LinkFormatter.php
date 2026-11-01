@@ -3,6 +3,10 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -26,36 +30,18 @@ use Drupal\link\LinkItemInterface;
 )]
 class LinkFormatter extends FormatterBase {
 
-  /**
-   * The path validator service.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
-   * Constructs a new LinkFormatter.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Third party settings.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator service.
-   */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected PathValidatorInterface $pathValidator,
+    protected AccessManagerInterface $accessManager,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    $this->pathValidator = $path_validator;
   }
 
   /**
@@ -68,6 +54,7 @@ class LinkFormatter extends FormatterBase {
       'url_plain' => '',
       'rel' => '',
       'target' => '',
+      'access_check' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -119,6 +106,12 @@ class LinkFormatter extends FormatterBase {
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
     ];
+    $elements['access_check'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Run access checks'),
+      '#description' => $this->t('Prevents inaccessible links from being displayed.'),
+      '#default_value' => $this->getSetting('access_check'),
+    ];
 
     return $elements;
   }
@@ -150,6 +143,9 @@ class LinkFormatter extends FormatterBase {
     if (!empty($settings['target'])) {
       $summary[] = $this->t('Open link in new window');
     }
+    if (!empty($settings['access_check'])) {
+      $summary[] = $this->t('Run access checks');
+    }
 
     return $summary;
   }
@@ -165,8 +161,12 @@ class LinkFormatter extends FormatterBase {
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
-      // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
+      if (!$this->checkItemAccess($url, $element)) {
+        continue;
+      }
+
+      // By default use the full URL as the link text.
       $link_title = $url->toString();
 
       // If the title field value is available, use it for the link text.
@@ -252,6 +252,39 @@ class LinkFormatter extends FormatterBase {
 
     $url->setOptions($options);
     return $url;
+  }
+
+  /**
+   * Checks whether a link item may be rendered.
+   *
+   * @param \Drupal\Core\Url $url
+   *   The URL of the link item.
+   * @param array $element
+   *   The formatter build, which the access cacheability is merged into.
+   *
+   * @return bool
+   *   TRUE if the item may be rendered, FALSE to skip it.
+   */
+  protected function checkItemAccess(Url $url, array &$element): bool {
+    if (empty($this->getSetting('access_check'))) {
+      return TRUE;
+    }
+
+    $access = $this->checkUrlAccess($url);
+    CacheableMetadata::createFromRenderArray($element)
+      ->merge(CacheableMetadata::createFromObject($access))
+      ->applyTo($element);
+
+    return $access->isAllowed();
+  }
+
+  /**
+   * Checks access to the given URL.
+   */
+  protected function checkUrlAccess(Url $url): AccessResultInterface {
+    return $url->isRouted()
+      ? $this->accessManager->checkNamedRoute($url->getRouteName(), $url->getRouteParameters(), NULL, TRUE)
+      : AccessResult::allowed();
   }
 
 }

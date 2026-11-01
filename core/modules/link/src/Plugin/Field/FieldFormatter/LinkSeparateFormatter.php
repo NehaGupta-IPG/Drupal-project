@@ -45,8 +45,12 @@ class LinkSeparateFormatter extends LinkFormatter {
     $settings = $this->getSettings();
 
     foreach ($items as $delta => $item) {
-      // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
+      if (!$this->checkItemAccess($url, $element)) {
+        continue;
+      }
+
+      // By default use the full URL as the link text.
       $link_title = $url->toString();
 
       // If the link text field value is available, use it for the text.

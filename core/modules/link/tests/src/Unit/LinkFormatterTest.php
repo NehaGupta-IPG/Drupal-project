@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Unit;
 
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -29,10 +31,17 @@ class LinkFormatterTest extends UnitTestCase {
    * LinkItem::getUrl will throw \InvalidArgumentException.
    */
   public function testFormatterLinkItemUrlMalformed(): void {
+    $entity = $this->createStub(EntityInterface::class);
+
     $linkItem = $this->createMock(LinkItemInterface::class);
+    $linkItem->method('getParent')
+      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
+    $linkItem->method('__get')
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -52,7 +61,8 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createStub(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createStub(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
     $elements = $linkFormatter->viewElements($fieldList, 'es');
     $this->assertEquals('link', $elements[0]['#type']);
   }
@@ -61,10 +71,17 @@ class LinkFormatterTest extends UnitTestCase {
    * Tests when LinkItem::getUrl throws an unexpected exception.
    */
   public function testFormatterLinkItemUrlUnexpectedException(): void {
+    $entity = $this->createStub(EntityInterface::class);
+
     $linkItem = $this->createMock(LinkItemInterface::class);
+    $linkItem->method('getParent')
+      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willThrowException(new \Exception('Unexpected!!!'));
+    $linkItem->method('__get')
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -78,7 +95,8 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createStub(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createStub(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
     $this->expectException(\Exception::class);
     $this->expectExceptionMessageIs('Unexpected!!!');
     $linkFormatter->viewElements($fieldList, 'fr');
@@ -88,12 +106,18 @@ class LinkFormatterTest extends UnitTestCase {
    * Tests when LinkItem::getUrl returns a functional URL.
    */
   public function testFormatterLinkItem(): void {
+    $entity = $this->createStub(EntityInterface::class);
     $expectedUrl = Url::fromUri('route:<front>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
+    $linkItem->method('getParent')
+      ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willReturn($expectedUrl);
+    $linkItem->method('__get')
+      ->with('options')
+      ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -113,7 +137,8 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createStub(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $accessManager = $this->createStub(AccessManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $accessManager);
     $elements = $linkFormatter->viewElements($fieldList, 'zh');
     $this->assertEquals([
       [
