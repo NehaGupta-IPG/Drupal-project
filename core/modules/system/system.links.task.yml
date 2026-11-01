@@ -68,6 +68,10 @@ system.admin_content:
   title: Content
   route_name: system.admin_content
   base_route: system.admin_content
+system.admin_content_overview:
+  title: 'Overview'
+  route_name: system.admin_content
+  parent_id: system.admin_content
 
 system.performance_settings:
   title: 'Performance'
