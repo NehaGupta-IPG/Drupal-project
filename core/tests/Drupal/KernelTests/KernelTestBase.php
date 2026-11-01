@@ -128,6 +128,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
 
   /**
    * The test container.
+   *
+   * In a test class that does not share its environment, this is the container
+   * builder that "::register()" receives, which is also used at runtime after a
+   * fresh compile. In a test class that shares its environment, this is the
+   * compiled container that was loaded from the cache.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareEnvironment
    */
   protected ?ContainerInterface $container;
 
@@ -686,10 +693,18 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    * Extend this method in your test to register additional services. This
    * method is called whenever the kernel is rebuilt.
    *
+   * In a test class that shares its environment, the container is cached and
+   * loaded from the cache for every test method. Add a service as a definition,
+   * with "$container->register()" or "$container->setDefinition()": the
+   * definition is compiled into the cached container. An object set with
+   * "$container->set()" exists only on this container builder and is not in
+   * the cached container.
+   *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The service container to enhance.
    *
    * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
+   * @see \Drupal\TestTools\Attribute\ShareEnvironment
    */
   public function register(ContainerBuilder $container): void {
     // Keep the container object around for tests.
