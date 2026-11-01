@@ -31,11 +31,12 @@ use Symfony\Component\Filesystem\Path;
  * If the web root and the project root are the same, nothing is excluded.
  *
  * This excluder can be disabled by changing the config setting
- * `package_manager.settings:include_unknown_files_in_project_root` to TRUE.
- * This may be needed for sites that have files outside the web root (besides
- * the vendor directory) which are nonetheless needed in order for Composer to
- * assemble the code base correctly; a classic example would be a directory of
- * patch files used by `cweagans/composer-patches`.
+ * `package_manager.settings:include_unknown_files_in_project_root` to ["*"].
+ * Specific top-level paths can be used to include only certain files. This may
+ * be needed for sites that have files outside the web root (besides the vendor
+ * directory) which are nonetheless needed in order for Composer to assemble
+ * the code base correctly; a classic example would be a directory of patch
+ * files used by `cweagans/composer-patches`.
  *
  * @internal
  *   This is an internal part of Package Manager and may be changed or removed
@@ -76,10 +77,10 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
   private function getExcludedPaths(): array {
     // If this excluder is disabled, or the project root and web root are the
     // same, we are not excluding any paths.
-    $is_disabled = $this->configFactory->get('package_manager.settings')
+    $paths_to_include = $this->configFactory->get('package_manager.settings')
       ->get('include_unknown_files_in_project_root');
     $web_root = $this->pathLocator->getWebRoot();
-    if ($is_disabled || empty($web_root)) {
+    if (empty($web_root) || in_array('*', $paths_to_include)) {
       return [];
     }
 
@@ -101,6 +102,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
       $web_root,
       'composer.json',
       'composer.lock',
+      ...$paths_to_include,
     ];
     foreach ($this->getScaffoldFiles() as $scaffold_file_path) {
       // The web root is always included in staging operations, so we don't need
@@ -172,7 +174,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
     if ($excluded_paths) {
       sort($excluded_paths);
 
-      $message = $this->t("The following paths in @project_root aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>TRUE</code>.\n\n@list", [
+      $message = $this->t("The following paths in @project_root aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>*</code>.\n\n@list", [
         '@project_root' => $this->pathLocator->getProjectRoot(),
         '@list' => implode("\n", $excluded_paths),
       ]);

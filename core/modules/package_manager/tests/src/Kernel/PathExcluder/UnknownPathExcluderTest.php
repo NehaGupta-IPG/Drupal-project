@@ -174,7 +174,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
         ->addLogger($logger);
 
       $this->runStatusCheck($stage);
-      $this->assertTrue($logger->hasRecordThatContains("The following paths in $active_dir aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>TRUE</code>.", RfcLogLevel::INFO));
+      $this->assertTrue($logger->hasRecordThatContains("The following paths in $active_dir aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>*</code>.", RfcLogLevel::INFO));
       foreach ($unknown_files as $unknown_file) {
         // If $unknown_file is in a subdirectory, only the subdirectory is going
         // to be logged as an excluded path. The excluder doesn't recurse into
@@ -212,27 +212,39 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
   }
 
   /**
-   * Tests that the excluder can be disabled by a config flag.
+   * Tests that paths to exclude can be modified by a config option.
    */
   public function testExcluderCanBeDisabled(): void {
     $this->createTestProjectForTemplate(TRUE);
 
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
+    mkdir($project_root . '/known');
+    touch($project_root . '/known/file.txt');
     mkdir($project_root . '/unknown');
     touch($project_root . '/unknown/file.txt');
 
     $config = $this->config('package_manager.settings');
-    $config->set('include_unknown_files_in_project_root', TRUE)->save();
+    $config->set('include_unknown_files_in_project_root', ['*'])->save();
 
     $stage = $this->createStage();
     $stage->create();
+    $this->assertFileExists($stage->getSandboxDirectory() . '/known/file.txt');
     $this->assertFileExists($stage->getSandboxDirectory() . '/unknown/file.txt');
     $stage->destroy();
 
-    $config->set('include_unknown_files_in_project_root', FALSE)->save();
+    $config->set('include_unknown_files_in_project_root', ['known'])->save();
     $this->assertFileExists($project_root . '/unknown/file.txt');
     $stage->create();
+    $this->assertFileExists($stage->getSandboxDirectory() . '/known/file.txt');
+    $this->assertFileDoesNotExist($stage->getSandboxDirectory() . '/unknown/file.txt');
+    $stage->destroy();
+
+    $config->set('include_unknown_files_in_project_root', [])->save();
+    $this->assertFileExists($project_root . '/known/file.txt');
+    $this->assertFileExists($project_root . '/unknown/file.txt');
+    $stage->create();
+    $this->assertFileDoesNotExist($stage->getSandboxDirectory() . '/known/file.txt');
     $this->assertFileDoesNotExist($stage->getSandboxDirectory() . '/unknown/file.txt');
   }
 
