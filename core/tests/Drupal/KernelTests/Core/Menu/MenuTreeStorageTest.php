@@ -377,6 +377,91 @@ class MenuTreeStorageTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a rebuild only invalidates cache tags for the menus it changes.
+   */
+  public function testRebuildInvalidatesOnlyChangedMenus(): void {
+    $link = [
+      'route_name' => 'test',
+      'route_parameters' => [],
+      'title' => 'test',
+      'parent' => '',
+      'options' => [],
+      'metadata' => [],
+    ];
+
+    // Populate one menu with a link managed outside of rebuild() (discovered =
+    // 0), as content menu links are.
+    $this->treeStorage->save(['id' => 'content_link', 'menu_name' => 'content_menu'] + $link);
+
+    // Build two further menus through rebuild() so both contain discovered
+    // links.
+    $this->treeStorage->rebuild([
+      'link_a' => ['id' => 'link_a', 'menu_name' => 'menu_a'] + $link,
+      'link_b' => ['id' => 'link_b', 'menu_name' => 'menu_b'] + $link,
+    ]);
+
+    // Reload the stored definitions so a rebuild with unchanged links is a
+    // genuine no-op, matching how the menu link manager feeds back stable
+    // definitions on each rebuild.
+    $definitions = $this->treeStorage->loadMultiple(['link_a', 'link_b']);
+
+    // Record each menu's cache tag checksum so the invalidations caused by the
+    // rebuild can be observed directly.
+    $checksum = \Drupal::service('cache_tags.invalidator.checksum');
+    $before = [];
+    foreach (['content_menu', 'menu_a', 'menu_b'] as $menu_name) {
+      $before[$menu_name] = $checksum->getCurrentChecksum(['config:system.menu.' . $menu_name]);
+    }
+
+    // Rebuild again, changing only menu_b's link. menu_a's link is unchanged
+    // and the content-only menu is not part of the rebuild, so only menu_b's
+    // cache tag is invalidated.
+    $definitions['link_b']['title'] = 'changed';
+    $this->treeStorage->rebuild($definitions);
+
+    $this->assertNotEquals($before['menu_b'], $checksum->getCurrentChecksum(['config:system.menu.menu_b']));
+    $this->assertEquals($before['menu_a'], $checksum->getCurrentChecksum(['config:system.menu.menu_a']));
+    $this->assertEquals($before['content_menu'], $checksum->getCurrentChecksum(['config:system.menu.content_menu']));
+  }
+
+  /**
+   * Tests that purging links only invalidates cache tags for emptied menus.
+   */
+  public function testRebuildPurgeInvalidatesOnlyPurgedMenus(): void {
+    $link = [
+      'route_name' => 'test',
+      'route_parameters' => [],
+      'title' => 'test',
+      'parent' => '',
+      'options' => [],
+      'metadata' => [],
+    ];
+
+    $this->treeStorage->rebuild([
+      'link_a' => ['id' => 'link_a', 'menu_name' => 'menu_a'] + $link,
+      'link_b' => ['id' => 'link_b', 'menu_name' => 'menu_b'] + $link,
+    ]);
+
+    // Reload the stored definitions so the retained link is a genuine no-op.
+    $definitions = $this->treeStorage->loadMultiple(['link_a', 'link_b']);
+
+    $checksum = \Drupal::service('cache_tags.invalidator.checksum');
+    $before = [];
+    foreach (['menu_a', 'menu_b'] as $menu_name) {
+      $before[$menu_name] = $checksum->getCurrentChecksum(['config:system.menu.' . $menu_name]);
+    }
+
+    // Rebuild without link_b, so it is purged as a no-longer-existing discovered
+    // link and menu_b is emptied. link_a is unchanged, so only menu_b's cache
+    // tag is invalidated.
+    unset($definitions['link_b']);
+    $this->treeStorage->rebuild($definitions);
+
+    $this->assertNotEquals($before['menu_b'], $checksum->getCurrentChecksum(['config:system.menu.menu_b']));
+    $this->assertEquals($before['menu_a'], $checksum->getCurrentChecksum(['config:system.menu.menu_a']));
+  }
+
+  /**
    * Tests MenuTreeStorage::loadByProperties().
    */
   public function testLoadByProperties(): void {
