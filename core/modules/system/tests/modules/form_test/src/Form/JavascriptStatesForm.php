@@ -612,6 +612,70 @@ class JavascriptStatesForm extends FormBase {
       '#title' => 'Textfield in details',
     ];
 
+    // Elements responding to 'empty' state of the textfield.
+    $form['checkbox_checked_when_textfield_trigger_empty'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Checkbox checked when textfield trigger empty',
+      '#default_value' => '0',
+      '#states' => [
+        'checked' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['checkbox_unchecked_when_textfield_trigger_empty'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Checkbox unchecked when textfield trigger empty',
+      '#default_value' => '1',
+      '#states' => [
+        'unchecked' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['select_invisible_when_textfield_trigger_empty'] = [
+      '#type' => 'select',
+      '#title' => 'Select invisible when textfield trigger empty',
+      '#options' => [0 => 0, 1 => 1, 2 => 2],
+      '#states' => [
+        'invisible' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['select_visible_when_textfield_trigger_empty'] = [
+      '#type' => 'select',
+      '#title' => 'Select visible when textfield trigger empty',
+      '#options' => [0 => 0, 1 => 1, 2 => 2],
+      '#states' => [
+        'visible' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_required_when_textfield_trigger_empty'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield required  when textfield trigger empty',
+      '#states' => [
+        'required' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['details_expanded_when_textfield_trigger_empty'] = [
+      '#type' => 'details',
+      '#title' => 'Details expanded when textfield trigger empty',
+      '#states' => [
+        'expanded' => [
+          ':input[name="textfield_trigger"]' => ['empty' => TRUE],
+        ],
+      ],
+    ];
+    $form['details_expanded_when_textfield_trigger_empty']['textfield_in_details'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield in details',
+    ];
+
     // Multiple triggers.
     $form['header_multiple_triggers'] = [
       '#type' => 'html_tag',

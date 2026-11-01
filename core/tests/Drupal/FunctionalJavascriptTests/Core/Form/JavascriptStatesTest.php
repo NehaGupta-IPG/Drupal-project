@@ -370,6 +370,62 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_required_target->hasAttribute('aria-required'));
     $this->assertTrue($details->hasAttribute('open'));
     $this->assertTrue($textfield_in_details->isVisible());
+
+    // Add a whitespace to the textfield and ensure that 'filled' state is
+    // not triggered.
+    $trigger->setValue(' ');
+    $this->assertFalse($checkbox_checked_target->isChecked());
+    $this->assertTrue($checkbox_unchecked_target->isChecked());
+    $this->assertTrue($select_invisible_target->isVisible());
+    $this->assertFalse($select_visible_target->isVisible());
+    $this->assertFalse($textfield_required_target->hasAttribute('required'));
+    $this->assertFalse($details->hasAttribute('open'));
+    $this->assertFalse($textfield_in_details->isVisible());
+
+    // Test the empty state behavior of the textfield.
+    $checkbox_checked_target = $page->findField('checkbox_checked_when_textfield_trigger_empty');
+    $this->assertNotEmpty($checkbox_checked_target);
+    $checkbox_unchecked_target = $page->findField('checkbox_unchecked_when_textfield_trigger_empty');
+    $this->assertNotEmpty($checkbox_unchecked_target);
+    $select_invisible_target = $page->findField('select_invisible_when_textfield_trigger_empty');
+    $this->assertNotEmpty($select_invisible_target);
+    $select_visible_target = $page->findField('select_visible_when_textfield_trigger_empty');
+    $this->assertNotEmpty($select_visible_target);
+    $textfield_required_target = $page->findField('textfield_required_when_textfield_trigger_empty');
+    $this->assertNotEmpty($textfield_required_target);
+    $details = $this->assertSession()->elementExists('css', '#edit-details-expanded-when-textfield-trigger-empty');
+    $textfield_in_details = $details->findField('textfield_in_details');
+    $this->assertNotEmpty($textfield_in_details);
+
+    // Check if all elements have the desired 'empty' state behavior.
+    $this->assertTrue($checkbox_checked_target->isChecked());
+    $this->assertFalse($checkbox_unchecked_target->isChecked());
+    $this->assertFalse($select_invisible_target->isVisible());
+    $this->assertTrue($select_visible_target->isVisible());
+    $this->assertEquals('required', $textfield_required_target->getAttribute('required'));
+    $this->assertTrue($details->hasAttribute('open'));
+    $this->assertTrue($textfield_in_details->isVisible());
+
+    // Add a whitespace to the textfield and ensure that all elements
+    // maintain their configured behavior for the 'empty' textfield state.
+    $trigger->setValue(' ');
+    $this->assertTrue($checkbox_checked_target->isChecked());
+    $this->assertFalse($checkbox_unchecked_target->isChecked());
+    $this->assertFalse($select_invisible_target->isVisible());
+    $this->assertTrue($select_visible_target->isVisible());
+    $this->assertEquals('required', $textfield_required_target->getAttribute('required'));
+    $this->assertTrue($details->hasAttribute('open'));
+    $this->assertTrue($textfield_in_details->isVisible());
+
+    // Change the empty state: fill the textfield.
+    $trigger->setValue('filled');
+    $this->assertFalse($checkbox_checked_target->isChecked());
+    $this->assertTrue($checkbox_unchecked_target->isChecked());
+    $this->assertTrue($select_invisible_target->isVisible());
+    $this->assertFalse($select_visible_target->isVisible());
+    $this->assertFalse($textfield_required_target->hasAttribute('required'));
+    $this->assertFalse($details->hasAttribute('open'));
+    $this->assertFalse($textfield_in_details->isVisible());
   }
 
   /**

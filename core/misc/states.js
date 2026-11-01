@@ -528,6 +528,7 @@
    * @prop value
    * @prop collapsed
    */
+  const blankSpaceExp = /^[\t\n\v\f\r ]+|[\t\n\v\f\r ]+$/g;
   states.Trigger.states = {
     // 'empty' describes the state to be monitored.
     empty: {
@@ -535,11 +536,11 @@
       keyup() {
         // The function associated with that trigger returns the new value for
         // the state.
-        return this.val() === '';
+        return this.val().replace(blankSpaceExp, '') === '';
       },
       // Listen to 'change' for number native "spinner" widgets.
       change() {
-        return this.val() === '';
+        return this.val().replace(blankSpaceExp, '') === '';
       },
     },
 
