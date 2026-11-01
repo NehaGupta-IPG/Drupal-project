@@ -48,7 +48,7 @@ trait LayoutBuilderEntityFormTrait {
               '#theme' => 'status_message_item',
               '#message' => $message,
             ],
-          ]
+          ],
         ],
         '#status_headings' => [
           'status' => t('Status message'),
