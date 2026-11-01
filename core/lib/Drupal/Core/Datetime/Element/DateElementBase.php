@@ -33,7 +33,10 @@ abstract class DateElementBase extends FormElementBase {
   protected static function datetimeRangeYears($string, $date = NULL) {
     $datetime = new DrupalDateTime();
     $this_year = $datetime->format('Y');
-    [$min_year, $max_year] = explode(':', $string);
+    // Ensure we always have two elements, even if $string is malformed.
+    $parts = explode(':', $string);
+    $min_year = $parts[0] ?? '';
+    $max_year = $parts[1] ?? '';
 
     // Valid patterns would be -5:+5, +0:+1, 2008:2010, 1:9999.
     // Note that year 0 is 0 while current year is: +0.
