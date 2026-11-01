@@ -1,2 +1,9 @@
 foo: bar
 404: herp
+string: ''
+array:
+  - itemA
+  - itemB
+other_array:
+  - itemX
+  - itemY
