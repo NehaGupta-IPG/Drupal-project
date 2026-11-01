@@ -3,6 +3,7 @@
 namespace Drupal\image\PathProcessor;
 
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,9 +45,19 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-    if (str_starts_with($path, '/' . $directory_path . '/styles/')) {
-      $path_prefix = '/' . $directory_path . '/styles/';
+    $directory_path = NULL;
+    $files_base_url = Settings::get('file_public_base_url', '');
+    if ($files_base_url) {
+      $url_parts = parse_url($files_base_url);
+      if (isset($url_parts['path'])) {
+        $directory_path = $url_parts['path'];
+      }
+    }
+    if (!$directory_path) {
+      $directory_path = '/' . $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
+    }
+    if (strpos($path, $directory_path . '/styles/') === 0) {
+      $path_prefix = $directory_path . '/styles/';
     }
     // Check if the string '/system/files/styles/' exists inside the path,
     // that means we have a case of private file's image style.
