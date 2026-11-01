@@ -10,6 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+// cspell:ignore previ
+
 /**
  * Test unicode handling features implemented in Unicode component.
  */
@@ -224,8 +226,11 @@ EOF;
       ['Short string', 42, 'Short string'],
       // Simple string longer than max length.
       ['Longer string than previous.', 10, 'Longer str'],
+      ['Longer string than previous.', -4, 'Longer string than previ'],
+      ['Longer string than previous.', 0, ''],
       // Unicode.
       ['以呂波耳・ほへとち。リヌルヲ。', 10, '以呂波'],
+      ['以呂波耳・ほへとち。リヌルヲ。', -10, '以呂波耳・ほへとち。リ�'],
     ];
   }
 
