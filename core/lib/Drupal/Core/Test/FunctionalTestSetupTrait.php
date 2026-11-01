@@ -78,6 +78,12 @@ trait FunctionalTestSetupTrait {
     // installation.
     // Not using File API; a potential error must trigger a PHP warning.
     $directory = DRUPAL_ROOT . '/' . $this->siteDirectory;
+    // Check that the directory exists and is writable. When multiple tests
+    // are running parallel, it can happen that at least one of these
+    // conditions is not true.
+    if (!is_dir($directory) && !@mkdir($directory, 0777, TRUE) && !is_dir($directory)) {
+      throw new \RuntimeException(sprintf('Unable to create directory: %s', $directory));
+    }
     copy(DRUPAL_ROOT . '/core/assets/scaffold/files/default.settings.php', $directory . '/settings.php');
 
     // The public file system path is created during installation. Additionally,
