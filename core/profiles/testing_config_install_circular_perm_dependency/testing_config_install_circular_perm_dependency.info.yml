@@ -1,0 +1,9 @@
+name: 'Testing Config install circular permission dependency'
+type: profile
+description: 'Test that installing an installation profile with a circular permission dependency works.'
+version: VERSION
+hidden: true
+install:
+  - drupal:user_dynamic_permissions_config_entity_test
+themes:
+  - stark

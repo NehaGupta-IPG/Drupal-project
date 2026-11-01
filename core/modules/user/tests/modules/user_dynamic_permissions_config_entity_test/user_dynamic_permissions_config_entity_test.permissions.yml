@@ -1,0 +1,2 @@
+permission_callbacks:
+  - Drupal\user_dynamic_permissions_config_entity_test\DynamicConfigEntityPermissions::permissions

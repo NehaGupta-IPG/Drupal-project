@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user_dynamic_permissions_config_entity_test
+id: role_1
+label: 'Role 1'
+weight: 2
+is_admin: null
+permissions:
+  - 'role_1 role permission'

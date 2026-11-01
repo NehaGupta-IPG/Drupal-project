@@ -1,0 +1,7 @@
+name: 'User Dynamic permissions config entity test'
+type: module
+description: 'Support module for testing dynamic permissions based on a config entity.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:user
