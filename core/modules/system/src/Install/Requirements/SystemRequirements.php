@@ -13,13 +13,9 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
-use Drupal\Core\Url;
-use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\PhpRequirements;
-use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -572,57 +568,6 @@ class SystemRequirements implements InstallRequirementsInterface {
     }
 
     return $requirements;
-  }
-
-  /**
-   * Display requirements from security advisories.
-   *
-   * @param array[] $requirements
-   *   The requirements array as specified in hook_requirements().
-   */
-  public static function systemAdvisoriesRequirements(array &$requirements): void {
-    if (!\Drupal::config('system.advisories')->get('enabled')) {
-      return;
-    }
-
-    /** @var \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $fetcher */
-    $fetcher = \Drupal::service('system.sa_fetcher');
-    try {
-      $advisories = $fetcher->getSecurityAdvisories(TRUE, 5);
-    }
-    catch (ClientExceptionInterface $exception) {
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = RequirementSeverity::Warning;
-      $requirements['system_advisories']['description'] = ['#theme' => 'system_security_advisories_fetch_error_message'];
-      Error::logException(\Drupal::logger('system'), $exception, 'Failed to retrieve security advisory data.');
-      return;
-    }
-
-    if (!empty($advisories)) {
-      $advisory_links = [];
-      $severity = RequirementSeverity::Warning;
-      foreach ($advisories as $advisory) {
-        if (!$advisory->isPsa()) {
-          $severity = RequirementSeverity::Error;
-        }
-        $advisory_links[] = new Link($advisory->getTitle(), Url::fromUri($advisory->getUrl()));
-      }
-      $requirements['system_advisories']['title'] = t('Critical security announcements');
-      $requirements['system_advisories']['severity'] = $severity;
-      $requirements['system_advisories']['description'] = [
-        'list' => [
-          '#theme' => 'item_list',
-          '#items' => $advisory_links,
-        ],
-      ];
-      if (\Drupal::moduleHandler()->moduleExists('help')) {
-        $requirements['system_advisories']['description']['help_link'] = Link::createFromRoute(
-          'What are critical security announcements?',
-          'help.page', ['name' => 'system'],
-          ['fragment' => 'security-advisories']
-        )->toRenderable();
-      }
-    }
   }
 
 }
