@@ -1318,6 +1318,10 @@ services:
     class: Drupal\Core\Routing\Enhancer\FormRouteEnhancer
     tags:
       - { name: route_enhancer }
+  route_enhancer.form.json_schema:
+    class: Drupal\Core\Routing\Enhancer\JsonSchemaFormRouteEnhancer
+    tags:
+      - { name: route_enhancer }
   route_enhancer.entity:
     class: Drupal\Core\Entity\Enhancer\EntityRouteEnhancer
     tags:
@@ -1392,6 +1396,14 @@ services:
     class: Drupal\Core\Entity\HtmlEntityFormController
     arguments: ['@http_kernel.controller.argument_resolver', '@form_builder', '@entity_type.manager']
   Drupal\Core\Entity\HtmlEntityFormController: '@controller.entity_form'
+  controller.form.json_schema:
+    class: Drupal\Core\Form\JsonSchemaFormController
+    arguments: ['@http_kernel.controller.argument_resolver', '@form_builder', '@class_resolver']
+  Drupal\Core\Form\JsonSchemaFormController: '@controller.form.json_schema'
+  controller.entity_form.json_schema:
+    class: Drupal\Core\Form\JsonSchemaEntityFormController
+    arguments: ['@http_kernel.controller.argument_resolver', '@form_builder', '@entity_type.manager']
+  Drupal\Core\Form\JsonSchemaEntityFormController: '@controller.entity_form.json_schema'
   form_ajax_response_builder:
     class: Drupal\Core\Form\FormAjaxResponseBuilder
     arguments: ['@main_content_renderer.ajax', '@current_route_match', '@callable_resolver']

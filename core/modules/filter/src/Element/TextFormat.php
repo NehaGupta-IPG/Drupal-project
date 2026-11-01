@@ -108,7 +108,7 @@ class TextFormat extends RenderElementBase {
       '#theme_wrappers',
     ];
     // Move this element into sub-element 'value'.
-    unset($element['value']);
+    unset($element['value'], $element['#type']);
     foreach (Element::properties($element) as $key) {
       if (!in_array($key, $keys_not_to_copy)) {
         $element['value'][$key] = $element[$key];
