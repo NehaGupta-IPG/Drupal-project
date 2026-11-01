@@ -217,6 +217,12 @@ class Term extends EditorialContentEntityBase implements TermInterface {
       ->setSetting('target_type', 'taxonomy_term')
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
+      $fields['created'] = BaseFieldDefinition::create('created')
+        ->setLabel(t('Created'))
+        ->setDescription(t('The time that the term was created.'))
+        ->setReadOnly(TRUE)
+        ->setTranslatable(TRUE);
+
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the term was last edited.'))
@@ -278,6 +284,21 @@ class Term extends EditorialContentEntityBase implements TermInterface {
    */
   public function setName($name) {
     $this->set('name', $name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCreatedTime() {
+    return $this->get('created')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCreatedTime($timestamp) {
+    $this->set('created', $timestamp);
     return $this;
   }
 
