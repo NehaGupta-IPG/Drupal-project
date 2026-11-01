@@ -129,8 +129,8 @@ trait FieldUiTestTrait {
     // Confirm that the local action is visible.
     $this->assertSession()->linkExists('Re-use an existing field');
     $this->clickLink('Re-use an existing field');
-    $this->assertSession()->elementExists('css', "input[value=Re-use][name=$existing_storage_name]");
-    $this->click("input[value=Re-use][name=$existing_storage_name]");
+    $button = $this->assertSession()->elementExists('css', "input[value=Re-use][name=$existing_storage_name]");
+    $button->click();
 
     // Set the main content to only the content region because the label can
     // contain HTML which will be auto-escaped by Twig.

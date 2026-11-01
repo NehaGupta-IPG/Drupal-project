@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,17 +15,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class EntityDisplayFormBaseTest extends BrowserTestBase {
+class EntityDisplayFormBaseTest extends FieldUiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui', 'entity_test', 'field_test'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+  protected static $modules = ['entity_test', 'field_test'];
 
   /**
    * {@inheritdoc}
@@ -35,6 +29,8 @@ class EntityDisplayFormBaseTest extends BrowserTestBase {
     parent::setUp();
 
     foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
+      $this->installEntitySchema($entity_type);
+
       // Auto-create fields for testing.
       FieldStorageConfig::create([
         'entity_type' => $entity_type,
@@ -58,7 +54,7 @@ class EntityDisplayFormBaseTest extends BrowserTestBase {
         ->save();
     }
 
-    $this->drupalLogin($this->drupalCreateUser([
+    $this->setCurrentUser($this->drupalCreateUser([
       'administer entity_test form display',
     ]));
   }

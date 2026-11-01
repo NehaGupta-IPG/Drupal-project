@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\node\Traits\NodeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,7 +16,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
+class ManageFieldsLifecycleTest extends ManageFieldsKernelTestBase {
+
+  use NodeCreationTrait {
+    createNode as drupalCreateNode;
+  }
 
   /**
    * Runs the field CRUD tests.
@@ -154,6 +159,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
       'field_storage[subform][cardinality]' => 'number',
       'field_storage[subform][cardinality_number]' => 6,
     ];
+    $this->drupalGet($field_edit_path);
     $this->submitForm($edit, 'Update settings');
     $this->submitForm([], 'Save settings');
     $this->drupalGet($field_edit_path);

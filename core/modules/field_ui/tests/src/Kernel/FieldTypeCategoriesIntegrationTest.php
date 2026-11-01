@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,33 +15,36 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class FieldTypeCategoriesIntegrationTest extends BrowserTestBase {
+class FieldTypeCategoriesIntegrationTest extends FieldUiKernelTestBase {
+
+  use ContentTypeCreationTrait {
+    createContentType as drupalCreateContentType;
+  }
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'node',
-    'file',
-    'field_ui',
-    'options',
     'comment',
+    'file',
+    'filter',
     'link',
+    'node',
+    'options',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->installEntitySchema('node');
+    $this->installConfig(['filter', 'node']);
+
     // Create a test user.
     $admin_user = $this->drupalCreateUser(['administer node fields']);
-    $this->drupalLogin($admin_user);
+    $this->setCurrentUser($admin_user);
   }
 
   /**
@@ -59,6 +64,18 @@ class FieldTypeCategoriesIntegrationTest extends BrowserTestBase {
     foreach ($css_libraries as $css_library) {
       $this->assertContains($css_library, $libraries);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDrupalSettings(): array {
+    $script = $this->assertSession()->elementExists('css', 'script[data-drupal-selector="drupal-settings-json"]');
+    $settings = Json::decode($script->getText());
+    if (isset($settings['ajaxPageState']['libraries'])) {
+      $settings['ajaxPageState']['libraries'] = UrlHelper::uncompressQueryParameter($settings['ajaxPageState']['libraries']);
+    }
+    return $settings;
   }
 
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityFormMode;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('field_ui')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
-class ManageFieldsMultipleTypesTest extends ManageFieldsFunctionalTestBase {
+class ManageFieldsMultipleTypesTest extends ManageFieldsKernelTestBase {
 
   /**
    * Tests that options are copied over when reusing a field.

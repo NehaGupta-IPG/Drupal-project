@@ -2,77 +2,88 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\HttpKernelFormHelperTrait;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
-use Drupal\node\NodeAccessRebuild;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 
 /**
  * Tests the Field UI "Manage fields" screen.
  */
-abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
+abstract class ManageFieldsKernelTestBase extends FieldUiKernelTestBase {
 
+  use BlockCreationTrait {
+    placeBlock as drupalPlaceBlock;
+  }
+  use ContentTypeCreationTrait {
+    createContentType as drupalCreateContentType;
+  }
   use EntityReferenceFieldCreationTrait;
   use FieldUiTestTrait;
+  use HttpKernelFormHelperTrait;
   use NodeAccessTrait;
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'node',
-    'field_ui',
-    'field_test',
-    'taxonomy',
-    'image',
     'block',
+    'entity_test',
+    'field_test',
+    'file',
+    'filter',
+    'image',
+    'node',
     'node_access_test',
+    'taxonomy',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * The ID of the custom content type created for testing.
    *
    * @var string
    */
-  protected $contentType;
+  protected string $contentType;
 
   /**
    * The label for a random field to be created for testing.
    *
    * @var string
    */
-  protected $fieldLabel;
+  protected string $fieldLabel;
 
   /**
    * The input name of a random field to be created for testing.
    *
    * @var string
    */
-  protected $fieldNameInput;
+  protected string $fieldNameInput;
 
   /**
    * The name of a random field to be created for testing.
    *
    * @var string
    */
-  protected $fieldName;
+  protected string $fieldName;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('taxonomy_term');
+    $this->installSchema('node', ['node_access']);
+    $this->installConfig(['filter', 'node']);
 
     $this->drupalPlaceBlock('system_breadcrumb_block');
     $this->drupalPlaceBlock('local_actions_block');
@@ -94,7 +105,7 @@ abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
       'administer account settings',
       'administer user display',
     ]);
-    $this->drupalLogin($admin_user);
+    $this->setCurrentUser($admin_user);
 
     // Create content type, with underscores.
     $type_name = $this->randomMachineName(8) . '_test';
@@ -141,7 +152,6 @@ abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->addPrivateField(NodeType::load('article'));
     \Drupal::state()->set('node_access_test.private', TRUE);
-
   }
 
 }

@@ -5,102 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\field_ui\Kernel;
 
 use Behat\Mink\Exception\ElementNotFoundException;
-use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
-use Drupal\Tests\field_ui\Traits\FieldUiAssertTrait;
-use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cSpell:ignore downlander
 /**
  * Tests the Field UI "Manage fields" screen.
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class ManageFieldsTest extends KernelTestBase {
-
-  use ContentTypeCreationTrait {
-    createContentType as drupalCreateContentType;
-  }
-  use EntityReferenceFieldCreationTrait;
-  use FieldUiAssertTrait;
-  use UserCreationTrait {
-    createUser as drupalCreateUser;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = [
-    'entity_test',
-    'field',
-    'field_test',
-    'field_ui',
-    'filter',
-    'node',
-    'system',
-    'taxonomy',
-    'text',
-    'user',
-  ];
-
-  /**
-   * The ID of the custom content type created for testing.
-   *
-   * @var string
-   */
-  protected string $contentType;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installConfig(['field_ui', 'user']);
-
-    // Create a test user.
-    $admin_user = $this->drupalCreateUser([
-      'administer node fields',
-    ]);
-    $this->setCurrentUser($admin_user);
-
-    // Create content type, with underscores.
-    $type_name = $this->randomMachineName(8) . '_test';
-    $type = $this->drupalCreateContentType(['name' => $type_name, 'type' => $type_name]);
-    $this->contentType = $type->id();
-
-    // Create Basic page and Article node types.
-    $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
-
-    // Create a vocabulary named "Tags".
-    $vocabulary = Vocabulary::create([
-      'name' => 'Tags',
-      'vid' => 'tags',
-      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-    ]);
-    $vocabulary->save();
-
-    $handler_settings = [
-      'target_bundles' => [
-        $vocabulary->id() => $vocabulary->id(),
-      ],
-    ];
-    $this->createEntityReferenceField('node', 'article', 'field_' . $vocabulary->id(), 'Tags', 'taxonomy_term', 'default', $handler_settings);
-
-    \Drupal::service('entity_display.repository')
-      ->getFormDisplay('node', 'article')
-      ->setComponent('field_' . $vocabulary->id())
-      ->save();
-  }
+class ManageFieldsTest extends ManageFieldsKernelTestBase {
 
   /**
    * Tests that Field UI respects locked fields.
@@ -200,6 +118,538 @@ class ManageFieldsTest extends KernelTestBase {
         $this->assertSession()->elementNotExists('xpath', "//a//span[text()='$label']");
       }
     }
+  }
+
+  /**
+   * Tests that default value is correctly validated and saved.
+   */
+  public function testDefaultValue(): void {
+    // Create a test field storage and field.
+    $field_name = 'test';
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'type' => 'test_field',
+    ])->save();
+    $field = FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'bundle' => $this->contentType,
+    ]);
+    $field->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    $display_repository->getFormDisplay('node', $this->contentType)
+      ->setComponent($field_name)
+      ->save();
+
+    $admin_path = 'admin/structure/types/manage/' . $this->contentType . '/fields/' . $field->id();
+    $element_id = "edit-default-value-input-$field_name-0-value";
+    $element_name = "default_value_input[{$field_name}][0][value]";
+    $this->drupalGet($admin_path);
+    $this->assertSession()->fieldValueEquals($element_id, '');
+
+    // Check that invalid default values are rejected.
+    $edit = [$element_name => '-1', 'set_default_value' => '1'];
+    $this->drupalGet($admin_path);
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("$field_name does not accept the value -1");
+
+    // Check that the default value is saved.
+    $edit = [$element_name => '1', 'set_default_value' => '1'];
+    $this->drupalGet($admin_path);
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
+    $field = FieldConfig::loadByName('node', $this->contentType, $field_name);
+    $this->assertEquals([['value' => 1]], $field->getDefaultValueLiteral(), 'The default value was correctly saved.');
+
+    // Check that the default value shows up in the form.
+    $this->drupalGet($admin_path);
+    $this->assertSession()->fieldValueEquals($element_id, '1');
+
+    // Check that the default value is left empty when "Set default value"
+    // checkbox is not checked.
+    $edit = [$element_name => '1', 'set_default_value' => '0'];
+    $this->drupalGet($admin_path);
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
+    $field = FieldConfig::loadByName('node', $this->contentType, $field_name);
+    $this->assertEquals([], $field->getDefaultValueLiteral(), 'The default value was removed.');
+
+    // Check that the default value can be emptied.
+    $this->drupalGet($admin_path);
+    $edit = [$element_name => ''];
+    $this->submitForm($edit, 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
+    $field = FieldConfig::loadByName('node', $this->contentType, $field_name);
+    $this->assertEquals([], $field->getDefaultValueLiteral(), 'The default value was correctly saved.');
+
+    // Check that the default value can be empty when the field is marked as
+    // required and can store unlimited values.
+    $field_storage = FieldStorageConfig::loadByName('node', $field_name);
+    $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $field_storage->save();
+
+    $this->drupalGet($admin_path);
+    $edit = [
+      'required' => 1,
+    ];
+    $this->submitForm($edit, 'Save settings');
+
+    $this->drupalGet($admin_path);
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->pageTextContains("Saved $field_name configuration");
+    $field = FieldConfig::loadByName('node', $this->contentType, $field_name);
+    $this->assertEquals([], $field->getDefaultValueLiteral(), 'The default value was correctly saved.');
+
+    // Check that the default widget is used when the field is hidden.
+    $display_repository->getFormDisplay($field->getTargetEntityTypeId(), $field->getTargetBundle())
+      ->removeComponent($field_name)
+      ->save();
+    $this->drupalGet($admin_path);
+    $this->assertSession()->fieldValueEquals($element_id, '');
+  }
+
+  /**
+   * Tests validation of duplicate and disallowed field names.
+   */
+  public function testFieldNameValidation(): void {
+    // field_tags already exists, so we're expecting an error when trying to
+    // create a new field with the same name.
+    $url = 'admin/structure/types/manage/' . $this->contentType . '/fields/add-field';
+    $this->drupalGet($url);
+    $this->clickLink('Boolean');
+    $this->submitForm([], 'Continue');
+    $edit = [
+      'label' => $this->randomMachineName(),
+      'field_name' => 'tags',
+    ];
+    $this->submitForm($edit, 'Continue');
+
+    $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
+
+    // Reset the field prefix so we can test properly.
+    $this->config('field_ui.settings')->set('field_prefix', '')->save();
+
+    $label = 'Disallowed field';
+    $edit = [
+      'label' => $label,
+    ];
+
+    // Try with an entity key.
+    $edit['field_name'] = 'title';
+    $bundle_path = 'admin/structure/types/manage/' . $this->contentType;
+    $this->drupalGet("{$bundle_path}/fields/add-field");
+    $this->clickLink('Test field');
+    $this->submitForm([], 'Continue');
+    $this->submitForm($edit, 'Continue');
+    $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
+
+    // Try with a base field.
+    $edit['field_name'] = 'sticky';
+    $bundle_path = 'admin/structure/types/manage/' . $this->contentType;
+    $this->drupalGet("{$bundle_path}/fields/add-field");
+    $this->clickLink('Test field');
+    $this->submitForm([], 'Continue');
+    $this->submitForm($edit, 'Continue');
+    $this->assertSession()->pageTextContains('The machine-readable name is already in use. It must be unique.');
+    $this->assertSession()->addressEquals($url . '/test_field/false');
+  }
+
+  /**
+   * Tests invalid field UI URLs and destinations.
+   */
+  public function testInvalidUrlsAndDestinations(): void {
+    $field_id = 'node.foo.bar';
+
+    $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/' . $field_id);
+    $this->assertSession()->statusCodeEquals(404);
+
+    $options = [
+      'query' => ['destinations' => ['http://example.com']],
+    ];
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.body', $options);
+    $this->submitForm([], 'Save settings');
+    // The external redirect should not fire.
+    $url = parse_url($this->getSession()->getCurrentUrl());
+    $this->assertStringEndsWith('/admin/structure/types/manage/article/fields/node.article.body', $url['path']);
+    $query = [];
+    parse_str($url['query'], $query);
+    $this->assertSame(['http://example.com'], $query['destinations']);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseContains('Attempt to update field <em class="placeholder">Body</em> failed: <em class="placeholder">The internal path component &#039;http://example.com&#039; is external. You are not allowed to specify an external URL together with internal:/.</em>.');
+  }
+
+  /**
+   * Tests that help descriptions render valid HTML.
+   */
+  public function testHelpDescriptions(): void {
+    // Create an image field.
+    FieldStorageConfig::create([
+      'field_name' => 'field_image',
+      'entity_type' => 'node',
+      'type' => 'image',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_image',
+      'entity_type' => 'node',
+      'label' => 'Image',
+      'bundle' => 'article',
+    ])->save();
+
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', 'article')
+      ->setComponent('field_image')
+      ->save();
+
+    $edit = [
+      'description' => '<strong>Test with an upload field.',
+    ];
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_image');
+    $this->submitForm($edit, 'Save settings');
+
+    // Check that hook_field_widget_single_element_form_alter() does believe
+    // this is the default value form.
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_tags');
+    $this->assertSession()->pageTextContains('From hook_field_widget_single_element_form_alter(): Default form is true.');
+
+    $edit = [
+      'description' => '<em>Test with a non upload field.',
+    ];
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_tags');
+    $this->submitForm($edit, 'Save settings');
+
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->responseContains('<strong>Test with an upload field.</strong>');
+    $this->assertSession()->responseContains('<em>Test with a non upload field.</em>');
+  }
+
+  /**
+   * Tests the "preconfigured field" functionality.
+   *
+   * @see \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface
+   */
+  public function testPreconfiguredFields(): void {
+    $this->drupalGet('admin/structure/types/manage/article/fields/add-field');
+
+    // Check that the preconfigured field option exist alongside the regular
+    // field type option.
+    $this->assertSession()->elementExists('xpath', "//a//span[text()='All custom options']");
+    $this->assertSession()->elementExists('xpath', "//a//span[text()='Test field with preconfigured options']");
+
+    // Add a field with every possible preconfigured value.
+    $this->fieldUIAddNewField(NULL, 'test_custom_options', 'Test label', 'field_ui:test_field_with_preconfigured_options:custom_options');
+    $field_storage = FieldStorageConfig::loadByName('node', 'field_test_custom_options');
+    $this->assertEquals(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED, $field_storage->getCardinality());
+    $this->assertEquals('preconfigured_storage_setting', $field_storage->getSetting('test_field_storage_setting'));
+
+    $field = FieldConfig::loadByName('node', 'article', 'field_test_custom_options');
+    $this->assertTrue($field->isRequired());
+    $this->assertEquals('preconfigured_field_setting', $field->getSetting('test_field_setting'));
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    $form_display = $display_repository->getFormDisplay('node', 'article');
+    $this->assertEquals('test_field_widget_multiple', $form_display->getComponent('field_test_custom_options')['type']);
+    $view_display = $display_repository->getViewDisplay('node', 'article');
+    $this->assertEquals('field_test_multiple', $view_display->getComponent('field_test_custom_options')['type']);
+    $this->assertEquals('altered dummy test string', $view_display->getComponent('field_test_custom_options')['settings']['test_formatter_setting_multiple']);
+  }
+
+  /**
+   * Tests that the 'field_prefix' setting works on Field UI.
+   */
+  public function testFieldPrefix(): void {
+    // Change default field prefix.
+    $field_prefix = $this->randomMachineName(10);
+    $this->config('field_ui.settings')->set('field_prefix', $field_prefix)->save();
+
+    // Create a field input and label exceeding the new maxlength, which is 22.
+    $field_exceed_max_length_label = $this->randomString(23);
+    $field_exceed_max_length_input = $this->randomMachineName(23);
+
+    // Try to create the field.
+    $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/add-field');
+    $this->clickLink('Test field');
+    $edit = [
+      'label' => $field_exceed_max_length_label,
+      'field_name' => $field_exceed_max_length_input,
+    ];
+    $this->submitForm($edit, 'Continue');
+    $this->assertSession()->pageTextContains('Machine-readable name cannot be longer than 22 characters but is currently 23 characters long.');
+
+    // Create a valid field.
+    $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->contentType, $this->fieldNameInput, $this->fieldLabel);
+    $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/node.' . $this->contentType . '.' . $field_prefix . $this->fieldNameInput);
+    $this->assertSession()->pageTextContains($this->fieldLabel . ' settings for ' . $this->contentType);
+  }
+
+  /**
+   * Test translation defaults.
+   */
+  public function testTranslationDefaults(): void {
+    $this->fieldUIAddNewField('admin/structure/types/manage/' . $this->contentType, $this->fieldNameInput, $this->fieldLabel);
+    $field_storage = FieldStorageConfig::loadByName('node', 'field_' . $this->fieldNameInput);
+    $this->assertTrue($field_storage->isTranslatable(), 'Field storage translatable.');
+
+    $field = FieldConfig::loadByName('node', $this->contentType, 'field_' . $this->fieldNameInput);
+    $this->assertFalse($field->isTranslatable(), 'Field instance should not be translatable by default.');
+
+    // Add a new field based on an existing field.
+    $this->drupalCreateContentType(['type' => 'additional', 'name' => 'Additional type']);
+    $this->fieldUIAddExistingField("admin/structure/types/manage/additional", $this->fieldName, 'Additional type');
+
+    $field_storage = FieldStorageConfig::loadByName('node', 'field_' . $this->fieldNameInput);
+    $this->assertTrue($field_storage->isTranslatable(), 'Field storage translatable.');
+
+    $field = FieldConfig::loadByName('node', 'additional', 'field_' . $this->fieldNameInput);
+    $this->assertFalse($field->isTranslatable(), 'Field instance should not be translatable by default.');
+  }
+
+  /**
+   * Tests drop button operations on the manage fields page.
+   */
+  public function testFieldDropButtonOperations(): void {
+    $assert_session = $this->assertSession();
+    $bundle = $this->contentType;
+
+    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('field_storage_config')
+      ->create([
+        'type' => 'string',
+        'field_name' => 'highlander',
+        'entity_type' => 'node',
+      ]);
+    $storage->save();
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $storage,
+        'bundle' => $bundle,
+      ])
+      ->save();
+
+    $this->drupalGet("/admin/structure/types/manage/{$bundle}/fields");
+
+    // Check that the summary element for the string field type exists and has
+    // the correct text (which comes from the FieldItemBase class).
+    $element = $assert_session->elementExists('css', '#highlander');
+    $field_label = (string) $this->container->get('plugin.manager.field.field_type')->getDefinitions()['string']['label'];
+    $assert_session->elementExists('css', '.field-settings-summary-cell .field-type-label:contains("' . $field_label . '")', $element);
+
+    // Add an entity reference field, and check that its summary is custom.
+    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('field_storage_config')
+      ->create([
+        'type' => 'entity_reference',
+        'field_name' => 'downlander',
+        'entity_type' => 'node',
+        'settings' => [
+          'target_type' => 'node',
+        ],
+      ]);
+    $storage->save();
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $storage,
+        'bundle' => $bundle,
+        'entity_type' => 'node',
+        'settings' => [
+          'handler_settings' => [
+            'target_bundles' => [$bundle => $bundle],
+          ],
+        ],
+      ])
+      ->save();
+
+    $this->drupalGet("/admin/structure/types/manage/{$bundle}/fields");
+    $element = $assert_session->elementExists('css', '#downlander');
+    $custom_summary_text = 'Reference type: Content';
+    $allowed_bundles_text = "Content type: $bundle";
+    $this->assertStringContainsString($custom_summary_text, $element->getText());
+    $this->assertStringContainsString($allowed_bundles_text, $element->getText());
+  }
+
+  /**
+   * Tests adding a field.
+   */
+  public function testAddField(): void {
+    $page = $this->getSession()->getPage();
+    $type = $this->contentType;
+
+    // Make sure field descriptions appear, both 1 line and multiple lines.
+    $this->drupalGet('/admin/structure/types/manage/' . $type . '/fields/add-field');
+    $this->clickLink('Fields for testing descriptions.');
+    $this->assertSession()->pageTextContains('This one-line field description is important for testing');
+    $this->assertSession()->pageTextContains('This multiple line description needs to use an array');
+    $this->assertSession()->pageTextContains('This second line contains important information');
+
+    // Create a new field without actually saving it.
+    $this->fieldUIAddNewField('admin/structure/types/manage/' . $type, 'test_field', 'Test field', 'test_field', [], [], FALSE);
+    // Assert that the field was not created.
+    $this->assertNull(FieldStorageConfig::loadByName('node', "field_test_field"));
+
+    $this->drupalGet('/admin/structure/types/manage/' . $type . '/fields/add-field');
+    $this->clickLink('Test field');
+    $this->submitForm([], 'Continue');
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+    // Test Breadcrumbs.
+    $this->getSession()->getPage()->findLink('Test field');
+    $this->assertSession()->statusMessageNotContains('Saved');
+
+    // Change the storage form values.
+    $edit = ['field_storage[subform][cardinality_number]' => 5];
+    $this->submitForm($edit, 'Update settings');
+    $this->assertSession()->statusMessageNotContains('Saved');
+
+    // Assert that the form values persist.
+    $this->assertEquals(5, $page->findField('field_storage[subform][cardinality_number]')->getValue());
+
+    // Try creating a field with the same machine name.
+    $this->drupalGet('/admin/structure/types/manage/' . $type . '/fields/add-field');
+    $this->clickLink('Test field');
+    $this->submitForm([], 'Continue');
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+    // Assert that the values in the field storage form are reset.
+    $this->assertEquals(1, $page->findField('field_storage[subform][cardinality_number]')->getValue());
+
+    // Assert that the field is created with the new settings.
+    $this->submitForm([], 'Update settings');
+    $this->assertSession()->statusMessageNotContains('Saved');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->statusMessageContains('Saved');
+
+    $this->assertEquals(1, FieldStorageConfig::loadByName('node', 'field_test_field')->getCardinality());
+  }
+
+  /**
+   * Tests editing field when the field exists in temp store.
+   */
+  public function testEditFieldWithLeftOverFieldInTempStore(): void {
+    $user = $this->drupalCreateUser(['administer node fields']);
+
+    $node_type = $this->drupalCreateContentType();
+    $bundle_path = '/admin/structure/types/manage/' . $node_type->id();
+
+    // Start adding a field but stop prior to saving.
+    $this->setCurrentUser($user);
+    $this->drupalGet($bundle_path . '/fields/add-field');
+    $this->clickLink('Test field');
+    $this->submitForm([], 'Continue');
+    $edit = [
+      'label' => 'Test field',
+      'field_name' => 'test_field',
+    ];
+    $this->submitForm($edit, 'Continue');
+
+    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('field_storage_config')
+      ->create([
+        'type' => 'test_field',
+        'field_name' => 'test_field',
+        'entity_type' => 'node',
+      ]);
+    $storage->save();
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $storage,
+        'bundle' => $node_type->id(),
+        'entity_type' => 'node',
+      ])
+      ->save();
+
+    $this->drupalGet("$bundle_path/fields/node.{$node_type->id()}.test_field");
+    $this->submitForm([], 'Save settings');
+    $this->assertSession()->statusMessageContains('Saved test_field configuration.', 'status');
+  }
+
+  /**
+   * Tests creating entity reference field to non-bundleable entity type.
+   */
+  public function testEntityReferenceToNonBundleableEntity(): void {
+    $type = $this->drupalCreateContentType([
+      'name' => 'kittens',
+      'type' => 'kittens',
+    ]);
+    $bundle_path = 'admin/structure/types/manage/' . $type->id();
+    $field_name = 'field_user_reference';
+
+    $admin_user = User::load(\Drupal::currentUser()->id());
+    $field_edit = [
+      'set_default_value' => '1',
+      "default_value_input[$field_name][0][target_id]" => $admin_user->label() . ' (' . $admin_user->id() . ')',
+    ];
+    $this->fieldUIAddNewField($bundle_path, 'user_reference', NULL, 'field_ui:entity_reference:user', [], $field_edit);
+    $field = FieldConfig::loadByName('node', 'kittens', $field_name);
+    $this->assertEquals([['target_id' => $admin_user->id()]], $field->getDefaultValue(User::create(['name' => '1337'])));
+  }
+
+  /**
+   * Tests hook_form_field_storage_config_form_edit_alter().
+   */
+  public function testFieldTypeCardinalityAlter(): void {
+    $bundle = $this->contentType;
+
+    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('field_storage_config')
+      ->create([
+        'type' => 'test_field',
+        'field_name' => 'field_test_field',
+        'entity_type' => 'node',
+      ]);
+    $storage->save();
+
+    $this->container->get('entity_type.manager')
+      ->getStorage('field_config')
+      ->create([
+        'field_storage' => $storage,
+        'bundle' => $bundle,
+        'entity_type' => 'node',
+      ])
+      ->save();
+
+    $this->drupalGet("/admin/structure/types/manage/$bundle/fields/node.$bundle.field_test_field");
+    $this->assertSession()->elementTextContains('css', '#edit-field-storage', 'Greetings from Drupal\field_test\Plugin\Field\FieldType\TestItem::storageSettingsForm');
+  }
+
+  /**
+   * Tests hook_field_info_entity_type_ui_definitions_alter().
+   */
+  public function testFieldUiDefinitionsAlter(): void {
+    $this->drupalGet('/admin/structure/types/manage/' . $this->contentType . '/fields/add-field');
+    $this->assertSession()->pageTextContains('Boolean (overridden by alter)');
+  }
+
+  /**
+   * Ensure field category fallback works for field types without a description.
+   */
+  public function testFieldCategoryFallbackWithoutDescription(): void {
+    $this->drupalGet('/admin/structure/types/manage/' . $this->contentType . '/fields/add-field');
+    $field_type = $this->assertSession()->elementExists('xpath', '//span[text()="Test field"]');
+    $description_container = $field_type->getParent()->find('css', '.field-option__description');
+    $this->assertNotNull($description_container);
+    $this->assertEquals('', $description_container->getText());
   }
 
 }

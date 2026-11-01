@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Functional;
 
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
-use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore downlander
 /**
  * Tests the Manage Display page of a fieldable entity type.
  */
@@ -38,156 +34,13 @@ class ManageFieldsTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * A user with permission to administer node fields, etc.
-   *
-   * @var \Drupal\user\UserInterface
-   */
-  protected $adminUser;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->adminUser = $this->drupalCreateUser(['administer node fields']);
-    $this->drupalLogin($this->adminUser);
     $this->config('system.logging')
       ->set('error_level', ERROR_REPORTING_DISPLAY_ALL)
       ->save();
-  }
-
-  /**
-   * Tests drop button operations on the manage fields page.
-   */
-  public function testFieldDropButtonOperations(): void {
-    $assert_session = $this->assertSession();
-
-    $node_type = $this->drupalCreateContentType();
-    $bundle = $node_type->id();
-
-    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
-    $storage = $this->container->get('entity_type.manager')
-      ->getStorage('field_storage_config')
-      ->create([
-        'type' => 'string',
-        'field_name' => 'highlander',
-        'entity_type' => 'node',
-      ]);
-    $storage->save();
-
-    $this->container->get('entity_type.manager')
-      ->getStorage('field_config')
-      ->create([
-        'field_storage' => $storage,
-        'bundle' => $bundle,
-      ])
-      ->save();
-
-    $this->drupalGet("/admin/structure/types/manage/{$bundle}/fields");
-
-    // Check that the summary element for the string field type exists and has
-    // the correct text (which comes from the FieldItemBase class).
-    $element = $assert_session->elementExists('css', '#highlander');
-    $field_label = (string) $this->container->get('plugin.manager.field.field_type')->getDefinitions()['string']['label'];
-    $assert_session->elementExists('css', '.field-settings-summary-cell .field-type-label:contains("' . $field_label . '")', $element);
-
-    // Add an entity reference field, and check that its summary is custom.
-    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
-    $storage = $this->container->get('entity_type.manager')
-      ->getStorage('field_storage_config')
-      ->create([
-        'type' => 'entity_reference',
-        'field_name' => 'downlander',
-        'entity_type' => 'node',
-        'settings' => [
-          'target_type' => 'node',
-        ],
-      ]);
-    $storage->save();
-
-    $this->container->get('entity_type.manager')
-      ->getStorage('field_config')
-      ->create([
-        'field_storage' => $storage,
-        'bundle' => $bundle,
-        'entity_type' => 'node',
-        'settings' => [
-          'handler_settings' => [
-            'target_bundles' => [$bundle => $bundle],
-          ],
-        ],
-      ])
-      ->save();
-
-    $this->drupalGet("/admin/structure/types/manage/{$bundle}/fields");
-    $element = $assert_session->elementExists('css', '#downlander');
-    $custom_summary_text = 'Reference type: Content';
-    $allowed_bundles_text = "Content type: $bundle";
-    $this->assertStringContainsString($custom_summary_text, $element->getText());
-    $this->assertStringContainsString($allowed_bundles_text, $element->getText());
-  }
-
-  /**
-   * Tests adding a field.
-   */
-  public function testAddField(): void {
-    $page = $this->getSession()->getPage();
-    $type = $this->drupalCreateContentType([
-      'name' => 'Article',
-      'type' => 'article',
-    ]);
-
-    // Make sure field descriptions appear, both 1 line and multiple lines.
-    $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
-    $this->clickLink('Fields for testing descriptions.');
-    $this->assertSession()->pageTextContains('This one-line field description is important for testing');
-    $this->assertSession()->pageTextContains('This multiple line description needs to use an array');
-    $this->assertSession()->pageTextContains('This second line contains important information');
-
-    // Create a new field without actually saving it.
-    $this->fieldUIAddNewField('admin/structure/types/manage/' . $type->id(), 'test_field', 'Test field', 'test_field', [], [], FALSE);
-    // Assert that the field was not created.
-    $this->assertNull(FieldStorageConfig::loadByName('node', "field_test_field"));
-
-    $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
-    $this->clickLink('Test field');
-    $this->submitForm([], 'Continue');
-    $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
-    ];
-    $this->submitForm($edit, 'Continue');
-    // Test Breadcrumbs.
-    $this->getSession()->getPage()->findLink('Test field');
-    $this->assertSession()->statusMessageNotContains('Saved');
-
-    // Change the storage form values.
-    $edit = ['field_storage[subform][cardinality_number]' => 5];
-    $this->submitForm($edit, 'Update settings');
-    $this->assertSession()->statusMessageNotContains('Saved');
-
-    // Assert that the form values persist.
-    $this->assertEquals(5, $page->findField('field_storage[subform][cardinality_number]')->getValue());
-
-    // Try creating a field with the same machine name.
-    $this->drupalGet('/admin/structure/types/manage/' . $type->id() . '/fields/add-field');
-    $this->clickLink('Test field');
-    $this->submitForm([], 'Continue');
-    $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
-    ];
-    $this->submitForm($edit, 'Continue');
-    // Assert that the values in the field storage form are reset.
-    $this->assertEquals(1, $page->findField('field_storage[subform][cardinality_number]')->getValue());
-
-    // Assert that the field is created with the new settings.
-    $this->submitForm([], 'Update settings');
-    $this->assertSession()->statusMessageNotContains('Saved');
-    $this->submitForm([], 'Save');
-    $this->assertSession()->statusMessageContains('Saved');
-
-    $this->assertEquals(1, FieldStorageConfig::loadByName('node', 'field_test_field')->getCardinality());
   }
 
   /**
@@ -246,125 +99,6 @@ class ManageFieldsTest extends BrowserTestBase {
     $this->submitForm([], 'Save');
     // An error is thrown only after the final 'Save'.
     $this->assertSession()->statusMessageContains("An error occurred while saving the field: 'field_storage_config' entity with ID 'node.field_test_field' already exists.");
-  }
-
-  /**
-   * Tests editing field when the field exists in temp store.
-   */
-  public function testEditFieldWithLeftOverFieldInTempStore(): void {
-    $user = $this->drupalCreateUser(['administer node fields']);
-
-    $node_type = $this->drupalCreateContentType();
-    $bundle_path = '/admin/structure/types/manage/' . $node_type->id();
-
-    // Start adding a field but stop prior to saving.
-    $this->drupalLogin($user);
-    $this->drupalGet($bundle_path . '/fields/add-field');
-    $this->clickLink('Test field');
-    $this->submitForm([], 'Continue');
-    $edit = [
-      'label' => 'Test field',
-      'field_name' => 'test_field',
-    ];
-    $this->submitForm($edit, 'Continue');
-
-    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
-    $storage = $this->container->get('entity_type.manager')
-      ->getStorage('field_storage_config')
-      ->create([
-        'type' => 'test_field',
-        'field_name' => 'test_field',
-        'entity_type' => 'node',
-      ]);
-    $storage->save();
-
-    $this->container->get('entity_type.manager')
-      ->getStorage('field_config')
-      ->create([
-        'field_storage' => $storage,
-        'bundle' => $node_type->id(),
-        'entity_type' => 'node',
-      ])
-      ->save();
-
-    $this->drupalGet("$bundle_path/fields/node.{$node_type->id()}.test_field");
-    $this->submitForm([], 'Save settings');
-    $this->assertSession()->statusMessageContains('Saved test_field configuration.', 'status');
-  }
-
-  /**
-   * Tests creating entity reference field to non-bundleable entity type.
-   */
-  public function testEntityReferenceToNonBundleableEntity(): void {
-    $type = $this->drupalCreateContentType([
-      'name' => 'kittens',
-      'type' => 'kittens',
-    ]);
-    $bundle_path = 'admin/structure/types/manage/' . $type->id();
-    $field_name = 'field_user_reference';
-
-    $field_edit = [
-      'set_default_value' => '1',
-      "default_value_input[$field_name][0][target_id]" => $this->adminUser->label() . ' (' . $this->adminUser->id() . ')',
-    ];
-    $this->fieldUIAddNewField($bundle_path, 'user_reference', NULL, 'field_ui:entity_reference:user', [], $field_edit);
-    $field = FieldConfig::loadByName('node', 'kittens', $field_name);
-    $this->assertEquals([['target_id' => $this->adminUser->id()]], $field->getDefaultValue(User::create(['name' => '1337'])));
-  }
-
-  /**
-   * Tests hook_form_field_storage_config_form_edit_alter().
-   */
-  public function testFieldTypeCardinalityAlter(): void {
-    $node_type = $this->drupalCreateContentType();
-    $bundle = $node_type->id();
-
-    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
-    $storage = $this->container->get('entity_type.manager')
-      ->getStorage('field_storage_config')
-      ->create([
-        'type' => 'test_field',
-        'field_name' => 'field_test_field',
-        'entity_type' => 'node',
-      ]);
-    $storage->save();
-
-    $this->container->get('entity_type.manager')
-      ->getStorage('field_config')
-      ->create([
-        'field_storage' => $storage,
-        'bundle' => $bundle,
-        'entity_type' => 'node',
-      ])
-      ->save();
-
-    $this->drupalGet("/admin/structure/types/manage/$bundle/fields/node.$bundle.field_test_field");
-    $this->assertSession()->elementTextContains('css', '#edit-field-storage', 'Greetings from Drupal\field_test\Plugin\Field\FieldType\TestItem::storageSettingsForm');
-  }
-
-  /**
-   * Tests hook_field_info_entity_type_ui_definitions_alter().
-   */
-  public function testFieldUiDefinitionsAlter(): void {
-    $user = $this->drupalCreateUser(['administer node fields']);
-    $node_type = $this->drupalCreateContentType();
-    $this->drupalLogin($user);
-    $this->drupalGet('/admin/structure/types/manage/' . $node_type->id() . '/fields/add-field');
-    $this->assertSession()->pageTextContains('Boolean (overridden by alter)');
-  }
-
-  /**
-   * Ensure field category fallback works for field types without a description.
-   */
-  public function testFieldCategoryFallbackWithoutDescription(): void {
-    $user = $this->drupalCreateUser(['administer node fields']);
-    $node_type = $this->drupalCreateContentType();
-    $this->drupalLogin($user);
-    $this->drupalGet('/admin/structure/types/manage/' . $node_type->id() . '/fields/add-field');
-    $field_type = $this->assertSession()->elementExists('xpath', '//span[text()="Test field"]');
-    $description_container = $field_type->getParent()->find('css', '.field-option__description');
-    $this->assertNotNull($description_container);
-    $this->assertEquals('', $description_container->getText());
   }
 
 }
