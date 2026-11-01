@@ -25,3 +25,11 @@ field_test.entity_constraints_nested_form:
         type: 'entity:entity_test_constraints'
   requirements:
     _permission: 'administer entity_test content'
+
+field_test.password_confirm_form:
+  path: '/test-element/password-confirm'
+  defaults:
+    _title: 'Password confirm form'
+    _form: '\Drupal\field_test\Form\PasswordConfirmTestForm'
+  requirements:
+    _permission: 'access content'
