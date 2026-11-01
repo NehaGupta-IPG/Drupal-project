@@ -114,9 +114,24 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   protected $trustedData = FALSE;
 
   /**
+   * Indicates whether the config entity contains overridden data.
+   *
+   * @var bool
+   */
+  protected bool $hasOverrides = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type) {
+
+    // The storage can inject whether this config entity has config
+    // overrides or not through a key inside the reserved _core key, if it is
+    // set, assign the value and then unset the key so it is not persisted.
+    if (isset($values['_core']['has_overrides'])) {
+      $this->hasOverrides = $values['_core']['has_overrides'];
+      unset($values['_core']['has_overrides']);
+    }
     parent::__construct($values, $entity_type);
 
     // Backup the original ID, if any.
@@ -635,6 +650,13 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   public function hasTrustedData() {
     // @phpstan-ignore-next-line
     return $this->trustedData;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasOverrides(): bool {
+    return $this->hasOverrides;
   }
 
   /**

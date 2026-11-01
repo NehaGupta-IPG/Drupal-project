@@ -1409,4 +1409,11 @@ class ViewUI implements ViewEntityInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function hasOverrides(): bool {
+    return $this->storage->hasOverrides();
+  }
+
 }

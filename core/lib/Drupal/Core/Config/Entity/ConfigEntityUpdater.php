@@ -108,6 +108,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
    *   types. This method should only be called once per update function.
    */
   public function update(array &$sandbox, $entity_type_id, ?callable $callback = NULL, bool $continue_on_error = FALSE) {
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
 
     if (isset($sandbox[self::SANDBOX_KEY]) && $sandbox[self::SANDBOX_KEY]['entity_type'] !== $entity_type_id) {
@@ -134,7 +135,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
     }
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $entities = $storage->loadMultiple(array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
+    $entities = $storage->loadMultipleOverrideFree(array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
     foreach ($entities as $entity) {
       try {
         if ($continue_on_error) {
