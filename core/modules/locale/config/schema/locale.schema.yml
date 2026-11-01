@@ -7,6 +7,9 @@ locale.settings:
     cache_strings:
       type: boolean
       label: 'Cache strings'
+    update_default_config_langcodes:
+      type: boolean
+      label: 'Update default configuration langcodes when new modules or themes are installed.'
     translate_english:
       type: boolean
       label: 'Enable English translation'

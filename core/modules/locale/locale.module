@@ -286,7 +286,12 @@ function locale_get_plural($count, $langcode = NULL) {
  */
 function locale_system_set_config_langcodes(): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service("locale.config_manager")->updateDefaultConfigLangcodes() instead. See https://www.drupal.org/node/3595086', E_USER_DEPRECATED);
-  \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
+  // Read update_default_config_langcodes from locale settings, fallback to the
+  // default value (TRUE) if it's not overridden.
+  $update_default_config_langcodes = \Drupal::config('locale.settings')->get('update_default_config_langcodes') ?? TRUE;
+  if ($update_default_config_langcodes) {
+    \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
+  }
 }
 
 /**
@@ -336,7 +341,10 @@ function locale_system_update(array $components): void {
     // components. Do this even if import is not enabled because parsing new
     // configuration may expose new source strings.
     $module_handler->loadInclude('locale', 'inc', 'locale.bulk');
-    if ($batch = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], TRUE)) {
+    // Read update_default_config_langcodes from locale settings, fallback to
+    // the default value (TRUE) if it's not overridden.
+    $update_default_config_langcodes = \Drupal::config('locale.settings')->get('update_default_config_langcodes') ?? TRUE;
+    if ($update_default_config_langcodes && $batch = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], $update_default_config_langcodes)) {
       batch_set($batch);
     }
   }

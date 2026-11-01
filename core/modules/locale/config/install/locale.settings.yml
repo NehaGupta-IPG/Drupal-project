@@ -1,4 +1,5 @@
 cache_strings: true
+update_default_config_langcodes: true
 translate_english: false
 javascript:
   directory: languages
