@@ -36,10 +36,18 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
 
     switch ($operation) {
       case 'view':
-        $access_result = AccessResult::allowedIf($account->hasPermission('access comments') && $entity->isPublished())->cachePerPermissions()->addCacheableDependency($entity)
-          ->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
-        if (!$access_result->isAllowed()) {
-          $access_result->setReason("The 'access comments' permission is required and the comment must be published.");
+        // Check if authors can view their own unpublished comment.
+        if ($account->isAuthenticated() && $account->id() === $entity->getOwnerId()) {
+          $access_result = AccessResult::allowedIf($account->hasPermission('access comments') || $account->hasPermission('view own unpublished comment'))->cachePerPermissions()->addCacheableDependency($entity)->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
+          if (!$access_result->isAllowed()) {
+            $access_result->setReason("The 'view own unpublished comment' permission is required and the comment must be published.");
+          }
+        }
+        else {
+          $access_result = AccessResult::allowedIf($account->hasPermission('access comments') && $entity->isPublished())->cachePerPermissions()->addCacheableDependency($entity)->andIf($entity->getCommentedEntity()->access($operation, $account, TRUE));
+          if (!$access_result->isAllowed()) {
+            $access_result->setReason("The 'access comments' permission is required and the comment must be published.");
+          }
         }
 
         return $access_result;

@@ -312,9 +312,34 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
     }
 
     if (!$this->currentUser->hasPermission('administer comments')) {
-      $query->condition('c.status', CommentInterface::PUBLISHED);
+      if ($this->currentUser->hasPermission('view own unpublished comment')) {
+        $andGroup = $query
+          ->andConditionGroup()
+          ->condition('c.status', CommentInterface::NOT_PUBLISHED)
+          ->condition('c.uid', $this->currentUser->id());
+        $orGroup = $query->orConditionGroup()
+          ->condition($andGroup)
+          ->condition('c.status', CommentInterface::PUBLISHED);
+        $query->condition($orGroup);
+      }
+      else {
+        $query->condition('c.status', CommentInterface::PUBLISHED);
+      }
+
       if ($comments_per_page) {
-        $count_query->condition('c.status', CommentInterface::PUBLISHED);
+        if ($this->currentUser->hasPermission('view own unpublished comment')) {
+          $andGroup = $count_query
+            ->andConditionGroup()
+            ->condition('c.status', CommentInterface::NOT_PUBLISHED)
+            ->condition('c.uid', $this->currentUser->id());
+          $orGroup = $count_query->orConditionGroup()
+            ->condition($andGroup)
+            ->condition('c.status', CommentInterface::PUBLISHED);
+          $count_query->condition($orGroup);
+        }
+        else {
+          $count_query->condition('c.status', CommentInterface::PUBLISHED);
+        }
       }
     }
     if ($mode == CommentManagerInterface::COMMENT_MODE_FLAT) {

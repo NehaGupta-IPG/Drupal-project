@@ -11,3 +11,5 @@ skip comment approval:
   title: 'Skip comment approval'
 edit own comments:
   title: 'Edit own comments'
+view own unpublished comment:
+  title: 'View own unpublished comment'
