@@ -121,13 +121,26 @@ class EntityAutocomplete extends Textfield {
 
     // Potentially the #value is set directly, so it contains the 'target_id'
     // array structure instead of a string.
-    if ($input !== FALSE && is_array($input)) {
-      $entity_ids = array_map(function (array $item) {
-        return $item['target_id'];
-      }, $input);
-
-      $entities = \Drupal::entityTypeManager()->getStorage($element['#target_type'])->loadMultiple($entity_ids);
-
+    if ($input !== FALSE) {
+      $entity_ids = [];
+      if (is_numeric($input)) {
+        $entity_ids[] = $input;
+      }
+      elseif (is_array($input)) {
+        foreach ($input as $item) {
+          if (is_numeric($item)) {
+            // For views exposed filters, the item may just be numeric.
+            $entity_ids[] = $item;
+          }
+          elseif (is_array($item) && isset($item['target_id']) && is_numeric($item['target_id'])) {
+            // Check if the item is an array with a 'target_id'.
+            $entity_ids[] = $item['target_id'];
+          }
+        }
+      }
+      if ($entity_ids) {
+        $entities = \Drupal::entityTypeManager()->getStorage($element['#target_type'])->loadMultiple($entity_ids);
+      }
       return static::getEntityLabels($entities);
     }
   }
