@@ -43,11 +43,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function getValue() {
-    $values = [];
-    foreach ($this->list as $delta => $item) {
-      $values[$delta] = $item->getValue();
-    }
-    return $values;
+    return $this->list;
   }
 
   /**
@@ -68,19 +64,10 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
       if (!is_array($values)) {
         throw new \InvalidArgumentException('Cannot set a list with a non-array value.');
       }
-      // Assign incoming values. Keys are renumbered to ensure 0-based
-      // sequential deltas. If possible, reuse existing items rather than
-      // creating new ones.
-      foreach (array_values($values) as $delta => $value) {
-        if (!isset($this->list[$delta])) {
-          $this->list[$delta] = $this->createItem($delta, $value);
-        }
-        else {
-          $this->list[$delta]->setValue($value, FALSE);
-        }
+      foreach (array_values($values) as $key => $value) {
+        $item = $this->createItem($key, $value);
+        $this->list[$key] = $item->getValue();
       }
-      // Truncate extraneous pre-existing values.
-      $this->list = array_slice($this->list, 0, count($values));
     }
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
@@ -93,8 +80,9 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    */
   public function getString() {
     $strings = [];
-    foreach ($this->list as $item) {
-      $strings[] = $item->getString();
+    foreach ($this->list as $index => $item) {
+      $typed_data = $this->createItem($index, $item);
+      $strings[] = $typed_data->getString();
     }
     // Remove any empty strings resulting from empty items.
     return implode(', ', FilterArray::removeEmptyStrings($strings));
@@ -107,7 +95,10 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     if (!is_numeric($index)) {
       throw new \InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
     }
-    return $this->list[$index] ?? NULL;
+    if (isset($this->list[$index])) {
+      $return = $this->createItem($index, $this->list[$index]);
+      return $return;
+    }
   }
 
   /**
@@ -126,9 +117,11 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     if ($value instanceof TypedDataInterface) {
       $value = $value->getValue();
     }
-    // If needed, create the item at the next position.
-    $item = $this->list[$index] ?? $this->appendItem();
-    $item->setValue($value);
+    else {
+      $item = $this->createItem($index, $value);
+      $value = $item->getValue();
+    }
+    $this->list[$index] = $value;
     return $this;
   }
 
@@ -158,11 +151,6 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   protected function rekey($from_index = 0) {
     // Re-key the list to maintain consecutive indexes.
     $this->list = array_values($this->list);
-    // Each item holds its own index as a "name", it needs to be updated
-    // according to the new list indexes.
-    for ($i = $from_index; $i < count($this->list); $i++) {
-      $this->list[$i]->setContext($i, $this);
-    }
   }
 
   /**
@@ -212,8 +200,8 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    */
   public function appendItem($value = NULL) {
     $offset = count($this->list);
+    $this->list[$offset] = $value;
     $item = $this->createItem($offset, $value);
-    $this->list[$offset] = $item;
     return $item;
   }
 
@@ -241,7 +229,11 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
-    return new \ArrayIterator($this->list);
+    $list = [];
+    foreach ($this->list as $index => $value) {
+      $list[$index] = $this->createItem($index, $value);
+    }
+    return new \ArrayIterator($list);
   }
 
   /**
@@ -255,7 +247,8 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    foreach ($this->list as $item) {
+    foreach ($this->list as $index => $value) {
+      $item = $this->createItem($index, $value);
       if ($item instanceof ComplexDataInterface || $item instanceof ListInterface) {
         if (!$item->isEmpty()) {
           return FALSE;
@@ -276,14 +269,15 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     if (isset($this->list)) {
       $removed = FALSE;
       // Apply the filter, detecting if some items were actually removed.
-      $this->list = array_filter($this->list, function ($item) use ($callback, &$removed) {
+      $this->list = array_filter($this->list, function ($value, $key) use ($callback, &$removed) {
+        $item = $this->createItem($key, $value);
         if (call_user_func($callback, $item)) {
           return TRUE;
         }
         else {
           $removed = TRUE;
         }
-      });
+      }, ARRAY_FILTER_USE_BOTH);
       if ($removed) {
         $this->rekey();
       }
@@ -307,7 +301,6 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   public function __clone() {
     foreach ($this->list as $delta => $item) {
       $this->list[$delta] = clone $item;
-      $this->list[$delta]->setContext($delta, $this);
     }
   }
 

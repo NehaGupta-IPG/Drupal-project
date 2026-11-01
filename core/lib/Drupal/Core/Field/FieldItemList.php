@@ -232,6 +232,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
     $result = [];
     $args = array_slice(func_get_args(), 1);
     foreach ($this->list as $delta => $item) {
+      $item = $this->createItem($delta, $item);
       // call_user_func_array() is way slower than a direct call so we avoid
       // using it if have no parameters.
       $result[$delta] = $args ? call_user_func_array([$item, $method], $args) : $item->{$method}();
