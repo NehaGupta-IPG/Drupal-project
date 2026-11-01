@@ -38,6 +38,7 @@ class JsAssetController extends AssetControllerBase {
       $container->get('asset.js.collection_grouper'),
       $container->get('asset.js.collection_optimizer'),
       $container->get('asset.js.dumper'),
+      $container->get('file_url_generator'),
     );
   }
 

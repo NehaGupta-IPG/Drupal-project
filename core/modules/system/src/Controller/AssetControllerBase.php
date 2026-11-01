@@ -11,6 +11,7 @@ use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -82,6 +83,8 @@ abstract class AssetControllerBase extends FileDownloadController {
    *   The asset collection optimizer.
    * @param \Drupal\Core\Asset\AssetDumperUriInterface $dumper
    *   The asset dumper.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator.
    */
   public function __construct(
     StreamWrapperManagerInterface $streamWrapperManager,
@@ -92,6 +95,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     protected readonly AssetCollectionGrouperInterface $grouper,
     protected readonly AssetCollectionOptimizerInterface $optimizer,
     protected readonly AssetDumperUriInterface $dumper,
+    protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
   ) {
     parent::__construct($streamWrapperManager);
     $this->fileExtension = $this->assetType;
@@ -224,8 +228,11 @@ abstract class AssetControllerBase extends FileDownloadController {
     }
     else {
       $expected_filename = $this->fileExtension . '_' . $generated_hash . '.' . $this->fileExtension;
+      $uri = 'assets://' . $this->fileExtension . '/' . $expected_filename;
+      $parsed_url = UrlHelper::parse($request->getRequestUri());
+
       $response = new RedirectResponse(
-        str_replace($file_name, $expected_filename, $request->getRequestUri()),
+        $this->fileUrlGenerator->generateString($uri) . '?' . UrlHelper::buildQuery($parsed_url['query'] ?? []),
         301,
         ['Cache-Control' => 'public, max-age=3600, must-revalidate'],
       );
