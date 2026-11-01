@@ -23,7 +23,7 @@ trait RequirementsTrait {
     $requirements = [];
 
     // Transaction isolation level.
-    $query = $connection->isMariaDb() ? 'SELECT @@SESSION.tx_isolation' : 'SELECT @@SESSION.transaction_isolation';
+    $query = 'SELECT @@SESSION.' . $connection->getTransactionIsolationVariableName();
     $isolation_level = $connection->query($query)->fetchField();
 
     // Tables missing primary key.

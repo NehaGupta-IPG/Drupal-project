@@ -269,6 +269,28 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
+   * Gets the name of the session variable holding the isolation level.
+   *
+   * MariaDB 11.1.1 added the transaction_isolation variable that MySQL uses
+   * and deprecated tx_isolation. Older MariaDB versions only know
+   * tx_isolation.
+   *
+   * @return string
+   *   Either 'transaction_isolation' or 'tx_isolation'.
+   */
+  public function getTransactionIsolationVariableName(): string {
+    if ($this->isMariaDb()) {
+      // Strip the "-MariaDB..." suffix, so that version_compare() only sees
+      // the numeric part of the version.
+      $version = explode('-', $this->version(), 2)[0];
+      if (version_compare($version, '11.1.1', '<')) {
+        return 'tx_isolation';
+      }
+    }
+    return 'transaction_isolation';
+  }
+
+  /**
    * Gets the MariaDB portion of the server version.
    *
    * @return string
