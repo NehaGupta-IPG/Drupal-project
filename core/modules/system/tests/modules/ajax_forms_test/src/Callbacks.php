@@ -81,6 +81,24 @@ class Callbacks {
   }
 
   /**
+   * Ajax callback to confirm update a table row from outside the table.
+   */
+  public function outsideTableCallback($form, FormStateInterface $form_state): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new HtmlCommand('#ajax_table_row_result', 'Outside table result'));
+    return $response;
+  }
+
+  /**
+   * Ajax callback to confirm update a table row from inside the table.
+   */
+  public function insideTableCallback($form, FormStateInterface $form_state): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new HtmlCommand('#ajax_table_row_result', 'Inside table result'));
+    return $response;
+  }
+
+  /**
    * Ajax callback triggered by the checkbox in a #group.
    */
   public static function checkboxGroupCallback($form, FormStateInterface $form_state): array {

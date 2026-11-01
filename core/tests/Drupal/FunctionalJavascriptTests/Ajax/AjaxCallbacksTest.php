@@ -50,4 +50,24 @@ class AjaxCallbacksTest extends WebDriverTestBase {
     $this->assertNotEmpty($this->assertSession()->waitForElement('xpath', '//div[@id="ajax_datetime_value"]/div[text()="2016-01-01 12:00:00"]'));
   }
 
+  /**
+   * Tests if Ajax callback works on table rows.
+   */
+  public function testTableRowAjaxCallbacks(): void {
+
+    // Test Ajax callback when datetime changes.
+    $this->drupalGet('ajax_forms_test_ajax_element_form');
+    $this->assertSame('No table row result', $this->getSession()->getPage()->find('xpath', '//div[@id="ajax_table_row_result"]')->getText());
+
+    // Press the button outside the table to update the table row.
+    $this->getSession()->getPage()->pressButton('edit-outside-table-button');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSame('Outside table result', $this->getSession()->getPage()->find('xpath', '//div[@id="ajax_table_row_result"]')->getText());
+
+    // Press the button inside the table to update the table row.
+    $this->getSession()->getPage()->pressButton('edit-inside-table-button');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $this->assertSame('Inside table result', $this->getSession()->getPage()->find('xpath', '//div[@id="ajax_table_row_result"]')->getText());
+  }
+
 }
