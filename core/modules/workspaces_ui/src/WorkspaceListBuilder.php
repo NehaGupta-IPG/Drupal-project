@@ -61,8 +61,17 @@ class WorkspaceListBuilder extends EntityListBuilder {
    *   The workspace repository service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
+   * @param \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association
+   *   The workspace association service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, WorkspaceManagerInterface $workspace_manager, WorkspaceRepositoryInterface $workspace_repository, RendererInterface $renderer) {
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityStorageInterface $storage,
+    WorkspaceManagerInterface $workspace_manager,
+    WorkspaceRepositoryInterface $workspace_repository,
+    RendererInterface $renderer,
+    protected WorkspaceAssociationInterface $workspaceAssociation,
+  ) {
     parent::__construct($entity_type, $storage);
     $this->workspaceManager = $workspace_manager;
     $this->workspaceRepository = $workspace_repository;
@@ -78,7 +87,8 @@ class WorkspaceListBuilder extends EntityListBuilder {
       $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('workspaces.manager'),
       $container->get('workspaces.repository'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('workspaces.association'),
     );
   }
 
@@ -176,7 +186,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
       ];
     }
 
-    if (!$entity->hasParent()) {
+    if ($this->isPublishable($entity)) {
       $operations['publish'] = [
         'title' => $this->t('Publish content'),
         // The 'Publish' operation should be the default one for the currently
@@ -188,7 +198,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
         ),
       ];
     }
-    else {
+    elseif ($entity->hasParent()) {
       /** @var \Drupal\workspaces\WorkspaceInterface $parent */
       $parent = $entity->parent->entity;
       $operations['merge'] = [
@@ -428,6 +438,18 @@ class WorkspaceListBuilder extends EntityListBuilder {
     ];
     unset($build['table']);
     unset($build['pager']);
+  }
+
+  /**
+   * Determine if an workspace should be publishable.
+   *
+   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   *
+   * @return bool
+   */
+  protected function isPublishable(WorkspaceInterface $workspace): bool {
+    return !$workspace->hasParent() &&
+      $this->workspaceAssociation->getTrackedEntities($workspace->id()) !== [];
   }
 
 }
