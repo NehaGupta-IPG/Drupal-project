@@ -133,12 +133,12 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     ]);
     $unpublished_node->save();
 
-    $different_bundle_node = Node::create([
+    $different_page_bundle_node = Node::create([
       'title' => 'Test page node',
       'type' => 'page',
       'status' => NodeInterface::PUBLISHED,
     ]);
-    $different_bundle_node->save();
+    $different_page_bundle_node->save();
 
     $deleted_node = Node::create([
       'title' => 'Test deleted node',
@@ -151,7 +151,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
       'field_test' => [
         ['entity' => $published_node],
         ['entity' => $unpublished_node],
-        ['entity' => $different_bundle_node],
+        ['entity' => $different_page_bundle_node],
         ['entity' => $deleted_node],
       ],
     ]);
@@ -202,7 +202,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $referencing_entity->save();
     $this->assertEquals($published_node->id(), $referencing_entity->field_test[0]->target_id);
     $this->assertEquals($unpublished_node->id(), $referencing_entity->field_test[1]->target_id);
-    $this->assertEquals($different_bundle_node->id(), $referencing_entity->field_test[2]->target_id);
+    $this->assertEquals($different_page_bundle_node->id(), $referencing_entity->field_test[2]->target_id);
     $this->assertEquals($deleted_node->id(), $referencing_entity->field_test[3]->target_id);
 
     $violations = $referencing_entity->field_test->validate();
@@ -218,7 +218,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $this->container->get('entity.memory_cache')->reset();
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
+    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_page_bundle_node->id()), $violations[0]->getMessage());
 
     // An invalid target was found, so the referencing entity had to be reloaded.
     $this->assertNotFalse($this->container->get('entity.memory_cache')->get('values:' . $referencing_entity->getEntityTypeId() . ':' . $referencing_entity->id()));
@@ -229,8 +229,245 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(2, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
+    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_page_bundle_node->id()), $violations[0]->getMessage());
     $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
+  }
+
+  /**
+   * Tests the validation of pre-existing entity reference items integrity.
+   */
+  public function testPreExistingItemsIntegrityValidation(): void {
+    // Install the test module to ensure node_grants is enabled.
+    $this->container->get('module_installer')->install([/*'node_access_test',*/ 'content_moderation']);
+    $this->container = \Drupal::getContainer();
+
+    // Create two types of users, with and without access to bypass content
+    // access.
+    /** @var \Drupal\user\RoleInterface $role_with_access */
+    $role_with_access = Role::create(['id' => 'role_with_access', 'label' => 'With access']);
+    $role_with_access->grantPermission('access content');
+    $role_with_access->grantPermission('view own unpublished content');
+    $role_with_access->grantPermission('edit any article content');
+    $role_with_access->grantPermission('node test view');
+    $role_with_access->grantPermission('bypass node access');
+    $role_with_access->save();
+
+    /** @var \Drupal\user\RoleInterface $role_without_access */
+    $role_without_access = Role::create(['id' => 'role_without_access', 'label' => 'Without access']);
+    $role_without_access->grantPermission('access content');
+    $role_without_access->grantPermission('view own unpublished content');
+    $role_without_access->grantPermission('edit any article content');
+    $role_without_access->save();
+
+    $user_with_access = User::create([
+      'name' => 'user_with_access',
+      'mail' => 'user_with_access@example.com',
+      'roles' => ['role_with_access'],
+    ]);
+    $user_without_access = User::create([
+      'name' => 'user_without_access',
+      'mail' => 'user_without_access@example.com',
+      'roles' => ['role_without_access'],
+    ]);
+    $user_with_access->save();
+    $user_without_access->save();
+
+    // Add an entity reference field.
+    $this->createEntityReferenceField(
+      'entity_test',
+      'entity_test',
+      'field_test',
+      'Field test',
+      'node',
+      'default',
+      ['target_bundles' => ['article']],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
+    );
+
+    // Create three test nodes.
+    $published_node = Node::create([
+      'title' => 'Test published node',
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+      'uid' => $user_without_access->id(),
+    ]);
+    $published_node->save();
+
+    $unpublished_node = Node::create([
+      'title' => 'Test unpublished node',
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'uid' => $user_without_access->id(),
+    ]);
+    $unpublished_node->save();
+
+    $referencing_entity = EntityTest::create([
+      'field_test' => [
+        ['entity' => $published_node],
+        ['entity' => $unpublished_node],
+      ],
+    ]);
+
+    // Check that users with access are able pass the validation for fields
+    // without pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_with_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // Check that users without access are not able pass the validation for
+    // fields without pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_without_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(1, $violations);
+    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $unpublished_node->id()), $violations[0]->getMessage());
+
+    // Now save the referencing entity which will create a pre-existing state
+    // for it and repeat the checks. This time, the user without access should
+    // be able to pass the validation as well because it's not changing the
+    // pre-existing state.
+    $referencing_entity->save();
+
+    $this->container->get('account_switcher')->switchTo($user_with_access);
+
+    // We check if the referencing entity was loaded by checking
+    // if it was added to the memory cache.
+    // This requires an empty memory cache for the test to be reliable.
+    $this->container->get('entity.memory_cache')->reset();
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // No invalid target was found, so the referencing entity was not reloaded.
+    $this->assertFalse($this->container->get('entity.memory_cache')->get('values:' . $referencing_entity->getEntityTypeId() . ':' . $referencing_entity->id()));
+
+    // Check that users without access are able pass the validation for fields
+    // with pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_without_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // Re-save the referencing entity and check that the referenced entity is
+    // not affected.
+    $referencing_entity->name->value = $this->randomString();
+    $referencing_entity->save();
+    $this->assertEquals($published_node->id(), $referencing_entity->field_test[0]->target_id);
+    $this->assertEquals($unpublished_node->id(), $referencing_entity->field_test[1]->target_id);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+  }
+
+  /**
+   * Tests the validation of pre-existing user entity reference items.
+   */
+  public function testPreExistingUserValidation(): void {
+    // Create two types of users, with and without access to bypass content
+    // access.
+    /** @var \Drupal\user\RoleInterface $role_with_access */
+    $role_with_access = Role::create(['id' => 'role_with_access', 'label' => 'With access']);
+    $role_with_access->grantPermission('access content');
+    $role_with_access->grantPermission('administer users');
+    $role_with_access->save();
+
+    /** @var \Drupal\user\RoleInterface $role_without_access */
+    $role_without_access = Role::create(['id' => 'role_without_access', 'label' => 'Without access']);
+    $role_without_access->grantPermission('access content');
+    $role_without_access->save();
+
+    $user_with_access = User::create([
+      'name' => 'user_with_access',
+      'mail' => 'user_with_access@example.com',
+      'roles' => ['role_with_access'],
+      'status' => TRUE,
+    ]);
+    $user_with_access->save();
+    $user_without_access = User::create([
+      'name' => 'user_without_access',
+      'mail' => 'user_without_access@example.com',
+      'roles' => ['role_without_access'],
+      'status' => TRUE,
+    ]);
+    $user_without_access->save();
+    $blocked_user = User::create([
+      'name' => 'blocked_user',
+      'mail' => 'blocked_user@example.com',
+      'roles' => [],
+      'status' => FALSE,
+    ]);
+    $blocked_user->save();
+
+    // Add an entity reference field.
+    $this->createEntityReferenceField(
+      'entity_test',
+      'entity_test',
+      'field_test',
+      'Field test',
+      'user',
+      'default',
+      [],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
+    );
+
+    $referencing_entity = EntityTest::create([
+      'field_test' => [
+        ['entity' => $user_with_access],
+        ['entity' => $user_without_access],
+        ['entity' => $blocked_user],
+      ],
+    ]);
+
+    // Check that users with access are able pass the validation for fields
+    // without pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_with_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // Check that users without access are not able pass the validation for
+    // fields without pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_without_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(1, $violations);
+    $this->assertEquals(sprintf('This entity (user: %s) cannot be referenced.', $blocked_user->id()), $violations[0]->getMessage());
+
+    // Now save the referencing entity which will create a pre-existing state
+    // for it and repeat the checks. This time, the user without access should
+    // be able to pass the validation as well because it's not changing the
+    // pre-existing state.
+    $referencing_entity->save();
+
+    $this->container->get('account_switcher')->switchTo($user_with_access);
+
+    // We check if the referencing entity was loaded by checking
+    // if it was added to the memory cache.
+    // This requires an empty memory cache for the test to be reliable.
+    $this->container->get('entity.memory_cache')->reset();
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // No invalid target was found, so the referencing entity was not reloaded.
+    $this->assertFalse($this->container->get('entity.memory_cache')->get('values:' . $referencing_entity->getEntityTypeId() . ':' . $referencing_entity->id()));
+
+    // Check that users without access are able pass the validation for fields
+    // with pre-existing content.
+    $this->container->get('account_switcher')->switchTo($user_without_access);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
+
+    // Re-save the referencing entity and check that the referenced entity is
+    // not affected.
+    $referencing_entity->name->value = $this->randomString();
+    $referencing_entity->save();
+    $this->assertEquals($user_with_access->id(), $referencing_entity->field_test[0]->target_id);
+    $this->assertEquals($user_without_access->id(), $referencing_entity->field_test[1]->target_id);
+    $this->assertEquals($blocked_user->id(), $referencing_entity->field_test[2]->target_id);
+
+    $violations = $referencing_entity->field_test->validate();
+    $this->assertCount(0, $violations);
   }
 
 }

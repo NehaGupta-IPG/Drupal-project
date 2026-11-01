@@ -3,9 +3,11 @@
 namespace Drupal\Core\Entity\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -109,12 +111,12 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
         $invalid_new_entities = $new_entities;
       }
 
-      foreach ($invalid_new_entities as $delta => $entity) {
+      foreach ($invalid_new_entities as $delta => $new_entity) {
         $this->context->buildViolation($constraint->invalidAutocreateMessage)
           ->setParameter('%type', $target_type_id)
-          ->setParameter('%label', $entity->label())
+          ->setParameter('%label', $new_entity->label())
           ->atPath((string) $delta . '.entity')
-          ->setInvalidValue($entity)
+          ->setInvalidValue($new_entity)
           ->addViolation();
       }
     }
@@ -139,8 +141,20 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
           // Check if any of the invalid existing references are simply not
           // accessible by the user, in which case they need to be excluded from
           // validation.
-          if (isset($previously_referenced_ids[$target_id]) && isset($existing_entities[$target_id]) && !$existing_entities[$target_id]->access('view')) {
-            continue;
+          if (isset($previously_referenced_ids[$target_id]) && isset($existing_entities[$target_id])) {
+            $existing_entity = $existing_entities[$target_id];
+            $can_view = $existing_entities[$target_id]->access('view');
+            if (!$can_view) {
+              continue;
+            }
+            if ($existing_entity instanceof UserInterface && $existing_entity->isBlocked()) {
+              // Blocked users are allowed to be pre-existing references.
+              continue;
+            }
+            if ($existing_entity instanceof EntityPublishedInterface && !$existing_entity->isPublished()) {
+              // Unpublished entities are allowed to be pre-existing references.
+              continue;
+            }
           }
 
           $message = isset($existing_entities[$target_id]) ? $constraint->message : $constraint->nonExistingMessage;
