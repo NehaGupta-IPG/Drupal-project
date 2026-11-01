@@ -39,11 +39,11 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
   protected $eventDispatcher;
 
   /**
-   * Cached configuration objects.
+   * The cache backend for configuration objects.
    *
-   * @var \Drupal\Core\Config\Config[]
+   * @var \Drupal\Core\Config\SearchableMemoryCache
    */
-  protected $cache = [];
+  protected $cache;
 
   /**
    * The typed config manager.
@@ -68,11 +68,19 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    *   An event dispatcher instance to use for configuration events.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
+   * @param \Drupal\Core\Config\SearchableMemoryCache $cache
+   *   The cache backend for configuration objects.
    */
-  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
+  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config, ?SearchableMemoryCache $cache = NULL) {
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;
     $this->typedConfigManager = $typed_config;
+    // To obtain relevant cache keys, we need to search our cache's keys.
+    $this->cache = $cache;
+    if ($this->cache === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cache argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3063687', E_USER_DEPRECATED);
+      $this->cache = \Drupal::service('cache.backend.memory');
+    }
   }
 
   /**
@@ -152,8 +160,8 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
 
     foreach ($names as $key => $name) {
       $cache_key = $this->getConfigCacheKey($name, $immutable);
-      if (isset($this->cache[$cache_key])) {
-        $list[$name] = $this->cache[$cache_key];
+      if (!is_null($this->cacheGet($cache_key))) {
+        $list[$name] = $this->cacheGet($cache_key);
         unset($names[$key]);
       }
     }
@@ -172,24 +180,51 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
       foreach ($storage_data as $name => $data) {
         $cache_key = $this->getConfigCacheKey($name, $immutable);
 
-        $this->cache[$cache_key] = $this->createConfigObject($name, $immutable);
-        $this->cache[$cache_key]->initWithData($data);
+        $config_object = $this->createConfigObject($name, $immutable);
+        $this->cacheSet($cache_key, $config_object);
+        $config_object->initWithData($data);
         if ($immutable) {
           if (isset($module_overrides[$name])) {
-            $this->cache[$cache_key]->setModuleOverride($module_overrides[$name]);
+            $config_object->setModuleOverride($module_overrides[$name]);
           }
           if (isset($GLOBALS['config'][$name])) {
-            $this->cache[$cache_key]->setSettingsOverride($GLOBALS['config'][$name]);
+            $config_object->setSettingsOverride($GLOBALS['config'][$name]);
           }
         }
 
         $this->propagateConfigOverrideCacheability($cache_key, $name);
 
-        $list[$name] = $this->cache[$cache_key];
+        $list[$name] = $config_object;
       }
     }
 
     return $list;
+  }
+
+  /**
+   * Retrieves a cached configuration value.
+   *
+   * @param string $cache_key
+   *   The cache key to retrieve the configuration value.
+   *
+   * @return mixed
+   *   The cached data if available, or NULL otherwise.
+   */
+  protected function cacheGet($cache_key) {
+    $static_value = $this->cache->get($cache_key) ? $this->cache->get($cache_key)->data : NULL;
+    return $static_value;
+  }
+
+  /**
+   * Stores a configuration value in the cache.
+   *
+   * @param string $cache_key
+   *   The cache key under which the data should be stored.
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface $data
+   *   The data to be cached (must be cacheable).
+   */
+  protected function cacheSet($cache_key, $data) {
+    $this->cache->set($cache_key, $data, Cache::PERMANENT, $data->getCacheTags());
   }
 
   /**
@@ -221,7 +256,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    */
   protected function propagateConfigOverrideCacheability($cache_key, $name) {
     foreach ($this->configFactoryOverrides as $override) {
-      $this->cache[$cache_key]->addCacheableDependency($override->getCacheableMetadata($name));
+      $this->cacheGet($cache_key)->addCacheableDependency($override->getCacheableMetadata($name));
     }
   }
 
@@ -231,12 +266,12 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
   public function reset($name = NULL) {
     if ($name) {
       // Clear all cached configuration for this name.
-      foreach ($this->getConfigCacheKeys($name) as $cache_key) {
-        unset($this->cache[$cache_key]);
+      foreach ($this->cache->getConfigCacheKeys($name) as $cache_key) {
+        $this->cache->delete($cache_key);
       }
     }
     else {
-      $this->cache = [];
+      $this->cache->deleteAll();
     }
 
     // Clear the static list cache if supported by the storage.
@@ -254,8 +289,8 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
     $this->storage->rename($old_name, $new_name);
 
     // Clear out the static cache of any references to the old name.
-    foreach ($this->getConfigCacheKeys($old_name) as $old_cache_key) {
-      unset($this->cache[$old_cache_key]);
+    foreach ($this->cache->getConfigCacheKeys($old_name) as $old_cache_key) {
+      $this->cache->delete($old_cache_key);
     }
 
     // Prime the cache and load the configuration with the correct overrides.
@@ -318,7 +353,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * {@inheritdoc}
    */
   public function clearStaticCache() {
-    $this->cache = [];
+    $this->cache->deleteAll();
     return $this;
   }
 
@@ -348,12 +383,12 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
     // Ensure that the static cache contains up to date configuration objects by
     // replacing the data on any entries for the configuration object apart
     // from the one that references the actual config object being saved.
-    foreach ($this->getConfigCacheKeys($saved_config->getName()) as $cache_key) {
-      $cached_config = $this->cache[$cache_key];
+    foreach ($this->cache->getConfigCacheKeys($saved_config->getName()) as $cache_key) {
+      $cached_config = $this->cacheGet($cache_key);
       if ($cached_config !== $saved_config) {
         // We can not just update the data since other things about the object
         // might have changed. For example, whether or not it is new.
-        $this->cache[$cache_key]->initWithData($saved_config->getRawData());
+        $cached_config->initWithData($saved_config->getRawData());
       }
     }
   }
@@ -375,8 +410,8 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
     }
 
     // Ensure that the static cache does not contain deleted configuration.
-    foreach ($this->getConfigCacheKeys($deleted_config->getName()) as $cache_key) {
-      unset($this->cache[$cache_key]);
+    foreach ($this->cache->getConfigCacheKeys($deleted_config->getName()) as $cache_key) {
+      $this->cache->delete($cache_key);
     }
   }
 
