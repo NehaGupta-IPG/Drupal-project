@@ -8,12 +8,35 @@ use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Exception\DriverException;
 use WebDriver\Element;
 use WebDriver\Exception;
+use WebDriver\Exception\JavaScriptError;
+use WebDriver\Exception\NoSuchWindow;
+use WebDriver\Exception\ScriptTimeout;
+use WebDriver\Exception\UnexpectedAlertOpen;
 use WebDriver\Exception\UnknownError;
 
 /**
  * Provides a driver for Selenium testing.
  */
 class DrupalSelenium2Driver extends Selenium2Driver {
+
+  /**
+   * Capabilities Drupal requires regardless of the test environment.
+   *
+   * The "ignore" prompt handler prevents WebDriver commands from dismissing
+   * JavaScript dialogs as a side effect. Tests that assert on dialogs need
+   * them to remain open.
+   *
+   * @see https://w3c.github.io/webdriver/#dfn-user-prompt-handler
+   */
+  private const CAPABILITIES = ['unhandledPromptBehavior' => 'ignore'];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(string $browserName = 'firefox', ?array $desiredCapabilities = NULL, string $wdHost = 'http://localhost:4444/wd/hub') {
+    parent::__construct($browserName, $desiredCapabilities, $wdHost);
+    $this->setWebDriver(new DrupalWebDriver($wdHost, self::CAPABILITIES));
+  }
 
   /**
    * Uploads a file to the Selenium instance and returns the remote path.
@@ -89,7 +112,46 @@ class DrupalSelenium2Driver extends Selenium2Driver {
     // behavior.
     // @see https://issues.chromium.org/issues/350540984
     $desiredCapabilities['goog:chromeOptions']['args'][] = '--disable-features=DeferRendererTasksAfterInput';
-    parent::setDesiredCapabilities($desiredCapabilities);
+    parent::setDesiredCapabilities([
+      ...self::CAPABILITIES,
+      ...$desiredCapabilities,
+    ]);
+  }
+
+  /**
+   * Waits until the browser has rendered a frame after an input event.
+   *
+   * Chrome defers renderer work from input events until the next frame, so
+   * the DOM may still reflect the pre-click state immediately after a click.
+   * Two nested requestAnimationFrame callbacks are the shortest reliable
+   * signal that the deferred work has run.
+   */
+  private function waitForRenderedFrame(): void {
+    try {
+      $this->getWebDriverSession()->execute_async([
+        'script' => <<<JS
+var done = arguments[arguments.length - 1];
+setTimeout(done, 2000);
+requestAnimationFrame(function () {
+  requestAnimationFrame(done);
+});
+JS,
+        'args' => [],
+      ]);
+    }
+    catch (JavaScriptError | NoSuchWindow | ScriptTimeout | UnexpectedAlertOpen) {
+      // Best-effort: scripts may fail while a dialog is open, and a navigation
+      // during the wait is reported as a script timeout. Subsequent assertions
+      // will fail on their own if needed.
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(string $xpath): void {
+    parent::submitForm($xpath);
+    $this->waitForRenderedFrame();
   }
 
   /**
@@ -115,6 +177,7 @@ class DrupalSelenium2Driver extends Selenium2Driver {
     if ($result !== TRUE) {
       throw $not_clickable_exception;
     }
+    $this->waitForRenderedFrame();
   }
 
   /**
