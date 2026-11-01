@@ -63,8 +63,11 @@ interface StreamWrapperManagerInterface {
    *
    * @return array
    *   An array keyed by scheme, with values containing an array of information
-   *   about the stream wrapper, as returned by hook_stream_wrappers(). If
-   *   $filter is omitted or set to StreamWrapperInterface::ALL, the entire
+   *   about the stream wrapper, with the following keys and values:
+   *   - class: stream wrapper class name
+   *   - type: a bitmask corresponding to the type constants in
+   *     StreamWrapperInterface
+   *   If $filter is omitted or set to StreamWrapperInterface::ALL, the entire
    *   Drupal stream wrapper registry is returned. Otherwise only the stream
    *   wrappers whose 'type' bitmask has an on bit for each bit specified in
    *   $filter are returned.
@@ -235,8 +238,7 @@ interface StreamWrapperManagerInterface {
    * Determines whether the URI has a valid scheme for file API operations.
    *
    * There must be a scheme and it must be a Drupal-provided scheme like
-   * 'public', 'private', 'temporary', or an extension provided with
-   * hook_stream_wrappers().
+   * 'public', 'private', 'temporary', or an other valid scheme.
    *
    * @param string $uri
    *   The URI to be tested.
