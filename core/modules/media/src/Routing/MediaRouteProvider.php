@@ -43,6 +43,17 @@ class MediaRouteProvider extends AdminHtmlRouteProvider {
   /**
    * {@inheritdoc}
    */
+  protected function getCollectionRoute(EntityTypeInterface $entity_type) {
+    if ($route = parent::getCollectionRoute($entity_type)) {
+      $route->setRequirement('_permission', 'access media overview');
+
+      return $route;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getCanonicalRoute(EntityTypeInterface $entity_type) {
     if ($this->config->get('standalone_url')) {
       return parent::getCanonicalRoute($entity_type);
