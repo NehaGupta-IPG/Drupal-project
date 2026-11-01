@@ -97,6 +97,15 @@ class FormElementHelperTest extends UnitTestCase {
         '#parents' => ['fieldset', 'id'],
       ],
     ];
+    $data[] = [
+      'id',
+      [
+        'id' => [
+          '#title' => 'ID',
+        ],
+      ],
+      [],
+    ];
     return $data;
   }
 
@@ -164,6 +173,15 @@ class FormElementHelperTest extends UnitTestCase {
         ],
       ],
       'ID',
+    ];
+    $data[] = [
+      'id',
+      [
+        'id' => [
+          '#title' => 'ID',
+        ],
+      ],
+      '',
     ];
     return $data;
   }
