@@ -268,6 +268,17 @@ class AssetOptimizationTest extends BrowserTestBase {
     $session = $this->getSession();
 
     $parts = UrlHelper::parse($url);
+    // Library-specific aggregates use 'libraries' instead of 'include', so
+    // also check the equivalent URL using 'include'. This is only done for CSS,
+    // because JavaScript aggregates using 'include' additionally depend on the
+    // scope, which changes the hash.
+    if (isset($parts['query']['libraries']) && str_ends_with($parts['path'], '.css')) {
+      $include_url = $this->convertToIncludeUrl($url);
+      $session->visit($include_url);
+      $this->assertSession()->statusCodeEquals(200);
+      \Drupal::service('file_system')->deleteRecursive($this->fileAssetsPath);
+      $this->assertInvalidAggregates($include_url);
+    }
     if (isset($parts['query']['include'])) {
       $session->visit($this->replaceGroupDelta($url, 100));
       $this->assertSession()->statusCodeEquals(400);
@@ -279,6 +290,12 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertSession()->statusCodeEquals(400);
 
       $session->visit($this->invalidExclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->emptyExclude($url));
+      $this->assertSession()->statusCodeEquals(200);
+
+      $session->visit($this->emptyInclude($url));
       $this->assertSession()->statusCodeEquals(400);
 
       // Library name must include at least one slash.
@@ -388,6 +405,24 @@ class AssetOptimizationTest extends BrowserTestBase {
 
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Converts a library-specific aggregate URL to one using 'include'.
+   *
+   * @param string $url
+   *   The source URL with the 'libraries' query parameter.
+   *
+   * @return string
+   *   The URL with 'libraries' replaced by 'include' and 'delta'.
+   */
+  protected function convertToIncludeUrl(string $url): string {
+    $parts = UrlHelper::parse($url);
+    $parts['query']['include'] = $parts['query']['libraries'];
+    $parts['query']['delta'] = '0';
+    unset($parts['query']['libraries'], $parts['query']['category']);
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query);
   }
 
   /**
@@ -541,7 +576,7 @@ class AssetOptimizationTest extends BrowserTestBase {
    *   The source URL.
    *
    * @return string
-   *   The URL with 'include' set to an arbitrary string.
+   *   The URL with 'include' set to an empty value.
    */
   protected function emptyInclude(string $url): string {
     // First replace the hash, so we don't get served the actual file on disk.
@@ -554,13 +589,13 @@ class AssetOptimizationTest extends BrowserTestBase {
   }
 
   /**
-   * Adds an invalid 'exclude' query parameter with an empty value.
+   * Adds an 'exclude' query parameter with an empty value.
    *
    * @param string $url
    *   The source URL.
    *
    * @return string
-   *   The URL with 'exclude' set to an arbitrary string.
+   *   The URL with 'exclude' set to an empty value.
    */
   protected function emptyExclude(string $url): string {
     // First replace the hash, so we don't get served the actual file on disk.
