@@ -260,7 +260,11 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     }
     $access = AccessResult::allowedIf(($translate_permission && $this->currentUser->hasPermission("$op content translations")))->cachePerPermissions();
     if (!$access->isAllowed()) {
-      return AccessResult::allowedIfHasPermission($this->currentUser, 'translate editable entities')->andIf($entity->access('update', $this->currentUser, TRUE));
+      $access = AccessResult::allowedIfHasPermission($this->currentUser, 'translate editable entities')->andIf($entity->access('update', $this->currentUser, TRUE));
+    }
+    $other_access = \Drupal::moduleHandler()->invokeAll('entity_translation_access', [$entity, $op, $this->currentUser]);
+    foreach ($other_access as $other) {
+      $access = $access->orIf($other);
     }
     return $access;
   }
