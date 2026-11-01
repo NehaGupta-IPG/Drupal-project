@@ -18,6 +18,10 @@ views.argument.taxonomy_index_tid_depth:
       type: boolean
       label: 'Use taxonomy term path'
 
+views.argument.taxonomy_index_tid_depth_join:
+  type: views.argument.taxonomy_index_tid_depth
+  label: 'Taxonomy term ID with depth (using joins)'
+
 views.argument.taxonomy_index_tid_depth_modifier:
   type: views_argument
   label: 'Taxonomy depth modifier'
@@ -149,6 +153,10 @@ views.filter.taxonomy_index_tid_depth:
     depth:
       type: integer
       label: 'Depth'
+
+views.filter.taxonomy_index_tid_depth_join:
+  type: views.filter.taxonomy_index_tid_depth
+  label: 'Taxonomy term ID with depth (using joins)'
 
 views.relationship.node_term_data:
   type: views_relationship
