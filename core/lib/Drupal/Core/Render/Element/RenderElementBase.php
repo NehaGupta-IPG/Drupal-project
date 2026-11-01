@@ -313,6 +313,10 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
           if (!isset($element['#ajax']['prevent'])) {
             $element['#ajax']['prevent'] = 'click';
           }
+          // Mark form submit as blocking unless otherwise specified.
+          if (!isset($element['#ajax']['blocking'])) {
+            $element['#ajax']['blocking'] = TRUE;
+          }
           break;
 
         case 'password':
