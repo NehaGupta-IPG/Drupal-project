@@ -215,8 +215,8 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
       return $access;
     }
 
-    // Check to see if the field has any values or a default value.
-    if ($field->isEmpty() && !$this->entityFieldHasDefaultValue()) {
+    // Check to see if the field has a value to render.
+    if (!$this->entityFieldHasValue()) {
       return $access->andIf(AccessResult::forbidden());
     }
     return $access;
@@ -413,22 +413,27 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   }
 
   /**
-   * Checks whether there is a default value set on the field.
+   * Checks whether there is a default value for the field.
    *
    * @return bool
-   *   TRUE if default value set, FALSE otherwise.
+   *   TRUE if the field has a value to render, FALSE otherwise.
    */
-  protected function entityFieldHasDefaultValue(): bool {
+  protected function entityFieldHasValue(): bool {
     $entity = $this->getEntity();
     $field = $entity->get($this->fieldName);
-    $definition = $field->getFieldDefinition();
-    if ($definition->getDefaultValue($entity)) {
+    if (!$field->isEmpty()) {
       return TRUE;
     }
 
     // @todo Remove special handling of image fields after
-    // https://www.drupal.org/project/drupal/issues/3005528.
+    //   https://www.drupal.org/project/drupal/issues/3005528.
+    $definition = $field->getFieldDefinition();
     if ($definition->getType() !== 'image') {
+      // Only interested in processing "image" field types.
+      return FALSE;
+    }
+
+    if (!$definition->getDefaultValue($entity)) {
       return FALSE;
     }
 
