@@ -350,7 +350,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         }
       }
     }
-    if (($uid_key = $entity_keys['uid'] ?? '')) {
+    if (($uid_key = $entity_keys['owner'] ?? '')) {
       $data[$data_table][$uid_key]['filter']['id'] = 'user_name';
     }
     if ($revision_table && ($revision_uid_key = $this->entityType->getRevisionMetadataKeys()['revision_user'] ?? '')) {
