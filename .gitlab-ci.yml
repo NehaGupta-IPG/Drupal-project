@@ -404,7 +404,7 @@ default:
   when: manual
   allow_failure: true
   variables:
-    REPEAT_TEST_CLASS: 'Drupal\Tests\Change\Me'
+    REPEAT_TEST_CLASS: 'Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler\FieldTest'
     REPEAT_COUNT: 100
   services:
     - <<: *with-database
