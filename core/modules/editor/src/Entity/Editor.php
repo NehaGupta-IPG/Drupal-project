@@ -30,6 +30,7 @@ use Drupal\editor\EditorInterface;
   handlers: [
     'access' => EditorAccessControlHandler::class,
   ],
+  admin_permission:  "administer filters",
   label_count: [
     'singular' => '@count text editor',
     'plural' => '@count text editors',

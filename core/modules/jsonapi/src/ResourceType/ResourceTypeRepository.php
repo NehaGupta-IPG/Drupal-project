@@ -310,7 +310,26 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    */
   protected static function isMutableResourceType(EntityTypeInterface $entity_type, $bundle) {
     assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
-    return !$entity_type instanceof ConfigEntityTypeInterface;
+    if (!$entity_type instanceof ConfigEntityTypeInterface) {
+      return TRUE;
+    }
+
+    $config_schema_type_definition = FALSE;
+    $config_prefix = $entity_type->getConfigPrefix();
+    $definitions = \Drupal::service('config.typed')->getDefinitions();
+    foreach ($definitions as $name => $definition) {
+      if (str_starts_with($name, $config_prefix . '.*') && str_replace('.*', '', $name) === $config_prefix) {
+        $config_schema_type_definition = \Drupal::service('config.typed')->getDefinition($name);
+        break;
+      }
+    }
+
+    if ($config_schema_type_definition === FALSE) {
+      return FALSE;
+    }
+
+    // Config entities are only mutable if they're fully validatable.
+    return array_key_exists('FullyValidatable', $config_schema_type_definition['constraints'] ?? []);
   }
 
   /**

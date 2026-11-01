@@ -21,6 +21,11 @@ class BlockTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['block'];
 
   /**
@@ -49,10 +54,12 @@ class BlockTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method): void {
-    switch ($method) {
-      case 'GET':
-        $this->entity->setVisibilityConfig('user_role', [])->save();
-        break;
+    if ($method === 'GET') {
+      $this->entity->getVisibilityConditions()->removeInstanceId('user_role');
+      $this->entity->save();
+    }
+    else {
+      $this->grantPermissionsToTestedRole(['administer blocks']);
     }
   }
 
@@ -139,9 +146,39 @@ class BlockTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function doTestPatchIndividual(): void {
+    // The read-access fixture uses a condition that is not fully validatable.
+    // Remove it before testing successful writes, without bypassing validation.
+    $this->entity->getVisibilityConditions()->removeInstanceId('user_role');
+    $this->entity->save();
+    parent::doTestPatchIndividual();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
-    // @todo Update once https://www.drupal.org/node/2300677 is fixed.
-    return [];
+    return [
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'plugin' => 'system_branding_block',
+          'theme' => 'stark',
+          'region' => 'header',
+          'settings' => [
+            'id' => 'system_branding_block',
+            'label' => 'Special',
+            'label_display' => '0',
+            'provider' => 'system',
+            'use_site_logo' => TRUE,
+            'use_site_name' => TRUE,
+            'use_site_slogan' => TRUE,
+          ],
+          'visibility' => [],
+        ],
+      ],
+    ];
   }
 
   /**

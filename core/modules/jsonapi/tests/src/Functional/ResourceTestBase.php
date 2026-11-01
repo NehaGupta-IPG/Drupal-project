@@ -14,6 +14,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -28,8 +29,15 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
+use Drupal\Core\TypedData\Plugin\DataType\DecimalData;
+use Drupal\Core\TypedData\Plugin\DataType\FloatData;
+use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
+use Drupal\Core\TypedData\Plugin\DataType\StringData;
+use Drupal\Core\TypedData\Plugin\DataType\Timestamp;
 use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\Core\Url;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\jsonapi\CacheableResourceResponse;
@@ -111,7 +119,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * The fields that are protected against modification during PATCH requests.
    *
+   * For config entities, this can be determined automatically: those config
+   * entity properties that are listed for the ImmutableProperties constraint.
+   * This always includes the property that is used as the `id` entity key.
+   *
    * @var string[]
+   *
+   * @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraint
+   * @see \Drupal\Core\Config\Entity\ConfigEntityType::getConstraints()
    */
   protected static $patchProtectedFieldNames;
 
@@ -126,9 +141,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static $uniqueFieldNames = [];
 
   /**
-   * The entity ID for the first created entity in testPost().
+   * The entity ID for the first created content entity in testPost().
    *
    * The default value of 2 should work for most content entities.
+   *
+   * For config entities, this will always need to be overridden.
    *
    * @var string|int
    *
@@ -248,6 +265,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
       ->getKey('uuid');
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
+
+    // Config entities need different treatment.
+    if ($this->entity instanceof ConfigEntityInterface) {
+      if (static::$patchProtectedFieldNames !== NULL) {
+        throw new \LogicException('$patchProtectedFieldNames must not be set for config entity JSON:API resource type tests: it is inferred automatically from its immutable properties.');
+      }
+      static::$patchProtectedFieldNames = array_flip($this->entity->getEntityType()->getConstraints()['ImmutableProperties']['properties']);
+    }
     // Refresh entity storage as new fields have been created.
     $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
 
@@ -419,7 +444,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function createAnotherEntity(string $key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
     // Some entity types are not stored, hence they cannot be reloaded.
-    if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
+    if ($this->entity instanceof ContentEntityInterface && get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
       $duplicate->set('field_rest_test', 'Second collection entity');
     }
     $duplicate->save();
@@ -443,7 +468,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     }
 
     if ($needs_manual_id) {
-      $duplicate->set($id_key, $original->id() . '_' . $key);
+      $duplicate->set($id_key, $original->id() . $key);
     }
     return $duplicate;
   }
@@ -480,7 +505,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   A JSON:API request document.
    */
   protected function getPatchDocument() {
-    return NestedArray::mergeDeep(['data' => ['id' => $this->entity->uuid()]], $this->getPostDocument());
+    $document = NestedArray::mergeDeep(['data' => ['id' => $this->entity->uuid()]], $this->getPostDocument());
+    // For config entities, there is both a UUID (used as the JSON:API resource
+    // ID), but also a name/"ID key", which is always a string key. This key
+    // cannot change.
+    if ($this->entity instanceof ConfigEntityInterface) {
+      $document['data']['attributes']['drupal_internal__' . $this->entity->getEntityType()->getKey('id')] = $this->entity->id();
+    }
+    return $document;
   }
 
   /**
@@ -906,6 +938,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       case 'label':
         // Add a second label to this entity to make it invalid.
         $label_field = $entity_type->hasKey('label') ? $entity_type->getKey('label') : static::$labelFieldName;
+        $label_field = $this->resourceType->getPublicName($label_field);
         $document['data']['attributes'][$label_field] = [
           0 => $document['data']['attributes'][$label_field],
           1 => 'Second Title',
@@ -1371,8 +1404,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * referred to as "resource identifiers."
    */
   public function testRelationships(): void {
+    // @todo Remove this in https://www.drupal.org/i/3423462
     if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('Configuration entities cannot have relationships.');
+      $this->markTestSkipped('Configuration entities cannot have relationships yet.');
     }
 
     $request_options = [];
@@ -2014,6 +2048,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests POST/PATCH/DELETE for an individual resource.
    */
   public function testIndividual(): void {
+    if ($this->entity instanceof ConfigEntityInterface && !$this->resourceType->isMutable()) {
+      $routes = $this->container->get('router.route_provider');
+      foreach (['collection.post', 'individual.patch', 'individual.delete'] as $operation) {
+        $name = sprintf('jsonapi.%s.%s', static::$resourceTypeName, $operation);
+        $this->assertCount(0, $routes->getRoutesByNames([$name]));
+      }
+      return;
+    }
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
@@ -2029,11 +2071,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestPostIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('POSTing config entities is not yet supported.');
-    }
-
     // Try with all of the following request bodies.
     $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = Json::encode($this->getPostDocument());
@@ -2102,8 +2139,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // field.
       $response = $this->request('POST', $url, $request_options);
       $label_field = $this->entity->getEntityType()->getKey('label');
-      $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
-      $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      if ($this->entity instanceof FieldableEntityInterface) {
+        $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
+        $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      }
+      else {
+        $this->assertResourceErrorResponse(422, 'The attribute ' . $this->resourceType->getPublicName($label_field) . ' must be a scalar.', $url, $response, FALSE);
+      }
     }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_2;
@@ -2115,11 +2157,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceErrorResponse(422, "IDs should be properly generated and formatted UUIDs as described in RFC 4122.", $url, $response);
     }
 
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
+    // Only fieldable entity types can have field-level access control.
+    if ($this->entity instanceof FieldableEntityInterface) {
+      $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
 
-    // DX: 403 when entity contains field without 'edit' access.
-    $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+      // DX: 403 when entity contains field without 'edit' access.
+      $response = $this->request('POST', $url, $request_options);
+      $this->assertResourceErrorResponse(403, "The current user is not allowed to POST the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+    }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_4;
 
@@ -2186,6 +2231,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertFalse($response->hasHeader('Location'));
     }
 
+    if ($this->entity instanceof ConfigEntityInterface) {
+      // Retrying a POST generates a new UUID but must not overwrite the entity
+      // with the same config ID, including entity types whose key is not "id".
+      $original_values = $this->entityLoadUnchanged(static::$firstCreatedEntityId)->toArray();
+      $response = $this->request('POST', $url, $request_options);
+      $this->assertResourceErrorResponse(409, 'Conflict: Entity already exists.', $url, $response, FALSE);
+      $this->assertSame($original_values, $this->entityLoadUnchanged(static::$firstCreatedEntityId)->toArray());
+      return;
+    }
+
     // 201 for well-formed request that creates another entity.
     // If the entity is stored, delete the first created entity (in case there
     // is a uniqueness constraint).
@@ -2245,12 +2300,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests PATCHing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestPatchIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('PATCHing config entities is not yet supported.');
-    }
-
-    $prior_revision_id = (int) $this->entityLoadUnchanged($this->entity->id())->getRevisionId();
+    $prior_revision_id = $this->entity instanceof ContentEntityInterface
+      ? (int) $this->entityLoadUnchanged($this->entity->id())->getRevisionId()
+      // Config entities do not have revision IDs.
+      : NULL;
 
     // Patch testing requires that another entity of the same type exists.
     $this->anotherEntity = $this->createAnotherEntity('dupe');
@@ -2265,7 +2318,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // The 'field_rest_test' field does not allow 'view' access, so does not end
     // up in the JSON:API document. Even when we explicitly add it to the JSON
     // API document that we send in a PATCH request, it is considered invalid.
-    $parseable_invalid_request_body_3 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_rest_test' => $this->entity->get('field_rest_test')->getValue()]]], $this->getPatchDocument()));
+    $parseable_invalid_request_body_3 = NULL;
+    if ($this->entity instanceof FieldableEntityInterface) {
+      $parseable_invalid_request_body_3 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_rest_test' => $this->entity->get('field_rest_test')->getValue()]]], $this->getPatchDocument()));
+    }
     $parseable_invalid_request_body_4 = Json::encode(NestedArray::mergeDeep(['data' => ['attributes' => ['field_nonexistent' => $this->randomString()]]], $this->getPatchDocument()));
     // It is invalid to PATCH a relationship field under the attributes member.
     if ($this->entity instanceof FieldableEntityInterface && $this->entity->hasField('field_jsonapi_test_entity_ref')) {
@@ -2323,21 +2379,45 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $request_options[RequestOptions::BODY] = $parseable_invalid_request_body;
       $response = $this->request('PATCH', $url, $request_options);
       $label_field = $this->entity->getEntityType()->getKey('label');
-      $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
-      $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      if ($this->entity instanceof FieldableEntityInterface) {
+        $label_field_capitalized = $this->entity->getFieldDefinition($label_field)->getLabel();
+        $this->assertResourceErrorResponse(422, "$label_field: $label_field_capitalized: this field cannot hold more than 1 values.", NULL, $response, '/data/attributes/' . $label_field);
+      }
+      else {
+        $this->assertResourceErrorResponse(422, 'The attribute ' . $this->resourceType->getPublicName($label_field) . ' must be a scalar.', $url, $response, FALSE);
+      }
     }
 
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_2;
+    // Only fieldable entity types can have field-level access control.
+    if ($this->entity instanceof FieldableEntityInterface) {
+      $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_2;
 
-    // DX: 403 when entity contains field without 'edit' access.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+      // DX: 403 when entity contains field without 'edit' access.
+      $response = $this->request('PATCH', $url, $request_options);
+      $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+    }
 
-    // DX: 403 when entity trying to update an entity's ID field.
+    // DX:
+    // - 403 when trying to update a content entity's ID field.
+    // - 422 when trying to update a config entity's ID field.
+    // The reason for the difference: config entities do not have field-level
+    // access control. Hence an entity-level validation error is triggered
+    // instead of a field-level access control error.
     $request_options[RequestOptions::BODY] = Json::encode($this->makeNormalizationInvalid($this->getPatchDocument(), 'id'));
     $response = $this->request('PATCH', $url, $request_options);
     $id_field_name = $this->entity->getEntityType()->getKey('id');
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field ($id_field_name). The entity ID cannot be changed.", $url, $response, "/data/attributes/$id_field_name");
+    $this->assertResourceErrorResponse(
+      $this->entity instanceof ContentEntityInterface ? 403 : 422,
+      $this->entity instanceof ContentEntityInterface
+        ? "The current user is not allowed to PATCH the selected field ($id_field_name). The entity ID cannot be changed."
+        : "Entity is not valid: The '$id_field_name' property cannot be changed.",
+      $this->entity instanceof ContentEntityInterface ? $url : NULL,
+      $response,
+      $this->entity instanceof ContentEntityInterface
+        ? "/data/attributes/$id_field_name"
+        // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraintValidator
+        : '/data'
+    );
 
     if ($this->entity->getEntityType()->hasKey('uuid')) {
       // DX: 400 when entity trying to update an entity's UUID field.
@@ -2346,24 +2426,51 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceErrorResponse(400, sprintf("The selected entity (%s) does not match the ID in the payload (%s).", $this->entity->uuid(), $this->anotherEntity->uuid()), $url, $response, FALSE);
     }
 
-    $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
+    // Only fieldable entity types can have field-level access control.
+    if ($this->entity instanceof FieldableEntityInterface) {
+      $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_3;
 
-    // DX: 403 when entity contains field without 'edit' nor 'view' access, even
-    // when the value for that field matches the current value. This is allowed
-    // in principle, but leads to information disclosure.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+      // DX: 403 when entity contains field without 'edit' nor 'view' access, even
+      // when the value for that field matches the current value. This is allowed
+      // in principle, but leads to information disclosure.
+      $response = $this->request('PATCH', $url, $request_options);
+      $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (field_rest_test).", $url, $response, '/data/attributes/field_rest_test');
+    }
 
     // DX: 403 when sending PATCH request with updated read-only fields.
+    // DX:
+    // - 403 when trying to update a content entity's read-only field
+    // - 422 when trying to update a config entity's immutable field
+    // The reason for the difference: config entities do not have field-level
+    // access control. Hence an entity-level validation error is triggered
+    // instead of a field-level access control error.
     [$modified_entity, $original_values] = static::getModifiedEntityForPatchTesting($this->entity);
     // Send PATCH request by serializing the modified entity, assert the error
     // response, change the modified entity field that caused the error response
     // back to its original value, repeat.
     foreach (static::$patchProtectedFieldNames as $patch_protected_field_name => $reason) {
-      $request_options[RequestOptions::BODY] = Json::encode($this->normalize($modified_entity, $url));
+      $document = $this->normalize($modified_entity, $url);
+      if ($this->entity instanceof ConfigEntityInterface) {
+        // Test one property at a time, including IDs that are computed by id().
+        $document = $this->normalize($this->entity, $url);
+        $public_name = $this->resourceType->getPublicName($patch_protected_field_name);
+        $document['data']['attributes'][$public_name] = $modified_entity->get($patch_protected_field_name);
+      }
+      $request_options[RequestOptions::BODY] = Json::encode($document);
       $response = $this->request('PATCH', $url, $request_options);
-      $this->assertResourceErrorResponse(403, "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : ''), $url->setAbsolute(), $response, '/data/attributes/' . $patch_protected_field_name);
-      $modified_entity->get($patch_protected_field_name)->setValue($original_values[$patch_protected_field_name]);
+      $this->assertResourceErrorResponse(
+        $this->entity instanceof ContentEntityInterface ? 403 : 422,
+        $this->entity instanceof ContentEntityInterface
+          ? "The current user is not allowed to PATCH the selected field (" . $patch_protected_field_name . ")." . ($reason !== NULL ? ' ' . $reason : '')
+          : "Entity is not valid: The '$patch_protected_field_name' property cannot be changed.",
+        $this->entity instanceof ContentEntityInterface ? $url : NULL,
+        $response,
+        $this->entity instanceof ContentEntityInterface
+          ? '/data/attributes/' . $patch_protected_field_name
+          // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\ImmutablePropertiesConstraintValidator
+          : '/data'
+      );
+      $modified_entity->set($patch_protected_field_name, $original_values[$patch_protected_field_name]);
     }
 
     $request_options[RequestOptions::BODY] = $parseable_invalid_request_body_4;
@@ -2392,8 +2499,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, FALSE, $response);
     $updated_entity = $this->entityLoadUnchanged($this->entity->id());
-    $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
-    $prior_revision_id = (int) $updated_entity->getRevisionId();
+    if ($this->entity instanceof RevisionableInterface) {
+      $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
+      $prior_revision_id = (int) $updated_entity->getRevisionId();
+    }
 
     $request_options[RequestOptions::BODY] = $parseable_valid_request_body;
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'text/xml';
@@ -2411,19 +2520,25 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Assert that the entity was indeed updated, and that the response body
     // contains the serialized updated entity.
     $updated_entity = $this->entityLoadUnchanged($this->entity->id());
-    $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
-    if ($this->entity instanceof RevisionLogInterface) {
-      if (static::$newRevisionsShouldBeAutomatic) {
-        $this->assertNotSame((int) $this->entity->getRevisionCreationTime(), (int) $updated_entity->getRevisionCreationTime());
-      }
-      else {
-        $this->assertSame((int) $this->entity->getRevisionCreationTime(), (int) $updated_entity->getRevisionCreationTime());
+    if ($this->entity instanceof RevisionableInterface) {
+      $this->assertSame(static::$newRevisionsShouldBeAutomatic, $prior_revision_id < (int) $updated_entity->getRevisionId());
+      if ($this->entity instanceof RevisionLogInterface) {
+        if (static::$newRevisionsShouldBeAutomatic) {
+          $this->assertNotSame((int) $this->entity->getRevisionCreationTime(), (int) $updated_entity->getRevisionCreationTime());
+        }
+        else {
+          $this->assertSame((int) $this->entity->getRevisionCreationTime(), (int) $updated_entity->getRevisionCreationTime());
+        }
       }
     }
     $updated_entity_document = $this->normalize($updated_entity, $url);
     $document = $this->getDocumentFromResponse($response);
     $this->assertSame($updated_entity_document, $document);
-    $prior_revision_id = (int) $updated_entity->getRevisionId();
+
+    if ($this->entity instanceof ContentEntityInterface) {
+      $prior_revision_id = (int) $updated_entity->getRevisionId();
+    }
+
     // Assert that the entity was indeed created using the PATCHed values.
     foreach ($this->getPatchDocument()['data']['attributes'] as $field_name => $field_normalization) {
       // If the value is an array of properties, only verify that the sent
@@ -2445,6 +2560,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
         static::recursiveKsort($updated_entity_document['data']['relationships'][$field_name]);
         $this->assertSame($relationship_field_normalization, array_diff_key($updated_entity_document['data']['relationships'][$field_name], ['links' => TRUE]));
       }
+    }
+
+    // All subsequent tests test FieldItemListInterface-related functionality.
+    if (!$this->entity instanceof FieldableEntityInterface) {
+      return;
     }
 
     // Ensure that fields do not get deleted if they're not present in the PATCH
@@ -2573,9 +2693,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
   protected function doTestDeleteIndividual(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('DELETEing config entities is not yet supported.');
+      $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+      $this->setUpAuthorization('DELETE');
+      $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+      $response = $this->request('DELETE', $url, $this->getAuthenticationRequestOptions());
+      $this->assertSame(405, $response->getStatusCode());
+      $this->entityStorage->resetCache();
+      $this->assertNotNull($this->entityStorage->load($this->entity->id()));
+      return;
     }
 
     // The URL and Guzzle request options that will be used in this test. The
@@ -2665,6 +2791,23 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $original_values = [];
     foreach (array_keys(static::$patchProtectedFieldNames) as $field_name) {
       $field = $modified_entity->get($field_name);
+
+      // Config entities get modified entities based on config schema.
+      if ($entity instanceof ConfigEntityInterface) {
+        $original_values[$field_name] = $modified_entity->get($field_name);
+        $modified_entity->set(
+          $field_name,
+          match ($entity->getTypedData()->get($field_name)->getDataDefinition()->getClass()) {
+            BooleanData::class => !$original_values[$field_name],
+            IntegerData::class, FloatData::class, DecimalData::class, Timestamp::class => $original_values[$field_name] + 1,
+            StringData::class => str_rot13($original_values[$field_name]),
+          }
+        );
+        continue;
+      }
+
+      // Content entities get modified entities using ::generateSampleItems(),
+      // with a few exceptions.
       $original_values[$field_name] = $field->getValue();
       switch ($field->getItemDefinition()->getClass()) {
         case BooleanItem::class:
@@ -3596,7 +3739,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Loads an entity in the test container, ignoring the static cache.
    *
-   * @param int $id
+   * @param int|string $id
    *   The entity ID.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
@@ -3681,6 +3824,32 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // MISS or UNCACHEABLE (poor cacheability) depends on data.
     // It must not be HIT.
     return $cache_max_age === 0 || !empty(array_intersect(['user', 'session'], $cache_context)) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+  }
+
+  /**
+   * Whether the tested config entity type is fully validatable.
+   *
+   * @return bool
+   *   Whether the tested config entity type is fully validatable.
+   *
+   * @see \Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase::isFullyValidatable()
+   */
+  protected function isFullyValidatableConfigEntityType(): bool {
+    $typed_config = $this->container->get('config.typed');
+    assert($typed_config instanceof TypedConfigManagerInterface);
+    // @see \Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter::getConfigTypedData()
+    $config_entity_type_schema_constraints = $typed_config
+      ->createFromNameAndData(
+        $this->entity->getConfigDependencyName(),
+        $this->entity->toArray()
+      )->getConstraints();
+
+    foreach ($config_entity_type_schema_constraints as $constraint) {
+      if ($constraint instanceof FullyValidatableConstraint) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

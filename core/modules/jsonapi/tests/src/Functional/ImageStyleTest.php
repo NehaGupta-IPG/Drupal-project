@@ -20,6 +20,11 @@ class ImageStyleTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['image'];
 
   /**
@@ -134,8 +139,16 @@ class ImageStyleTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'attributes' => [
+          'drupal_internal__name' => 'special',
+          'label' => 'Special',
+          'effects' => [],
+        ],
+      ],
+    ];
   }
 
 }

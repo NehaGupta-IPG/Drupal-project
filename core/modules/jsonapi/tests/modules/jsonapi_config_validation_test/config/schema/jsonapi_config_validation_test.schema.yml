@@ -1,0 +1,41 @@
+jsonapi_config_validation_test.root:
+  type: mapping
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    plugins:
+      type: sequence
+      sequence:
+        type: mapping
+        mapping:
+          plugin:
+            type: string
+          settings:
+            type: jsonapi_config_validation_test.plugin.[%parent.plugin]
+
+jsonapi_config_validation_test.plugin.valid:
+  type: mapping
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    child:
+      type: string
+    settings:
+      type: jsonapi_config_validation_test.plugin.[%parent.child]
+
+jsonapi_config_validation_test.plugin.leaf:
+  type: mapping
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    label:
+      type: label
+
+jsonapi_config_validation_test.plugin.invalid:
+  type: mapping
+  mapping:
+    label:
+      type: label
+
+jsonapi_config_validation_test.plugin.inherited:
+  type: jsonapi_config_validation_test.plugin.leaf

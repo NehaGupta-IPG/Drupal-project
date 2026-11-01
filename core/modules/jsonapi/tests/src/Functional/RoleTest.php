@@ -104,9 +104,22 @@ class RoleTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'drama_llama';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'user_role--user_role',
+        'attributes' => [
+          'drupal_internal__id' => 'drama_llama',
+          'label' => 'Drama llama',
+          'weight' => 3,
+        ],
+      ],
+    ];
   }
 
 }

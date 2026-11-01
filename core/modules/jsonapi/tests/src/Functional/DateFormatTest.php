@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Url;
 use Drupal\jsonapi\JsonApiSpec;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -76,7 +78,10 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedDocument(): array {
-    $self_url = Url::fromUri('base:/jsonapi/date_format/date_format/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
+    $self_url = Url::fromUri('base:/jsonapi/date_format/date_format/' . $this->entity->uuid())
+      ->setAbsolute()
+      ->toString(TRUE)
+      ->getGeneratedUrl();
     return [
       'jsonapi' => [
         'meta' => [
@@ -111,9 +116,93 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'date_format--date_format',
+        'attributes' => [
+          'drupal_internal__id' => 'special',
+          'label' => 'My special date format',
+          'pattern' => 'U',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Tests date pattern validation.
+   */
+  #[\PHPUnit\Framework\Attributes\TestWith([NULL, "This value should not be null."])]
+  #[\PHPUnit\Framework\Attributes\TestWith(["⌚", "This is not a valid date format."])]
+  public function testPostValidationErrors(?string $pattern, string $expected_validation_error): void {
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    $doc = $this->getPostDocument();
+    $doc['data']['attributes']['pattern'] = $pattern;
+
+    // Create date_format POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // POST request: 422 when adding relationships to non-existing resources.
+    $response = $this->request('POST', $url, $request_options);
+    $expected_document = [
+      'errors' => [
+        0 => [
+          'title' => 'Unprocessable Content',
+          'status' => '422',
+          'detail' => "pattern: $expected_validation_error",
+          'source' => [
+            'pointer' => '/data/attributes/pattern',
+          ],
+        ],
+      ],
+      'jsonapi' => static::$jsonApiMember,
+    ];
+    $this->assertResourceResponse(422, $expected_document, $response);
+  }
+
+  /**
+   * Tests that duplicate config entity identifiers are rejected.
+   */
+  public function testPostingExistingId(): void {
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    // Create date_format POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+
+    $doc = $this->getPostDocument();
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // Create the original entity, then reject a duplicate config ID.
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertResourceResponse(201, FALSE, $response);
+    $original = $this->entityLoadUnchanged('special')->toArray();
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertResourceResponse(409, FALSE, $response);
+    $this->assertSame($original, $this->entityLoadUnchanged('special')->toArray());
+
+    // A different config ID cannot reuse an existing UUID either.
+    $doc['data']['id'] = $original['uuid'];
+    $doc['data']['attributes']['drupal_internal__id'] = 'another';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+    $response = $this->request('POST', $url, $request_options);
+    $this->assertResourceResponse(409, FALSE, $response);
+    $this->assertNull($this->entityLoadUnchanged('another'));
+    $this->assertSame($original, $this->entityLoadUnchanged('special')->toArray());
   }
 
 }

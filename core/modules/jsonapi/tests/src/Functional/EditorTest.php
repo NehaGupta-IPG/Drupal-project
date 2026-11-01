@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\jsonapi\JsonApiSpec;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -42,6 +44,11 @@ class EditorTest extends ConfigEntityResourceTestBase {
    * @var \Drupal\editor\EditorInterface
    */
   protected $entity;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $firstCreatedEntityId = 'special';
 
   /**
    * {@inheritdoc}
@@ -163,8 +170,63 @@ class EditorTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    if (!FilterFormat::load('special')) {
+      FilterFormat::create([
+        'name' => 'My special format',
+        'format' => 'special',
+        'langcode' => 'en',
+        'filters' => [],
+      ])->save();
+    }
+
+    return [
+      'data' => [
+        'type' => 'editor--editor',
+        'attributes' => [
+          'dependencies' => [
+            'config' => [
+              'filter.format.special',
+            ],
+          ],
+          'drupal_internal__format' => 'special',
+          'editor' => 'ckeditor5',
+          'settings' => [
+            'toolbar' => [
+              'items' => ['bold', 'italic'],
+            ],
+          ],
+          'image_upload' => [
+            'status' => FALSE,
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPatchDocument() {
+    return [
+      'data' => [
+        'type' => 'editor--editor',
+        'id' => $this->entity->uuid(),
+        'attributes' => [
+          'drupal_internal__format' => 'llama',
+          // This specifies a different image upload directory.
+          'image_upload' => [
+            'status' => TRUE,
+            'scheme' => 'public',
+            'directory' => 'inline-images-changed',
+            'max_size' => NULL,
+            'max_dimensions' => [
+              'width' => NULL,
+              'height' => NULL,
+            ],
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -222,6 +284,66 @@ class EditorTest extends ConfigEntityResourceTestBase {
     // editor access also depends on access to the configured filter format.
     \Drupal::entityTypeManager()->getAccessControlHandler('filter_format')->resetCache();
     return parent::entityAccess($entity, $operation, $account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testPatchIndividual(): void {
+    // Ensure ::getModifiedEntityForPatchTesting() can pick an alternative value
+    // for the 'format' property.
+    // cSpell:disable
+    FilterFormat::create([
+      // TRICKY: `llama` is transformed to `yynzn` by str_rot13() in the test.
+      // @see ::getModifiedEntityForPatchTesting()
+      'format' => 'yynzn',
+      'name' => $this->randomString(),
+    ])->save();
+    // cSpell:enable
+
+    parent::doTestPatchIndividual();
+  }
+
+  /**
+   * Cannot use `unicorn` because `editor.settings.unicorn` is not validatable.
+   */
+  public function testEditorPluginWithNonFullyValidatableSettings(): void {
+    $this->container->get('module_installer')->install(['editor_test']);
+
+    $this->setUpAuthorization('POST');
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    $doc = $this->getPostDocument();
+    // @see \Drupal\editor_test\Plugin\Editor\UnicornEditor
+    $doc['data']['attributes']['editor'] = 'unicorn';
+    // @see `type: editor.settings.unicorn` in core/modules/editor/tests/modules/editor_test/config/schema/editor_test.schema.yml
+    $doc['data']['attributes']['settings'] = [
+      'ponies_too' => FALSE,
+    ];
+
+    // Create editor POST request.
+    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $request_options = $this->getAuthenticationRequestOptions();
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
+    $request_options[RequestOptions::BODY] = Json::encode($doc);
+
+    // POST request: 422 when adding relationships to non-existing resources.
+    $response = $this->request('POST', $url, $request_options);
+    $expected_document = [
+      'errors' => [
+        0 => [
+          'title' => 'Unprocessable Content',
+          'status' => '422',
+          'detail' => 'settings: The value at property path settings cannot be validated because the resolved schema type "editor.settings.unicorn" is not fully validatable.',
+          'source' => [
+            'pointer' => '/data/attributes/settings',
+          ],
+        ],
+      ],
+      'jsonapi' => static::$jsonApiMember,
+    ];
+    $this->assertResourceResponse(422, $expected_document, $response);
   }
 
 }

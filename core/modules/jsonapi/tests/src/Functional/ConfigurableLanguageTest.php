@@ -23,6 +23,11 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'fr';
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language'];
 
   /**
@@ -108,8 +113,15 @@ class ConfigurableLanguageTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'attributes' => [
+          'drupal_internal__id' => 'fr',
+          'label' => 'French',
+        ],
+      ],
+    ];
   }
 
   /**

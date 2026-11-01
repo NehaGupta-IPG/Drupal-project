@@ -115,9 +115,24 @@ class ActionTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'user_add_role_action.custom';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => 'action--action',
+        'attributes' => [
+          'drupal_internal__id' => 'user_add_role_action.custom',
+          'label' => 'My special action',
+          'plugin' => 'user_add_role_action',
+          'action_type' => 'user',
+          'configuration' => ['rid' => RoleInterface::ANONYMOUS_ID],
+        ],
+      ],
+    ];
   }
 
 }

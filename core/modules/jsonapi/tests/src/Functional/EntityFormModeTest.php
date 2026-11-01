@@ -27,6 +27,11 @@ class EntityFormModeTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $firstCreatedEntityId = 'user.special';
+
+  /**
+   * {@inheritdoc}
+   */
   protected static $entityTypeId = 'entity_form_mode';
 
   /**
@@ -112,8 +117,16 @@ class EntityFormModeTest extends ConfigEntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getPostDocument(): array {
-    // @todo Update in https://www.drupal.org/node/2300677.
-    return [];
+    return [
+      'data' => [
+        'type' => static::$resourceTypeName,
+        'attributes' => [
+          'drupal_internal__id' => 'user.special',
+          'label' => 'Special',
+          'targetEntityType' => 'user',
+        ],
+      ],
+    ];
   }
 
 }
