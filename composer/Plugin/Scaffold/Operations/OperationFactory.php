@@ -111,29 +111,8 @@ class OperationFactory {
     if ($operation_data->hasDefault()) {
       $default_data_file = ScaffoldFilePath::sourcePath($package_name, $package_path, $operation_data->destination(), $operation_data->default());
     }
-    if (!$this->hasContent($prepend_source_file) && !$this->hasContent($append_source_file)) {
-      $message = '  - Keep <info>[dest-rel-path]</info> unchanged: no content to prepend / append was provided.';
-      return new SkipOp($message);
-    }
 
     return new AppendOp($prepend_source_file, $append_source_file, $operation_data->forceAppend(), $default_data_file);
-  }
-
-  /**
-   * Checks to see if the specified scaffold file exists and has content.
-   *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath|null $file
-   *   (optional) Scaffold file to check.
-   *
-   * @return bool
-   *   True if the file exists and has content.
-   */
-  protected function hasContent(?ScaffoldFilePath $file = NULL) {
-    if (!$file) {
-      return FALSE;
-    }
-    $path = $file->fullPath();
-    return is_file($path) && (filesize($path) > 0);
   }
 
   /**
