@@ -747,6 +747,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $this->initializeSettings($request);
         $this->boot();
       }
+      // When reusing the kernel, negotiate the theme for each main request.
+      // Subrequests continue to use the theme of their main request.
+      if ($type === self::MAIN_REQUEST && $this->container->initialized('theme.manager')) {
+        $this->container->get('theme.manager')->resetActiveTheme();
+      }
       $response = $this->getHttpKernel()->handle($request, $type, $catch);
     }
     catch (\Exception $e) {
