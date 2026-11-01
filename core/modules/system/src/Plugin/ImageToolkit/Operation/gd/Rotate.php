@@ -38,11 +38,6 @@ class Rotate extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function validateArguments(array $arguments) {
-    // PHP 5.5 GD bug: https://bugs.php.net/bug.php?id=65148: To prevent buggy
-    // behavior on negative multiples of 90 degrees we convert any negative
-    // angle to a positive one between 0 and 360 degrees.
-    $arguments['degrees'] -= floor($arguments['degrees'] / 360) * 360;
-
     // Validate or set background color argument.
     if (!empty($arguments['background'])) {
       // Validate the background color: Color::hexToRgb does so for us.

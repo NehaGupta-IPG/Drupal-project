@@ -81,11 +81,6 @@ class Rectangle {
    * @return $this
    */
   public function rotate($angle) {
-    // PHP 5.5 GD bug: https://bugs.php.net/bug.php?id=65148: To prevent buggy
-    // behavior on negative multiples of 30 degrees we convert any negative
-    // angle to a positive one between 0 and 360 degrees.
-    $angle -= floor($angle / 360) * 360;
-
     // For some rotations that are multiple of 30 degrees, we need to correct
     // an imprecision between GD that uses C floats internally, and PHP that
     // uses C doubles. Also, for rotations that are not multiple of 90 degrees,
