@@ -73,6 +73,9 @@
    * Checks if node is valid big pipe replacement.
    */
   function checkMutation(node) {
+    if (!node) {
+      return false;
+    }
     return Boolean(
       node.nodeType === Node.ELEMENT_NODE &&
       node.nodeName === 'SCRIPT' &&
