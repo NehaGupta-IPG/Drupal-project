@@ -731,9 +731,6 @@ function _locale_strip_quotes($string) {
  * @param string $filepath
  *   File name to parse.
  *
- * @throws Exception
- *   If a non-local file is attempted to be parsed.
- *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(LocaleJs::class)->parseJsFile() instead.
  *
