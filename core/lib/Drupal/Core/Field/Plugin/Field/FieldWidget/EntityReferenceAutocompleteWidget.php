@@ -94,7 +94,6 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $entity = $items->getEntity();
-    $referenced_entities = $items->referencedEntities();
 
     $selection_settings = [];
     // Append the match operation to the selection settings.
@@ -120,7 +119,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
       // the 'ValidReference' constraint.
       '#validate_reference' => FALSE,
       '#maxlength' => 1024,
-      '#default_value' => $referenced_entities[$delta] ?? NULL,
+      '#default_value' => $items->get($delta)->entity ?? NULL,
       '#size' => $this->getSetting('size'),
       '#placeholder' => $this->getSetting('placeholder'),
     ];
