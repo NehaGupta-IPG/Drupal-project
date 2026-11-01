@@ -283,7 +283,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
           // properly.
           $build['#attributes']['class'] = array_unique(array_merge($build['#attributes']['class'], explode(' ', $attribute->nodeValue)));
         }
-        else {
+        elseif ($build['#theme'] !== 'media_embed_error') {
           $build['#attributes'][$attribute->nodeName] = $attribute->nodeValue;
         }
       }
