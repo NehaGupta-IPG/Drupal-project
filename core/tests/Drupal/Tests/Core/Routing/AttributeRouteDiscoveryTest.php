@@ -236,6 +236,21 @@ EOF
   }
 
   /**
+   * Tests that a class using a trait from a missing module is skipped.
+   *
+   * PHP handles this differently to a missing parent class or interface: on
+   * PHP versions prior to 8.5, using a missing trait triggers an
+   * unrecoverable fatal error rather than a catchable \Error. If this test
+   * fails with a fatal error rather than an assertion failure, the fallback
+   * classloader used by AttributeRouteDiscovery is not working correctly.
+   *
+   * @see \Drupal\Component\Discovery\MissingClassDetectionClassLoader
+   */
+  public function testMissingTraitDoesNotBreakDiscovery(): void {
+    $this->assertNull($this->routeCollection->get('router_test.missing_trait_dependency'));
+  }
+
+  /**
    * Tests that a method inherits class-level globals.
    */
   public function testClassGlobalsInheritance(): void {
