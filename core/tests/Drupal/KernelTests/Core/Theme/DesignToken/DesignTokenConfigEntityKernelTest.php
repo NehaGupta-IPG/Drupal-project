@@ -315,7 +315,7 @@ class DesignTokenConfigEntityKernelTest extends KernelTestBase {
     $validIds = implode(', ', array_keys($definitions));
     $cases = [
       'invalid_id' => [
-        'exceptionMessage' => 'Schema errors for core.design_token.invalidId with the following errors: 0 [id] The &lt;em class=&quot;placeholder&quot;&gt;&amp;quot;invalidId&amp;quot;&lt;/em&gt; machine name is not valid.',
+        'exceptionMessage' => 'Schema errors for core.design_token.invalidId with the following errors: 0 [id] The <em class="placeholder">&quot;invalidId&quot;</em> machine name is not valid.',
         'config' => [
           'id' => 'invalidId',
           'path' => 'foo',
@@ -326,7 +326,7 @@ class DesignTokenConfigEntityKernelTest extends KernelTestBase {
         ],
       ],
       'invalid_path' => [
-        'exceptionMessage' => 'Schema errors for core.design_token.invalid_path with the following errors: 0 [path] The &lt;em class=&quot;placeholder&quot;&gt;&amp;quot;foo bar.baz_foo-bar Capital&amp;quot;&lt;/em&gt; path is not valid.',
+        'exceptionMessage' => 'Schema errors for core.design_token.invalid_path with the following errors: 0 [path] The <em class="placeholder">&quot;foo bar.baz_foo-bar Capital&quot;</em> path is not valid.',
         'config' => [
           'id' => 'invalid_path',
           'path' => 'foo bar.baz_foo-bar Capital',
@@ -372,7 +372,7 @@ class DesignTokenConfigEntityKernelTest extends KernelTestBase {
         ],
       ],
       'invalid_font_weight_range' => [
-        'exceptionMessage' => "Schema errors for core.design_token.font_weight_range with the following errors: 0 [scopes.:root] This value should be between &lt;em class=&quot;placeholder&quot;&gt;1&lt;/em&gt; and &lt;em class=&quot;placeholder&quot;&gt;1000&lt;/em&gt;.",
+        'exceptionMessage' => 'Schema errors for core.design_token.font_weight_range with the following errors: 0 [scopes.:root] This value should be between <em class="placeholder">1</em> and <em class="placeholder">1000</em>.',
         'config' => [
           'id' => 'font_weight_range',
           'path' => 'font.family',
