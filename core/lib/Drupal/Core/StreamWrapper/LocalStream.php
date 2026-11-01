@@ -166,11 +166,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_lock($operation) {
-    if (in_array($operation, [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB])) {
-      return flock($this->handle, $operation);
-    }
-
-    return TRUE;
+    return flock($this->handle, $operation);
   }
 
   /**
