@@ -17,7 +17,7 @@
   --tabs--focus-height: 0.1875rem;
   --tabs--active-height: 0.1875rem;
   --tabs-link-height: 3rem; /* 48px */
-  --tabs-secondary-link-height: 2.5rem; /* 40px */
+  --tabs-secondary-link-height: 2rem; /* 32px */
   --tabs-base-border: 1px solid var(--admin-color-border);
   --tabs-trigger-border: 1px solid rgb(216, 217, 224, 0.8);
 }
@@ -91,7 +91,7 @@
       position: relative; /* Anchor ::after */
       overflow: hidden;
       margin-inline: calc(calc(var(--tabs--focus-height) + 0.1875rem) * -1);
-      padding-block: calc(var(--tabs--focus-height) + 0.1875rem) 0;
+      padding-block: calc(var(--tabs--focus-height) + 0.1875rem);
       padding-inline: calc(var(--tabs--focus-height) + 0.1875rem);
       border-radius: 0;
 
@@ -101,15 +101,6 @@
 
       .tabs__tab {
         font-size: var(--admin-font-size-s);
-      }
-
-      .tabs__link {
-        /* min-block-size: var(--tabs-secondary-link-height); */
-        /* padding-block: var(--admin-space-xs); */
-
-        &:focus {
-          min-block-size: var(--tabs-secondary-link-height);
-        }
       }
     }
   }
