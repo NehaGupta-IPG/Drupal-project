@@ -1377,6 +1377,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     if (!empty($alter['nl2br'])) {
+      $value = str_replace('\n', "\n", $value);
       $value = nl2br($value);
     }
 

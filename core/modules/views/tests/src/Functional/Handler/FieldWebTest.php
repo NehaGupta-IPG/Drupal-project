@@ -601,6 +601,28 @@ class FieldWebTest extends ViewTestBase {
     $this->assertSubString($output, $random_text, 'Find text without html if stripping of views field output is disabled.');
     $this->assertSubString($output, $html_text, 'Find text with the html if stripping of views field output is disabled.');
 
+    // Test converting newlines to <br>.
+    $name_field->options['alter']['alter_text'] = TRUE;
+    $name_field->options['alter']['text'] = "Line 1\nLine 2\nLine 3";
+    $name_field->options['alter']['nl2br'] = TRUE;
+
+    $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field, $row) {
+      return $name_field->advancedRender($row);
+    });
+
+    // Check if newlines are converted to <br>.
+    $this->assertMatchesRegularExpression('/Line 1<br\s*\/?>\s*Line 2<br\s*\/?>\s*Line 3/', $output, 'Ensure newlines are converted to <br> tags when nl2br is enabled.');
+
+    // Disable nl2br and check again.
+    $name_field->options['alter']['nl2br'] = FALSE;
+    $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field, $row) {
+      return $name_field->advancedRender($row);
+    });
+
+    // Ensure newlines remain unchanged.
+    $this->assertNotSubString($output, '<br />', 'Ensure newlines remain as-is when nl2br is disabled.');
+    $this->assertSubString($output, "Line 1\nLine 2\nLine 3", 'Ensure the text contains raw newlines when nl2br is disabled.');
+
     // Tests for removing whitespace and the beginning and the end.
     $name_field->options['alter']['alter_text'] = FALSE;
     $views_test_data_name = $row->views_test_data_name;
