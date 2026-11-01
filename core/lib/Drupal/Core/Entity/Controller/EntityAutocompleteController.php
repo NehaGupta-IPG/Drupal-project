@@ -1,11 +1,12 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\Core\Entity\Controller;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityAutocompleteMatcherInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -75,6 +76,11 @@ class EntityAutocompleteController extends ControllerBase {
    *   Thrown if the selection settings key is not found in the key/value store
    *   or if it does not match the stored data.
    */
+  #[Route(
+    path: '/entity_reference_autocomplete/{target_type}/{selection_handler}/{selection_settings_key}',
+    name: 'system.entity_autocomplete',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function handleAutocomplete(Request $request, $target_type, $selection_handler, $selection_settings_key) {
     $matches = [];
 

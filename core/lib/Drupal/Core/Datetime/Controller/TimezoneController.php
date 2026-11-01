@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\Core\Datetime\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -26,6 +27,21 @@ class TimezoneController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The time zone identifier or 'false' in JsonResponse object.
    */
+  #[Route(
+    path: '/system/timezone/{abbreviation}/{offset}/{is_daylight_saving_time}',
+    name: 'system.timezone',
+    requirements: [
+      '_access' => 'TRUE',
+      'abbreviation' => '0|([A-Z]{3,5})',
+      'offset' => '\-?\d+',
+      'is_daylight_saving_time' => '\-1|0|1',
+    ],
+    defaults: [
+      'abbreviation' => '',
+      'offset' => -1,
+      'is_daylight_saving_time' => NULL,
+    ],
+  )]
   public function getTimezone($abbreviation = '', $offset = -1, $is_daylight_saving_time = NULL) {
     $offset = intval($offset);
     // Out of bounds check for offset. Offset +/- UTC is typically no

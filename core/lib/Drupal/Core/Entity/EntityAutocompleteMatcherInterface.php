@@ -26,7 +26,7 @@ interface EntityAutocompleteMatcherInterface {
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    *   Thrown when the current user doesn't have access to the specified entity.
    *
-   * @see \Drupal\system\Controller\EntityAutocompleteController
+   * @see \Drupal\Core\Entity\Controller\EntityAutocompleteController
    */
   public function getMatches($target_type, $selection_handler, $selection_settings, $string = '');
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Unit\Batch;
 
 use Drupal\Core\Batch\BatchStorageInterface;
-use Drupal\system\Controller\BatchController;
+use Drupal\Core\Batch\Controller\BatchController;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
