@@ -19,6 +19,7 @@ use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\File\MimeType\MimeTypeGuesser;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
@@ -741,6 +742,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
     // Ensure sane PHP environment variables.
     static::bootEnvironment();
+
+    // Form errors are shared within a request, but they should not leak into
+    // another main request when the kernel is reused by a persistent worker.
+    if ($type === self::MAIN_REQUEST) {
+      (new FormState())->clearErrors();
+    }
 
     try {
       if (!$this->booted) {
