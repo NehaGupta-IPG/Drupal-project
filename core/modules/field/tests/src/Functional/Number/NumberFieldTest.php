@@ -149,6 +149,48 @@ class NumberFieldTest extends BrowserTestBase {
   }
 
   /**
+   * Tests a decimal field with a minimum value, which offsets the step.
+   */
+  public function testNumberDecimalFieldMinimum(): void {
+    $field_name = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'decimal',
+      'settings' => ['precision' => 10, 'scale' => 2],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'settings' => ['min' => '10'],
+    ])->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, ['type' => 'number'])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSame('0.01', $this->assertSession()->fieldExists("{$field_name}[0][value]")->getAttribute('step'));
+
+    // Subtracting the minimum from these values must not introduce floating
+    // point rounding errors that cause them to be rejected.
+    foreach (['10.00', '10.01', '10.02', '123.45', '99999999.99'] as $valid_entry) {
+      $this->drupalGet('entity_test/add');
+      $this->submitForm(["{$field_name}[0][value]" => $valid_entry], 'Save');
+      $this->assertSession()->pageTextNotContains("{$field_name} is not a valid number.");
+      $this->assertSession()->pageTextContains('has been created.');
+    }
+
+    // Values with more decimals than the scale allows are not valid.
+    $this->drupalGet('entity_test/add');
+    $this->submitForm(["{$field_name}[0][value]" => '10.015'], 'Save');
+    $this->assertSession()->pageTextContains("{$field_name} is not a valid number.");
+  }
+
+  /**
    * Tests a decimal field with a scale of 0.
    *
    * A scale of 0 is the documented minimum for decimal fields, and must not

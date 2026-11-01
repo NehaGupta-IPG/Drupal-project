@@ -43,13 +43,13 @@ class NumberTest extends TestCase {
    *   The value argument for Number::validStep().
    * @param int|float|string $step
    *   The step argument for Number::validStep().
-   * @param float $offset
+   * @param int|float|string $offset
    *   The offset argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
    */
   #[DataProvider('providerTestValidStepOffset')]
-  public function testValidStepOffset(int|float|string $value, int|float|string $step, float $offset, bool $expected): void {
+  public function testValidStepOffset(int|float|string $value, int|float|string $step, int|float|string $offset, bool $expected): void {
     $return = Number::validStep($value, $step, $offset);
     $this->assertEquals($expected, $return);
   }
@@ -188,6 +188,19 @@ class NumberTest extends TestCase {
       // Mixed input types.
       'String value float step' => ['1.5', 0.5, TRUE],
       'Float value string step' => [1.5, '0.5', TRUE],
+
+      // Signs and whitespace in numeric strings.
+      'Explicit positive sign' => ['+1.5', '0.5', TRUE],
+      'Surrounding whitespace' => [' 1.5 ', '0.5', TRUE],
+      'Leading decimal point' => ['.5', '0.25', TRUE],
+
+      // Exponents far outside the range of floats.
+      'Tiny scientific value' => ['1e-500', '0.01', FALSE],
+
+      // Steps with more significant digits than fit in a native integer fall
+      // back to floating point math.
+      'Long step valid' => ['2.46913578024691357802', '1.23456789012345678901', TRUE],
+      'Long step invalid' => ['2', '1.23456789012345678901', FALSE],
     ];
   }
 
@@ -249,6 +262,15 @@ class NumberTest extends TestCase {
       'Negative offset invalid with trailing zeros' => ['500.0050000000000000', '0.01', -500.0, FALSE],
       'Negative offset valid without trailing zeros' => ['500.01', '0.01', -500.0, TRUE],
       'Negative offset valid with trailing zeros' => ['500.0100000000000000', '0.01', -500.0, TRUE],
+
+      // Zero value with a non-zero offset.
+      'Zero value valid' => ['0', '0.5', -1.5, TRUE],
+      'Zero value invalid' => ['0', '0.5', -1.25, FALSE],
+
+      // Offsets given as strings, as used by #min in form elements.
+      'String offset valid' => ['10.01', '0.01', '10.00', TRUE],
+      'String offset invalid' => ['10.015', '0.01', '10', FALSE],
+      'String offset with more decimals than the step' => ['10.015', '0.01', '0.005', TRUE],
     ];
   }
 
