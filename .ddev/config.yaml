@@ -1,0 +1,15 @@
+type: drupal11
+
+php_version: "8.4"
+
+web_environment:
+    # Environment variables needed for PHPUnit tests.
+    # @todo Support functional JavaScript tests.
+    - SIMPLETEST_BASE_URL=$DDEV_PRIMARY_URL
+    - SIMPLETEST_DB=$DDEV_DATABASE_FAMILY://db:db@db/db
+
+hooks:
+    post-start:
+        # Install PHP dependencies automatically.
+        # @todo Also install JavaScript dependencies.
+        - composer: install
