@@ -1,6 +1,8 @@
 name: 'Editorial workflow'
 description: 'Provides an editorial workflow for moderating content.'
 type: 'Workflow'
+recipes:
+  - content_editor_role
 install:
   - content_moderation
   # The moderated_content view depends on Node.
@@ -13,3 +15,15 @@ config:
   import:
     content_moderation:
       - views.view.moderated_content
+  actions:
+    user.role.content_editor:
+      grantPermissions:
+        - 'view any unpublished content'
+        - 'view latest version'
+        # The transitions are defined in the included
+        # workflows.workflow.editorial.yml
+        - 'use editorial transition archive'
+        - 'use editorial transition archived_draft'
+        - 'use editorial transition archived_published'
+        - 'use editorial transition create_new_draft'
+        - 'use editorial transition publish'
