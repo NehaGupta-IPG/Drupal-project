@@ -15,10 +15,10 @@ trait FieldLabelOptionsTrait {
    */
   protected function getFieldLabelOptions(): array {
     return [
-      'above' => $this->t('Above'),
-      'inline' => $this->t('Inline'),
-      'hidden' => '- ' . $this->t('Hidden') . ' -',
-      'visually_hidden' => '- ' . $this->t('Visually Hidden') . ' -',
+      FieldLabelVisibility::Above->value => $this->t('Above'),
+      FieldLabelVisibility::Inline->value => $this->t('Inline'),
+      FieldLabelVisibility::Hidden->value => '- ' . $this->t('Hidden') . ' -',
+      FieldLabelVisibility::VisuallyHidden->value => '- ' . $this->t('Visually Hidden') . ' -',
     ];
   }
 
