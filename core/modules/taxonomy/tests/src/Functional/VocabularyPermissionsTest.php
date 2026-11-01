@@ -290,7 +290,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
 
     // Confirm deletion.
     $this->submitForm([], 'Delete');
-    $this->assertSession()->pageTextContains("Deleted term {$edit['name[0][value]']}.");
+    $this->assertSession()->pageTextContains("The taxonomy term {$edit['name[0][value]']} has been deleted.");
 
     // Test as user with "create" permissions.
     $user = $this->drupalCreateUser(["create terms in {$vocabulary->id()}"]);
@@ -369,7 +369,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
 
     // Confirm deletion.
     $this->submitForm([], 'Delete');
-    $this->assertSession()->pageTextContains("Deleted term {$term->getName()}.");
+    $this->assertSession()->pageTextContains("The taxonomy term {$term->getName()} has been deleted.");
 
     // Test as user without proper permissions.
     $user = $this->drupalCreateUser();
