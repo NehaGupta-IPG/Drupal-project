@@ -187,7 +187,12 @@ trait SqlFieldableEntityTypeListenerTrait {
       try {
         if (!$original->isRevisionable() && $entity_type->isRevisionable()) {
           // Set the revision ID to be same as the entity ID.
-          $entity->set($revision_id_key, $entity->id());
+          $entity_id = $entity->id();
+          if (!is_numeric($entity_id)) {
+            $entity_id = $sandbox['next_revision_id'] ?? 1;
+            $sandbox['next_revision_id'] = $entity_id + 1;
+          }
+          $entity->set($revision_id_key, $entity_id);
 
           // We had no revisions so far, so the existing data belongs to the
           // default revision now.
