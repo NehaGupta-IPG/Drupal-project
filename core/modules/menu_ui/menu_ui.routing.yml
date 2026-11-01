@@ -6,6 +6,15 @@ entity.menu.collection:
   requirements:
     _permission: 'administer menu'
 
+menu_ui.menu_administrative:
+  path: '/admin/structure/menu/administrative'
+  defaults:
+    _entity_list: 'menu'
+    _title: 'Administrative Menus'
+    administrative: true
+  requirements:
+    _permission: 'administer menu'
+
 menu_ui.parent_options_js:
   path: '/admin/structure/menu/parents'
   defaults:
