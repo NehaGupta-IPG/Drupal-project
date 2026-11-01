@@ -7,6 +7,7 @@ namespace Drupal\Tests;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Utility\Error;
 use Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger;
+use PHPUnit\Util\Color;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -103,10 +104,12 @@ trait BrowserHtmlDebugTrait {
    * @param string|null $message
    *   (optional) The HTML output message to be stored. If not supplied the
    *   current page content is used.
+   * @param string $label
+   *   A label to print above the file URL.
    *
    * @see \Drupal\Tests\Listeners\VerbosePrinter::printResult()
    */
-  protected function htmlOutput($message = NULL): void {
+  protected function htmlOutput($message = NULL, $label = ''): void {
     if (!$this->htmlOutputEnabled) {
       return;
     }
@@ -115,10 +118,15 @@ trait BrowserHtmlDebugTrait {
     $html_output_filename = $this->htmlOutputClassName . '-' . $this->htmlOutputCounter . '-' . $this->htmlOutputTestId . '.html';
     file_put_contents($this->htmlOutputDirectory . '/' . $html_output_filename, $message);
     file_put_contents($this->htmlOutputCounterStorage, $this->htmlOutputCounter++);
+
+    if ($label) {
+      $label = '➤ ' . $label . PHP_EOL;
+    }
     // Do not use the file_url_generator service as the module_handler service
     // might not be available.
     $uri = $this->htmlOutputBaseUrl . '/sites/simpletest/browser_output/' . $html_output_filename;
-    HtmlOutputLogger::log($uri);
+    $uri = Color::colorize('fg-yellow', $uri) . PHP_EOL;
+    HtmlOutputLogger::log($label . $uri);
   }
 
   /**
@@ -188,7 +196,8 @@ trait BrowserHtmlDebugTrait {
               $html_output .= '<hr />' . $body;
               $html_output .= $this->formatHtmlOutputHeaders($response->getHeaders());
 
-              $this->htmlOutput($html_output);
+              $label = $request->getMethod() . ': ' . $request->getUri() . ' - ' . $response->getStatusCode();
+              $this->htmlOutput($html_output, $label);
             }
             return $response;
           });
