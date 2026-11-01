@@ -687,6 +687,7 @@ class ConfigImporter {
           '@collection' => $operation['collection'],
         ]);
       }
+      \Drupal::logger('config')->info($context['message']);
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
         foreach (['delete', 'create', 'rename', 'update'] as $op) {
