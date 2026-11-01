@@ -247,7 +247,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       $media = $this->entityRepository->loadEntityByUuid('media', $uuid);
       assert($media === NULL || $media instanceof MediaInterface);
       if (!$media) {
-        $this->loggerFactory->get('media')->error('During rendering of embedded media: the media item with UUID "@uuid" does not exist.', ['@uuid' => $uuid]);
+        $this->loggerFactory->get('media')->warning('During rendering of embedded media: the media item with UUID "@uuid" does not exist.', ['@uuid' => $uuid]);
       }
       else {
         $media = $this->entityRepository->getTranslationFromContext($media, $langcode);
