@@ -78,3 +78,12 @@ function file_schema(): Schema {
 function file_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Add new index for admin/content/files.
+ */
+function file_update_11000() {
+  $entity_type = \Drupal::entityTypeManager()->getDefinition('file');
+  $entity_type_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type_update_manager->updateEntityType($entity_type);
+}

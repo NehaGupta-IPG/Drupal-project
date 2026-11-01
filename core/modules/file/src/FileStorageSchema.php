@@ -2,6 +2,7 @@
 
 namespace Drupal\file;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
@@ -9,6 +10,21 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
  * Defines the file schema handler.
  */
 class FileStorageSchema extends SqlContentEntityStorageSchema {
+
+  protected function getEntitySchema(ContentEntityTypeInterface $entity_type, $reset = FALSE) {
+    $schema = parent::getEntitySchema($entity_type, $reset);
+    $index_fields = ['fid', 'filename', 'filemime', 'filesize', 'status', 'created', 'changed'];
+    $table_mapping = $this->getTableMapping($entity_type, $this->fieldStorageDefinitions);
+    $tables = $this->getEntitySchemaTables($table_mapping);
+    $base_table = $tables['base_table'];
+    foreach ($index_fields as $key => $field) {
+      if (!isset($schema[$base_table]['fields'][$field])) {
+        unset($index_fields[$key]);
+      }
+    }
+    $schema[$base_table]['indexes'][$this->getEntityIndexName($entity_type, 'admin_content_files')] = $index_fields;
+    return $schema;
+  }
 
   /**
    * {@inheritdoc}
