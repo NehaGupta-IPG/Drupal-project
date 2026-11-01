@@ -300,10 +300,13 @@ INFO;
    */
   public function testThemeSettingsRenderCacheClear(): void {
     \Drupal::service('module_installer')->install(['page_cache']);
+    // Set a different, so "drupalLogout()" won't prewarm the front page cache:
+    $this->config('system.site')->set('page.front', '/node')->save();
     $this->container->get('theme_installer')->install(['default_admin']);
     // Ensure the frontpage is cached for anonymous users. The render cache will
     // cleared by installing a theme.
     $this->drupalLogout();
+    // Invalidate the "rendered cache tag.
     $this->drupalGet('');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
     $this->drupalGet('');

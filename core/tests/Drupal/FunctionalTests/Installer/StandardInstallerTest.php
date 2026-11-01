@@ -23,8 +23,12 @@ class StandardInstallerTest extends ConfigAfterInstallerTestBase {
    * Ensures that the welcome page is shown after installation.
    */
   public function testInstaller(): void {
-    $this->assertSession()->addressEquals('admin/welcome');
+    // The welcome page is configured as the site's front page, so the
+    // outbound path processor rewrites the redirect target to "/".
+    $this->assertSession()->addressEquals('');
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->titleEquals('Welcome to Drupal Core | Drupal');
+    $this->assertSession()->pageTextContains('Come for the code, stay for the community.');
   }
 
   /**

@@ -279,10 +279,14 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->enableEndpoint(TRUE);
     $expected_cacheability = new CacheableMetadata();
     $expected_cacheability->addCacheContexts([
+      // The menu also includes the "user.login" front page, so the front page
+      // path is also part of it:
+      'url.path.is_front',
       'user.roles:authenticated',
     ]);
     $expected_cacheability->addCacheTags([
       'config:system.menu.account',
+      'config:system.site',
       'http_response',
     ]);
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'));

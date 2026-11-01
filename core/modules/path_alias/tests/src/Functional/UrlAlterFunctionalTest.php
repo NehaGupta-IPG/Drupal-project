@@ -23,7 +23,7 @@ class UrlAlterFunctionalTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['path', 'url_alter_test'];
+  protected static $modules = ['path', 'url_alter_test', 'test_page_test'];
 
   /**
    * {@inheritdoc}
@@ -34,6 +34,9 @@ class UrlAlterFunctionalTest extends BrowserTestBase {
    * Tests that URL altering works and that it occurs in the correct order.
    */
   public function testUrlAlter(): void {
+    // Set the test page as the front page, so that
+    // "PathProcessorFront:processOutbound" won't alter the "user/login" path.
+    $this->config('system.site')->set('page.front', '/test-page')->save();
     // Ensure that the path_alias table exists after Drupal installation.
     $this->assertTrue(Database::getConnection()->schema()->tableExists('path_alias'), 'The path_alias table exists after Drupal installation.');
 

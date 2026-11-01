@@ -3,29 +3,26 @@
 namespace Drupal\Core\PathProcessor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Path\FrontPagePathTrait;
+use Drupal\Core\Render\BubbleableMetadata;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Processes the inbound path by resolving it to the front page if empty.
  */
-class PathProcessorFront implements InboundPathProcessorInterface {
+class PathProcessorFront implements InboundPathProcessorInterface, OutboundPathProcessorInterface {
 
-  /**
-   * A config factory for retrieving required config settings.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $config;
+  use FrontPagePathTrait;
 
   /**
    * Constructs a PathProcessorFront object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   A config factory for retrieving the site front page configuration.
    */
-  public function __construct(ConfigFactoryInterface $config) {
-    $this->config = $config;
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -33,7 +30,7 @@ class PathProcessorFront implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     if ($path === '/') {
-      $path = $this->config->get('system.site')->get('page.front');
+      $path = $this->getFrontPagePath();
       if (empty($path)) {
         // We have to return a valid path but / does not have a route and config
         // might be broken so stop execution.
@@ -48,6 +45,21 @@ class PathProcessorFront implements InboundPathProcessorInterface {
         parse_str($components['query'], $parameters);
         $parameters = array_replace($parameters, $request->query->all());
         $request->query->replace($parameters);
+      }
+    }
+    return $path;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
+    if ($path === $this->getFrontPagePath()) {
+      $path = '/';
+      // Add cache context to ensure cache invalidation when front page changes.
+      if ($bubbleable_metadata) {
+        $bubbleable_metadata->addCacheContexts(['url.path.is_front']);
+        $bubbleable_metadata->addCacheTags(['config:system.site']);
       }
     }
     return $path;

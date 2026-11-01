@@ -11,6 +11,8 @@ use Drupal\Core\Url;
  */
 class PathMatcher implements PathMatcherInterface {
 
+  use FrontPagePathTrait;
+
   /**
    * Whether the current page is the front page.
    *
@@ -19,25 +21,11 @@ class PathMatcher implements PathMatcherInterface {
   protected $isCurrentFrontPage;
 
   /**
-   * The default front page.
-   *
-   * @var string
-   */
-  protected $frontPage;
-
-  /**
    * The cache of regular expressions.
    *
    * @var array
    */
   protected $regexes;
-
-  /**
-   * The config factory service.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
 
   /**
    * The current route match.
@@ -77,7 +65,7 @@ class PathMatcher implements PathMatcherInterface {
       $replacements = [
         '|',
         '.*',
-        '\1' . preg_quote($this->getFrontPagePath(), '/') . '\2',
+        '\1' . preg_quote($this->getFrontPagePath() ?? '', '/') . '\2',
       ];
       $patterns_quoted = preg_quote($patterns, '/');
       $this->regexes[$patterns] = '/^(' . preg_replace($to_replace, $replacements, $patterns_quoted) . ')$/';
@@ -100,21 +88,6 @@ class PathMatcher implements PathMatcherInterface {
       }
     }
     return $this->isCurrentFrontPage;
-  }
-
-  /**
-   * Gets the current front page path.
-   *
-   * @return string
-   *   The front page path.
-   */
-  protected function getFrontPagePath() {
-    // Lazy-load front page config.
-    if (!isset($this->frontPage)) {
-      $this->frontPage = $this->configFactory->get('system.site')
-        ->get('page.front') ?? '';
-    }
-    return $this->frontPage;
   }
 
 }
