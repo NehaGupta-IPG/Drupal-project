@@ -272,7 +272,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // have a case-insensitive match from the incoming path to the lower case
     // pattern outlines from \Drupal\Core\Routing\RouteCompiler::compile().
     // @see \Drupal\Core\Routing\CompiledRoute::__construct()
-    $parts = preg_split('@/+@', mb_strtolower($path), -1, PREG_SPLIT_NO_EMPTY);
+    $parts = [];
+    if (!empty($path)) {
+      $parts = preg_split('@/+@', mb_strtolower($path), -1, PREG_SPLIT_NO_EMPTY);
+    }
 
     $collection = new RouteCollection();
 
