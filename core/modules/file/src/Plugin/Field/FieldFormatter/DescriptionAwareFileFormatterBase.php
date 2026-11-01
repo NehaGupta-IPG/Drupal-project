@@ -3,6 +3,7 @@
 namespace Drupal\file\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Plugin\Field\FileFormatterBase;
 
 /**
  * Base class for file formatters that have to deal with file descriptions.

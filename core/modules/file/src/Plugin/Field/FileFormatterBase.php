@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\file\Plugin\Field\FieldFormatter;
+namespace Drupal\file\Plugin\Field;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;

@@ -4,7 +4,7 @@ namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\field\FieldConfigInterface;
-use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\file\Plugin\Field\FileFormatterBase;
 
 /**
  * Base class for image file formatters.

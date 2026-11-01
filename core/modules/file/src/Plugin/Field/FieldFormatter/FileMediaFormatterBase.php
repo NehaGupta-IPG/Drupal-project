@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\File\MimeType\MimeTypeMapInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\file\Plugin\Field\FileFormatterBase;
 
 /**
  * Base class for media file formatter.

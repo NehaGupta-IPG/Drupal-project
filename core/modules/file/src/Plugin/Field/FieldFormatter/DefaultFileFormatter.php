@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\Plugin\Field\BaseFieldFileFormatterBase;
 
 /**
  * Formatter for a text field on a file entity that links the field to the file.

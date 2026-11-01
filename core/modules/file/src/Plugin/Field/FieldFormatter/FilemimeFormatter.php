@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\Plugin\Field\BaseFieldFileFormatterBase;
 
 /**
  * Formatter to render the file MIME type, with an optional icon.

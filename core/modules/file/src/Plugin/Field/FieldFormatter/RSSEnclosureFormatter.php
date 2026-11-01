@@ -5,6 +5,7 @@ namespace Drupal\file\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\Plugin\Field\FileFormatterBase;
 
 /**
  * Plugin implementation of the 'file_rss_enclosure' formatter.

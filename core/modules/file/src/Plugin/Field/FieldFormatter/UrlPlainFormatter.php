@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Field\FileFormatterBase;
 
 /**
  * Plugin implementation of the 'file_url_plain' formatter.
