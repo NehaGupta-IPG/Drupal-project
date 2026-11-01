@@ -1588,7 +1588,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $container->setParameter('app.root', $this->getAppRoot());
     $container->setParameter('site.path', $this->getSitePath());
 
+    // Attempt to acquire a lock, so that other operations, such as during cron,
+    // can skip processing if the container is rebuilding. The lock is not used
+    // to control container rebuilds themselves since it needs to be possible
+    // for multiple processes to rebuild the container in some circumstances.
+    $lock = $container->get('lock');
+    $lock_acquired = $lock->acquire('container_compile');
     $container->compile();
+    if ($lock_acquired) {
+      $lock->release('container_compile');
+    }
     return $container;
   }
 

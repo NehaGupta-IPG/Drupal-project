@@ -11,6 +11,7 @@ use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\CallableResolver;
 
 /**
@@ -630,18 +631,19 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function getHookImplementationList(string $hook): ImplementationList {
     if (!isset($this->hookImplementationLists[$hook])) {
       if ($this->hookLists === NULL) {
+        $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
         if ($cache = $this->cache->get('hook_data')) {
           $hook_data = $cache->data;
         }
         else {
           $hook_data = $this->keyValueFactory->get('hook_data')->getMultiple([
-            'hook_list',
-            'packed_order_operations',
+            'hook_list:' . $suffix,
+            'packed_order_operations:' . $suffix,
           ]);
           $this->cache->set('hook_data', $hook_data);
         }
-        $this->hookLists = $hook_data['hook_list'] ?? [];
-        $this->packedOrderOperations = $hook_data['packed_order_operations'] ?? [];
+        $this->hookLists = $hook_data['hook_list:' . $suffix] ?? [];
+        $this->packedOrderOperations = $hook_data['packed_order_operations:' . $suffix] ?? [];
       }
       $hook_list = $this->hookLists[$hook] ?? [];
       if ($hook_list) {

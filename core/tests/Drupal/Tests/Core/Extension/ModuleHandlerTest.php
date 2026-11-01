@@ -10,6 +10,7 @@ use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -61,7 +62,7 @@ class ModuleHandlerTest extends UnitTestCase {
     }
     $keyvalue = new KeyValueMemoryFactory();
     $cache = new NullBackend('bootstrap');
-    $keyvalue->get('hook_data')->set('hook_list', $implementations);
+    $keyvalue->get('hook_data')->set('hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION), $implementations);
     $callableResolver = $this->createStub(CallableResolver::class);
     $callableResolver
       ->method('getCallableFromDefinition')
