@@ -280,17 +280,22 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     );
     $validation_errors = array_reduce($replacing_definitions, function (array $errors, array $new_definition) use ($definitions) {
       $original_definition = $definitions[$new_definition['replaces']];
-      $original_schemas = $original_definition['props'] ?? NULL;
       $new_schemas = $new_definition['props'] ?? NULL;
-      if (!$original_schemas || !$new_schemas) {
-        return [
-          sprintf(
-            "Component \"%s\" is attempting to replace \"%s\", however component replacement requires both components to have schema definitions.",
-            $new_definition['id'],
-            $original_definition['id'],
-          ),
-        ];
+      if (!$new_schemas) {
+        $errors[] = sprintf(
+          "Component \"%s\" is attempting to replace \"%s\", however component replacement requires the replacing component to have a schema definition.",
+          $new_definition['id'],
+          $original_definition['id'],
+        );
+        return $errors;
       }
+      // A component without props is considered as having an empty object
+      // schema. This allows replacing it with a component declaring optional
+      // props, while still preventing the addition of required props.
+      $original_schemas = ($original_definition['props'] ?? []) ?: [
+        'type' => 'object',
+        'properties' => [],
+      ];
       try {
         $this->compatibilityChecker->isCompatible(
           $original_schemas,
