@@ -67,7 +67,7 @@ class HtmlTagTest extends RendererTestBase {
     $element = [
       '#tag' => 'br',
     ];
-    $tags['void-element'] = [$element, "<br />\n"];
+    $tags['void-element'] = [$element, "<br>\n"];
 
     // Attributes.
     $element = [
@@ -221,7 +221,7 @@ class HtmlTagTest extends RendererTestBase {
     $element = [
       '#tag' => 'link',
     ];
-    $tags['link'] = [$element, '<link />' . "\n"];
+    $tags['link'] = [$element, '<link>' . "\n"];
 
     return $tags;
   }

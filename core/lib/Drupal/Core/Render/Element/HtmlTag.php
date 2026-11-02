@@ -46,6 +46,17 @@ class HtmlTag extends RenderElementBase {
   protected static $voidElements = [
     'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
     'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr',
+  ];
+
+  /**
+   * SVG elements that must remain self-closing.
+   *
+   * SVG is XML, so these elements must remain self-closing when rendered in
+   * an HTML document.
+   *
+   * @var string[]
+   */
+  protected static $svgElements = [
     'rect', 'circle', 'polygon', 'ellipse', 'stop', 'use', 'path',
   ];
 
@@ -90,15 +101,20 @@ class HtmlTag extends RenderElementBase {
     // ensure this cannot be abused.
     $escaped_tag = HtmlUtility::escape($element['#tag']);
     $open_tag = '<' . $escaped_tag . $attributes;
-    $close_tag = '</' . $escaped_tag . ">\n";
     // Construct a void element.
     if (in_array($element['#tag'], self::$voidElements)) {
+      $open_tag .= '>';
+      $close_tag = "\n";
+    }
+    // SVG elements are XML and must remain self-closing.
+    elseif (in_array($element['#tag'], self::$svgElements)) {
       $open_tag .= ' />';
       $close_tag = "\n";
     }
     // Construct all other elements.
     else {
       $open_tag .= '>';
+      $close_tag = '</' . $escaped_tag . ">\n";
       if ($element['#value'] === NULL) {
         $element['#markup'] = '';
       }
