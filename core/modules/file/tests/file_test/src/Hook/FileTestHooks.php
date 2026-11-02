@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\file_test\Hook;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Drupal\file_test\FileTestCdn;
 use Drupal\file_test\FileTestHelper;
 
@@ -28,6 +31,20 @@ class FileTestHooks {
       // passed by reference.
       $file->file_test['loaded'] = TRUE;
     }
+  }
+
+  /**
+   * Implements hook_file_access().
+   */
+  #[Hook('file_access')]
+  public function fileAccess(FileInterface $file, string $operation, AccountInterface $account) {
+    if (\Drupal::state()->get('file_test_private_file_forbidden', FALSE)) {
+      if ($operation === 'download') {
+        // For all other cases, we deny access.
+        return AccessResult::forbidden();
+      }
+    }
+    return AccessResult::neutral();
   }
 
   /**
