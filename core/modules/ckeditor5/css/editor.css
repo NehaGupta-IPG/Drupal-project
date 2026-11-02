@@ -25,6 +25,14 @@
   overflow: auto;
 }
 
+/* Balloon panels need a higher z-index than Drupal's modals */
+.ck.ck-balloon-panel {
+  z-index: 1261;
+}
+.ck.ck-balloon-panel.ck-tooltip {
+  z-index: 1262;
+}
+
 /* Enhance visibility of selected/active buttons on the toolbar. */
 .ck-toolbar__items .ck.ck-button.ck-on {
   border: 1px solid var(--ck-color-button-on-color);

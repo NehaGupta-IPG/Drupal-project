@@ -79,6 +79,16 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     // Then press the button to add a link.
     $this->pressEditorButton('Link');
 
+    // Check that the balloon panel is visible and above the modal.
+    $balloon_panel = $page->find('css', '.ck.ck-balloon-panel');
+    $this->assertTrue($balloon_panel->isVisible(), 'The CKEditor 5 balloon panel is visible and positioned above the modal.');
+
+    // If a tooltip is present, ensure it’s visible and above the modal.
+    $tooltip = $page->find('css', '.ck.ck-balloon-panel.ck-tooltip');
+    if ($tooltip) {
+      $this->assertTrue($tooltip->isVisible(), 'The CKEditor 5 tooltip is visible and positioned above the modal.');
+    }
+
     $link_url = '/ckeditor5_test/dialog';
     $input = $assert_session->waitForElementVisible('css', '.ck-balloon-panel input.ck-input-text');
     // Make sure the input field can have focus and we can type into it.
