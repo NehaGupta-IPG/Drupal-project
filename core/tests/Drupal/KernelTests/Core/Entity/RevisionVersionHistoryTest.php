@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Controller\VersionHistoryController;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -26,6 +28,13 @@ class RevisionVersionHistoryTest extends KernelTestBase {
   use UserCreationTrait {
     createUser as drupalCreateUser;
   }
+
+  /**
+   * Revision IDs to exclude from the revision list query.
+   *
+   * @var int[]
+   */
+  protected array $excludedRevisionIds = [];
 
   /**
    * {@inheritdoc}
@@ -373,6 +382,48 @@ class RevisionVersionHistoryTest extends KernelTestBase {
     $this->assertSession()->elementExists('css', '.pager');
     $this->assertSession()->linkByHrefNotExists($secondRevision->toUrl('revision')->toString());
     $this->assertSession()->linkByHrefExists($firstRevision->toUrl('revision')->toString());
+  }
+
+  /**
+   * Tests that modules can alter the revision list query.
+   */
+  public function testRevisionListQueryAlter(): void {
+    $this->installEntitySchema('entity_test_mulrev');
+    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
+    $entity = EntityTestMulRev::create([
+      'type' => 'entity_test_mulrev',
+      'name' => 'view all revisions,view revision',
+    ]);
+    $entity->save();
+
+    // One revision more than fits on a page, so excluding one of them must
+    // also remove the pager.
+    $entity->setNewRevision(TRUE);
+    $entity->setName('view all revisions,view revision,0')->save();
+    $excludedRevision = $entity->getRevisionId();
+    for ($i = 1; $i < VersionHistoryController::REVISIONS_PER_PAGE; $i++) {
+      $entity->setNewRevision(TRUE);
+      $entity->setName('view all revisions,view revision,' . $i)->save();
+    }
+    $this->excludedRevisionIds = [$excludedRevision];
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementsCount('css', 'table tbody tr', VersionHistoryController::REVISIONS_PER_PAGE);
+    $this->assertSession()->elementNotExists('css', '.pager');
+
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $this->assertSession()->linkByHrefNotExists($storage->loadRevision($excludedRevision)->toUrl('revision')->toString());
+  }
+
+  /**
+   * Implements hook_query_TAG_alter() for entity_revision_overview.
+   */
+  #[Hook('query_entity_revision_overview_alter')]
+  public function queryEntityRevisionOverviewAlter(SelectInterface $query): void {
+    if ($this->excludedRevisionIds) {
+      $revision_key = $this->container->get('entity_type.manager')->getDefinition($query->getMetaData('entity_type'))->getKey('revision');
+      $query->condition("base_table.$revision_key", $this->excludedRevisionIds, 'NOT IN');
+    }
   }
 
   /**
