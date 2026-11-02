@@ -804,4 +804,38 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     }
   }
 
+  /**
+   * Tests that a failed field update restores the original schema.
+   */
+  public function testFieldUpdateRollback(): void {
+    // Install a field stored in dedicated tables.
+    $original = BaseFieldDefinition::create('uuid')
+      ->setName('test_field')
+      ->setLabel('Test field')
+      ->setTargetEntityTypeId('entity_test_update')
+      ->setCardinality(2);
+    $this->state->set('entity_test_update.additional_base_field_definitions', ['test_field' => $original]);
+    $this->entityDefinitionUpdateManager->installFieldStorageDefinition('test_field', 'entity_test_update', 'entity_test', $original);
+    $this->assertTrue($this->database->schema()->tableExists('entity_test_update__test_field'));
+
+    // Make moving the field to the shared table fail: the unique key that
+    // the update adds already exists.
+    $schema = $this->database->schema();
+    $schema->addField('entity_test_update', 'test_field', ['type' => 'varchar_ascii', 'length' => 128]);
+    $schema->addUniqueKey('entity_test_update', 'entity_test_update_field__test_field__value', ['test_field']);
+
+    $storage_definition = BaseFieldDefinition::create('uuid')
+      ->setName('test_field')
+      ->setLabel('Test field')
+      ->setTargetEntityTypeId('entity_test_update');
+    $this->state->set('entity_test_update.additional_base_field_definitions', ['test_field' => $storage_definition]);
+    try {
+      $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($storage_definition);
+      $this->fail('The field update did not fail.');
+    }
+    catch (EntityStorageException) {
+    }
+    $this->assertTrue($this->database->schema()->tableExists('entity_test_update__test_field'));
+  }
+
 }
