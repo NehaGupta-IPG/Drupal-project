@@ -1726,7 +1726,7 @@ function install_profile_themes(&$install_state): void {
   if (isset($install_state['default_theme'])) {
     $themes = array_unique(array_merge($themes, [$install_state['default_theme']]));
   }
-  \Drupal::service('theme_installer')->install($themes);
+  \Drupal::service('theme_installer')->install($themes, TRUE, FALSE);
 
   // Ensure that the install profile's theme is used.
   // @see _drupal_maintenance_theme()
