@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterEvent;
@@ -313,7 +314,13 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
       // Configuration entities can be identified by having 'dependencies' and
       // 'uuid' keys.
       if (isset($data['dependencies']) && isset($data['uuid'])) {
-        $dependencies_to_check = array_intersect_key($data['dependencies'], array_flip(['module', 'theme', 'config']));
+        $dependencies = $data['dependencies'];
+        if (isset($dependencies['enforced'])) {
+          $enforced = $dependencies['enforced'];
+          unset($dependencies['enforced']);
+          $dependencies = NestedArray::mergeDeep($dependencies, $enforced);
+        }
+        $dependencies_to_check = array_intersect_key($dependencies, array_flip(['module', 'theme', 'config']));
         foreach ($dependencies_to_check as $type => $dependencies) {
           $diffs = array_diff($dependencies, $existing_dependencies[$type]);
           if (!empty($diffs)) {
