@@ -61,7 +61,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   }
 
   /**
-   * Adds a language and tests string translation by users with the appropriate permissions.
+   * Adds a language and tests string translation with proper user permissions.
    */
   public function testStringTranslation(): void {
     // User to add and remove language.
@@ -289,7 +289,6 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->container->get('language_manager')->reset();
 
     // Build the JavaScript translation file.
-
     // Retrieve the source string of the first string available in the
     // {locales_source} table and translate it.
     $query = Database::getConnection()->select('locales_source', 's');
@@ -387,7 +386,6 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($search, 'Filter');
     // Find the edit path.
-
     $textarea = $this->assertSession()->elementExists('xpath', '//textarea');
     $lid = $textarea->getAttribute('name');
     foreach ($bad_translations as $translation) {
@@ -561,12 +559,92 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($search, 'Filter');
     $this->assertSession()->pageTextContains('No strings available.');
+
+    // Test the context search filter.
+    // The strings to be translated.
+    $str_with_context = $this->randomMachineName(16);
+    $str_with_context2 = $this->randomMachineName(16);
+
+    // The contexts to test.
+    $context = $this->randomMachineName(16);
+    $context2 = $this->randomMachineName(16);
+
+    // Register strings with contexts.
+    $this->t($str_with_context, [], [
+      'context' => $context,
+      'langcode' => $langcode,
+    ])->render();
+    $this->t($str_with_context2, [], [
+      'context' => $context2,
+      'langcode' => $langcode,
+    ])->render();
+
+    // Reset locale cache again.
+    $this->container->get('string_translation')->reset();
+
+    // Ensure search result only contains string for selected context.
+    $search = [
+      'string' => $str_with_context,
+      'langcode' => $langcode,
+      'context' => $context,
+      'translation' => 'all',
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    $this->assertSession()->pageTextContains($str_with_context);
+    $this->assertSession()->pageTextNotContains($str_with_context2);
+
+    // Test the location search filter.
+    // Find an existing string with a location in the database.
+    $connection = Database::getConnection();
+    $query = $connection->select('locales_source', 's');
+    $query->addJoin('INNER', 'locales_location', 'l', '[s].[lid] = [l].[sid]');
+    $result = $query->fields('s', ['source', 'lid'])
+      ->fields('l', ['type', 'name'])
+      ->range(0, 1)
+      ->execute()
+      ->fetchAssoc();
+
+    // Ensure we have a string with location data to test.
+    $this->assertNotEmpty($result, 'Found a string with location data for testing.');
+
+    $location_string = $result['source'];
+    $location_filter = $result['type'] . ': ' . $result['name'];
+
+    // Search for the string with its location filter.
+    $search = [
+      'string' => $location_string,
+      'langcode' => $langcode,
+      'translation' => 'all',
+      'context' => '',
+      'location' => $location_filter,
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    $this->assertSession()->pageTextContains($location_string);
+
+    // Find a different location to use for negative test.
+    $query2 = $connection->select('locales_location', 'l');
+    $different_location = $query2->fields('l', ['type', 'name'])
+      ->condition('sid', $result['lid'], '!=')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAssoc();
+
+    if ($different_location) {
+      // Search for the string with a different location - should not appear.
+      $search['location'] = $different_location['type'] . ': ' . $different_location['name'];
+      $this->drupalGet('admin/config/regional/translate');
+      $this->submitForm($search, 'Filter');
+      $this->assertSession()->pageTextContains('No strings available.');
+    }
+
   }
 
   /**
    * Tests that only changed strings are saved customized when edited.
    */
-  public function testUICustomizedStrings(): void {
+  public function testUiCustomizedStrings(): void {
     $user = $this->drupalCreateUser([
       'translate interface',
       'administer languages',

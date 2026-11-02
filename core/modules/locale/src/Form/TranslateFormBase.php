@@ -66,6 +66,14 @@ abstract class TranslateFormBase extends FormBase {
       }
     }
 
+    if (!empty($filter_values['context'])) {
+      $options['filters']['context'] = $filter_values['context'];
+    }
+
+    if (!empty($filter_values['location'])) {
+      $options['filters']['location'] = $filter_values['location'];
+    }
+
     return $this->localeStorage->getTranslations($conditions, $options);
   }
 
@@ -115,6 +123,16 @@ abstract class TranslateFormBase extends FormBase {
    */
   protected function translateFilters() {
     $filters = [];
+
+    // Get all available string translation contexts.
+    $contexts = $this->localeStorage->getContexts();
+    $context_options = [];
+    foreach ($contexts as $context) {
+      $context_options[strtolower($context)] = $context;
+    }
+
+    // Get all available string locations.
+    $locations = $this->localeStorage->getDistinctLocations();
 
     // Get all languages, except English.
     $this->languageManager->reset();
@@ -168,6 +186,18 @@ abstract class TranslateFormBase extends FormBase {
         ],
       ],
       'default' => 'all',
+    ];
+
+    $filters['context'] = [
+      'title' => $this->t('Context'),
+      'options' => $context_options,
+      'default' => '',
+    ];
+
+    $filters['location'] = [
+      'title' => $this->t('Location'),
+      'options' => $locations,
+      'default' => '',
     ];
 
     return $filters;

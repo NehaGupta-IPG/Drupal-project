@@ -8,7 +8,7 @@ use Drupal\Core\Database\Query\PagerSelectExtender;
 /**
  * Defines a class to store localized strings in the database.
  */
-class StringDatabaseStorage implements StringStorageInterface {
+class StringDatabaseStorage implements StringStorageInterface, StringContextInterface {
 
   /**
    * The database connection.
@@ -107,6 +107,34 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   public function countTranslations() {
     return $this->dbExecute("SELECT t.language, COUNT(*) AS translated FROM {locales_source} s INNER JOIN {locales_target} t ON s.lid = t.lid GROUP BY t.language")->fetchAllKeyed();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContexts(): array {
+    return $this->connection->select('locales_source', 's')
+      ->fields('s', ['context'])
+      ->condition('context', '', '<>')
+      ->distinct()
+      ->orderBy('context')
+      ->execute()
+      ->fetchCol();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDistinctLocations(): array {
+    $query = $this->connection->select('locales_location', 'l');
+    $query->addExpression("CONCAT(l.type, ': ', l.name)", 'location');
+    $query->distinct();
+    $query->orderBy('location');
+    $results = $query->execute()->fetchCol();
+
+    // Return as associative array with location as both key and value, or empty
+    // array.
+    return $results ? array_combine($results, $results) : [];
   }
 
   /**
@@ -426,6 +454,28 @@ class StringDatabaseStorage implements StringStorageInterface {
       else {
         $query->condition($field_alias, (array) $value, 'IN');
       }
+    }
+
+    // Add context filter.
+    if (isset($options['filters']['context'])) {
+      $context_filter = $this->connection->condition('AND');
+      $query->condition($context_filter);
+      $context_filter->condition($this->dbFieldTable('context') . '.context', $this->connection->escapeLike($options['filters']['context']), 'LIKE');
+      unset($options['filters']['context']);
+    }
+
+    // Add location filter.
+    if (isset($options['filters']['location'])) {
+      $location = $options['filters']['location'];
+      // Parse "type: name" format.
+      if (str_contains($location, ': ')) {
+        [$type, $name] = explode(': ', $location, 2);
+        $location_subquery = $this->connection->select('locales_location', 'll')->fields('ll', ['sid']);
+        $location_subquery->condition('ll.type', $type);
+        $location_subquery->condition('ll.name', $name);
+        $query->condition('s.lid', $location_subquery, 'IN');
+      }
+      unset($options['filters']['location']);
     }
 
     // Process other options, string filter, query limit, etc.
