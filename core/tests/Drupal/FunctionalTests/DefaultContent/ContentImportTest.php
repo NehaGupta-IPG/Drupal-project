@@ -330,4 +330,32 @@ class ContentImportTest extends BrowserTestBase {
     $this->assertTrue($invalid_uuid_detected);
   }
 
+  /**
+   * Tests that ::importEntity() validates the entity even in dry-run mode.
+   */
+  public function testImportEntityDryRunValidation(): void {
+    $path = $this->contentDir . '/node/2d3581c3-92c7-4600-8991-a0d4b3741198.yml';
+    /** @var string $data */
+    $data = file_get_contents($path);
+    $data = Yaml::decode($data);
+    // The Finder normally supplies this; ::importEntity() requires it.
+    $data['_meta']['path'] = $path;
+    /** @var array{default: array{sticky: array<int, array{value: mixed}>}} $data */
+    $data['default']['sticky'][0]['value'] = 'not a boolean!';
+
+    // A dry run builds and validates the entity but does not save it, so the
+    // invalid value is still caught.
+    try {
+      $this->container->get(Importer::class)->importEntity($data, dry_run: TRUE);
+      $this->fail('Expected an InvalidEntityException.');
+    }
+    catch (InvalidEntityException $e) {
+      $this->assertStringContainsString('sticky.0.value=This value should be of the correct primitive type.', $e->getMessage());
+    }
+
+    // Nothing should have been persisted.
+    $this->assertNull($this->container->get(EntityRepositoryInterface::class)
+      ->loadEntityByUuid('node', '2d3581c3-92c7-4600-8991-a0d4b3741198'));
+  }
+
 }
