@@ -4,6 +4,7 @@ namespace Drupal\responsive_image\Hook;
 
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\responsive_image\ResponsiveImageBuilder;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -18,6 +19,7 @@ class ResponsiveImageThemeHooks {
     #[AutowireServiceClosure('logger.responsive_image')]
     protected \Closure $loggerClosure,
     protected ResponsiveImageBuilder $responsiveImageBuilder,
+    protected ImageFactory $imageFactory,
   ) {
 
   }
@@ -132,7 +134,16 @@ class ResponsiveImageThemeHooks {
     // execution.
     if (!$responsive_image_style) {
       $variables['img_element'] = [];
-      ($this->loggerClosure)()->error('Failed to load responsive image style: “@style“ while displaying responsive image.', ['@style' => $variables['responsive_image_style_id']]);
+      ($this->loggerClosure)()->error('Failed to load responsive image style: “@style” while displaying responsive image.', ['@style' => $variables['responsive_image_style_id']]);
+      return;
+    }
+    // Warn when the image file is zero-bytes or otherwise unreadable.
+    if (!$this->imageFactory->get($variables['uri'])->isValid()) {
+      $variables['img_element'] = [];
+      ($this->loggerClosure)()->warning('Image file is not valid (possibly zero bytes) for URI “@uri”. Responsive image style “@style” was not applied.', [
+        '@uri' => $variables['uri'],
+        '@style' => $variables['responsive_image_style_id'],
+      ]);
       return;
     }
     // Retrieve all breakpoints and multipliers and reverse order of
