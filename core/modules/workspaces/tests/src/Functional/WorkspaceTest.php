@@ -312,7 +312,11 @@ class WorkspaceTest extends BrowserTestBase {
 
     $active_workspace_row = $page->find('css', '.active-workspace');
     $this->assertTrue($active_workspace_row->hasClass('active-workspace--default'));
-    $this->assertEquals('Live', $active_workspace_row->find('css', 'td:first-of-type')->getText());
+    $this->assertEquals('Live (active)', $active_workspace_row->find('css', 'td:first-of-type')->getText());
+    $assert_session->elementsCount('css', 'tr.active-workspace', 1);
+    $assert_session->elementTextEquals('css', 'table caption', 'Current workspace: Live');
+    $assert_session->elementTextEquals('css', 'tr.active-workspace td:first-child strong', 'Live (active)');
+    $assert_session->linkNotExists('Summer event (active)');
 
     // The 'Switch to Live' operation is not shown when 'Live' is the active
     // workspace.
@@ -324,11 +328,24 @@ class WorkspaceTest extends BrowserTestBase {
 
     $active_workspace_row = $page->find('css', '.active-workspace');
     $this->assertTrue($active_workspace_row->hasClass('active-workspace--not-default'));
-    $this->assertEquals('Summer event', $active_workspace_row->find('css', 'td:first-of-type')->getText());
+    $this->assertEquals('Summer event (active)', $active_workspace_row->find('css', 'td:first-of-type')->getText());
+    $assert_session->elementsCount('css', 'tr.active-workspace', 1);
+    $assert_session->elementTextEquals('css', 'table caption', 'Current workspace: Summer event');
+    $assert_session->elementTextEquals('css', 'tr.active-workspace td:first-child strong a', 'Summer event (active)');
+    $assert_session->linkNotExists('Switch to Summer event');
 
     // 'Live' is no longer the active workspace, so it's 'Switch to Live'
     // operation should be visible now.
     $assert_session->linkExists('Switch to Live');
+
+    // Switching back removes the active marker from the workspace link.
+    $page->clickLink('Switch to Live');
+    $page->pressButton('Confirm');
+    $assert_session->elementsCount('css', 'tr.active-workspace', 1);
+    $assert_session->elementTextEquals('css', 'table caption', 'Current workspace: Live');
+    $assert_session->elementTextEquals('css', 'tr.active-workspace td:first-child strong', 'Live (active)');
+    $assert_session->linkNotExists('Summer event (active)');
+    $assert_session->linkExists('Summer event');
 
     // Delete any of the workspace owners and visit workspaces listing.
     $this->drupalLogin($this->editor2);
