@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Drupal\BuildTests\Composer\Plugin\Unpack\Functional;
 
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Composer\Util\Filesystem;
 use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
 use Drupal\Tests\Composer\Plugin\Unpack\Fixtures;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Tests recipe unpacking.
@@ -49,6 +51,16 @@ class UnpackRecipeTest extends BuildTestBase {
       'COMPOSER_INSTALLERS' => InstalledVersions::getInstallPath('composer/installers'),
     ];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
+
+    // The recipes' `composer.json` files shouldn't have an explicit version;
+    // Composer should infer it.
+    $finder = Finder::create()
+      ->files()
+      ->name('composer.json')
+      ->in($this->fixturesDir . '/recipes');
+    foreach ($finder as $composer_json) {
+      $this->assertArrayNotHasKey('version', $this->getFileContents($composer_json->getPathname()));
+    }
   }
 
   /**
@@ -675,6 +687,14 @@ class UnpackRecipeTest extends BuildTestBase {
     // Ensure recipe files exist.
     $this->assertFileExists($root_project_path . '/recipes/recipe-a/recipe.yml');
     $this->assertFileExists($root_project_path . '/recipes/recipe-b/recipe.yml');
+
+    // Valid versions should have been written to a catalog file.
+    $catalog = $root_project_path . '/vendor/composer/recipe-unpack.json';
+    $this->assertFileExists($catalog);
+    $catalog = $this->getFileContents($catalog);
+    $version_parser = new VersionParser();
+    $version_parser->normalize($catalog['fixtures/recipe-a']);
+    $version_parser->normalize($catalog['fixtures/recipe-b']);
 
     // Ensure composer.lock is ordered correctly.
     $root_composer_lock = $this->getFileContents($root_project_path . '/composer.lock');

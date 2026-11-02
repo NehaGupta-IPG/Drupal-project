@@ -4,6 +4,7 @@ namespace Drupal\Composer\Plugin\RecipeUnpack;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
+use Composer\Json\JsonManipulator;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Semver\VersionParser;
@@ -38,6 +39,25 @@ final readonly class Unpacker {
     $this->updateComposerJsonPackages();
     $this->updateComposerLockContent();
     $this->unpackCollection->markPackageUnpacked($this->package);
+  }
+
+  /**
+   * Stores the package's unpacked version in its `composer.json` file.
+   */
+  public function writeUnpackedVersion(): void {
+    $path = $this->composer->getConfig()->get('vendor-dir') . '/composer';
+
+    assert(is_dir($path) && is_writable($path));
+    $path .= '/recipe-unpack.json';
+
+    $manipulator = new JsonManipulator(
+      file_exists($path) ? file_get_contents($path) : '{}',
+    );
+    $manipulator->addMainKey(
+      $this->package->getName(),
+      $this->package->getPrettyVersion(),
+    );
+    file_put_contents($path, $manipulator->getContents());
   }
 
   /**
