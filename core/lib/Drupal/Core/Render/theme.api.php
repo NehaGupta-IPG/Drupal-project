@@ -1137,8 +1137,8 @@ function hook_page_attachments(array &$attachments): void {
  */
 function hook_page_attachments_alter(array &$attachments): void {
   // Conditionally remove an asset.
-  if (in_array('core/jquery', $attachments['#attached']['library'])) {
-    $index = array_search('core/jquery', $attachments['#attached']['library']);
+  $index = array_search('core/jquery', $attachments['#attached']['library']);
+  if ($index !== FALSE) {
     unset($attachments['#attached']['library'][$index]);
   }
 }
