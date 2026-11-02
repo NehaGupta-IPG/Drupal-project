@@ -41,7 +41,7 @@ class SchemaInspector {
     $extension = new Extension(\DRUPAL_ROOT, 'module', $pathname, NULL);
     try {
       $class_name = install_get_fixed_class_name($extension, 'Install/Schema');
-      $install_task = \Drupal::classResolver($class_name);
+      $install_task = \Drupal::classResolver()->getInstanceFromDefinition($class_name);
       if ($install_task instanceof SchemaInterface) {
         $schema = $install_task->getSchema();
       }
