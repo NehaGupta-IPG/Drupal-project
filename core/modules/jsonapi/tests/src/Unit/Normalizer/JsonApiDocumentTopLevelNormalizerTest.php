@@ -113,7 +113,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
       [
         [
           'data' => [
-            'type' => 'lorem',
+            'type' => 'node--article',
             'id' => 'e1a613f6-f2b9-4e17-9d33-727eb6509d8b',
             'attributes' => ['title' => 'dummy_title'],
           ],
@@ -126,7 +126,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
       [
         [
           'data' => [
-            'type' => 'lorem',
+            'type' => 'node--article',
             'id' => '0676d1bf-55b3-4bbc-9fbc-3df10f4599d5',
             'relationships' => [
               'field_dummy' => [
@@ -150,7 +150,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
       [
         [
           'data' => [
-            'type' => 'lorem',
+            'type' => 'node--article',
             'id' => '535ba297-8d79-4fc1-b0d6-dc2f047765a1',
             'relationships' => [
               'field_dummy' => [
@@ -179,7 +179,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
       [
         [
           'data' => [
-            'type' => 'lorem',
+            'type' => 'node--article',
             'id' => '535ba297-8d79-4fc1-b0d6-dc2f047765a1',
             'relationships' => [
               'field_dummy' => [
