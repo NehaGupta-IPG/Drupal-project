@@ -42,6 +42,7 @@ class PathAliasTest extends PathTestBase {
       'administer url aliases',
       'create url aliases',
       'access content overview',
+      'override url aliases',
     ]);
     $this->drupalLogin($web_user);
 

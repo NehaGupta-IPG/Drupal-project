@@ -44,6 +44,7 @@ use Drupal\path_alias\PathAliasStorageSchema;
   list_cache_tags: ['route_match'],
   constraints: [
     'UniquePathAlias' => [],
+    'PathAliasOverride' => [],
   ],
 )]
 class PathAlias extends ContentEntityBase implements PathAliasInterface {

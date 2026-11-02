@@ -2,3 +2,7 @@ administer url aliases:
   title: 'Administer URL aliases'
 create url aliases:
   title: 'Create and edit URL aliases'
+override url aliases:
+  title: 'Override system aliases'
+  description: 'Grants the ability to create and manage URL aliases that take precedence over existing system paths. This permission should be assigned with caution as it allows users to override critical functionality.'
+  restrict access: TRUE
