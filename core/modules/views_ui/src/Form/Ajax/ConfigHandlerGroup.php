@@ -71,7 +71,7 @@ class ConfigHandlerGroup extends ViewsFormBase {
     $item = $executable->getHandler($display_id, $type, $id);
 
     if ($item) {
-      $handler = $executable->display_handler->getHandler($type, $id);
+      $handler = \Drupal::service('views.plugin_managers')->get($type)->getHandler($item);
       if (empty($handler)) {
         $form['markup'] = [
           '#markup' => $this->t("Error: handler for @table > @field doesn't exist!", [
