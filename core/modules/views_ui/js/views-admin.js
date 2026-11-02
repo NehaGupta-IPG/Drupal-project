@@ -219,9 +219,14 @@
         const transliterated = this.getTransliterated();
         const suffix = this.suffix;
         this.target.each(function (i) {
-          // Ensure that the maxlength is not exceeded by prepopulating the field.
-          const maxlength = $(this).attr('maxlength') - suffix.length;
-          this.value = transliterated.substring(0, maxlength) + suffix;
+          if ($(this).attr('maxlength')) {
+            // Ensure that the maxlength is not exceeded by prepopulating the
+            // field.
+            const maxlength = $(this).attr('maxlength') - suffix.length;
+            this.value = transliterated.substr(0, maxlength) + suffix;
+          } else {
+            this.value = transliterated + suffix;
+          }
         });
       },
 
