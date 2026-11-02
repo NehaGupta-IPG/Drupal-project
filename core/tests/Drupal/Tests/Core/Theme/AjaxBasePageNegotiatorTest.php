@@ -45,6 +45,11 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   protected $requestStack;
 
   /**
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -53,7 +58,8 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->tokenGenerator = $this->prophesize(CsrfTokenGenerator::class);
     $config_factory = $this->getConfigFactoryStub(['system.theme' => ['default' => 'stark']]);
     $this->requestStack = new RequestStack();
-    $this->negotiator = new AjaxBasePageNegotiator($this->tokenGenerator->reveal(), $config_factory, $this->requestStack);
+    $this->currentUser = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->negotiator = new AjaxBasePageNegotiator($this->tokenGenerator->reveal(), $config_factory, $this->requestStack, $this->currentUser);
   }
 
   /**

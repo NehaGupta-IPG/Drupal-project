@@ -707,7 +707,7 @@ services:
       - { name: theme_negotiator, priority: -100 }
   theme.negotiator.ajax_base_page:
     class: Drupal\Core\Theme\AjaxBasePageNegotiator
-    arguments: ['@csrf_token', '@config.factory', '@request_stack']
+    arguments: ['@csrf_token', '@config.factory', '@request_stack', '@current_user']
     tags:
       - { name: theme_negotiator, priority: 1000 }
   container.namespaces:

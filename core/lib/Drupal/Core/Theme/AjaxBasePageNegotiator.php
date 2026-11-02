@@ -5,6 +5,7 @@ namespace Drupal\Core\Theme;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -23,27 +24,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxBasePageNegotiator implements ThemeNegotiatorInterface {
 
   /**
-   * The CSRF token generator.
-   *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
-   */
-  protected $csrfGenerator;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
    * Constructs a new AjaxBasePageNegotiator.
    *
    * @param \Drupal\Core\Access\CsrfTokenGenerator $token_generator
@@ -52,12 +32,15 @@ class AjaxBasePageNegotiator implements ThemeNegotiatorInterface {
    *   The config factory.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack used to retrieve the current request.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
-  public function __construct(CsrfTokenGenerator $token_generator, ConfigFactoryInterface $config_factory, RequestStack $request_stack) {
-    $this->csrfGenerator = $token_generator;
-    $this->configFactory = $config_factory;
-    $this->requestStack = $request_stack;
-  }
+  public function __construct(
+    protected CsrfTokenGenerator $token_generator,
+    protected ConfigFactoryInterface $config_factory,
+    protected RequestStack $request_stack,
+    protected AccountInterface $current_user,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -75,6 +58,11 @@ class AjaxBasePageNegotiator implements ThemeNegotiatorInterface {
     $theme = $ajax_page_state['theme'];
     $token = $ajax_page_state['theme_token'];
 
+    // Skip csrf token validation for anonymous users because
+    // this validation will always fail for anonymous users.
+    if ($this->currentUser->isAnonymous() && ($theme === $this->configFactory->get('system.theme')->get('default') || $theme)) {
+      return $theme;
+    }
     // Prevent a request forgery from giving a person access to a theme they
     // shouldn't be otherwise allowed to see. However, since everyone is
     // allowed to see the default theme, token validation isn't required for
