@@ -319,19 +319,19 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     if (empty($this->value)) {
       if ($this->accept_null) {
         if ($query_operator === self::EQUAL) {
-          $condition = ($this->query->getConnection()->condition('OR'))
+          $condition = ($this->sqlQuery()->getConnection()->condition('OR'))
             ->condition($field, 0, $query_operator)
             ->isNull($field);
         }
         else {
-          $condition = ($this->query->getConnection()->condition('AND'))
+          $condition = ($this->sqlQuery()->getConnection()->condition('AND'))
             ->condition($field, 0, $query_operator)
             ->isNotNull($field);
         }
-        $this->query->addWhere($this->options['group'], $condition);
+        $this->handlerQuery()->addWhere($this->options['group'], $condition);
       }
       else {
-        $this->query->addWhere($this->options['group'], $field, 0, $query_operator);
+        $this->handlerQuery()->addWhere($this->options['group'], $field, 0, $query_operator);
       }
     }
     else {
@@ -339,14 +339,14 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
         // Forces a self::EQUAL operator instead of a self::NOT_EQUAL for
         // performance reasons.
         if ($query_operator === self::EQUAL) {
-          $this->query->addWhere($this->options['group'], $field, 1, self::EQUAL);
+          $this->handlerQuery()->addWhere($this->options['group'], $field, 1, self::EQUAL);
         }
         else {
-          $this->query->addWhere($this->options['group'], $field, 0, self::EQUAL);
+          $this->handlerQuery()->addWhere($this->options['group'], $field, 0, self::EQUAL);
         }
       }
       else {
-        $this->query->addWhere($this->options['group'], $field, 1, $query_operator);
+        $this->handlerQuery()->addWhere($this->options['group'], $field, 1, $query_operator);
       }
     }
   }
@@ -365,7 +365,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       $operator = "IS NOT NULL";
     }
 
-    $this->query->addWhere($this->options['group'], $field, NULL, $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, NULL, $operator);
   }
 
   /**

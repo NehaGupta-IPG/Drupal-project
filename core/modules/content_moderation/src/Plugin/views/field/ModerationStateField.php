@@ -30,7 +30,7 @@ class ModerationStateField extends EntityField {
     $column_name = $storage->getTableMapping()->getFieldColumnName($storage_definition, 'value');
     $this->aliases[$column_name] = $this->tableAlias . '.' . $column_name;
 
-    $this->query->addOrderBy(NULL, NULL, $order, $this->aliases[$column_name]);
+    $this->handlerQuery()->addOrderBy(NULL, NULL, $order, $this->aliases[$column_name]);
   }
 
 }

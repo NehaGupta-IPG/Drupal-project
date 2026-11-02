@@ -31,7 +31,7 @@ class Current extends BooleanOperator {
     $this->ensureMyTable();
 
     $field = $this->tableAlias . '.' . $this->realField . ' ';
-    $or = $this->view->query->getConnection()->condition('OR');
+    $or = $this->sqlQuery()->getConnection()->condition('OR');
 
     if (empty($this->value)) {
       $or->condition($field, '***CURRENT_USER***', '<>');
@@ -42,7 +42,7 @@ class Current extends BooleanOperator {
     else {
       $or->condition($field, '***CURRENT_USER***', '=');
     }
-    $this->query->addWhere($this->options['group'], $or);
+    $this->handlerQuery()->addWhere($this->options['group'], $or);
   }
 
   /**

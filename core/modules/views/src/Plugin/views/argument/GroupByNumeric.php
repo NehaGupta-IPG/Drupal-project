@@ -22,7 +22,7 @@ class GroupByNumeric extends ArgumentPluginBase {
     $field = $this->getField();
     $placeholder = $this->placeholder();
 
-    $this->query->addHavingExpression(0, "$field = $placeholder", [$placeholder => $this->argument]);
+    $this->sqlQuery()->addHavingExpression(0, "$field = $placeholder", [$placeholder => $this->argument]);
   }
 
   /**

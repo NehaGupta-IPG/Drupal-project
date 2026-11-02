@@ -26,7 +26,7 @@ class Random extends SortPluginBase implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   public function query() {
-    $this->query->addOrderBy('rand');
+    $this->handlerQuery()->addOrderBy('rand');
   }
 
   /**

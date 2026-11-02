@@ -121,11 +121,11 @@ class NumericArgument extends ArgumentPluginBase {
     if (count($this->value) > 1) {
       $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
       $placeholder .= '[]';
-      $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
+      $this->sqlQuery()->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
     }
     else {
       $operator = empty($this->options['not']) ? '=' : '!=';
-      $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator $placeholder" . $null_check, [$placeholder => $this->argument]);
+      $this->sqlQuery()->addWhereExpression(0, "$this->tableAlias.$this->realField $operator $placeholder" . $null_check, [$placeholder => $this->argument]);
     }
   }
 

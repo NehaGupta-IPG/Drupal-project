@@ -108,11 +108,11 @@ class ManyToOneHelper {
     }
     // If we found that there are tables in between, add the relationship.
     if ($r_join->table != $join->table) {
-      $relationship = $this->handler->query->addRelationship($this->handler->table . '_' . $r_join->table, $r_join, $r_join->table, $this->handler->relationship);
+      $relationship = $this->handler->query->getSqlQuery()->addRelationship($this->handler->table . '_' . $r_join->table, $r_join, $r_join->table, $this->handler->relationship);
     }
 
     // And now add our table, using the new relationship if one was used.
-    $alias = $this->handler->query->addTable($this->handler->table, $relationship, $join, $alias);
+    $alias = $this->handler->query->getSqlQuery()->addTable($this->handler->table, $relationship, $join, $alias);
 
     // Store what values are used by this table chain so that other chains can
     // automatically discard those values.
@@ -150,7 +150,7 @@ class ManyToOneHelper {
     }
 
     if (empty($options['add_table']) || empty($view->many_to_one_tables[$field])) {
-      return $query->ensureTable($this->handler->table, $this->handler->relationship, $join);
+      return $query->getSqlQuery()->ensureTable($this->handler->table, $this->handler->relationship, $join);
     }
     else {
       if (!empty($view->many_to_one_tables[$field])) {
@@ -190,7 +190,7 @@ class ManyToOneHelper {
             $join->type = 'INNER';
           }
 
-          $this->handler->tableAlias = $this->handler->query->ensureTable($this->handler->table, $this->handler->relationship, $join);
+          $this->handler->tableAlias = $this->handler->query->getSqlQuery()->ensureTable($this->handler->table, $this->handler->relationship, $join);
           $this->handler->view->many_to_one_tables[$field] = $this->handler->value;
         }
         else {
@@ -275,7 +275,7 @@ class ManyToOneHelper {
    * Provides a unique placeholders for handlers.
    */
   protected function placeholder() {
-    return $this->handler->query->placeholder($this->handler->options['table'] . '_' . $this->handler->options['field']);
+    return $this->handler->query->getSqlQuery()->placeholder($this->handler->options['table'] . '_' . $this->handler->options['field']);
   }
 
   public function addFilter() {
@@ -325,7 +325,7 @@ class ManyToOneHelper {
         $placeholders = [
           $placeholder => $value,
         ];
-        $this->handler->query->addWhereExpression($options['group'], "$field $operator", $placeholders);
+        $this->handler->query->getSqlQuery()->addWhereExpression($options['group'], "$field $operator", $placeholders);
       }
       else {
         $placeholder = $this->placeholder();
@@ -333,18 +333,18 @@ class ManyToOneHelper {
           $placeholder .= '[]';
 
           if ($operator == 'IS NULL') {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            $this->handler->query->getSqlQuery()->addWhereExpression($options['group'], "$field $operator");
           }
           else {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator($placeholder)", [$placeholder => $value]);
+            $this->handler->query->getSqlQuery()->addWhereExpression($options['group'], "$field $operator($placeholder)", [$placeholder => $value]);
           }
         }
         else {
           if ($operator == 'IS NULL') {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator");
+            $this->handler->query->getSqlQuery()->addWhereExpression($options['group'], "$field $operator");
           }
           else {
-            $this->handler->query->addWhereExpression($options['group'], "$field $operator $placeholder", [$placeholder => $value]);
+            $this->handler->query->getSqlQuery()->addWhereExpression($options['group'], "$field $operator $placeholder", [$placeholder => $value]);
           }
         }
       }
@@ -352,13 +352,13 @@ class ManyToOneHelper {
 
     if ($add_condition) {
       $field = $this->handler->realField;
-      $clause = $operator == 'or' ? $this->handler->query->getConnection()->condition('OR') : $this->handler->query->getConnection()->condition('AND');
+      $clause = $operator == 'or' ? $this->handler->query->getSqlQuery()->getConnection()->condition('OR') : $this->handler->query->getSqlQuery()->getConnection()->condition('AND');
       foreach ($this->handler->tableAliases as $value => $alias) {
         $clause->condition("$alias.$field", $value);
       }
 
       // Implode on either AND or OR.
-      $this->handler->query->addWhere($options['group'], $clause);
+      $this->handler->query->getHandlerQuery()->addWhere($options['group'], $clause);
     }
   }
 

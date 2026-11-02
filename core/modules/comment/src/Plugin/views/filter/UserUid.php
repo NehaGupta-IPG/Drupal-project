@@ -29,11 +29,11 @@ class UserUid extends FilterPluginBase {
     $subselect->where("[c].[entity_id] = [$this->tableAlias].[$entity_id]");
     $subselect->condition('c.entity_type', $entity_type);
 
-    $condition = ($this->view->query->getConnection()->condition('OR'))
+    $condition = ($this->sqlQuery()->getConnection()->condition('OR'))
       ->condition("$this->tableAlias.uid", $this->value, $this->operator)
       ->exists($subselect);
 
-    $this->query->addWhere($this->options['group'], $condition);
+    $this->handlerQuery()->addWhere($this->options['group'], $condition);
   }
 
 }

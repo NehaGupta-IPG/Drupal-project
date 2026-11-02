@@ -82,14 +82,12 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
    * {@inheritdoc}
    */
   public function query() {
-    /** @var \Drupal\views\Plugin\views\query\Sql $query */
-    $query = $this->query;
     $query_base_table = $this->relationship ?: $this->view->storage->get('base_table');
 
     $entity_type = $this->entityTypeManager->getDefinition($this->getEntityType());
     $keys = $entity_type->getKeys();
 
-    $subquery = $query->getConnection()->select($query_base_table, 'base_table');
+    $subquery = $this->sqlQuery()->getConnection()->select($query_base_table, 'base_table');
     $subquery->addExpression("MAX(base_table.{$keys['revision']})", $keys['revision']);
     $subquery->fields('base_table', [$keys['id'], 'langcode']);
     $subquery->groupBy("base_table.{$keys['id']}");
@@ -109,8 +107,8 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
     ];
 
     $join = $this->joinHandler->createInstance('standard', $definition);
-    $query->addTable($query_base_table, $this->relationship, $join);
-    $query->addWhere($this->options['group'], "$query_base_table.revision_translation_affected", '1', '=');
+    $this->sqlQuery()->addTable($query_base_table, $this->relationship, $join);
+    $this->handlerQuery()->addWhere($this->options['group'], "$query_base_table.revision_translation_affected", '1', '=');
   }
 
 }

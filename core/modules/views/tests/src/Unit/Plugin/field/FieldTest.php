@@ -410,6 +410,7 @@ class FieldTest extends UnitTestCase {
 
     $handler->query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
       ->disableOriginalConstructor()
+      ->onlyMethods(['ensureTable', 'addOrderBy'])
       ->getMock();
     $handler->query->expects($this->atLeastOnce())
       ->method('ensureTable')
@@ -471,6 +472,7 @@ class FieldTest extends UnitTestCase {
 
     $handler->query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
       ->disableOriginalConstructor()
+      ->onlyMethods(['ensureTable', 'addOrderBy'])
       ->getMock();
     $handler->query->expects($this->atLeastOnce())
       ->method('ensureTable')
@@ -530,6 +532,7 @@ class FieldTest extends UnitTestCase {
 
     $query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
       ->disableOriginalConstructor()
+      ->onlyMethods(['ensureTable', 'addField'])
       ->getMock();
     $query->expects($this->once())
       ->method('ensureTable')
@@ -593,6 +596,7 @@ class FieldTest extends UnitTestCase {
 
     $query = $this->getMockBuilder('Drupal\views\Plugin\views\query\Sql')
       ->disableOriginalConstructor()
+      ->onlyMethods(['ensureTable', 'addField'])
       ->getMock();
     $query->expects($this->once())
       ->method('ensureTable')

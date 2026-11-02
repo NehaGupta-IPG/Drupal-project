@@ -56,7 +56,7 @@ class Date extends SortPluginBase {
     switch ($this->options['granularity']) {
       case 'second':
       default:
-        $this->query->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
+        $this->handlerQuery()->addOrderBy($this->tableAlias, $this->realField, $this->options['order']);
         return;
 
       case 'minute':
@@ -85,7 +85,7 @@ class Date extends SortPluginBase {
     }
 
     // Add the field.
-    $this->query->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
+    $this->handlerQuery()->addOrderBy(NULL, $formula, $this->options['order'], $this->tableAlias . '_' . $this->field . '_' . $this->options['granularity']);
   }
 
 }

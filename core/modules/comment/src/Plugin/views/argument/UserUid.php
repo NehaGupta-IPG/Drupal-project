@@ -94,11 +94,11 @@ class UserUid extends ArgumentPluginBase {
       $subselect->where("[c].[entity_id] = [$this->tableAlias].[$entity_id]");
       $subselect->condition('c.entity_type', $entity_type);
 
-      $condition = ($this->view->query->getConnection()->condition('OR'))
+      $condition = ($this->sqlQuery()->getConnection()->condition('OR'))
         ->condition("$this->tableAlias.uid", $this->argument, '=')
         ->exists($subselect);
 
-      $this->query->addWhere(0, $condition);
+      $this->handlerQuery()->addWhere(0, $condition);
     }
   }
 

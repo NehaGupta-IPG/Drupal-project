@@ -76,7 +76,7 @@ class TaxonomyIndexTidDepth extends TaxonomyIndexTid {
     }
     // If no relationship, then use the alias of the base table.
     else {
-      $this->tableAlias = $this->query->ensureTable($this->view->storage->get('base_table'));
+      $this->tableAlias = $this->sqlQuery()->ensureTable($this->view->storage->get('base_table'));
     }
 
     $this->addSubQueryJoin($this->value);

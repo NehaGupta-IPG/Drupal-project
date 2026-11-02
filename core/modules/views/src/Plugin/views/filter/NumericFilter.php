@@ -380,15 +380,15 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
   protected function opBetween($field) {
     if (is_numeric($this->value['min']) && is_numeric($this->value['max'])) {
       $operator = $this->operator == 'between' ? 'BETWEEN' : 'NOT BETWEEN';
-      $this->query->addWhere($this->options['group'], $field, [$this->value['min'], $this->value['max']], $operator);
+      $this->handlerQuery()->addWhere($this->options['group'], $field, [$this->value['min'], $this->value['max']], $operator);
     }
     elseif (is_numeric($this->value['min'])) {
       $operator = $this->operator == 'between' ? '>=' : '<';
-      $this->query->addWhere($this->options['group'], $field, $this->value['min'], $operator);
+      $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value['min'], $operator);
     }
     elseif (is_numeric($this->value['max'])) {
       $operator = $this->operator == 'between' ? '<=' : '>';
-      $this->query->addWhere($this->options['group'], $field, $this->value['max'], $operator);
+      $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value['max'], $operator);
     }
   }
 
@@ -396,7 +396,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
    * Filters by a simple operator.
    */
   protected function opSimple($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value['value'], $this->operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value['value'], $this->operator);
   }
 
   /**
@@ -410,7 +410,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       $operator = "IS NOT NULL";
     }
 
-    $this->query->addWhere($this->options['group'], $field, NULL, $operator);
+    $this->handlerQuery()->addWhere($this->options['group'], $field, NULL, $operator);
   }
 
   /**
@@ -420,7 +420,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
    *   The expression pointing to the queries field, for example "foo.bar".
    */
   protected function opRegex($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value['value'], 'REGEXP');
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value['value'], 'REGEXP');
   }
 
   /**
@@ -430,7 +430,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
    *   The expression pointing to the queries field, for example "foo.bar".
    */
   protected function opNotRegex($field) {
-    $this->query->addWhere($this->options['group'], $field, $this->value['value'], 'NOT REGEXP');
+    $this->handlerQuery()->addWhere($this->options['group'], $field, $this->value['value'], 'NOT REGEXP');
   }
 
   /**

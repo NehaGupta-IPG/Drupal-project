@@ -30,8 +30,8 @@ class StatisticsLastUpdated extends Date {
    */
   public function query() {
     $this->ensureMyTable();
-    $this->node_table = $this->query->ensureTable('node', $this->relationship);
-    $this->field_alias = $this->query->addOrderBy(NULL, "GREATEST(" . $this->node_table . ".changed, " . $this->tableAlias . ".last_comment_timestamp)", $this->options['order'], $this->tableAlias . '_' . $this->field);
+    $this->node_table = $this->sqlQuery()->ensureTable('node', $this->relationship);
+    $this->field_alias = $this->handlerQuery()->addOrderBy(NULL, "GREATEST(" . $this->node_table . ".changed, " . $this->tableAlias . ".last_comment_timestamp)", $this->options['order'], $this->tableAlias . '_' . $this->field);
   }
 
 }

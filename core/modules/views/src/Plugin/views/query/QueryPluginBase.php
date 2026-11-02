@@ -60,6 +60,26 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
   protected $groupOperator;
 
   /**
+   * Returns common handler query operations.
+   */
+  public function getHandlerQuery(): HandlerQueryInterface {
+    if ($this instanceof HandlerQueryInterface) {
+      return $this;
+    }
+    return new LegacyHandlerQueryAdapter($this);
+  }
+
+  /**
+   * Returns SQL-specific handler query operations.
+   */
+  public function getSqlQuery(): SqlQueryInterface {
+    if ($this instanceof SqlQueryInterface) {
+      return $this;
+    }
+    return new LegacySqlQueryAdapter($this);
+  }
+
+  /**
    * Generate a query and a countQuery from all of the information supplied.
    *
    * @param bool $get_count

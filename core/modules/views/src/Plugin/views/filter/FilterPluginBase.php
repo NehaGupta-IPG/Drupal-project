@@ -1730,7 +1730,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    */
   public function query() {
     $this->ensureMyTable();
-    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", $this->value, $this->operator);
+    $this->handlerQuery()->addWhere($this->options['group'], "$this->tableAlias.$this->realField", $this->value, $this->operator);
   }
 
   /**
