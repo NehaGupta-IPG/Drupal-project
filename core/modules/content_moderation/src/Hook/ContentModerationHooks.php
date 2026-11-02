@@ -377,4 +377,21 @@ class ContentModerationHooks {
     }
   }
 
+  /**
+   * Implements hook_entity_bundle_field_info_alter().
+   */
+  #[Hook('entity_bundle_field_info_alter')]
+  public function entityBundleFieldInfoAlter(&$fields, EntityTypeInterface $entity_type, $bundle): void {
+    /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_info */
+    $moderation_info = \Drupal::service('content_moderation.moderation_information');
+    if ($moderation_info->shouldModerateEntitiesOfBundle($entity_type, $bundle)) {
+      // Force the published field to be translatable since moderation_state is
+      // always translatable and controls it.
+      $published_field = $entity_type->getKey('published');
+      if ($published_field && isset($fields[$published_field])) {
+        $fields[$published_field]->setTranslatable(TRUE);
+      }
+    }
+  }
+
 }
