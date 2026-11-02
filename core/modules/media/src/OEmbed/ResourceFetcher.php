@@ -4,6 +4,7 @@ namespace Drupal\media\OEmbed;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -16,13 +17,27 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 class ResourceFetcher implements ResourceFetcherInterface {
 
+  /**
+   * The module handler.
+   */
+  protected ModuleHandlerInterface $moduleHandler;
+
   public function __construct(
     protected ClientInterface $httpClient,
     protected ProviderRepositoryInterface $providers,
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
+    ModuleHandlerInterface|int|null $moduleHandler = NULL,
     protected int $timeout = 5,
   ) {
+    if (!$moduleHandler instanceof ModuleHandlerInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3042423', E_USER_DEPRECATED);
+      if (is_int($moduleHandler)) {
+        $this->timeout = $moduleHandler;
+      }
+      $moduleHandler = \Drupal::moduleHandler();
+    }
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -62,6 +77,8 @@ class ResourceFetcher implements ResourceFetcherInterface {
     if (empty($data) || !is_array($data)) {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
+
+    $this->moduleHandler->alter('oembed_resource_data', $data, $url);
 
     $this->cacheBackend->set($cache_id, $data);
 
