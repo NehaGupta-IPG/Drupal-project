@@ -296,27 +296,25 @@ final class Importer implements LoggerAwareInterface {
         unset($item_value['target_uuid']);
       }
 
+      // Only values with a statically defined property (computed or not) can
+      // be individually resolved below. The rest are set as-is using the
+      // setValue() method.
+      $known_properties = $item->getProperties(TRUE);
       $serialized_property_names = self::getCustomSerializedPropertyNames($item);
-      foreach ($item_value as $property_name => $value) {
-        if (\in_array($property_name, $serialized_property_names)) {
-          if (\is_string($value)) {
+      foreach (array_intersect_key($item_value, $known_properties) as $property_name => $value) {
+        if (in_array($property_name, $serialized_property_names, TRUE)) {
+          if (is_string($value)) {
             throw new ImportException("Received string for serialized property $field_name.$delta.$property_name");
           }
-          $value = serialize($value);
+          $item_value[$property_name] = serialize($value);
+          continue;
         }
 
-        $property = $item->get($property_name);
-
-        if ($property instanceof EntityReference) {
-          if (is_array($value)) {
-            $value = $this->toEntity($value);
-          }
-          else {
-            $value = $this->loadEntityDependency($value);
-          }
+        if ($known_properties[$property_name] instanceof EntityReference) {
+          $item_value[$property_name] = is_array($value) ? $this->toEntity($value) : $this->loadEntityDependency($value);
         }
-        $property->setValue($value);
       }
+      $item->setValue($item_value);
     }
   }
 
