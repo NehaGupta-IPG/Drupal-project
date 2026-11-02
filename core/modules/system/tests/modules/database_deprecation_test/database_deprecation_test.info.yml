@@ -1,0 +1,5 @@
+name: 'Database Deprecation Test'
+type: module
+description: 'Support module for testing Database layer deprecations.'
+package: Testing
+version: VERSION

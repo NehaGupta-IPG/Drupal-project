@@ -232,7 +232,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
     foreach ($module_groups as $modules) {
-      $this->doInstall($modules, $installed_modules, $sync_status);
+      $this->doInstall($modules, $installed_modules, $sync_status, $module_data);
       // Refresh the installed modules list from configuration to preserve
       // module weight.
       $extension_config = \Drupal::configFactory()->getEditable('core.extension');
@@ -273,8 +273,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   An array of the already installed modules.
    * @param bool $sync_status
    *   The config sync status.
+   * @param array<string, \Drupal\Core\Extension\Extension> $module_data
+   *   The scanned modules data.
    */
-  private function doInstall(array $module_list, array $installed_modules, bool $sync_status): void {
+  private function doInstall(array $module_list, array $installed_modules, bool $sync_status, array $module_data): void {
     $extension_config = \Drupal::configFactory()->getEditable('core.extension');
 
     // Save this data without checking schema. This is a performance
@@ -351,7 +353,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $this->moduleHandler->invokeAll('module_preinstall', [$module, $sync_status]);
 
       // Now install the module's schema if necessary.
-      $this->installSchema($module);
+      $is_test_module = isset($module_data[$module]->info['package']) && $module_data[$module]->info['package'] === 'Testing';
+      $this->installSchema($module, $is_test_module);
     }
 
     // Clear plugin manager caches.
@@ -817,23 +820,28 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *
    * @param string $module
    *   The module for which the tables will be created.
+   * @param bool $is_test_module
+   *   (optional) Indicates if the module is a test module.
    *
    * @internal
    */
-  protected function installSchema(string $module): void {
+  protected function installSchema(string $module, bool $is_test_module = FALSE): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
-    $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
-      assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert(
+        $schemaDefinition->type === SchemaDefinitionType::Module ||
+        ($is_test_module && $schemaDefinition->type === SchemaDefinitionType::Test),
+        'Invalid schema definition type, must be SchemaDefinitionType::Module, or ::Test for test modules'
+      );
       assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
-      $schema->createSchemaFromDefinition($schemaDefinition);
+      $this->connection->schema()->createSchemaFromDefinition($schemaDefinition);
     }
     else {
       if (count($schemaDefinition) !== 0) {
         @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
       }
       foreach ($schemaDefinition as $name => $table) {
-        $schema->createTable($name, $table);
+        $this->connection->schema()->createTable($name, $table);
       }
     }
   }

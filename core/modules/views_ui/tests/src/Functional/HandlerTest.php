@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
@@ -54,18 +57,22 @@ class HandlerTest extends UITestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
-
-    $schema['views_test_data']['fields']['uid'] = [
-      'description' => "The {users}.uid of the author of the beatle entry.",
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-    ];
-
-    return $schema;
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = $table->columns;
+    $columns[] = Column::int(
+      name: 'uid',
+      description: "The {users}.uid of the author of the beatle entry.",
+      unsigned: TRUE,
+      notNull: TRUE,
+      default: new IntValue(0),
+    );
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**

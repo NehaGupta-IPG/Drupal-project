@@ -5,6 +5,16 @@ declare(strict_types=1);
 namespace Drupal\views\Tests;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 
 /**
  * Provides tests view data and the base test schema with sample data records.
@@ -63,61 +73,65 @@ class ViewTestData {
    *
    * @internal
    */
-  public static function schemaDefinition() {
-    $schema['views_test_data'] = [
-      'description' => 'Basic test table for Views tests.',
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
-        'name' => [
-          'description' => "A person's name",
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'age' => [
-          'description' => "The person's age",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-        ],
-        'job' => [
-          'description' => "The person's job",
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => 'Undefined',
-        ],
-        'created' => [
-          'description' => "The creation date of this record",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'big',
-        ],
-        'status' => [
-          'description' => "The status of this record",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-        ],
+  public static function schemaDefinition(): Schema {
+    $tables[] = new Table(
+      name: 'views_test_data',
+      description: 'Basic test table for Views tests.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::varcharAscii(
+          name: 'name',
+          description: "A person's name",
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        Column::int(
+          name: 'age',
+          description: "The person's age",
+          unsigned: TRUE,
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::varchar(
+          name: 'job',
+          description: "The person's job",
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue('Undefined'),
+        ),
+        Column::int(
+          name: 'created',
+          description: "The creation date of this record",
+          size: ColumnSize::Big,
+          unsigned: TRUE,
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::int(
+          name: 'status',
+          description: "The status of this record",
+          unsigned: TRUE,
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
       ],
-      'primary key' => ['id'],
-      'unique keys' => [
-        'name' => ['name'],
+      primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'name', columns: ['name']),
       ],
-      'indexes' => [
-        'ages' => ['age'],
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
       ],
-    ];
-    return $schema;
+    );
+
+    return new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'views_test_data',
+      tables: $tables,
+    );
   }
 
   /**

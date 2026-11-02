@@ -9,7 +9,7 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 /**
  * Describes a database table's column.
  */
-final class Column implements SchemaDefinitionInterface {
+final class Column extends SchemaDefinitionBase {
 
   /**
    * Constructor.

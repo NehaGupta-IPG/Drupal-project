@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\filter\Combine;
 use Drupal\views\Views;
@@ -768,10 +770,16 @@ class FilterCombineTest extends ViewsKernelTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
-    unset($schema['views_test_data']['fields']['job']['not null']);
-    return $schema;
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'job');
+    $columns[] = $table->getColumnDefinition('job')->with(['notNull' => NULL]);
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
 }

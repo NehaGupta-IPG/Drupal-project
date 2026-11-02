@@ -7,7 +7,7 @@ namespace Drupal\Core\Database\SchemaDefinition;
 /**
  * Describes a column of a database index or key.
  */
-final class KeyColumn implements SchemaDefinitionInterface {
+final class KeyColumn extends SchemaDefinitionBase {
 
   /**
    * Constructor.

@@ -241,7 +241,7 @@ class InsertTest extends DatabaseTestBase {
    */
   public function testInsertFromWithSerialKey(): void {
     // Create a copy of the test table.
-    $schema = database_test_schema();
+    $schema = database_test_schema()->toArray();
     $this->connection->schema()->createTable('test_backup', $schema['test']);
 
     $this->connection->insert('test_backup')->from($this->connection->select('test')->fields('test'))->execute();

@@ -669,4 +669,63 @@ class SchemaDefinitionTest extends UnitTestCase {
     );
   }
 
+  /**
+   * Tests cloning an object with ::with().
+   */
+  public function testWithCloning(): void {
+    $original = new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          length: 25,
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+
+    $expected = new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          length: 42,
+          default: new StringValue('bar'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+
+    $columns = array_filter($original->columns, fn (Column $column): bool => $column->name !== 'id');
+    $columns[] = $original->getColumnDefinition('id')->with([
+      'length' => 42,
+      'default' => new StringValue('bar'),
+    ]);
+
+    $this->assertEquals($expected, $original->with(['columns' => $columns]));
+  }
+
+  /**
+   * Tests passing an invalid property to ::with().
+   */
+  public function testInvalidWithCloning(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessageIs("Drupal\Core\Database\SchemaDefinition\Table does not have a 'bar' property");
+
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          length: 25,
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+
+    $table->with(['bar' => 'qux']);
+  }
+
 }

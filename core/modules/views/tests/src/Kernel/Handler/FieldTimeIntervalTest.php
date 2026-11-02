@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -60,10 +62,16 @@ class FieldTimeIntervalTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function schemaDefinition() {
-    $schema_definition = parent::schemaDefinition();
-    $schema_definition['views_test_data']['fields']['age']['not null'] = FALSE;
-    return $schema_definition;
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'age');
+    $columns[] = $table->getColumnDefinition('age')->with(['notNull' => FALSE]);
+    return $parentSchema->with([
+      'tables' => [
+        $table->with(['columns' => $columns]),
+      ],
+    ]);
   }
 
   /**
