@@ -1,4 +1,15 @@
-const argv = require('minimist')(process.argv.slice(2));
+const { parseArgs } = require('node:util');
+
+const argOptions = {
+  defaultTheme: {
+    type: 'string',
+  },
+};
+const { values: argv } = parseArgs({
+  args: process.argv.slice(2),
+  options: argOptions,
+  strict: false,
+});
 
 const a11yThemeTest = {
   '@tags': ['core', 'a11y', 'a11y:default'],

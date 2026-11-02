@@ -17,7 +17,16 @@
 'use strict';
 
 const { globSync } = require('glob');
-const argv = require('minimist')(process.argv.slice(2));
+const { parseArgs } = require('node:util');
+const argsOption = {
+  check: {
+    type: 'boolean',
+  },
+  file: {
+    type: 'string',
+  },
+};
+const { values: argv } = parseArgs({args: process.argv.slice(2), options: argsOption});
 const changeOrAdded = require('./changeOrAdded');
 const check = require('./check');
 const log = require('./log');
