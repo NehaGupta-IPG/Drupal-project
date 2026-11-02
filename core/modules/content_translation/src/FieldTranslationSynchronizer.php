@@ -167,6 +167,9 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
             // used as the unchanged items. In fact there are no unchanged items
             // to check against.
             $langcode = $original_langcode ?: $sync_langcode;
+            if (!$entity_unchanged->hasTranslation($langcode)) {
+              $entity_unchanged->addTranslation($langcode, $entity_unchanged->toArray());
+            }
             $unchanged_items = $entity_unchanged->getTranslation($langcode)->get($field_name)->getValue();
             $this->synchronizeItems($values, $unchanged_items, $sync_langcode, array_keys($translations), $columns);
 
