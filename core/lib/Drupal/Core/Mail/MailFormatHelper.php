@@ -28,6 +28,13 @@ class MailFormatHelper {
   protected static $regexp;
 
   /**
+   * Base URL for the current request.
+   *
+   * @var string
+   */
+  protected static $baseUrl;
+
+  /**
    * Array of tags supported.
    *
    * @var array
@@ -129,7 +136,8 @@ class MailFormatHelper {
     // Replace inline <a> tags with the text of link and a footnote.
     // 'See <a href="https://www.drupal.org">the Drupal site</a>' becomes
     // 'See the Drupal site [1]' with the URL included as a footnote.
-    static::htmlToMailUrls(NULL, TRUE);
+    $request = \Drupal::request();
+    static::htmlToMailUrls(NULL, $request->getBasePath(), $request->getBaseUrl());
     $pattern = '@(<a[^>]+?href="([^"]*)"[^>]*?>([^<]*)</a>)@i';
     $string = preg_replace_callback($pattern, [static::class, 'htmlToMailUrls'], $string);
     $urls = static::htmlToMailUrls();
@@ -326,23 +334,34 @@ class MailFormatHelper {
    *
    * Callback for preg_replace_callback() within
    * \Drupal\Core\Mail\MailFormatHelper::htmlToText().
+   *
+   * @param string|null $match
+   *   A URL to track, or NULL to return the list of tracked URLs.
+   * @param string|null $base_path
+   *   If set, stores the base path for future use and resets the internal
+   *   URL List.
+   * @param string|null $base_url
+   *   If set, stores the base URL for future use.
+   *
+   * @return array|string
+   *   A label for the URL if a URL was passed, or an array of tracked URLs
+   *   otherwise.
    */
-  protected static function htmlToMailUrls($match = NULL, $reset = FALSE) {
-    // @todo Use request context instead.
-    global $base_url, $base_path;
-
-    if ($reset) {
+  protected static function htmlToMailUrls($match = NULL, $base_path = NULL, $base_url = NULL) {
+    if ($base_path) {
+      // Store base path and URL for future calls.
+      static::$regexp = '@^' . preg_quote($base_path, '@') . '@';
+      if ($base_url) {
+        static::$baseUrl = $base_url;
+      }
       // Reset internal URL list.
       static::$urls = [];
     }
     else {
-      if (empty(static::$regexp)) {
-        static::$regexp = '@^' . preg_quote($base_path, '@') . '@';
-      }
       if ($match) {
         [, , $url, $label] = $match;
         // Ensure all URLs are absolute.
-        static::$urls[] = strpos($url, '://') ? $url : preg_replace(static::$regexp, $base_url . '/', $url);
+        static::$urls[] = strpos($url, '://') ? $url : preg_replace(static::$regexp, static::$baseUrl . '/', $url);
         // Strip newlines and carriage returns from anchor text.
         return preg_replace('/\r?\n|\r/', '', $label) . ' [' . count(static::$urls) . ']';
       }
