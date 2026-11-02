@@ -9,6 +9,12 @@ use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+use Drupal\Component\Utility\Html;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Test\Form\KernelTestFormBuilder;
+use Drupal\Core\Test\Session\KernelTestSessionManager;
+use Drupal\Core\Test\Session\KernelTestSessionMiddleware;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
@@ -18,12 +24,17 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  * This is for use by Kernel tests, with the following limitations:
  * - There is no logged in user. Use \Drupal\Tests\user\Traits\UserCreationTrait
  *   to set a current user.
- * - There is no active theme. To place blocks, a test must first install a
- *   theme and then set it as active.
- * - Session semantics differ from normal page requests. Do not rely on session
- *   state beyond its existence (no persistence or regeneration).
+ * - There is no active theme. To render forms or place blocks, a test must
+ *   first install a theme and then set it as active.
+ * - Session semantics differ from normal page requests. To enable session
+ *   persistence, see self::alterSessionServices(), and to set the current user
+ *   use self::setCurrentUserWithSession().
  * - Page caching modules will not work. See \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait
  *   for how to set them up.
+ * - To submit a form, see self::alterFormBuilder(). To submit a form as an
+ *   authenticated user, session persistence with self::alterSessionServices()
+ *   is also needed and the user must be logged in with
+ *   self::setCurrentUserWithSession.
  */
 trait HttpKernelUiHelperTrait {
 
@@ -35,6 +46,75 @@ trait HttpKernelUiHelperTrait {
    * This is lazily initialized by the first call to self::drupalGet().
    */
   protected ?Mink $mink;
+
+  /**
+   * Sets up services to enable sessions with Kernel test HTTP requests.
+   *
+   * This should be called from an implementation of
+   * \Drupal\Core\DependencyInjection\ServiceModifierInterface::alter().
+   *
+   * If using sessions, setting the current user must be done with
+   * self::setCurrentUserWithSession().
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container to alter.
+   */
+  public function alterSessionServices(ContainerBuilder $container): void {
+    // Alter session services that normally skip session creation on the CLI.
+    $service_definition = $container->getDefinition('http_middleware.session');
+    $service_definition->setClass(KernelTestSessionMiddleware::class);
+
+    $service_definition = $container->getDefinition('session_manager');
+    $service_definition->setClass(KernelTestSessionManager::class);
+  }
+
+  /**
+   * Sets up form services to enable forms with Kernel test HTTP requests.
+   *
+   * This should be called from an implementation of
+   * \Drupal\Core\DependencyInjection\ServiceModifierInterface::alter().
+   *
+   * @todo This can be deprecated and removed when
+   * https://www.drupal.org/project/drupal/issues/2505339 is fixed.
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container to alter.
+   */
+  public function alterFormBuilder(ContainerBuilder $container): void {
+    // Alter the form builder.
+    $service_definition = $container->getDefinition('form_builder');
+    $service_definition->setClass(KernelTestFormBuilder::class);
+  }
+
+  /**
+   * Switch the current logged in user in both the system and the session.
+   *
+   * This should be used instead of
+   * \Drupal\Tests\user\Traits\UserCreationTrait::setCurrentUser() if session
+   * support is required.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account object.
+   *
+   * @see self::alterSessionServices()
+   */
+  public function setCurrentUserWithSession(AccountInterface $account): void {
+    // Reset the Mink browser session.
+    $this->getSession()->reset();
+
+    // Destroy the PHP session if there is one.
+    if (isset($_SESSION)) {
+      $this->container->get('session_manager')->destroy();
+    }
+
+    $this->container->get('current_user')->setAccount($account);
+
+    if ($account->id()) {
+      // Set the account ID into the session. This is the same as
+      // user_login_finalize().
+      $this->container->get('session')->set('uid', $account->id());
+    }
+  }
 
   /**
    * Retrieves a Drupal path.
@@ -85,6 +165,8 @@ trait HttpKernelUiHelperTrait {
 
     $session->visit($path);
 
+    $this->resetStatics();
+
     $out = $session->getPage()->getContent();
     $this->content = $out;
 
@@ -126,6 +208,96 @@ trait HttpKernelUiHelperTrait {
     // Use static::drupalGet() rather than the click() method on the element,
     // because that will not produce HTML debug output.
     $this->drupalGet($links[$index]->getAttribute('href'));
+  }
+
+  /**
+   * Fills and submits a form.
+   *
+   * This is not named 'submitForm' as that prevents Kernel test classes from
+   * behaving as form classes.
+   *
+   * @param array $edit
+   *   Field data in an associative array. Changes the current input fields
+   *   (where possible) to the values indicated.
+   *
+   *   A checkbox can be set to TRUE to be checked and should be set to FALSE to
+   *   be unchecked.
+   * @param string $submit
+   *   Value of the submit button whose click is to be emulated. For example,
+   *   'Save'. The processing of the request depends on this value. For example,
+   *   a form may have one button with the value 'Save' and another button with
+   *   the value 'Delete', and execute different code depending on which one is
+   *   clicked.
+   * @param string $form_html_id
+   *   (optional) HTML ID of the form to be submitted. On some pages
+   *   there are many identical forms, so just using the value of the submit
+   *   button is not enough. For example: 'trigger-node-presave-assign-form'.
+   *   Note that this is not the Drupal $form_id, but rather the HTML ID of the
+   *   form, which is typically the same thing but with hyphens replacing the
+   *   underscores.
+   */
+  protected function drupalSubmitForm(array $edit, $submit, $form_html_id = NULL): void {
+    $assert_session = $this->assertSession();
+    $submit_button = $assert_session->buttonExists($submit);
+    // Check if button has a form attribute set.
+    if ($form_id = $submit_button->getAttribute('form')) {
+      $form = $assert_session->elementExists('xpath', "//form[@id='$form_id']");
+      $action = $form->getAttribute('action');
+    }
+    // Get the form.
+    elseif (isset($form_html_id)) {
+      $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
+      $submit_button = $assert_session->buttonExists($submit, $form);
+      $action = $form->getAttribute('action');
+    }
+    else {
+      $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
+      $action = $form->getAttribute('action');
+    }
+
+    // Edit the form values.
+    foreach ($edit as $name => $value) {
+      $field = $assert_session->fieldExists($name, $form);
+
+      $value = match ($field->getAttribute('type')) {
+        // Provide support for the values '1' and '0' for checkboxes instead of
+        // TRUE and FALSE.
+        // @todo Get rid of supporting 1/0 by converting all tests cases using
+        // this to boolean values.
+        'checkbox' => (bool) $value,
+        // Mink only allows strings for text, number and radio button values.
+        'text', 'number', 'radio' => (string) $value,
+        default => $value,
+      };
+
+      $field->setValue($value);
+    }
+
+    // Submit form.
+    $submit_button->press();
+
+    $this->resetStatics();
+
+    // Log only for WebDriverTestBase tests because for tests using
+    // DrupalTestBrowser we log with ::getResponseLogHandler.
+    if ($this->htmlOutputEnabled) {
+      $out = $this->getSession()->getPage()->getContent();
+      $html_output = 'POST request to: ' . $action .
+        '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr />' . $out;
+      $html_output .= $this->getHtmlOutputHeaders();
+      $this->htmlOutput($html_output);
+    }
+  }
+
+  /**
+   * Resets variables which would normally be fresh in a new request.
+   *
+   * This must be called after each request to the HttpKernelBrowser browser.
+   */
+  protected function resetStatics(): void {
+    Html::resetSeenIds();
+    \Drupal::service('entity.memory_cache')->deleteAll();
   }
 
   /**
