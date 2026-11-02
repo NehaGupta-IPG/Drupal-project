@@ -49,13 +49,6 @@ class NullNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    return ['type' => 'null'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getSupportedTypes(?string $format): array {
     return $this->supportedTypes;
   }
