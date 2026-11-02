@@ -3,6 +3,7 @@
 namespace Drupal\image\Hook;
 
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
@@ -14,6 +15,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
+use Drupal\image\ImageStyleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
@@ -26,6 +28,8 @@ class ImageHooks {
   public function __construct(
     #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
     protected readonly \Closure $imageDerivativeUtilitiesClosure,
+    #[AutowireServiceClosure(ImageFactory::class)]
+    protected readonly \Closure $imageFactoryClosure,
   ) {}
 
   /**
@@ -301,6 +305,32 @@ class ImageHooks {
     // Remove the default image when the instance is deleted.
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
       \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_prepare_form() for 'image_style'.
+   *
+   * Help site builders to use modern image formats by adding a WebP
+   * conversion effect to new image styles by default, if the image toolkit
+   * supports WebP.
+   *
+   * Note that hook_ENTITY_TYPE_create() is intentionally not being used to
+   * allow programmatic creation of image styles with other defaults.
+   */
+  #[Hook('image_style_prepare_form')]
+  public function imageStylePrepareForm(ImageStyleInterface $style, string $operation): void {
+    if ($operation === 'add'
+      && $style->getEffects()->count() === 0
+      && in_array('webp', ($this->imageFactoryClosure)()->getSupportedExtensions(), TRUE)
+    ) {
+      $style->addImageEffect([
+        'id' => 'image_convert',
+        'weight' => 0,
+        'data' => [
+          'extension' => 'webp',
+        ],
+      ]);
     }
   }
 
