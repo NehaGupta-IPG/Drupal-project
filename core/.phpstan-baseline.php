@@ -704,12 +704,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Gettext/PoStreamReader.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$log_vars might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Gettext/PoStreamReader.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Gettext\\\\PoStreamWriter\\:\\:close\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
