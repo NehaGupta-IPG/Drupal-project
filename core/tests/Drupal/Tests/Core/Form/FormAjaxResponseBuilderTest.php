@@ -7,16 +7,19 @@ namespace Drupal\Tests\Core\Form;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Form\FormAjaxResponseBuilder;
+use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\MainContent\MainContentRendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Utility\CallableResolver;
+use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -56,6 +59,33 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
     $this->routeMatch = $this->createStub(RouteMatchInterface::class);
     $this->callableResolver = $this->createStub(CallableResolver::class);
     $this->formAjaxResponseBuilder = new FormAjaxResponseBuilder($this->renderer, $this->routeMatch, $this->callableResolver);
+  }
+
+  /**
+   * Rejects opening or returning to an expired calling form.
+   */
+  public function testExpiredCallingForm(): void {
+    $container = new ContainerBuilder();
+    $container->set('form_builder', $this->createStub(FormBuilder::class));
+    \Drupal::setContainer($container);
+    $this->renderer->expects($this->never())->method('renderResponse');
+    foreach (['openDialog', 'ajaxSubmit'] as $method) {
+      $state = new FormState();
+      $state->set('form_parent', 'expired-form');
+      $state->setTriggeringElement([
+        '#id' => 'open',
+        '#url' => Url::fromRoute('ajax_test.dialog_child'),
+      ]);
+      $form = ['#build_id' => 'expired-form'];
+      try {
+        $this->formAjaxResponseBuilder->$method($form, $state, new Request());
+        $this->fail('The expired calling form was accepted.');
+      }
+      catch (HttpException $e) {
+        $this->assertSame(400, $e->getStatusCode());
+        $this->assertSame('The calling form is no longer available.', $e->getMessage());
+      }
+    }
   }
 
   /**

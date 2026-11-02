@@ -26,14 +26,22 @@ trait AjaxFormHelperTrait {
    *   successful submission.
    */
   public function ajaxSubmit(array &$form, FormStateInterface $form_state) {
-    if ($form_state->hasAnyErrors()) {
+    if ($form_state->hasAnyErrors() || $form_state->isRebuilding()) {
       $form['status_messages'] = [
         '#type' => 'status_messages',
         '#weight' => -1000,
       ];
       $form['#sorted'] = FALSE;
       $response = new AjaxResponse();
-      $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
+
+      // If a wrapper is configured, let Form API use it to replace the form.
+      // Rebuilding may change the form's selector, so the new selector may no
+      // longer match the form that is still displayed in the browser.
+      $wrapper = $form_state->getTriggeringElement()['#ajax']['wrapper'] ?? NULL;
+      $selector = is_string($wrapper) && $wrapper !== ''
+        ? NULL
+        : '[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]';
+      $response->addCommand(new ReplaceCommand($selector, $form));
     }
     else {
       $response = $this->successfulAjaxSubmit($form, $form_state);

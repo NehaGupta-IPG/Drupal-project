@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -714,6 +715,17 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   public function prepareForm($form_id, &$form, FormStateInterface &$form_state) {
     $user = $this->currentUser();
 
+    // The calling form can supply defaults for the form it opens. Retrieve
+    // these from its cached state, keeping any properties the opened form
+    // has already set. Retain the relationship for subsequent rebuilds.
+    if ($parent_build_id = $form_state->get('form_parent') ?? $form_state->getUserInput()['form_parent'] ?? NULL) {
+      $parent_state = new FormState();
+      if (!$this->getCache($parent_build_id, $parent_state)) {
+        throw new BadRequestHttpException('The calling form is no longer available.');
+      }
+      $form_state->set('form_parent', $parent_build_id)->setCached();
+      $form += $parent_state->get('form_defaults') ?? [];
+    }
     $form['#type'] = 'form';
 
     // Only update the action if it is not already set.
@@ -1061,6 +1073,15 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (!empty($element['#description'])) {
       $element['#attributes']['aria-describedby'] = $element['#id'] . '--description';
     }
+    // Apply the form's AJAX settings to submit buttons that have none of
+    // their own. Unless a wrapper is configured, replace the whole form.
+    if (!empty($element['#executes_submit_callback']) && !isset($element['#ajax'])) {
+      $complete_form = &$form_state->getCompleteForm();
+      if (!empty($complete_form['#ajax'])) {
+        $element['#ajax'] = $complete_form['#ajax'] + ['wrapper' => $complete_form['#id']];
+      }
+    }
+
     // Handle input elements.
     if (!empty($element['#input'])) {
       $this->handleInputElement($form_id, $element, $form_state);
