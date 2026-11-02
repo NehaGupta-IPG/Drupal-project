@@ -137,9 +137,18 @@ class InlineBlockTest extends InlineBlockTestBase {
 
     $this->drupalGet('node/1/layout');
     $this->addInlineBlockToLayout('Block title', 'The block body');
+    // In our case it should be AJAX call.
     $page->pressButton($no_save_button_text);
+    $assert_session->assertWaitOnAjaxRequest();
     if ($confirm_button_text) {
-      $page->pressButton($confirm_button_text);
+      // Wait loading modal dialog and find buttons panel.
+      $button_pane = $assert_session->waitForElementVisible('css', 'div.ui-dialog-buttonpane');
+
+      // Press the button.
+      $button_pane->pressButton($confirm_button_text);
+
+      $assert_session->assertWaitOnAjaxRequest();
+
     }
     $this->drupalGet('node/1');
     $this->assertEmpty($this->blockStorage->loadMultiple(), 'No entity blocks were created when layout changes are discarded.');
@@ -162,8 +171,15 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->configureInlineBlock('The block body', 'The block updated body');
 
     $page->pressButton($no_save_button_text);
+    $assert_session->assertWaitOnAjaxRequest();
     if ($confirm_button_text) {
-      $page->pressButton($confirm_button_text);
+      // Wait loading modal dialog and find buttons panel.
+      $button_pane = $assert_session->waitForElementVisible('css', 'div.ui-dialog-buttonpane');
+
+      // Press the button.
+      $button_pane->pressButton($confirm_button_text);
+
+      $assert_session->assertWaitOnAjaxRequest();
     }
     $this->drupalGet('node/1');
 
