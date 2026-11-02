@@ -538,7 +538,7 @@ function &batch_get() {
  *
  * @param array $batch
  *   The batch array.
- * @param string $set_id
+ * @param int $set_id
  *   The id of the set to process.
  */
 function _batch_populate_queue(&$batch, $set_id): void {
