@@ -210,6 +210,14 @@ class FormHelper {
     // use #wrapper_attributes.
     $key = (($elements['#markup'] ?? FALSE) === '' && ($elements['#input'] ?? FALSE) === TRUE) ? '#wrapper_attributes' : '#attributes';
     $elements[$key]['data-drupal-states'] = Json::encode($elements['#states']);
+    if (isset($elements['#initial_state'])) {
+      if ($elements['#initial_state'] == 'hidden') {
+        $elements[$key]['data-drupal-initially-hidden'] = TRUE;
+      }
+      if ($elements['#initial_state'] == 'expanded') {
+        $elements[$key]['open'] = TRUE;
+      }
+    }
   }
 
 }

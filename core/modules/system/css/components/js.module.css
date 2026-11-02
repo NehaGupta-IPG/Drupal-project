@@ -13,4 +13,7 @@
   .js-hide {
     display: none !important;
   }
+  [data-drupal-initially-hidden]:not([data-once*="states"]) {
+    display: none;
+  }
 }

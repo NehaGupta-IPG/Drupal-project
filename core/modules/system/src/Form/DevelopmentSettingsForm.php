@@ -84,6 +84,7 @@ class DevelopmentSettingsForm extends FormBase {
       '#states' => [
         'visible' => $twig_development_state_conditions,
       ],
+      '#initial_state' => $twig_debug || $twig_cache_disable ? 'visible' : 'hidden',
     ];
     $form['twig_development']['twig_debug'] = [
       '#type' => 'checkbox',
