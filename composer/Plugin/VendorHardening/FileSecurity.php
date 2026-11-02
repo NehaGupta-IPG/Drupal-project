@@ -124,7 +124,7 @@ EOF;
     // Try to write the file. This can fail if concurrent requests are both
     // trying to write a the same time.
     if (@file_put_contents($file_path, $contents)) {
-      return @chmod($file_path, 0444);
+      return @chmod($file_path, 0440);
     }
     return FALSE;
   }
