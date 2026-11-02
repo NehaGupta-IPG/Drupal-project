@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Module implementation file.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function jsonapi_translation_help($route_name): ?string {
+  switch ($route_name) {
+    case 'help.page.jsonapi_translation':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The JSON:API Translation module adds multilingual and translations support to the JSON:API module. For more information, see the <a href=":docs">online documentation for the JSON:API Translation module</a>.', [
+        // @todo Create documentation page.
+        ':docs' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/translations',
+      ]) . '</p>';
+      return $output;
+  }
+  return NULL;
+}
