@@ -34,6 +34,8 @@
           if (date) {
             return Drupal.t('Authored on @date', { '@date': date });
           }
+
+          return '';
         });
     },
   };
