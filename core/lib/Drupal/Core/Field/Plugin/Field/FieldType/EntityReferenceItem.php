@@ -320,7 +320,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    */
   public function isEmpty() {
     // Avoid loading the entity by first checking the 'target_id'.
-    if ($this->target_id !== NULL) {
+    if (is_numeric($this->target_id) || !empty($this->target_id)) {
       return FALSE;
     }
     if ($this->entity && $this->entity instanceof EntityInterface) {
