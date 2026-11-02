@@ -400,7 +400,12 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @return $this
    */
   public function merge(Attribute $collection) {
-    $merged_attributes = NestedArray::mergeDeep($this->toArray(), $collection->toArray());
+    $selfArray = $this->toArray();
+    $otherArray = $collection->toArray();
+
+    // Ensure arrays are preserved.
+    AttributeHelper::matchCollectionsTypes($selfArray, $otherArray);
+    $merged_attributes = NestedArray::mergeDeep($selfArray, $otherArray);
     foreach ($merged_attributes as $name => $value) {
       $this->storage[$name] = $this->createAttributeValue($name, $value);
     }
