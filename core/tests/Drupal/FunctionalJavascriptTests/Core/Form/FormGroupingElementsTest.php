@@ -139,6 +139,57 @@ class FormGroupingElementsTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests aria-expanded reflects the correct state after toggling details.
+   */
+  public function testDetailsAriaExpandedOnToggle(): void {
+    $this->drupalGet('form-test/group-details');
+
+    $session = $this->getSession();
+    $page = $session->getPage();
+    $assert_session = $this->assertSession();
+    $summary = $page->find('css', '#edit-meta > summary');
+
+    // Ensure the details starts closed.
+    $session->executeScript("document.querySelector('#edit-meta').removeAttribute('open')");
+
+    // Click to open.
+    $summary->click();
+    $assert_session->waitForElementVisible('css', '#edit-meta[open]');
+    $this->assertSame('true', $summary->getAttribute('aria-expanded'));
+
+    // Click to close.
+    $summary->click();
+    $session->wait(5000, "!document.querySelector('#edit-meta').hasAttribute('open')");
+    $this->assertSame('false', $summary->getAttribute('aria-expanded'));
+  }
+
+  /**
+   * Tests aria-expanded reflects the correct state after keyboard toggle.
+   */
+  public function testDetailsAriaExpandedOnKeyboardToggle(): void {
+    $this->drupalGet('form-test/group-details');
+
+    $session = $this->getSession();
+    $page = $session->getPage();
+    $assert_session = $this->assertSession();
+    $summary = $page->find('css', '#edit-meta > summary');
+
+    // Ensure the details starts closed.
+    $session->executeScript("document.querySelector('#edit-meta').removeAttribute('open')");
+
+    // Focus the summary and press Space to open.
+    $summary->focus();
+    $summary->keyPress(32);
+    $assert_session->waitForElementVisible('css', '#edit-meta[open]');
+    $this->assertSame('true', $summary->getAttribute('aria-expanded'));
+
+    // Press Space again to close.
+    $summary->keyPress(32);
+    $session->wait(5000, "!document.querySelector('#edit-meta').hasAttribute('open')");
+    $this->assertSame('false', $summary->getAttribute('aria-expanded'));
+  }
+
+  /**
    * Confirms tabs containing a field with a validation error are open.
    */
   public function testVerticalTabValidationVisibility(): void {
