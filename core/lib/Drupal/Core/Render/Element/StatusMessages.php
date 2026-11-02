@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 
@@ -50,8 +51,12 @@ class StatusMessages extends RenderElementBase {
    *   The updated renderable array containing the placeholder.
    */
   public static function generatePlaceholder(array $element) {
+    // Add a random string to the lazy builder callback to make each
+    // message area unique. This will prevent the same messages from being
+    // rendered more than once when a page contains multiple status
+    // message elements.
     $build = [
-      '#lazy_builder' => [static::class . '::renderMessages', [$element['#display']]],
+      '#lazy_builder' => [static::class . '::renderMessages', [$element['#display'], (new Random())->string()]],
       '#create_placeholder' => TRUE,
       // Prevent this placeholder being handled by big pipe. Messages are
       // very quick to render and this allows pages without other placeholders
