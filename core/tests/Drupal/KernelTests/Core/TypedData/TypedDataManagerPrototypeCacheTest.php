@@ -77,9 +77,9 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   /**
    * Tests Map cached as prototype does not collide with a scalar property.
    *
-   * Variant 1: When the first Map defines a property as a nested Map and the
-   * second Map defines the same property name as a string, accessing the
-   * property on the second Map should return StringData, not a Map prototype.
+   * When the first Map defines a property as a nested Map and the second Map
+   * defines the same property name as a string, accessing the property on the
+   * second Map should return StringData, not a Map prototype.
    */
   public function testMapPropertyTypeCollision(): void {
     // Map A: 'title' is a nested Map.
@@ -104,9 +104,9 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   /**
    * Tests different scalar types do not collide in the prototype cache.
    *
-   * Variant 2: When the first Map defines a property as a string and the
-   * second defines the same property name as an integer, the second should
-   * return IntegerData, not StringData.
+   * When the first Map defines a property as a string and the second defines
+   * the same property name as an integer, the second should return
+   * IntegerData, not StringData.
    */
   public function testMapPropertyScalarTypeCollision(): void {
     // Map A: 'count' is a string.
@@ -131,9 +131,9 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   /**
    * Tests constraints are not silently dropped due to prototype caching.
    *
-   * Variant 3: When the first Map defines a property with no constraints and
-   * the second defines the same property name with a constraint, validation on
-   * the second must still enforce the constraint.
+   * When the first Map defines a property with no constraints and the second
+   * defines the same property name with a constraint, validation on the second
+   * must still enforce the constraint.
    */
   public function testMapPropertyConstraintsDropped(): void {
     // Map A: 'email' is a string with NO constraints.
@@ -161,9 +161,9 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   /**
    * Tests constraints do not leak from one Map to another via the cache.
    *
-   * Variant 4: When the first Map defines a property with constraints and the
-   * second defines the same property name without constraints, validation on
-   * the second must not enforce the first Map's constraints.
+   * When the first Map defines a property with constraints and the second
+   * defines the same property name without constraints, validation on the
+   * second must not enforce the first Map's constraints.
    */
   public function testMapPropertyConstraintsLeaked(): void {
     // Map C: 'name' has a Length(max: 5) constraint.
@@ -188,11 +188,11 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   }
 
   /**
-   * Tests List item constraints are not dropped/leaked via prototype caching.
+   * Tests List item constraints are not dropped due to prototype caching.
    *
-   * Variant 5: Two ListDataDefinition instances with the same item type but
-   * different item constraints should not share a prototype — the first list's
-   * constraint state must not win for the second list.
+   * When the first list has string items with no constraints and the second
+   * has string items with a constraint, validating an item of the second list
+   * must still enforce the constraint.
    */
   public function testListItemConstraintsDropped(): void {
     // List A: unconstrained string items.
