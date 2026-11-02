@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\media\MediaForm;
 use Drupal\media\MediaInterface;
@@ -112,6 +113,13 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   use StringTranslationTrait;
 
   /**
+   * Force media item metadata update.
+   *
+   * @var bool
+   */
+  protected bool $forceMetadataUpdate = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getName() {
@@ -170,15 +178,23 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *   The updated media item.
    *
    * @internal
-   *
-   * @todo There has been some disagreement about how to handle updates to
-   *   thumbnails. We need to decide on what the API will be for this.
-   *   https://www.drupal.org/node/2878119
    */
   protected function updateThumbnail($from_queue = FALSE) {
-    $this->thumbnail->target_id = $this->loadThumbnail($this->getThumbnailUri($from_queue))->id();
+    $thumbnail_uri = $this->getThumbnailUri($from_queue);
+    // An enforced update must not keep pointing at a thumbnail whose file has
+    // gone missing; fall back to the default thumbnail instead.
+    if ($this->forceMetadataUpdate && !empty($thumbnail_uri) && !file_exists($thumbnail_uri)) {
+      $thumbnail_uri = NULL;
+    }
+    $this->thumbnail->target_id = $this->loadThumbnail($thumbnail_uri)->id();
     $this->thumbnail->width = $this->getThumbnailWidth($from_queue);
     $this->thumbnail->height = $this->getThumbnailHeight($from_queue);
+
+    // Only flush derivatives when the source returned a thumbnail URI.
+    // loadThumbnail() uses the default thumbnail when this value is empty.
+    if (!empty($thumbnail_uri)) {
+      \Drupal::service(ImageDerivativeUtilities::class)->pathFlush($thumbnail_uri);
+    }
 
     // Set the thumbnail alt.
     $media_source = $this->getSource();
@@ -275,7 +291,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     if ($thumbnails_queued && $this->isNew()) {
       return $this->getDefaultThumbnailUri();
     }
-    elseif ($thumbnails_queued && !$from_queue) {
+    elseif ($thumbnails_queued && !$from_queue && !$this->forceMetadataUpdate) {
       return $this->get('thumbnail')->entity->getFileUri();
     }
 
@@ -362,8 +378,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function shouldUpdateThumbnail($is_new = FALSE) {
     // Update thumbnail if we don't have a thumbnail yet or when the source
-    // field value changes.
-    return !$this->get('thumbnail')->entity || $is_new || $this->hasSourceFieldChanged();
+    // field value changed or when it was enforced.
+    return $is_new || $this->forceMetadataUpdate || !$this->get('thumbnail')->entity || $this->hasSourceFieldChanged();
   }
 
   /**
@@ -391,11 +407,15 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     foreach ($this->translations as $langcode => $data) {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
-        if ($translation->bundle->entity->thumbnailDownloadsAreQueued() && $translation->shouldUpdateThumbnail($is_new)) {
+        // An enforced update already replaced the thumbnail in prepareSave().
+        if (!$this->forceMetadataUpdate && $translation->bundle->entity->thumbnailDownloadsAreQueued() && $translation->shouldUpdateThumbnail($is_new)) {
           \Drupal::queue('media_entity_thumbnail')->createItem(['id' => $translation->id()]);
         }
+        $translation->forceMetadataUpdate = FALSE;
       }
     }
+    // The enforced update applies to this save only.
+    $this->forceMetadataUpdate = FALSE;
   }
 
   /**
@@ -443,50 +463,94 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       );
     }
 
+    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
+      $translation = $this->getTranslation($langcode);
+      // Translation objects carry their own copy of the flag, which the
+      // thumbnail and source plugin code read.
+      $translation->forceMetadataUpdate = $this->forceMetadataUpdate;
+
+      // Set fields provided by the media source and mapped in the media type
+      // config.
+      $this->updateMappedMetadata($translation, $this->forceMetadataUpdate);
+
+      // Try to set a default name for this media item if no name is provided.
+      if ($translation->get('name')->isEmpty()) {
+        $translation->setName($translation->getName());
+      }
+
+      // Set thumbnail.
+      if ($translation->shouldUpdateThumbnail($this->isNew())) {
+        $translation->updateThumbnail();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function enforceMetadataUpdate(): static {
+    $this->forceMetadataUpdate = TRUE;
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isMetadataUpdateEnforced(): bool {
+    return $this->forceMetadataUpdate;
+  }
+
+  /**
+   * Maps metadata values into entity field values.
+   *
+   * @param \Drupal\media\MediaInterface $translation
+   *   The media translation we are updating.
+   * @param bool $overwrite_existing
+   *   (optional) If TRUE, metadata values will always be copied into mapped
+   *   field values. If FALSE, values will be copied only if the mapped field is
+   *   empty or if the media source field changed. Defaults to FALSE.
+   */
+  protected function updateMappedMetadata(MediaInterface $translation, $overwrite_existing = FALSE): void {
     $media_source = $this->getSource();
-    foreach ($this->translations as $langcode => $data) {
-      if ($this->hasTranslation($langcode)) {
-        $translation = $this->getTranslation($langcode);
-        // Try to set fields provided by the media source and mapped in
-        // media type config.
-        $original = $this->getOriginal();
-        foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
-          if (!$translation->hasField($entity_field_name)) {
-            continue;
-          }
-          $set_metadata = FALSE;
-          // Only save value in the entity if the field is empty, or if the
-          // source field changed from one non-empty value to another non-empty
-          // value.
-          // 1st scenario: field is empty, safely store metadata there.
-          if ($translation->get($entity_field_name)->isEmpty()) {
-            $set_metadata = TRUE;
-          }
-          else {
-            // 2nd scenario: field is not empty, but the source field has
-            // changed between two non-empty values.
-            $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
-            $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
-            if (!$original_source_field_empty &&
-                !$new_source_field_empty &&
-                $translation->hasSourceFieldChanged()) {
-              $set_metadata = TRUE;
-            }
-          }
-          if ($set_metadata) {
-            $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
-          }
+    $original = $this->getOriginal();
+    foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
+      if (!$translation->hasField($entity_field_name)) {
+        continue;
+      }
+      $set_metadata = FALSE;
+      // Populate the field value in one of these scenarios:
+      // - The caller asked for it explicitly.
+      // - The entity field is empty.
+      // - The source field changed from one non-empty value to another
+      //   non-empty value.
+      if ($overwrite_existing) {
+        // 1st scenario: explicitly set the metadata.
+        $set_metadata = TRUE;
+      }
+      elseif ($translation->get($entity_field_name)->isEmpty()) {
+        // 2nd scenario: field is empty, safely store metadata there.
+        $set_metadata = TRUE;
+      }
+      else {
+        // 3rd scenario: field is not empty, but the source field has
+        // changed between two non-empty values.
+        $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
+        $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
+        if (!$original_source_field_empty &&
+          !$new_source_field_empty &&
+          $translation->hasSourceFieldChanged()) {
+          $set_metadata = TRUE;
         }
-
-        // Try to set a default name for this media item if no name is provided.
-        if ($translation->get('name')->isEmpty()) {
-          $translation->setName($translation->getName());
+      }
+      if ($set_metadata) {
+        $value = $media_source->getMetadata($translation, $metadata_attribute_name);
+        // Never let an enforced update erase a stored value because the source
+        // is missing or unavailable and returned nothing.
+        if ($overwrite_existing && $value === NULL && !$translation->get($entity_field_name)->isEmpty()) {
+          continue;
         }
-
-        // Set thumbnail.
-        if ($translation->shouldUpdateThumbnail($this->isNew())) {
-          $translation->updateThumbnail();
-        }
+        $translation->set($entity_field_name, $value);
       }
     }
   }

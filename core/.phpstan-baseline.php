@@ -17828,24 +17828,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/src/Plugin/views/filter/Status.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\FieldFormatter\\\\OEmbedFormatterTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/FieldFormatter/OEmbedFormatterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\FieldFormatter\\\\OEmbedFormatterTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/FieldFormatter/OEmbedFormatterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\FieldFormatter\\\\OEmbedFormatterTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/FieldFormatter/OEmbedFormatterTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
@@ -17858,46 +17840,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Functional/MediaTranslationUITest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\ResourceFetcherTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/ResourceFetcherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\ResourceFetcherTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/ResourceFetcherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\ResourceFetcherTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/ResourceFetcherTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaResourceTestBase\\:\\:uploadFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\UrlResolverTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/UrlResolverTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\UrlResolverTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/UrlResolverTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\UrlResolverTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/UrlResolverTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaEmbedFilterTestBase\\:\\:showHiddenFields\\(\\) has no return type specified\\.$#',
@@ -17918,24 +17864,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaJavascriptTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaSourceOEmbedVideoTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaSourceOEmbedVideoTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaSourceOEmbedVideoTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaSourceOEmbedVideoTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaSourceOEmbedVideoTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaSourceOEmbedVideoTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaSourceTestBase\\:\\:createMediaTypeField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17952,24 +17880,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaSourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaStandardProfileTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaStandardProfileTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaStandardProfileTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaStandardProfileTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\FunctionalJavascript\\\\MediaStandardProfileTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/FunctionalJavascript/MediaStandardProfileTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Kernel\\\\MediaEmbedFilterTestBase\\:\\:assertHasAttributes\\(\\) has no return type specified\\.$#',
@@ -18278,24 +18188,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/MediaLibraryTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\WidgetOEmbedTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/WidgetOEmbedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\WidgetOEmbedTest\\:\\:lockHttpClientToFixtures\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/WidgetOEmbedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media_library\\\\FunctionalJavascript\\\\WidgetOEmbedTest\\:\\:useFixtureProviders\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media_library/tests/src/FunctionalJavascript/WidgetOEmbedTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_link_content\\\\Entity\\\\MenuLinkContent\\:\\:postSave\\(\\) has no return type specified\\.$#',

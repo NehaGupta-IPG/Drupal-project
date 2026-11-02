@@ -2,12 +2,14 @@
 
 namespace Drupal\media;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -157,6 +159,23 @@ class MediaListBuilder extends EntityListBuilder {
       $query->pager($this->limit);
     }
     return $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL): array {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
+    if ($entity->access('update')) {
+      $operations['update_metadata'] = [
+        'title' => $this->t('Refresh'),
+        'url' => $this->ensureDestination(new Url('media.update_metadata', [
+          'media' => $entity->id(),
+        ])),
+        'weight' => 150,
+      ];
+    }
+    return $operations;
   }
 
 }

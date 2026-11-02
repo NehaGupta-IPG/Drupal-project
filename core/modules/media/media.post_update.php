@@ -5,6 +5,8 @@
  * Post update functions for Media.
  */
 
+use Drupal\system\Entity\Action;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -20,4 +22,19 @@ function media_removed_post_updates(): array {
     'media_post_update_remove_mappings_targeting_source_field' => '11.0.0',
     'media_post_update_media_author_views_filter_update' => '12.0.0',
   ];
+}
+
+/**
+ * Install the 'Refresh from source' media action.
+ */
+function media_post_update_install_update_metadata_action(): void {
+  if (!Action::load('media_update_metadata')) {
+    Action::create([
+      'id' => 'media_update_metadata',
+      'label' => 'Refresh from source',
+      'type' => 'media',
+      'plugin' => 'media_update_metadata',
+    ])
+      ->save();
+  }
 }
