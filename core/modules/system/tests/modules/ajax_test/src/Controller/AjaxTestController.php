@@ -456,6 +456,44 @@ class AjaxTestController {
   }
 
   /**
+   * Returns an empty response with the given HTTP status code.
+   *
+   * @param int $code
+   *   HTTP status code.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   */
+  public function httpStatus(int $code): Response {
+    return new Response('', $code);
+  }
+
+  /**
+   * Provides an Ajax link that targets a bare HTTP error response.
+   *
+   * @param int $code
+   *   HTTP status code for the Ajax request target.
+   *
+   * @return array
+   *   The Ajax link render array.
+   */
+  public function httpStatusLink(int $code): array {
+    return [
+      '#type' => 'link',
+      '#url' => Url::fromRoute('ajax_test.http_status', ['code' => $code]),
+      '#title' => 'Ajax HTTP status',
+      '#attributes' => [
+        'class' => ['use-ajax'],
+      ],
+      '#attached' => [
+        'library' => [
+          'core/drupal.ajax',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Provides an Ajax link used with different HTTP methods.
    *
    * @return array
