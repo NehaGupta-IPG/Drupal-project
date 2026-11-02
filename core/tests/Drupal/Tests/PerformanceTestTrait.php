@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Behat\Mink\Driver\Selenium2Driver;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
@@ -128,10 +129,30 @@ trait PerformanceTestTrait {
     }
 
     $session = $this->getSession();
-    $session->getDriver()->getWebDriverSession()->log('performance');
     $collection->deleteAll();
-    $return = $callable();
-    $performance_data = $this->processChromeDriverPerformanceLogs($service_name);
+    $performance_data = new PerformanceData();
+    // Handle situations where this trait is used without Selenium2Driver.
+    // For example, in a Functional test with the BrowserKitDriver.
+    if ($session->getDriver() instanceof Selenium2Driver) {
+      // Call to clear out the logs before starting.
+      $session->getDriver()->getWebDriverSession()->log('performance');
+      $return = $callable();
+      $this->processChromeDriverPerformanceLogs($performance_data, $service_name);
+    }
+    else {
+      $return = $callable();
+      // Wait until the recorded data stops changing.
+      $previous = NULL;
+      for ($attempts = 0; $attempts < 10; $attempts++) {
+        $current = $collection->get('performance_test_data');
+        if ($current && $current == $previous) {
+          break;
+        }
+        $previous = $current;
+        sleep(1);
+      }
+    }
+
     if (isset($return)) {
       $performance_data->setReturnValue($return);
     }
@@ -281,6 +302,9 @@ trait PerformanceTestTrait {
       $args[':now'] = 'NOW';
       $args[':keys__0'] = 'KEY';
     }
+    elseif (str_starts_with($query, 'SELECT "name", "value" FROM "key_value_expire" WHERE "collection" =')) {
+      $args[':now'] = 'NOW';
+    }
 
     // Inline query arguments and log the query, reverse arguments to avoid
     // matches on placeholders with 2+ digits.
@@ -319,6 +343,8 @@ trait PerformanceTestTrait {
    *
    * @todo https://www.drupal.org/project/drupal/issues/3379757
    *
+   * @param \Drupal\Tests\PerformanceData $performance_data
+   *   An instance of the performance data value object.
    * @param string|null $service_name
    *   An optional human readable identifier so that traces can be grouped
    *   together.
@@ -326,7 +352,7 @@ trait PerformanceTestTrait {
    * @return \Drupal\Tests\PerformanceData
    *   An instance of the performance data value object.
    */
-  protected function processChromeDriverPerformanceLogs(?string $service_name): PerformanceData {
+  protected function processChromeDriverPerformanceLogs(PerformanceData $performance_data, ?string $service_name): PerformanceData {
     $attempts = 0;
     $lcp_count = 0;
     $request_count = 0;
@@ -369,7 +395,6 @@ trait PerformanceTestTrait {
       }
       sleep(1);
     }
-    $performance_data = new PerformanceData();
     $this->collectNetworkData($messages, $performance_data);
 
     if (isset($service_name)) {

@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\FunctionalTests;
+
+use Drupal\Core\Database\Database;
+use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\PerformanceTestTrait;
+
+/**
+ * Collects performance metrics.
+ *
+ * @ingroup testing
+ */
+abstract class PerformanceTestBase extends BrowserTestBase {
+  use PerformanceTestTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['performance_test'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->doSetUpTasks();
+    \Drupal::service('module_installer')->uninstall(['automated_cron']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareEnvironment(): void {
+    parent::prepareEnvironment();
+    $db = Database::getConnection();
+    $test_file_name = (new \ReflectionClass($this))->getFileName();
+    $is_core_test = str_starts_with($test_file_name, DRUPAL_ROOT . DIRECTORY_SEPARATOR . 'core');
+    if ($db->databaseType() !== 'mysql' && $is_core_test) {
+      $this->markTestSkipped('Drupal core performance tests only run on MySQL');
+    }
+  }
+
+}
