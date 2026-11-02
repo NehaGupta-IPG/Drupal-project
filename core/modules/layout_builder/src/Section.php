@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder;
 
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 use Drupal\Core\Render\Element;
 
@@ -84,11 +85,8 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
     $regions = [];
-    foreach ($this->getComponents() as $component) {
-      if ($output = $component->toRenderArray($contexts, $in_preview)) {
-        $regions[$component->getRegion()][$component->getUuid()] = $output;
-      }
-    }
+    $context = ['contexts' => $contexts, 'in_preview' => $in_preview];
+    $this->moduleHandler()->alter('layout_builder_section_regions_render_array', $regions, $this, $context);
 
     $layout = $this->getLayout($contexts);
     if ($layout instanceof PreviewAwarePluginInterface) {
@@ -100,6 +98,8 @@ class Section implements ThirdPartySettingsInterface {
     if (!Element::isEmpty($build) && isset($contexts['layout_builder.entity'])) {
       $build['#entity'] = $contexts['layout_builder.entity']->getContextValue();
     }
+
+    $this->moduleHandler()->alter('layout_builder_section_render_array', $build, $this, $context);
     return $build;
   }
 
@@ -332,6 +332,16 @@ class Section implements ThirdPartySettingsInterface {
       $component->setWeight($weight++);
     }
     return $this;
+  }
+
+  /**
+   * Wraps the module handler.
+   *
+   * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler.
+   */
+  protected function moduleHandler(): ModuleHandlerInterface {
+    return \Drupal::moduleHandler();
   }
 
   /**

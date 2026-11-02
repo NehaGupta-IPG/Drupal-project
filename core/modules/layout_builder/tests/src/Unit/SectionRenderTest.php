@@ -10,6 +10,7 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManagerInterface;
@@ -33,6 +34,19 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[CoversClass(Section::class)]
 #[Group('layout_builder')]
 class SectionRenderTest extends UnitTestCase {
+
+  /**
+   * Default cache metadata.
+   *
+   * @var array
+   */
+  const CACHE_DEFAULT = [
+    '#cache' => [
+      'contexts' => [],
+      'tags' => [],
+      'max-age' => -1,
+    ],
+  ];
 
   /**
    * The current user.
@@ -63,13 +77,6 @@ class SectionRenderTest extends UnitTestCase {
   protected $contextRepository;
 
   /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
-   */
-  protected $eventDispatcher;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -80,11 +87,23 @@ class SectionRenderTest extends UnitTestCase {
     $this->contextHandler = $this->prophesize(ContextHandlerInterface::class);
     $this->contextRepository = $this->prophesize(ContextRepositoryInterface::class);
     // @todo Refactor this into some better tests in https://www.drupal.org/node/2942605.
-    $this->eventDispatcher = (new \ReflectionClass(EventDispatcher::class))->newInstanceWithoutConstructor();
+    $event_dispatcher = (new \ReflectionClass(EventDispatcher::class))->newInstanceWithoutConstructor();
 
     $this->account = $this->prophesize(AccountInterface::class);
-    $subscriber = new BlockComponentRenderArray($this->account->reveal());
-    $this->eventDispatcher->addSubscriber($subscriber);
+    $component_subscriber = new BlockComponentRenderArray($this->account->reveal());
+    $event_dispatcher->addSubscriber($component_subscriber);
+
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler->method('alter')
+      ->willReturnCallback(function (string|array $hook, mixed &$data, mixed &$context1 = NULL, mixed &$context2 = NULL): void {
+        if ($hook === 'layout_builder_section_regions_render_array') {
+          foreach ($context1->getComponents() as $component) {
+            if ($output = $component->toRenderArray($context2['contexts'], $context2['in_preview'])) {
+              $data[$component->getRegion()][$component->getUuid()] = $output;
+            }
+          }
+        }
+      });
 
     $layout = $this->prophesize(LayoutInterface::class);
     $layout->getPluginDefinition()->willReturn(new LayoutDefinition([]));
@@ -97,7 +116,8 @@ class SectionRenderTest extends UnitTestCase {
     $container->set('plugin.manager.core.layout', $layout_plugin_manager->reveal());
     $container->set('context.handler', $this->contextHandler->reveal());
     $container->set('context.repository', $this->contextRepository->reveal());
-    $container->set('event_dispatcher', $this->eventDispatcher);
+    $container->set('event_dispatcher', $event_dispatcher);
+    $container->set('module_handler', $module_handler);
     \Drupal::setContainer($container);
   }
 
@@ -115,13 +135,8 @@ class SectionRenderTest extends UnitTestCase {
       '#base_plugin_id' => 'block_plugin_id',
       '#derivative_plugin_id' => NULL,
       'content' => $block_content,
-      '#cache' => [
-        'contexts' => [],
-        'tags' => [],
-        'max-age' => -1,
-      ],
       '#in_preview' => FALSE,
-    ];
+    ] + static::CACHE_DEFAULT;
 
     $block = $this->prophesize(BlockPluginInterface::class)->willImplement(PreviewFallbackInterface::class);
     $this->blockManager->createInstance('block_plugin_id', ['id' => 'block_plugin_id'])->willReturn($block->reveal());
@@ -169,13 +184,7 @@ class SectionRenderTest extends UnitTestCase {
     ];
     $expected = [
       'content' => [
-        'some_uuid' => [
-          '#cache' => [
-            'contexts' => [],
-            'tags' => [],
-            'max-age' => -1,
-          ],
-        ],
+        'some_uuid' => static::CACHE_DEFAULT,
       ],
     ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
@@ -258,13 +267,8 @@ class SectionRenderTest extends UnitTestCase {
       '#base_plugin_id' => 'block_plugin_id',
       '#derivative_plugin_id' => NULL,
       'content' => $block_content,
-      '#cache' => [
-        'contexts' => [],
-        'tags' => [],
-        'max-age' => -1,
-      ],
       '#in_preview' => FALSE,
-    ];
+    ] + static::CACHE_DEFAULT;
 
     $block = $this->prophesize(BlockPluginInterface::class)
       ->willImplement(ContextAwarePluginInterface::class)

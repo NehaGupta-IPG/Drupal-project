@@ -24,6 +24,7 @@ use Drupal\layout_builder\Form\DefaultsEntityForm;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplayStorage;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\LayoutOverrideFieldHelper;
+use Drupal\layout_builder\Section;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -413,6 +414,20 @@ class LayoutBuilderHooks {
     if (isset($element['#third_party_settings']['layout_builder']['view_mode'])) {
       // See system_theme_suggestions_field().
       $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'] . '__' . $element['#third_party_settings']['layout_builder']['view_mode'];
+    }
+  }
+
+  /**
+   * Implements hook_layout_builder_section_regions_render_array_alter().
+   *
+   * Builds the regions render array from the section components.
+   */
+  #[Hook('layout_builder_section_regions_render_array_alter')]
+  public function layoutBuilderSectionRegionsRenderArrayAlter(array &$regions, Section $section, array $context): void {
+    foreach ($section->getComponents() as $component) {
+      if ($output = $component->toRenderArray($context['contexts'], $context['in_preview'])) {
+        $regions[$component->getRegion()][$component->getUuid()] = $output;
+      }
     }
   }
 

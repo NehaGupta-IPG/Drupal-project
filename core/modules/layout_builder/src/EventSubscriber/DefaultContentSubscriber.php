@@ -32,7 +32,7 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Reacts before an entity is exported.
+   * Executes before an entity is exported.
    *
    * Adds an export callback for `layout_section` field items to ensure that
    * any referenced block content entities are marked as dependencies of the
