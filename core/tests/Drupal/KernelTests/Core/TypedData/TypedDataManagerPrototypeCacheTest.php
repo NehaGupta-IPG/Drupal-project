@@ -81,7 +81,7 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
    * second Map defines the same property name as a string, accessing the
    * property on the second Map should return StringData, not a Map prototype.
    */
-  public function testMapPropertyTypeCollisionThrowsException(): void {
+  public function testMapPropertyTypeCollision(): void {
     // Map A: 'title' is a nested Map.
     $map_a = MapDataDefinition::create('map');
     $map_a->setPropertyDefinition('title', MapDataDefinition::create('map'));
