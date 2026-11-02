@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
@@ -58,7 +59,7 @@ class DisplayKernelTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_display_defaults', 'test_view'];
+  public static $testViews = ['test_display_defaults', 'test_exposed_block', 'test_view'];
 
   /**
    * Tests the default display options.
@@ -115,6 +116,24 @@ class DisplayKernelTest extends ViewsKernelTestBase {
     $first = $display_handler->getPlugin('style');
     $second = $display_handler->getPlugin('style');
     $this->assertSame($first, $second, 'The same plugin instance was returned.');
+  }
+
+  /**
+   * Tests viewExposedFormBlocks() when the route name is NULL (e.g. 404 pages).
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3386085
+   */
+  public function testViewExposedFormBlocksNullRouteName(): void {
+    $route_match = $this->createMock(RouteMatchInterface::class);
+    $route_match->method('getRouteName')->willReturn(NULL);
+    $this->container->set('current_route_match', $route_match);
+
+    $view = Views::getView('test_exposed_block');
+    $view->setDisplay('page_1');
+
+    // This should not throw any deprecation or TypeError.
+    $view->display_handler->viewExposedFormBlocks();
+    $this->addToAssertionCount(1);
   }
 
   /**
