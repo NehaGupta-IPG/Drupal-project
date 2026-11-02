@@ -16,6 +16,7 @@ use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -294,7 +295,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests denormalizing serialized columns.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeSerializedItem(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessageIs('The generic FieldItemNormalizer cannot denormalize string values for "value" properties of the "serialized" field (field item class: Drupal\entity_test\Plugin\Field\FieldType\SerializedItem).');
     $this->serializer->denormalize([
@@ -310,7 +313,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests normalizing/denormalizing custom serialized columns.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeCustomSerializedItem(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $entity = EntitySerializedField::create(['serialized_text' => serialize(['Hello world!'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['Hello world!'], $normalized['serialized_text'][0]['value']);
@@ -329,7 +334,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests normalizing/denormalizing invalid custom serialized fields.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeInvalidCustomSerializedField(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $entity = EntitySerializedField::create(['serialized_long' => serialize(['Hello world!'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['Hello world!'], $normalized['serialized_long'][0]['value']);
@@ -348,7 +355,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests normalizing/denormalizing empty custom serialized fields.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeEmptyCustomSerializedField(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $entity = EntitySerializedField::create(['serialized_long' => serialize([])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals([], $normalized['serialized_long'][0]['value']);
@@ -361,7 +370,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests normalizing/denormalizing valid custom serialized fields.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeValidCustomSerializedField(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $entity = EntitySerializedField::create(['serialized_long' => serialize(['key' => 'value'])]);
     $normalized = $this->serializer->normalize($entity);
     $this->assertEquals(['key' => 'value'], $normalized['serialized_long'][0]['value']);
@@ -374,7 +385,9 @@ class EntitySerializationTest extends NormalizerTestBase {
   /**
    * Tests normalizing/denormalizing using string values.
    */
+  #[IgnoreDeprecations]
   public function testDenormalizeStringValue(): void {
+    $this->expectUserDeprecationMessage('Support for serialized_fields_property_names is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. Handle unserialization manually or switch to a JSON column. See https://www.drupal.org/project/drupal/issues/3603923');
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessageIs('The generic FieldItemNormalizer cannot denormalize string values for "value" properties of the "serialized_long" field (field item class: Drupal\Core\Field\Plugin\Field\FieldType\StringLongItem).');
     $this->serializer->denormalize([
