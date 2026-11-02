@@ -8,7 +8,8 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=8.5.0",
-        "masterminds/html5": "^2.7"
+        "masterminds/html5": "^2.7",
+        "symfony/validator": "^8.1"
     },
     "autoload": {
         "psr-4": {

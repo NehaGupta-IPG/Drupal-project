@@ -2,6 +2,10 @@
 
 namespace Drupal\Component\Utility;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
+
 /**
  * Helper class URL based methods.
  *
@@ -453,22 +457,25 @@ class UrlHelper {
    */
   public static function isValid($url, $absolute = FALSE) {
     if ($absolute) {
-      return (bool) preg_match("
-        /^                                                      # Start at the beginning of the text
-        (?:ftp|https?|feed):\/\/                                # Look for ftp, http, https or feed schemes
-        (?:                                                     # Userinfo (optional) which is typically
-          (?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*      # a username or a username and password
-          (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@          # combination
-        )?
-        (?:
-          (?:[a-z0-9\-\.]|%[0-9a-f]{2})+                        # A domain name or a IPv4 address
-          |(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\])         # or a well formed IPv6 address
-        )
-        (?::[0-9]+)?                                            # Server port number (optional)
-        (?:[\/|\?]
-          (?:[\w#!:\.\?\+=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})   # The path and query (optional)
-        *)?
-      $/xi", $url);
+      // Decode percent-encoded non-ASCII bytes and unreserved ASCII characters
+      // in the hostname for validation. Leave other escapes intact so encoded
+      // delimiters cannot change the URL structure. Do not decode user
+      // information, paths, or queries.
+      if (preg_match('~^[a-z][a-z0-9+.-]*://(?:[^/?#@]*@)?([^/?#:]+)~i', $url, $matches, PREG_OFFSET_CAPTURE)) {
+        [$host, $offset] = $matches[1];
+        $decoded_host = preg_replace_callback('/%[0-9a-f]{2}/i', static function (array $matches): string {
+          $decoded = rawurldecode($matches[0]);
+          return ord($decoded) >= 0x80 || preg_match('/[a-z0-9._~-]/i', $decoded) ? $decoded : $matches[0];
+        }, $host);
+        // Normalize Unicode domain separators only within the hostname.
+        $decoded_host = strtr($decoded_host, ['。' => '.', '．' => '.', '｡' => '.']);
+        $url = substr_replace($url, $decoded_host, $offset, strlen($host));
+      }
+      $violations = Validation::createValidator()->validate($url, [
+        new Url(protocols: ['http', 'https', 'ftp', 'feed'], requireTld: FALSE),
+        new NotBlank(),
+      ]);
+      return count($violations) === 0;
     }
     else {
       return (bool) preg_match("/^(?:[\w#!:\.\?\+=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})+$/i", $url);

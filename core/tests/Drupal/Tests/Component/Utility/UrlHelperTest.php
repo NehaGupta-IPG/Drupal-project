@@ -81,6 +81,8 @@ class UrlHelperTest extends TestCase {
   public static function providerTestValidAbsoluteData(): array {
     $urls = [
       'example.com',
+      'localhost',
+      'web',
       'www.example.com',
       'ex-ample.com',
       // cspell:disable-next-line
@@ -98,8 +100,77 @@ class UrlHelperTest extends TestCase {
       'john%20doe:secret:foo@example.org/',
       'example.org/~,$\'*;',
       'caf%C3%A9.example.org',
+      'caf%c3%a9.example.org',
+      'user:pass@caf%C3%A9.example.org:8080/path%2Fpart?value=%40#fragment',
       // cspell:ignore FEDC
       '[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html',
+      // The following test Universal Acceptance.
+      // @see https://uasg.tech/
+      'ua-test.link',
+      'ua-test.technology',
+      'www.example.com/',
+      // Strings within parenthesis without leading space char.
+      'www.example.com/strings_(string_within_parenthesis)',
+      // Numbers within parenthesis without leading space char.
+      'www.example.com/numbers_(9999)',
+      'www.example.com/?name=ferret&color=purple',
+      'www.example.com/page?name=ferret&color=purple',
+      'www.example.com?a=&b[]=c&d[]=e&d[]=f&h==',
+      'www.example.com#colors',
+      // Use the list of valid URLs from
+      // https://cran.r-project.org/web/packages/rex/vignettes/url_parsing.html.
+      "foo.com/blah_blah",
+      "foo.com/blah_blah/",
+      "foo.com/blah_blah_(wikipedia)",
+      "foo.com/blah_blah_(wikipedia)_(again)",
+      "✪df.ws/123",
+      "userid:password@example.com:8080",
+      "userid:password@example.com:8080/",
+      "userid@example.com",
+      "userid@example.com/",
+      "userid@example.com:8080",
+      "userid@example.com:8080/",
+      "userid:password@example.com",
+      "userid:password@example.com/",
+      "➡.ws/䨹",
+      "⌘.ws",
+      "⌘.ws/",
+      "foo.com/blah_(wikipedia)#cite-1",
+      "foo.com/blah_(wikipedia)_blah#cite-1",
+      "foo.com/unicode_(✪)_in_parens",
+      "foo.com/(something)?after=parens",
+      "code.google.com/events/#&product=browser",
+      "j.mp",
+      "foo.bar/baz",
+      "foo.bar/?q=Test%20URL-encoded%20stuff",
+      // @todo this URL should validate.
+      // "-.~_!$&'()*+,;=:%40:80%2f::::::@example.com",
+      "1337.net",
+      "a.b-c.de",
+      // cspell:disable
+      '普遍接受-测试.top',
+      'ua-test.世界',
+      '普遍接受-测试.世界',
+      '普遍接受-测试。世界',
+      '普遍接受-测试。世界/我的页面',
+      'ua-test.xn--rhqv96g',
+      'xn----f38am99bqvcd5liy1cxsg.top',
+      'xn----f38am99bqvcd5liy1cxsg.xn--rhqv96g',
+      'اختبار-القبولالعالمي.top',
+      'اختبار-القبولالعالمي.شبكة',
+      'ua-test.link/我的页面',
+      'ua-test.technology/我的页面',
+      '普遍接受-测试.top/我的页面',
+      'ua-test.世界/我的页面',
+      '普遍接受-测试.世界/我的页面',
+      'ختبار-القبولالعالمي.top/我的页面',
+      'اختبار-القبولالعالمي.شبكة/我的页面',
+      "www.example.com/wpstyle/?p=364",
+      "www.example.com/foo/?bar=baz&inga=42&quux",
+      "☺.damowmow.com/",
+      "مثال.إختبار",
+      "例子.测试",
+      // cspell:enable
     ];
 
     return self::dataEnhanceWithScheme($urls);
@@ -117,7 +188,7 @@ class UrlHelperTest extends TestCase {
    */
   #[DataProvider('providerTestValidAbsoluteData')]
   public function testValidAbsolute(string $url, string $scheme): void {
-    $test_url = $scheme . '://' . $url;
+    $test_url = $scheme . $url;
     $valid_url = UrlHelper::isValid($test_url, TRUE);
     $this->assertTrue($valid_url, $test_url . ' is a valid URL.');
   }
@@ -130,11 +201,57 @@ class UrlHelperTest extends TestCase {
    */
   public static function providerTestInvalidAbsolute(): array {
     $data = [
+      'caf%C3.example.org',
+      'caf%FF.example.org',
+      'caf%GG.example.org',
+      'example.org%2Fother.example.org',
+      'example.org%40other.example.org',
+      'example.org%3A8080',
       '',
       'ex!ample.com',
       'ex%ample.com',
+      // Use invalid URLs from
+      // https://cran.r-project.org/web/packages/rex/vignettes/url_parsing.html.
+      '',
+      '.',
+      '..',
+      '../',
+      "?",
+      "??",
+      "??/",
+      "#",
+      "##",
+      "##/",
+      'foo.bar?q=Spaces should be encoded',
+      "//",
+      "///a",
+      "///",
+      "/a",
+      'foo.bar/foo(bar)baz quux',
+      // @todo The following URLs should fail validation.
+      // '-error-.invalid/',
+      // 'a.b--c.de/',
+      // '-a.b.co',
+      // 'a.b-.co',
+      // '0.0.0.0',
+      // '3628126748',
+      // '.www.foo.bar/',
+      // 'www.foo.bar./',
+      // '.www.foo.bar./',
     ];
-    return self::dataEnhanceWithScheme($data);
+    $schemes = [
+      ['', ''],
+      ['foo.bar/', 'ftps'],
+      ['foo.com', ''],
+      ['not-a-valid-scheme', 'invalid'],
+      ['test', ''],
+      ['test', 'h'],
+      // cspell:disable
+      [' shouldfail', '://'],
+      ['1234', 'rdar'],
+      // cspell:enable
+    ];
+    return array_merge($schemes, self::dataEnhanceWithScheme($data));
   }
 
   /**
@@ -183,7 +300,7 @@ class UrlHelperTest extends TestCase {
    */
   #[DataProvider('providerTestInvalidAbsolute')]
   public function testInvalidAbsolute(string $url, string $scheme): void {
-    $test_url = $scheme . '://' . $url;
+    $test_url = $scheme . $url;
     $valid_url = UrlHelper::isValid($test_url, TRUE);
     $this->assertFalse($valid_url, $test_url . ' is NOT a valid URL.');
   }
@@ -589,6 +706,94 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
+   * Tests that URL validation is independent of protocol filtering settings.
+   */
+  #[RunInSeparateProcess]
+  public function testValidAbsoluteProtocols(): void {
+    UrlHelper::setAllowedProtocols(['custom']);
+
+    foreach (['http', 'https', 'ftp', 'feed'] as $protocol) {
+      $this->assertTrue(UrlHelper::isValid($protocol . '://example.org', TRUE));
+    }
+    $this->assertFalse(UrlHelper::isValid('custom://example.org', TRUE));
+  }
+
+  /**
+   * Tests absolute URL syntax accepted before internationalized host support.
+   */
+  #[DataProvider('providerAbsoluteUrlCompatibility')]
+  public function testAbsoluteUrlCompatibility(string $url): void {
+    $this->assertTrue(UrlHelper::isValid($url, TRUE));
+  }
+
+  /**
+   * Provides absolute URLs for compatibility regression tests.
+   */
+  public static function providerAbsoluteUrlCompatibility(): array {
+    return [
+      'Unreserved characters in user information' => ['https://user-._name:pass@example.org/'],
+      'Sub-delimiters in user information' => ['https://user!$&\'()*+,;=name:pass@example.org/'],
+      'Encoded delimiters in user information' => ['https://user%40name:pass%3Aword@example.org/'],
+      'Unreserved characters in path' => ['https://example.org/path-._~part'],
+      'Sub-delimiters in path' => ['https://example.org/path!$&\'()*+,;=part'],
+      'Encoded delimiters in path' => ['https://example.org/path%2Fpart%3Fquery%23fragment'],
+      'Reserved characters in query' => ['https://example.org/?value=!$&\'()*+,;=:@/?'],
+      'Encoded delimiters in query' => ['https://example.org/?value=%26%3D%23'],
+      'Reserved characters in fragment' => ['https://example.org/#value=!$&\'()*+,;=:@/?'],
+      'Encoded delimiters in fragment' => ['https://example.org/#value=%23%3F%2F'],
+      'Uppercase scheme' => ['HTTPS://example.org:8080/path?query=value#fragment'],
+      'Single-label host with port' => ['https://localhost:8080/path?query=value#fragment'],
+      'Trailing dot in hostname' => ['https://example.org.:8080/path?query=value#fragment'],
+      'IPv4 address with port' => ['https://127.0.0.1:8080/path?query=value#fragment'],
+      'Compressed IPv6 address with port' => ['https://[::1]:8080/path?query=value#fragment'],
+    ];
+  }
+
+  /**
+   * Tests internationalized absolute URL syntax.
+   */
+  #[DataProvider('providerInternationalizedUrls')]
+  public function testInternationalizedUrls(string $url, bool $expected): void {
+    $this->assertSame($expected, UrlHelper::isValid($url, TRUE));
+  }
+
+  /**
+   * Provides internationalized URL syntax cases.
+   */
+  public static function providerInternationalizedUrls(): array {
+    return [
+      'Unicode hostname' => ['https://例子.测试', TRUE],
+      'Punycode hostname' => ['https://xn--fsqu00a.xn--0zwm56d', TRUE],
+      'Right-to-left hostname' => ['https://مثال.إختبار', TRUE],
+      'Unicode path' => ['https://example.org/我的页面', TRUE],
+      'Ideographic full stop' => ['https://例子。测试', TRUE],
+      'Full width full stop' => ['https://例子．测试', TRUE],
+      'Half width ideographic full stop' => ['https://例子｡测试', TRUE],
+      'Encoded domain separator' => ['https://例子%E3%80%82测试', TRUE],
+      'Encoded ASCII letter' => ['https://%65xample.org', TRUE],
+      'Encoded ASCII capital letter' => ['https://%45xample.org', TRUE],
+      'Encoded ASCII digit' => ['https://example%31.org', TRUE],
+      'Encoded hyphen' => ['https://ex%2Dample.org', TRUE],
+      'Encoded dot' => ['https://example%2eorg', TRUE],
+      'Encoded underscore' => ['https://ex%5Fample.org', TRUE],
+      'Mixed ASCII and UTF-8 escapes' => ['https://caf%65%C3%A9.example.org', TRUE],
+      'Encoded UTF-8 hostname' => ['https://caf%C3%A9.example.org', TRUE],
+      'Truncated UTF-8' => ['https://caf%C3.example.org', FALSE],
+      'Overlong UTF-8' => ['https://example%C0%AEorg', FALSE],
+      'UTF-8 surrogate' => ['https://example%ED%A0%80.org', FALSE],
+      'Invalid UTF-8 byte' => ["https://example\xFF.org", FALSE],
+      'Encoded slash' => ['https://example.org%2Fother.example.org', FALSE],
+      'Encoded at sign' => ['https://example.org%40other.example.org', FALSE],
+      'Encoded colon' => ['https://example.org%3A8080', FALSE],
+      'Encoded question mark' => ['https://example.org%3Fquery', FALSE],
+      'Encoded number sign' => ['https://example.org%23fragment', FALSE],
+      'Double-encoded ASCII letter' => ['https://%2565xample.org', FALSE],
+      'Encoded control character' => ['https://example%00.org', FALSE],
+      'Empty URL' => ['', FALSE],
+    ];
+  }
+
+  /**
    * Enhances test URLs with schemes.
    *
    * @param array $urls
@@ -598,7 +803,7 @@ class UrlHelperTest extends TestCase {
    *   A list of provider data with schemes.
    */
   protected static function dataEnhanceWithScheme(array $urls): array {
-    $url_schemes = ['http', 'https', 'ftp'];
+    $url_schemes = ['http://', 'https://', 'ftp://', 'feed://'];
     $data = [];
     foreach ($url_schemes as $scheme) {
       foreach ($urls as $url) {
