@@ -6,10 +6,10 @@ namespace Drupal\file\Upload;
 
 use Drupal\file\FileInterface;
 use Drupal\Core\File\FileExists;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -29,7 +29,6 @@ class ManagedFileElementHelper {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly MessengerInterface $messenger,
     protected readonly RendererInterface $renderer,
     protected readonly FormFileUploader $formFileUploader,
     protected readonly UploadedFilesExtractor $uploadedFilesExtractor,
@@ -71,10 +70,6 @@ class ManagedFileElementHelper {
     ?int $delta = NULL,
     FileExists $fileExists = FileExists::Rename,
   ): array|FileInterface|null|false {
-    // Get all errors set before calling this method. This will also clear them
-    // from the messenger service.
-    $errorsBefore = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
-
     $uploadLocation = $element['#upload_location'] ?? 'temporary://';
     $uploadName = implode('_', $element['#parents']);
     $uploadValidators = $element['#upload_validators'] ?? [];
@@ -83,14 +78,16 @@ class ManagedFileElementHelper {
       $uploadLocation = 'temporary://';
     }
 
-    $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $delta, $fileExists);
+    $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $fileExists);
 
-    // Get new errors that are generated while trying to save the upload. This
-    // will also clear them from the messenger service.
-    $errorsNew = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
-    if (!empty($errorsNew)) {
+    if ($result !== NULL && $result->hasErrors()) {
+      $errorDetails = $result->getErrorDetails();
+      $errors = [];
+      foreach ($result->getErrors() as $delta => $error) {
+        $errors[] = isset($errorDetails[$delta]) ? $this->renderErrorWithDetails($error, $errorDetails[$delta]) : $error;
+      }
 
-      if (count($errorsNew) > 1) {
+      if (count($errors) > 1) {
         // Render multiple errors into a single message.
         // This is needed because only one error per element is supported.
         $render_array = [
@@ -99,27 +96,47 @@ class ManagedFileElementHelper {
           ],
           'item_list' => [
             '#theme' => 'item_list',
-            '#items' => $errorsNew,
+            '#items' => $errors,
           ],
         ];
         $errorMessage = $this->renderer->renderInIsolation($render_array);
       }
       else {
-        $errorMessage = reset($errorsNew);
+        $errorMessage = reset($errors);
       }
 
       $formState->setError($element, $errorMessage);
     }
 
-    // Ensure that errors set prior to calling this method are still shown to
-    // the user.
-    if (!empty($errorsBefore)) {
-      foreach ($errorsBefore as $error) {
-        $this->messenger->addError($error);
-      }
+    if ($result === NULL) {
+      return NULL;
     }
+    $files = $result->getFiles();
+    return isset($delta) ? $result->getFile($delta) : $files;
+  }
 
-    return $result;
+  /**
+   * Renders an error message followed by a list of detail messages.
+   *
+   * @param string|\Drupal\Component\Render\MarkupInterface $error
+   *   The error message.
+   * @param array<string|\Stringable> $details
+   *   The detail messages.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface
+   *   The rendered error.
+   */
+  protected function renderErrorWithDetails(string|MarkupInterface $error, array $details): MarkupInterface {
+    $renderArray = [
+      'error' => [
+        '#markup' => $error,
+      ],
+      'item_list' => [
+        '#theme' => 'item_list',
+        '#items' => $details,
+      ],
+    ];
+    return $this->renderer->renderInIsolation($renderArray);
   }
 
   /**
