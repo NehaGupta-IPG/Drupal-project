@@ -28,14 +28,14 @@ appear after main classes #}
     {{ icon(icon.pack_id|default('navigation'), icon.icon_id, icon.settings|default({class: 'toolbar-button__icon', size: 20})) }}
   {% endif %}
 
-  {% if action %}
-    <span data-toolbar-action class="visually-hidden">{{ action }}</span>
-  {% endif %}
   {% block content %}
     {% if text %}
       <span class="toolbar-button__label" data-toolbar-text>{{~ text ~}}</span>
     {% endif %}
   {% endblock %}
+  {% if action %}
+    <span data-toolbar-action class="visually-hidden">{{ action }}</span>
+  {% endif %}
 
   {% if modifiers is iterable and ('expand--side' in modifiers or 'expand--down' in modifiers) %}
     {{ icon('navigation', 'chevron', {class: 'toolbar-button__chevron', size: 16}) }}
