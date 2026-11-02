@@ -457,7 +457,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         if (isset($sites[$site_id]) && is_dir($app_root . '/sites/' . $sites[$site_id])) {
           $site_id = $sites[$site_id];
         }
-        if (is_file($app_root . '/sites/' . $site_id . '/settings.php') || (!$require_settings && is_file($app_root . '/sites/' . $site_id))) {
+        if (is_file($app_root . '/sites/' . $site_id . '/settings.php') || (!$require_settings && is_dir($app_root . '/sites/' . $site_id))) {
           return "sites/$site_id";
         }
       }

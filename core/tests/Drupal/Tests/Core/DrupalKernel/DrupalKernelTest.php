@@ -119,27 +119,53 @@ class DrupalKernelTest extends UnitTestCase {
   #[RunInSeparateProcess]
   public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
+
+    // Missing sites.php should always fall back to sites/default.
+    $request = new Request();
+    $request->server->set('SERVER_NAME', 'www.example.org');
+    $request->server->set('SERVER_PORT', '8888');
+    $request->server->set('SCRIPT_NAME', '/index.php');
+    $this->assertEquals('sites/default', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
+    $this->assertEquals('sites/default', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
+
     $sites_php = <<<'EOD'
 <?php
 $sites['8888.www.example.org'] = 'example';
+$sites['8888.www.foo.bar'] = 'foobar';
+$sites['8888.www.fizz.buzz'] = 'fizzbuzz';
 EOD;
 
-    // Create the expected directory structure.
+    // Create the expected sites directory structure.
     vfsStream::create([
       'sites' => [
         'sites.php' => $sites_php,
         'example' => [
           'settings.php' => 'test',
         ],
+        'foobar' => [],
       ],
     ]);
 
-    $request = new Request();
-    $request->server->set('SERVER_NAME', 'www.example.org');
-    $request->server->set('SERVER_PORT', '8888');
-    $request->server->set('SCRIPT_NAME', '/index.php');
+    // Reuse the request from above, but now sites.php does exist.
     $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
     $this->assertEquals('sites/example', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
+
+    // Test a host that is in sites.php, but does not have a settings.php file.
+    // Only fall back to sites/default when $require_settings parameter is TRUE.
+    $request = new Request();
+    $request->server->set('SERVER_NAME', 'www.foo.bar');
+    $request->server->set('SERVER_PORT', '8888');
+    $request->server->set('SCRIPT_NAME', '/index.php');
+    $this->assertEquals('sites/default', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
+    $this->assertEquals('sites/foobar', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
+
+    // Test a host that is not in sites.php, falling back to sites/default.
+    $request = new Request();
+    $request->server->set('SERVER_NAME', 'www.fizz.buzz');
+    $request->server->set('SERVER_PORT', '8888');
+    $request->server->set('SCRIPT_NAME', '/index.php');
+    $this->assertEquals('sites/default', DrupalKernel::findSitePath($request, TRUE, $vfs_root->url()));
+    $this->assertEquals('sites/default', DrupalKernel::findSitePath($request, FALSE, $vfs_root->url()));
   }
 
   /**
