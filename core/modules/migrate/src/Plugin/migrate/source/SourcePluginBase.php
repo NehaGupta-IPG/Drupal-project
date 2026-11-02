@@ -535,8 +535,23 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    *   The count of available source records.
    */
   protected function doCount() {
-    $iterator = $this->getIterator();
-    return $iterator instanceof \Countable ? $iterator->count() : iterator_count($this->initializeIterator());
+    // If we have already instantiated a countable iterator, we can use that.
+    if ($this->iterator instanceof \Countable) {
+      return $this->iterator->count();
+    }
+
+    // At this point we either have no instance or the existing instance cannot
+    // be counted. In both cases we need a new iterator.
+    $iterator = $this->initializeIterator();
+
+    // A non-countable iterator is exhausted by counting it, so it must not
+    // become the one the migration runs with. We also can't use ::getIterator()
+    // here, but still write the iterator to the property if it's countable.
+    if ($iterator instanceof \Countable) {
+      $this->iterator ??= $iterator;
+      return $iterator->count();
+    }
+    return iterator_count($iterator);
   }
 
   /**
