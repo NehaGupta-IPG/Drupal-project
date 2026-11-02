@@ -262,6 +262,13 @@ class ThemePreprocess {
     $language_interface = $this->languageManager->getCurrentLanguage();
     $variables['html_attributes']['lang'] = $language_interface->getId();
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
+    // Always render the default color scheme, so that the markup is the same
+    // for every account and declares no cacheability. It is also what a client
+    // without JavaScript keeps. A customized preference reaches the client in
+    // a cookie, and a script in the head overrides the attribute from it.
+    // @see \Drupal\Core\Render\BareHtmlPageRenderer::systemPageAttachments()
+    // @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber
+    $variables['html_attributes']['data-color-scheme'] = 'auto';
 
     if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
       $variables['db_offline'] = TRUE;

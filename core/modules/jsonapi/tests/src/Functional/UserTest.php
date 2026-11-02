@@ -163,6 +163,7 @@ class UserTest extends ResourceTestBase {
           'display_name' => 'Llama',
           'created' => '1973-11-29T21:33:09+00:00',
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
+          'color_scheme' => 'auto',
           'default_langcode' => TRUE,
           'langcode' => 'en',
           'name' => 'Llama',

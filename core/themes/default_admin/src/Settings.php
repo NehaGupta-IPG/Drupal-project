@@ -227,18 +227,6 @@ final class Settings implements ContainerInjectionInterface {
     $experimental_label = ' <span class="admin-experimental-flag">Experimental</span>';
     $beta_label = ' <span class="admin-beta-flag">Beta</span>';
 
-    $form['enable_dark_mode'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Appearance'),
-      '#description' => $this->t('Enables dark mode for the administration interface.'),
-      '#default_value' => (string) ($account ? $this->get('enable_dark_mode', $account) : $this->getDefault('enable_dark_mode')),
-      '#options' => [
-        'auto' => $this->t('Auto'),
-        0 => $this->t('Light'),
-        1 => $this->t('Dark'),
-      ],
-    ];
-
     // Accent color setting.
     $presets = Helper::accentColors();
     $options = array_map(static function ($preset) {

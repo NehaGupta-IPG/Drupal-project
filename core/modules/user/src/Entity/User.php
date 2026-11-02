@@ -13,6 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\UserSessionRepositoryInterface;
+use Drupal\user\ColorSchemeItem;
 use Drupal\user\Form\UserCancelForm;
 use Drupal\user\NotificationHandler;
 use Drupal\user\ProfileForm;
@@ -364,6 +365,13 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * {@inheritdoc}
    */
+  public function getColorScheme() {
+    return $this->getFieldValue('color_scheme', 'value') ?: 'auto';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPreferredLangcode($fallback_to_default = TRUE) {
     $language_list = $this->languageManager()->getLanguages();
     $preferred_langcode = $this->get('preferred_langcode')->value;
@@ -552,6 +560,15 @@ class User extends ContentEntityBase implements UserInterface {
         'AllowedValues' => ['callback' => __CLASS__ . '::getAllowedTimezones'],
       ]);
     $fields['timezone']->getItemDefinition()->setClass(TimeZoneItem::class);
+
+    $fields['color_scheme'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Color scheme'))
+      ->setDescription(t("The user's preferred color scheme for the interface."))
+      ->setDefaultValue('auto')
+      ->addPropertyConstraints('value', [
+        'AllowedValues' => ['choices' => ColorSchemeItem::ALLOWED_VALUES],
+      ]);
+    $fields['color_scheme']->getItemDefinition()->setClass(ColorSchemeItem::class);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('User status'))

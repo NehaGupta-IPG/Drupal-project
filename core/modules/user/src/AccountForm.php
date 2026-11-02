@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\ColorSchemeSupport;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\user\Entity\Role;
@@ -33,32 +34,44 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected $languageManager;
 
   /**
+   * The color scheme support service.
+   *
+   * @var \Drupal\Core\Theme\ColorSchemeSupport
+   */
+  protected ColorSchemeSupport $colorSchemeSupport;
+
+  /**
    * Constructs a new AccountForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Theme\ColorSchemeSupport $color_scheme_support
+   *   The color scheme support service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ColorSchemeSupport $color_scheme_support, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->languageManager = $language_manager;
+    $this->colorSchemeSupport = $color_scheme_support;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
+    $instance = new static(
       $container->get('entity.repository'),
       $container->get('language_manager'),
+      $container->get('theme.color_scheme_support'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time')
     );
+    return $instance;
   }
 
   /**
@@ -324,7 +337,105 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $form['timezone']['timezone']['#attributes'] = ['class' => ['timezone-detect']];
     }
 
+    $form['user_settings'] = [
+      '#type' => 'details',
+      '#title' => $this->t('User settings'),
+      '#open' => TRUE,
+      '#weight' => 7,
+    ];
+    $form['user_settings']['color_scheme'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Color scheme'),
+      '#options' => [
+        'light' => $this->t('Light'),
+        'dark' => $this->t('Dark'),
+        'auto' => $this->t('System'),
+      ],
+      '#default_value' => $account->get('color_scheme')->value ?: 'auto',
+    ] + $this->colorSchemeElementProperties($account);
+
     return parent::form($form, $form_state);
+  }
+
+  /**
+   * Builds the description and disabled state of the color scheme element.
+   *
+   * Only a theme that declares 'supports color scheme' in its .info.yml file
+   * honors the preference, so what the element offers depends on the site
+   * theme and the administration theme:
+   * - Neither declares support: nothing honors the preference, so the element
+   *   is disabled.
+   * - Both declare support: the preference applies to the whole site.
+   * - Only the site theme declares support: the preference applies outside
+   *   administration pages.
+   * - Only the administration theme declares support: the preference applies
+   *   to administration pages, which only accounts that may use the
+   *   administration theme ever see. For other accounts nothing honors the
+   *   preference, so the element is disabled.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The account the form is built for.
+   *
+   * @return array
+   *   Form element properties to add to the color scheme element.
+   *
+   * @see \Drupal\Core\Theme\ColorSchemeSupport
+   */
+  protected function colorSchemeElementProperties(UserInterface $account): array {
+    $default_supports = $this->colorSchemeSupport->siteThemeSupports();
+    $admin_supports = $this->colorSchemeSupport->adminThemeSupports();
+
+    if ($default_supports && $admin_supports) {
+      return [
+        '#description' => $this->t('System follows your operating system or browser setting. Applies wherever your site’s theme supports it.'),
+      ];
+    }
+
+    if ($default_supports) {
+      return [
+        '#description' => $this->t('System follows your operating system or browser setting. The site follows this setting, administrative pages do not.'),
+      ];
+    }
+
+    if ($admin_supports) {
+      if ($this->accountMayUseAdminTheme($account)) {
+        return [
+          '#description' => $this->t('System follows your operating system or browser setting. Administrative pages follow this setting, the rest of the site does not.'),
+        ];
+      }
+      return [
+        '#disabled' => TRUE,
+        '#description' => $this->t('This setting has no effect on your account. Only administration pages support it, and this account does not use the administration theme.'),
+      ];
+    }
+
+    return [
+      '#disabled' => TRUE,
+      '#description' => $this->t('This setting has no effect. Neither the site nor the administration pages support it.'),
+    ];
+  }
+
+  /**
+   * Determines whether an account may use the administration theme.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The account the form is built for.
+   *
+   * @return bool
+   *   TRUE if the account may use the administration theme.
+   */
+  protected function accountMayUseAdminTheme(UserInterface $account): bool {
+    // A new account holds no roles yet: it is not authenticated, so a
+    // permission check evaluates the anonymous role, which says nothing about
+    // the account being created. Offer the setting instead of disabling it on
+    // evidence that does not apply, and let the account edit form decide once
+    // the roles are known.
+    if ($account->isNew()) {
+      return TRUE;
+    }
+    // The permission belongs to the account being edited, not to the account
+    // filling in the form.
+    return $account->hasPermission('view the administration theme');
   }
 
   /**
@@ -414,6 +525,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'mail',
       'roles',
       'timezone',
+      'color_scheme',
       'langcode',
       'preferred_langcode',
       'preferred_admin_langcode',
@@ -433,6 +545,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'mail',
       'roles',
       'timezone',
+      'color_scheme',
       'langcode',
       'preferred_langcode',
       'preferred_admin_langcode',

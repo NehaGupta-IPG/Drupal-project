@@ -177,6 +177,13 @@ class AccountProxy implements AccountProxyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getColorScheme() {
+    return $this->getAccount()->getColorScheme();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getLastAccessedTime() {
     return $this->getAccount()->getLastAccessedTime();
   }

@@ -6,7 +6,6 @@ namespace Drupal\default_admin\Hook;
 
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -149,8 +148,6 @@ class ThemeHooks implements TrustedCallbackInterface {
     $settings = Settings::getInstance();
     // Expose theme settings to JS.
     $default_admin_settings = [
-      'dark_mode' => $settings->get('enable_dark_mode'),
-      'dark_mode_class' => 'dark-mode',
       'accent_colors' => Helper::accentColors(),
       'preset_accent_color' => $settings->get('preset_accent_color'),
       'accent_color' => $settings->get('accent_color'),
@@ -163,18 +160,6 @@ class ThemeHooks implements TrustedCallbackInterface {
     $page['#attached']['drupalSettings']['defaultAdmin'] = $default_admin_settings;
     // Retain the previous key for integrations while the theme is experimental.
     $page['#attached']['drupalSettings']['gin'] = $default_admin_settings;
-
-    $page['#attached']['html_head'][] = [
-      [
-        '#tag' => 'script',
-        '#attributes' => [
-          'type' => 'application/json',
-          'id' => 'default-admin-setting-dark_mode',
-        ],
-        '#value' => new FormattableMarkup('{ "defaultAdminDarkMode": "@value" }', ['@value' => $settings->get('enable_dark_mode') ?? 'unknown']),
-      ],
-      'default_admin_dark_mode',
-    ];
   }
 
   /**

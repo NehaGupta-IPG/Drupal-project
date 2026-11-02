@@ -56,23 +56,12 @@ class AdminTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertStringContainsString('"defaultAdmin":{', $response);
     $this->assertStringContainsString('"gin":{', $response);
-    $this->assertStringContainsString('"dark_mode":"auto"', $response);
     $this->assertStringContainsString('"preset_accent_color":"blue"', $response);
     $this->assertStringContainsString('"preset_focus_color":"default"', $response);
     $this->assertSession()->elementAttributeContains('css', 'html', 'data-admin-focus', 'default');
     $this->assertSession()->elementAttributeNotExists('css', 'html', 'data-gin-focus');
     $this->assertSession()->elementExists('css', 'nav.breadcrumb[aria-labelledby="system-breadcrumb"]');
     $this->assertSession()->elementExists('css', 'nav.breadcrumb #system-breadcrumb.visually-hidden');
-  }
-
-  /**
-   * Tests the dark mode setting.
-   */
-  public function testDarkModeSetting(): void {
-    \Drupal::configFactory()->getEditable('default_admin.settings')->set('enable_dark_mode', '1')->save();
-    $response = $this->drupalGet('/admin/content');
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertStringContainsString('"dark_mode":"1"', $response);
   }
 
   /**
@@ -115,17 +104,17 @@ class AdminTest extends BrowserTestBase {
     $this->drupalLogin($user1);
 
     // Change something on the logged in user form.
-    $this->assertStringContainsString('"dark_mode":"auto"', $this->drupalGet($user1->toUrl('edit-form')));
+    $this->assertStringContainsString('"preset_accent_color":"blue"', $this->drupalGet($user1->toUrl('edit-form')));
 
     $this->submitForm([
       'enable_user_settings' => TRUE,
-      'enable_dark_mode' => '1',
+      'preset_accent_color' => 'red',
     ], 'Save');
-    $this->assertStringContainsString('"dark_mode":"1"', $this->drupalGet($user1->toUrl('edit-form')));
+    $this->assertStringContainsString('"preset_accent_color":"red"', $this->drupalGet($user1->toUrl('edit-form')));
 
     // Login as admin.
     $this->drupalLogin($this->rootUser);
-    $this->assertStringContainsString('"dark_mode":"auto"', $this->drupalGet('edit-form'));
+    $this->assertStringContainsString('"preset_accent_color":"blue"', $this->drupalGet('edit-form'));
   }
 
   /**
@@ -139,19 +128,16 @@ class AdminTest extends BrowserTestBase {
     $this->submitForm([
       'enable_user_settings' => TRUE,
       'high_contrast_mode' => TRUE,
-      'enable_dark_mode' => '1',
     ], 'Save');
 
     // Check logged-in's user is not affected.
     $loggedInUserResponse = $this->drupalGet('edit-form');
     $this->assertStringContainsString('"high_contrast_mode":false', $loggedInUserResponse);
-    $this->assertStringContainsString('"dark_mode":"auto"', $loggedInUserResponse);
 
     // Check settings of user1.
     $this->drupalLogin($user1);
     $rootUserResponse = $this->drupalGet($user1->toUrl('edit-form'));
     $this->assertStringContainsString('"high_contrast_mode":true', $rootUserResponse);
-    $this->assertStringContainsString('"dark_mode":"1"', $rootUserResponse);
   }
 
 }

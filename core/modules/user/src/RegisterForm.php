@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Theme\ColorSchemeSupport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,12 +20,13 @@ class RegisterForm extends AccountForm {
   public function __construct(
     EntityRepositoryInterface $entity_repository,
     LanguageManagerInterface $language_manager,
+    ColorSchemeSupport $color_scheme_support,
     EntityTypeBundleInfoInterface $entity_type_bundle_info,
     TimeInterface $time,
     protected LoginFinalizer $loginFinalizer,
     protected NotificationHandler $notificationHandler,
   ) {
-    parent::__construct($entity_repository, $language_manager, $entity_type_bundle_info, $time);
+    parent::__construct($entity_repository, $language_manager, $color_scheme_support, $entity_type_bundle_info, $time);
   }
 
   /**
@@ -34,6 +36,7 @@ class RegisterForm extends AccountForm {
     return new static(
       $container->get(EntityRepositoryInterface::class),
       $container->get(LanguageManagerInterface::class),
+      $container->get(ColorSchemeSupport::class),
       $container->get(EntityTypeBundleInfoInterface::class),
       $container->get(TimeInterface::class),
       $container->get(LoginFinalizer::class),
