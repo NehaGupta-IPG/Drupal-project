@@ -23,19 +23,85 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 class TimestampDatetimeWidget extends WidgetBase {
 
   /**
+   * @var string
+   */
+  public const TIMESTAMP_OPTION_ON_CREATE = 'on_create';
+
+  /**
+   * @var string
+   */
+  public const TIMESTAMP_OPTION_ON_SUBMISSION = 'on_submission';
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'use_current_time' => static::TIMESTAMP_OPTION_ON_SUBMISSION,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
+    $options = $this->getSettingOptions();
+    $element['use_current_time'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Use current time'),
+      '#options' => $options,
+      '#description' => $this->t('Set the value to the current time on form submission or on create form element.'),
+      '#default_value' => $this->getSetting('use_current_time'),
+    ];
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+    $options = $this->getSettingOptions();
+
+    $item = $this->getSetting('use_current_time') ?? static::TIMESTAMP_OPTION_ON_SUBMISSION;
+    $summary[] = $this->t(
+      'Use current time : @use_current_time',
+      ['@use_current_time' => $options[$item] ?? '- None -']
+    );
+
+    return $summary;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $default_value = isset($items[$delta]->value) ? DrupalDateTime::createFromTimestamp($items[$delta]->value) : '';
+    $current_times_setting = $this->getSetting('use_current_time');
+    $options = $this->getSettingOptions();
+    if ($current_times_setting == static::TIMESTAMP_OPTION_ON_CREATE && empty($items[$delta]->getValue())) {
+      $now = \Drupal::time()->getRequestTime();
+      $default_value = DrupalDateTime::createFromTimestamp($now);
+    }
+    else {
+      $default_value = isset($items[$delta]->value) ? DrupalDateTime::createFromTimestamp($items[$delta]->value) : '';
+    }
+
     $element['value'] = $element + [
       '#type' => 'datetime',
       '#default_value' => $default_value,
       '#date_year_range' => '1902:2037',
     ];
 
-    $element['value']['#description'] = $element['#description'] !== ''
-    ? $element['#description']
-    : $this->t('Leave blank to use the time of form submission.');
+    $element['value']['#description'] = $element['#description'];
+
+    if ($current_times_setting && $element['#description'] === '') {
+      $element['value']['#description'] .= $this->t(
+        'Use current time : @use_current_time',
+        ['@use_current_time' => $options[$current_times_setting] ?? $options[static::TIMESTAMP_OPTION_ON_SUBMISSION]]
+      );
+    }
+
     return $element;
   }
 
@@ -55,9 +121,26 @@ class TimestampDatetimeWidget extends WidgetBase {
       else {
         $date = new DrupalDateTime();
       }
+
       $item['value'] = $date->getTimestamp();
     }
     return $values;
+  }
+
+  /**
+   * List of options for the element settings.
+   *
+   * @return array
+   *   The list of options.
+   */
+  public function getSettingOptions(): array {
+    // There is no option, 'none', because it creates a new date on form
+    // submission.
+    $options = [
+      static::TIMESTAMP_OPTION_ON_SUBMISSION => $this->t('On form submission'),
+      static::TIMESTAMP_OPTION_ON_CREATE => $this->t('On form create'),
+    ];
+    return $options;
   }
 
 }
