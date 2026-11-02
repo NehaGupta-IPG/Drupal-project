@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -88,6 +89,42 @@ class UserRequirementsTest extends KernelTestBase {
 
     $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
     $this->assertArrayNotHasKey('conflicting emails', $output);
+  }
+
+  /**
+   * Tests that displays using the deprecated 'member_for' field are flagged.
+   */
+  public function testMemberForExtraField(): void {
+    $display = EntityViewDisplay::create([
+      'targetEntityType' => 'user',
+      'bundle' => 'user',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+    $display->save();
+
+    // The field is not on the display by default, assert we don't have the
+    // warning.
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
+    $this->assertArrayNotHasKey('user_member_for_extra_field', $output);
+
+    // Add the field, assert the warning comes through.
+    $display->setComponent('member_for', ['weight' => 5])->save();
+    $output = $this->moduleHandler->invoke('user', 'runtime_requirements');
+    $this->assertArrayHasKey('user_member_for_extra_field', $output);
+    $this->assertSame('1 user display', (string) $output['user_member_for_extra_field']['value']);
+    $items = $output['user_member_for_extra_field']['description']['displays']['#items'];
+
+    // Display is listed in plain text if field_ui is not enabled.
+    $this->assertCount(1, $items);
+    $this->assertSame('Default', (string) $items[0]['#plain_text']);
+
+    // Display is linked if field_ui is enabled.
+    \Drupal::service('module_installer')->install(['field_ui']);
+    $output = \Drupal::moduleHandler()->invoke('user', 'runtime_requirements');
+    $item = $output['user_member_for_extra_field']['description']['displays']['#items'][0];
+    $this->assertSame('Default', (string) $item['#title']);
+    $this->assertSame('/admin/config/people/accounts/display/default', $item['#url']->toString());
   }
 
 }
