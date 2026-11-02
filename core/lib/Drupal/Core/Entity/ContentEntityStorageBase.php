@@ -613,6 +613,17 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * {@inheritdoc}
    */
+  public function loadMultiple(?array $ids = NULL) {
+    if ($ids === NULL) {
+      @trigger_error("Using NULL to load all {$this->entityTypeId} entities is deprecated in drupal:11.4.0 and will throw an exception in drupal:13.0.0. Instead, use an entity query and load entities in smaller chunks. See https://www.drupal.org/node/3586374", E_USER_DEPRECATED);
+    }
+
+    return parent::loadMultiple($ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function preLoad(?array &$ids = NULL) {
     $entities = [];
 

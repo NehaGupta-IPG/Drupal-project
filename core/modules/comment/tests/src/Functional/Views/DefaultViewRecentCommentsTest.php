@@ -109,7 +109,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
     }
 
     // Store all the nodes just created to access their properties on the tests.
-    $this->commentsCreated = Comment::loadMultiple();
+    $this->commentsCreated = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties();
 
     // Sort created comments in descending order.
     ksort($this->commentsCreated, SORT_NUMERIC);

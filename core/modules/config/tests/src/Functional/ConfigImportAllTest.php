@@ -108,7 +108,7 @@ class ConfigImportAllTest extends ModuleTestBase {
           || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
         && !in_array($entity_type->getProvider(), ['system', 'user'], TRUE)) {
         $storage = $entity_type_manager->getStorage($entity_type->id());
-        $storage->delete($storage->loadMultiple());
+        $storage->delete($storage->loadByProperties());
       }
     }
 

@@ -259,7 +259,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
       $langcode_key => LanguageInterface::LANGCODE_NOT_SPECIFIED,
     ])->save();
 
-    $entities = $storage->loadMultiple();
+    $entities = $storage->loadByProperties();
     $this->assertCount(3, $entities, "$entity_type: Three entities were created.");
     $entities = $storage->loadMultiple([$translated_id]);
     $this->assertCount(1, $entities, "$entity_type: One entity correctly loaded by id.");

@@ -94,10 +94,10 @@ class EntityApiTest extends EntityKernelTestBase {
     $this->assertEquals('test3', $entity->name->value, "$entity_type: Entity updated.");
 
     // Try deleting multiple test entities by deleting all.
-    $entities = $storage->loadMultiple();
+    $entities = $storage->loadByProperties();
     $storage->delete($entities);
 
-    $all = $storage->loadMultiple();
+    $all = $storage->loadByProperties();
     $this->assertEmpty($all, "All entities of type '$entity_type' should have been deleted.");
 
     // Verify that all data got deleted.
@@ -127,7 +127,7 @@ class EntityApiTest extends EntityKernelTestBase {
     $controller->delete($entities);
 
     // Verify that entities got deleted.
-    $all = $storage->loadMultiple();
+    $all = $storage->loadByProperties();
     $this->assertEmpty($all, "All entities of type '$entity_type' should have been deleted.");
 
     // Verify that all data got deleted from the tables.

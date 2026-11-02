@@ -486,10 +486,8 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    */
   protected function doUninstallTest(): void {
     // Delete all the nodes so there is no data.
-    $nodes = Node::loadMultiple();
-    foreach ($nodes as $node) {
-      $node->delete();
-    }
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $storage->delete($storage->loadByProperties());
     $language_count = count(\Drupal::configFactory()->listAll('language.content_settings.'));
     \Drupal::service('module_installer')->uninstall(['content_translation']);
     $this->rebuildContainer();

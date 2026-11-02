@@ -147,7 +147,7 @@ class FieldEntityLinkTest extends ViewsKernelTestBase {
     ];
 
     $index = 0;
-    foreach (EntityTest::loadMultiple() as $entity) {
+    foreach (\Drupal::entityTypeManager()->getStorage('entity_test')->loadByProperties() as $entity) {
       foreach ($expected_results as $template => $expected_result) {
         $expected_link = '';
         if ($expected_result) {
