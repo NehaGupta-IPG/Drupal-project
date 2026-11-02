@@ -112,27 +112,33 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * {@inheritdoc}
    */
   public function selectPluralForm(int|float $count, string $string, ?string $langcode = NULL): string {
+    // See the same logic in Drupal.formatPlural() in JavaScript too.
     $translated_array = explode(PoItem::DELIMITER, $string);
-    if ($count == 1 || count($translated_array) == 1) {
-      // Singular form.
-      return $translated_array[0];
-    }
 
     // Plural formulas are defined over integers, so a fractional count is
     // truncated for the lookup only. The count itself is still displayed as
-    // given via the @count placeholder.
+    // given via the @count placeholder. Without a plural formula, the first
+    // variant is for 1, and the second variant for other counts.
     $index = $this->getPluralIndex((int) $count, $langcode);
+    if ($index < 0) {
+      $index = (int) ($count != 1);
+    }
 
-    // Fallback to second plural form.
-    return $translated_array[$index] ?? $translated_array[1];
+    // Fall back to the second, then to the first variant, when the variant is
+    // missing or empty.
+    foreach ([$index, 1] as $i) {
+      if (($translated_array[$i] ?? '') !== '') {
+        return $translated_array[$i];
+      }
+    }
+    return $translated_array[0];
   }
 
   /**
    * Returns plural form index for a specific number.
    *
-   * The base implementation only distinguishes between singular and plural,
-   * so it always returns the second (index 1) plural form. Subclasses that
-   * know a language's full plural rules should override this method.
+   * Without plural formulae, the base implementation returns -1. Subclasses
+   * with a language's plural formula should override this method.
    *
    * @param int $count
    *   Number to return plural for.
@@ -142,10 +148,10 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *
    * @return int
    *   The numeric index of the plural variant to use for this $langcode and
-   *   $count combination.
+   *   $count combination, or -1 without a plural formula.
    */
   protected function getPluralIndex(int $count, ?string $langcode = NULL): int {
-    return 1;
+    return -1;
   }
 
   /**

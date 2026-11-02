@@ -49,15 +49,7 @@ class TranslationManager extends CoreTranslationManager {
       $index = $count > 199 ? 100 + ($count % 100) : $count;
       return $plural_formulas[$index] ?? $plural_formulas['default'];
     }
-    // In case there is no plural formula for English (no imported translation
-    // for English), use a default formula.
-    elseif ($langcode == 'en') {
-      return (int) ($count != 1);
-    }
-    // Otherwise, return -1 (unknown).
-    else {
-      return -1;
-    }
+    return -1;
   }
 
 }
