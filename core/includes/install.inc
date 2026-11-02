@@ -7,7 +7,6 @@
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -216,30 +215,14 @@ function drupal_install_system($install_state): void {
   // Store the installation profile in configuration to populate the
   // 'install_profile' container parameter.
   $config = \Drupal::configFactory()->getEditable('core.extension');
-  if ($install_state['parameters']['profile'] === FALSE) {
+  if ($install_state['parameters']['profile'] === FALSE
+    || !empty($install_state['profile_info']['opt_out_install'])) {
     $config->clear('profile');
   }
   else {
     $config->set('profile', $install_state['parameters']['profile']);
   }
   $config->save();
-
-  $connection = Database::getConnection();
-  $provider = $connection->getProvider();
-  // When the database driver is provided by a module, then install that module.
-  // This module must be installed before any other module, as it must be able
-  // to override any call to hook_schema() or any "backend_overridable" service.
-  // In edge cases, a driver module may extend from another driver module (for
-  // instance, a module to provide backward compatibility with a database
-  // version no longer supported by core). In order for the extended classes to
-  // be autoloadable, the extending module should list the extended module in
-  // its dependencies, and here the dependencies will be installed as well.
-  if ($provider !== 'core') {
-    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
-    if (str_contains($autoload, 'src/Driver/Database/')) {
-      $kernel->getContainer()->get('module_installer')->install([$provider], TRUE);
-    }
-  }
 }
 
 /**
@@ -759,11 +742,47 @@ function install_profile_info($profile, $langcode = 'en') {
 }
 
 /**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param string $directory_search
+ *   The namespace to check.
+ *
+ * @return string
+ *   The tasks.
+ *
+ * @internal
+ */
+function install_get_fixed_class_name(Extension $extension, string $directory_search): string {
+  $class_name = '';
+  $extension_path = $extension->getPath();
+  $extension_name = $extension->getName();
+  $dir = \Drupal::root() . "/$extension_path/src/$directory_search";
+  if (is_dir($dir)) {
+    $fileSystemIterator = new FilesystemIterator($dir);
+    foreach ($fileSystemIterator as $fileInfo) {
+      if ($fileInfo->isFile() && $fileInfo->getExtension() === 'php') {
+        $filename = $fileInfo->getFilename();
+        $extension_path = $dir . '/' . $filename;
+        require_once $extension_path;
+
+        $namespace = "Drupal\\$extension_name\\" . str_replace('/', '\\', $directory_search);
+        $class_name = $namespace . '\\' . $fileInfo->getBasename('.php');
+      }
+    }
+  }
+  return $class_name;
+}
+
+/**
  * Checks a module or profile requirements.
  *
  * See \Drupal\Core\Extension\InstallRequirementsInterface for more information.
  *
- * @param \Drupal\Core\Extension $extension
+ * @param \Drupal\Core\Extension\Extension $extension
  *   The extension to check install requirements for.
  *
  * @return array
@@ -772,26 +791,10 @@ function install_profile_info($profile, $langcode = 'en') {
  * @internal
  */
 function install_check_class_requirements(Extension $extension): array {
-  $extension_path = $extension->getPath();
-  $extension_name = $extension->getName();
-  $dir = \Drupal::root() . "/$extension_path/src/Install/Requirements";
+  $class_name = install_get_fixed_class_name($extension, 'Install/Requirements');
   $requirements = [];
-  if (is_dir($dir)) {
-    $fileSystemIterator = new FilesystemIterator($dir);
-    foreach ($fileSystemIterator as $fileInfo) {
-      if ($fileInfo->isFile() && $fileInfo->getExtension() === 'php') {
-        $filename = $fileInfo->getFilename();
-        $requirements_path = $dir . '/' . $filename;
-        require_once $requirements_path;
-
-        $namespace = "Drupal\\$extension_name\\Install\\Requirements";
-        $class_name = $namespace . '\\' . $fileInfo->getBasename('.php');
-        if (class_exists($class_name) && is_subclass_of($class_name, InstallRequirementsInterface::class)) {
-          $requirements = $class_name::getRequirements();
-        }
-      }
-    }
-
+  if (class_exists($class_name) && is_subclass_of($class_name, InstallRequirementsInterface::class)) {
+    $requirements = $class_name::getRequirements();
   }
   return $requirements;
 }

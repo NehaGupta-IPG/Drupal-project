@@ -2,9 +2,10 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -167,7 +168,7 @@ WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND pg_attribute.attrelid = :key::regclass
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
           ':key' => $quoted_key,
@@ -306,11 +307,12 @@ EOD;
 
     $sql_keys = [];
     if (!empty($table['primary key']) && is_array($table['primary key'])) {
-      $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
+      $this->validatePrimaryKeySchema($table['primary key'], $table['fields']);
       $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($table['primary key']) . ')';
     }
     if (isset($table['unique keys']) && is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
+        $this->validateUniqueKeySchema($key);
         // Use the createPrimaryKeySql(), which already discards any prefix
         // lengths passed as part of the key column specifiers. (Postgres
         // doesn't support setting a prefix length for PRIMARY or UNIQUE
@@ -370,6 +372,14 @@ EOD;
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (!empty($spec['unsigned'])) {
@@ -669,9 +679,15 @@ EOD;
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($new_keys['primary key']) && in_array($field, $new_keys['primary key'], TRUE);
+    $is_primary_key = !empty($new_keys['primary key']);
     if ($is_primary_key) {
-      $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field => $spec]);
+      $this->validatePrimaryKeySchema($new_keys['primary key'], [$field => $spec]);
+    }
+
+    if (!empty($new_keys['unique keys'])) {
+      foreach ($new_keys['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $fix_null = FALSE;
@@ -803,7 +819,7 @@ EOD;
     if ($this->constraintExists($table, 'pkey')) {
       throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
-
+    $this->validatePrimaryKeySchema($fields);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
@@ -841,7 +857,7 @@ EOD;
     if ($this->constraintExists($table, $name . '__key')) {
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
-
+    $this->validateUniqueKeySchema($fields);
     // Use the createPrimaryKeySql(), which already discards any prefix lengths
     // passed as part of the key column specifiers. (Postgres doesn't support
     // setting a prefix length for PRIMARY or UNIQUE indices.)
@@ -934,8 +950,13 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($new_keys['primary key']) && in_array($field_new, $new_keys['primary key'], TRUE)) {
-      $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field_new => $spec]);
+    if (!empty($new_keys['primary key'])) {
+      $this->validatePrimaryKeySchema($new_keys['primary key'], [$field_new => $spec]);
+    }
+    if (!empty($new_keys['unique keys'])) {
+      foreach ($new_keys['unique keys'] as $key_fields) {
+        $this->validateUniqueKeySchema($key_fields);
+      }
     }
 
     $spec = $this->processField($spec);

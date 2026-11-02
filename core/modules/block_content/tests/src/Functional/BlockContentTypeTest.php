@@ -206,7 +206,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
     $block = $this->createBlockContent(FALSE, 'foo');
     // Attempt to delete the block type, which should not be allowed.
     $this->drupalGet('admin/structure/block-content/manage/' . $type->id() . '/delete');
-    $this->assertSession()->pageTextContains($type->label() . ' is used by 1 content block on your site. You can not remove this block type until you have removed all of the ' . $type->label() . ' blocks.');
+    $this->assertSession()->pageTextContains($type->label() . ' is used by 1 content block on your site. You may not remove this block type until you have removed all of the ' . $type->label() . ' content blocks.');
     $this->assertSession()->pageTextNotContains('This action cannot be undone.');
 
     // Delete the block.
@@ -235,7 +235,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
       ->getStorage('block_content');
 
     // Install all themes.
-    $themes = ['olivero', 'stark', 'claro'];
+    $themes = ['stark', 'default_admin'];
     \Drupal::service('theme_installer')->install($themes);
     $theme_settings = $this->config('system.theme');
     foreach ($themes as $default_theme) {
@@ -263,7 +263,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
             'theme' => $theme,
           ]));
           $this->submitForm(['region' => 'content'], 'Save block');
-          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => $theme . '-' . Html::getClass($edit['info[0][value]'])]]));
+          $this->assertSession()->addressEquals(Url::fromRoute('block.admin_display_theme', ['theme' => $theme], ['query' => ['block-placement' => Html::getClass($theme . '-' . $edit['info[0][value]'])]]));
         }
         else {
           $this->fail('Could not load created block.');
