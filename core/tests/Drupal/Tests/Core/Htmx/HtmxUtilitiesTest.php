@@ -110,6 +110,25 @@ class HtmxUtilitiesTest extends UnitTestCase {
   }
 
   /**
+   * Tests that ::applyTo() preserves existing cache metadata.
+   */
+  public function testApplyToPreservesExistingCacheMetadata(): void {
+    $render = [
+      '#cache' => [
+        'contexts' => ['user.roles'],
+        'tags' => ['node:1'],
+        'max-age' => 300,
+      ],
+    ];
+
+    $this->htmx->applyTo($render);
+
+    $this->assertSame(['user.roles'], $render['#cache']['contexts']);
+    $this->assertSame(['node:1'], $render['#cache']['tags']);
+    $this->assertSame(300, $render['#cache']['max-age']);
+  }
+
+  /**
    * Test ::applyTo with attribute key.
    */
   public function testApplyToWithKey(): void {

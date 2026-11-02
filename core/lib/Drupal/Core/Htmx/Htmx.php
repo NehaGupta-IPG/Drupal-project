@@ -1421,7 +1421,9 @@ class Htmx {
       $element[$attributeKey] = $element[$attributeKey] ?? [];
       $element[$attributeKey] = AttributeHelper::mergeCollections($element[$attributeKey], $this->attributes);
     }
-    $this->cacheableMetadata->applyTo($element);
+    CacheableMetadata::createFromRenderArray($element)
+      ->merge($this->cacheableMetadata)
+      ->applyTo($element);
   }
 
   /**
