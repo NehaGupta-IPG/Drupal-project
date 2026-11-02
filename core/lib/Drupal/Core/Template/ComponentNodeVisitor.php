@@ -62,8 +62,10 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
         $print_nodes[] = new PrintNode(new ConstantExpression('" -->', $line), $line);
       }
     }
+    // Get the actual TwigExtension class that may have been overridden.
+    $extension_class = get_class(\Drupal::service('twig.extension'));
     $print_nodes[] = new PrintNode(new FunctionExpression(
-      new TwigFunction('attach_library', [$env->getExtension(TwigExtension::class), 'attachLibrary']),
+      new TwigFunction('attach_library', [$env->getExtension($extension_class), 'attachLibrary']),
       new Nodes([new ConstantExpression($component->getLibraryName(), $line)]),
       $line
     ), $line);

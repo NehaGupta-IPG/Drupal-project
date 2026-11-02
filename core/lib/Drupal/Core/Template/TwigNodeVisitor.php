@@ -46,11 +46,15 @@ class TwigNodeVisitor implements NodeVisitorInterface {
         unset($this->skipRenderVarFunction);
         return $node;
       }
+
+      // Get the actual TwigExtension class that may have been overridden.
+      $extension_class = get_class(\Drupal::service('twig.extension'));
+
       $class = get_class($node);
       $line = $node->getTemplateLine();
       return new $class(
         new FunctionExpression(
-          new TwigFunction('render_var', [$env->getExtension(TwigExtension::class), 'renderVar']),
+          new TwigFunction('render_var', [$env->getExtension($extension_class), 'renderVar']),
           new Nodes([$node->getNode('expr')]),
           $line
         ),
