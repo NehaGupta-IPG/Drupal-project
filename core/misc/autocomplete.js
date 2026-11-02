@@ -18,6 +18,9 @@
    *   Array of values, split by comma.
    */
   function autocompleteSplitValues(value) {
+    if (autocomplete.options.isSingle) {
+      return value ? [value] : [];
+    }
     // We will match the value against comma-separated terms.
     const result = [];
     let quote = false;
@@ -217,6 +220,15 @@
           $.extend(autocomplete.options, {
             firstCharacterDenyList: denyList,
           });
+          // Read the cardinality from the field attributes.
+          const isSingleAttribute = $autocomplete.attr(
+            'data-autocomplete-single',
+          );
+          if (isSingleAttribute && isSingleAttribute !== '0') {
+            $.extend(autocomplete.options, {
+              isSingle: true,
+            });
+          }
           // Use jQuery UI Autocomplete on the textfield.
           $autocomplete.autocomplete(autocomplete.options).each(function () {
             $(this).data('ui-autocomplete')._renderItem =
@@ -270,6 +282,8 @@
       firstCharacterDenyList: '',
       // Custom options, indicate IME usage status.
       isComposing: false,
+      // Indicates the cardinality of the field.
+      isSingle: false,
     },
     ajax: {
       dataType: 'json',
