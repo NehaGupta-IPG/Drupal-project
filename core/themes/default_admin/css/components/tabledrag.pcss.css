@@ -296,9 +296,7 @@ body {
 
   #field-display-overview,
   #field-display-overview-wrapper,
-  .field--widget-entity-reference-paragraphs,
-  .field--type-link,
-  .field--type-smartdate {
+  .field--type-link {
     .layer-wrapper > & {
       .action-link {
         pointer-events: all;
