@@ -39,7 +39,7 @@ class UserViewsData extends EntityViewsData {
       ],
     ];
 
-    $data['users']['uid_current'] = [
+    $data['users_field_data']['uid_current'] = [
       'real field' => 'uid',
       'title' => $this->t('Current'),
       'help' => $this->t('Filter the view to the currently logged in user.'),
