@@ -2,6 +2,7 @@
 
 namespace Drupal\editor\Entity;
 
+use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -183,6 +184,7 @@ class Editor extends ConfigEntityBase implements EditorInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set editor'), pluralize: FALSE)]
   public function setEditor($editor) {
     $this->editor = $editor;
     return $this;
@@ -198,6 +200,7 @@ class Editor extends ConfigEntityBase implements EditorInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set settings'), pluralize: FALSE)]
   public function setSettings(array $settings) {
     $this->settings = $settings;
     return $this;
@@ -213,6 +216,7 @@ class Editor extends ConfigEntityBase implements EditorInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set image upload settings'), pluralize: FALSE)]
   public function setImageUploadSettings(array $image_upload_settings) {
     $this->image_upload = $image_upload_settings;
     return $this;
