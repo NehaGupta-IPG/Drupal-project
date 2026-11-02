@@ -616,6 +616,8 @@
       dataType: 'json',
       jsonp: false,
       method: ajax.httpMethod,
+      resetForm: elementSettings.reset,
+      clearForm: elementSettings.clear,
     };
 
     if (elementSettings.dialog) {

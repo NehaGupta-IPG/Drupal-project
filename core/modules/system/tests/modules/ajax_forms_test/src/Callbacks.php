@@ -72,6 +72,13 @@ class Callbacks {
   }
 
   /**
+   * Ajax callback that returns an empty response.
+   */
+  public static function noOpCallback(): AjaxResponse {
+    return new AjaxResponse();
+  }
+
+  /**
    * Ajax callback to confirm image button was submitted.
    */
   public static function imageButtonCallback($form, FormStateInterface $form_state): AjaxResponse {

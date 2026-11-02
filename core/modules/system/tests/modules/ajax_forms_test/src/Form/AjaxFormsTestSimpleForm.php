@@ -155,6 +155,28 @@ class AjaxFormsTestSimpleForm extends FormBase {
       ],
     ];
 
+    $form['ajax_submit_textfield'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Ajax submit textfield'),
+      '#default_value' => 'Ajax submit default value',
+    ];
+    $form['ajax_submit_reset'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Reset form with Ajax'),
+      '#ajax' => [
+        'callback' => [Callbacks::class, 'noOpCallback'],
+        'reset' => TRUE,
+      ],
+    ];
+    $form['ajax_submit_clear'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Clear form with Ajax'),
+      '#ajax' => [
+        'callback' => [Callbacks::class, 'noOpCallback'],
+        'clear' => TRUE,
+      ],
+    ];
+
     return $form;
   }
 
