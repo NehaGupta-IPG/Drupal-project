@@ -390,6 +390,7 @@ class BreadcrumbTest extends BrowserTestBase {
     // Create an only slightly privileged user being able to access site reports
     // but not administration pages.
     $this->webUser = $this->drupalCreateUser([
+      'access dblog reports',
       'access site reports',
     ]);
     $this->drupalLogin($this->webUser);

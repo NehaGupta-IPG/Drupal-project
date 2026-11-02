@@ -4,7 +4,7 @@ dblog.overview:
     _controller: '\Drupal\dblog\Controller\DbLogController::overview'
     _title: 'Recent log messages'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.confirm:
   path: '/admin/reports/dblog/confirm'
@@ -12,7 +12,7 @@ dblog.confirm:
     _form: '\Drupal\dblog\Form\DblogClearLogConfirmForm'
     _title: 'Confirm delete recent log messages'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.event:
   path: '/admin/reports/dblog/event/{event_id}'
@@ -20,7 +20,7 @@ dblog.event:
     _controller: '\Drupal\dblog\Controller\DbLogController::eventDetails'
     _title: 'Details'
   requirements:
-    _permission: 'access site reports'
+    _permission: 'access dblog reports'
 
 dblog.page_not_found:
   path: '/admin/reports/page-not-found'

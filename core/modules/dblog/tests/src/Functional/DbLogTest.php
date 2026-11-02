@@ -55,6 +55,20 @@ class DbLogTest extends BrowserTestBase {
   protected $webUser;
 
   /**
+   * A user with the 'access site reports' permission.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $userWithSiteReportsPermissions;
+
+  /**
+   * A user with the 'access dblog reports' permission.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $userWithDblogReportsPermissions;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -67,10 +81,20 @@ class DbLogTest extends BrowserTestBase {
       'administer site configuration',
       'access administration pages',
       'access help pages',
+      'access dblog reports',
       'access site reports',
       'administer users',
     ]);
-    $this->webUser = $this->drupalCreateUser([]);
+    $this->userWithSiteReportsPermissions = $this->drupalCreateUser([
+      'access administration pages',
+      'access site reports',
+    ]);
+    $this->userWithDblogReportsPermissions = $this->drupalCreateUser([
+      'access administration pages',
+      'access dblog reports',
+      'access site reports',
+    ]);
+    $this->webUser = $this->drupalCreateUser();
   }
 
   /**
@@ -108,6 +132,8 @@ class DbLogTest extends BrowserTestBase {
     $this->test403LogEventPage();
     $this->testMessageParsing();
     $this->testOverviewLinks();
+    $this->testAccessDblogReportsPermission();
+    $this->testAccessSiteReportsPermission();
   }
 
   /**
@@ -176,6 +202,40 @@ class DbLogTest extends BrowserTestBase {
     $backtrace = "//tr//pre[contains(@class, 'backtrace')]";
     $this->assertCount(1, $table->findAll('xpath', $backtrace));
     $this->assertSession()->responseContains('&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;');
+  }
+
+  /**
+   * Tests whether users can access the Recent log messages page.
+   */
+  protected function testAccessDblogReportsPermission(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalLogin($this->userWithDblogReportsPermissions);
+
+    // Make sure the user can reach the Recent log messages page.
+    $this->drupalGet('/admin/reports/dblog');
+    $assert_session->statusCodeEquals(200);
+
+    $this->drupalLogout();
+  }
+
+  /**
+   * Tests whether users can see the Reports menu item in the admin menu.
+   */
+  protected function testAccessSiteReportsPermission(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalLogin($this->userWithSiteReportsPermissions);
+
+    // Check if the user can access the Reports page.
+    $this->drupalGet('/admin/reports');
+    $assert_session->statusCodeEquals(200);
+
+    // Make sure the user can't reach the Recent log messages page.
+    $this->drupalGet('/admin/reports/dblog');
+    $assert_session->statusCodeEquals(403);
+
+    $this->drupalLogout();
   }
 
   /**
