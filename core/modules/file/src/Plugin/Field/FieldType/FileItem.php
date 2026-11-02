@@ -63,6 +63,7 @@ class FileItem extends EntityReferenceItem {
       'display_field' => FALSE,
       'display_default' => FALSE,
       'uri_scheme' => \Drupal::config('system.file')->get('default_scheme'),
+      'uri_scheme_field' => FALSE,
     ] + parent::defaultStorageSettings();
   }
 
@@ -171,6 +172,13 @@ class FileItem extends EntityReferenceItem {
       '#default_value' => $this->getSetting('uri_scheme'),
       '#description' => $this->t('Select where the final files should be stored. Private file storage has significantly more overhead than public files, but allows restricted access to files within this field.'),
       '#disabled' => $has_data,
+    ];
+
+    $element['uri_scheme_field'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable <em>file system used for upload</em> field'),
+      '#default_value' => $this->getSetting('uri_scheme_field'),
+      '#description' => $this->t('The "file system used for upload" option allows users to choose where the final file should be stored: public or private separately for each file.'),
     ];
 
     return $element;

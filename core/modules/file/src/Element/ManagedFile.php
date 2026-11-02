@@ -16,6 +16,8 @@ use Drupal\Core\Security\StaticTrustedCallbackHelper;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\UntrustedCallbackException;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file\Upload\ManagedFileElementHelper;
@@ -75,6 +77,21 @@ class ManagedFile extends FormElementBase {
     if ($input !== FALSE) {
       $input['fids'] = $fids;
       $return = $input;
+
+      // Only accept a submitted URI scheme when the element allows choosing
+      // one and the scheme is a visible, writable stream wrapper.
+      $uri_scheme = NULL;
+      if (!empty($element['#uri_scheme_field']) && isset($input['uri_scheme']) && is_string($input['uri_scheme'])) {
+        $allowed_schemes = \Drupal::service(StreamWrapperManagerInterface::class)->getNames(StreamWrapperInterface::WRITE_VISIBLE);
+        if (isset($allowed_schemes[$input['uri_scheme']])) {
+          $uri_scheme = $input['uri_scheme'];
+        }
+      }
+
+      // Override the URI scheme of the upload location.
+      if ($uri_scheme !== NULL && isset($element['#uri_scheme_default'])) {
+        $element['#upload_location'] = str_replace($element['#uri_scheme_default'] . '://', $uri_scheme . '://', $element['#upload_location']);
+      }
 
       // Uploads take priority over all other values.
       if ($files = \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload($element, $form_state)) {
