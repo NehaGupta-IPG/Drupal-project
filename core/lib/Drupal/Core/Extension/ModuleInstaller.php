@@ -928,7 +928,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         return $install_task->getLastRemoved();
       }
     }
-    catch (\Exception) {
+    catch (\InvalidArgumentException) {
       $function = $extension->getName() . '_' . $hook;
       if (function_exists($function)) {
         return $function(...$args);

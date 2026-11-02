@@ -39,17 +39,19 @@ class SchemaInspector {
       ->getPath($module);
     $pathname = "$module_path/$module.info.yml";
     $extension = new Extension(\DRUPAL_ROOT, 'module', $pathname, NULL);
-    $class_name = install_get_fixed_class_name($extension, 'Install/Schema');
-    if (class_exists($class_name)) {
-      if (is_subclass_of($class_name, SchemaInterface::class)) {
-        $install_class = \Drupal::classResolver($class_name);
-        /** @var \Drupal\Core\Extension\Install\SchemaInterface $install_class */
-        $schema = $install_class->getSchema();
+    try {
+      $class_name = install_get_fixed_class_name($extension, $directory_search);
+      $install_task = \Drupal::classResolver($class_name);
+      if ($install_task instanceof SchemaInterface) {
+        $schema = $install_task->getSchema();
       }
     }
-    elseif ($handler->loadInclude($module, 'install')) {
-      $schema = $handler->invoke($module, 'schema') ?? [];
+    catch (\InvalidArgumentException) {
+      if ($handler->loadInclude($module, 'install')) {
+        $schema = $handler->invoke($module, 'schema') ?? [];
+      }
     }
+
     // @todo Remove Schema check in drupal:13.0.0.
     if ($schema instanceof Schema) {
       assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
