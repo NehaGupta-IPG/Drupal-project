@@ -17,6 +17,7 @@ use Drupal\node\NodeGrantDatabaseStorageInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeStorageInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -54,9 +55,13 @@ class NodeOperationAccessTest extends UnitTestCase {
    * @param bool|null $isDefaultRevision
    *   Whether the node should be default revision, or NULL if not to expect it
    *   to be called.
+   * @param bool|null $isLatestRevision
+   *   Whether the node should be the latest revision, or NULL if not to expect it
+   *   to be called.
    */
   #[DataProvider('providerTestRevisionOperations')]
-  public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL): void {
+  #[AllowMockObjectsWithoutExpectations]
+  public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL, $isLatestRevision = NULL): void {
     $account = $this->createStub(AccountInterface::class);
     $account->method('hasPermission')
       ->willReturnMap($hasPermissionMap);
@@ -96,9 +101,17 @@ class NodeOperationAccessTest extends UnitTestCase {
       ->method('getEntityTypeId')
       ->willReturn('node');
 
-    $node->expects($this->atLeastOnce())
-      ->method('isDefaultRevision')
-      ->willReturn($isDefaultRevision);
+    if (!is_null($isDefaultRevision)) {
+      $node->expects($this->atLeastOnce())
+        ->method('isDefaultRevision')
+        ->willReturn($isDefaultRevision);
+    }
+
+    if (!is_null($isLatestRevision)) {
+      $node->expects($this->atLeastOnce())
+        ->method('isLatestTranslationAffectedRevision')
+        ->willReturn($isLatestRevision);
+    }
 
     $nodeStorage = $this->createStub(NodeStorageInterface::class);
     $nodeStorage
@@ -213,8 +226,8 @@ class NodeOperationAccessTest extends UnitTestCase {
       FALSE,
     ];
 
-    // Can revert if has update access.
-    $data['revert, with update access, non default'] = [
+    // Can revert to a non-default, non-latest revision with access.
+    $data['revert, with update access, non default, not latest'] = [
       'revert revision',
       [
         ['access content', TRUE],
@@ -223,11 +236,26 @@ class NodeOperationAccessTest extends UnitTestCase {
         ['bypass node access', TRUE],
       ],
       TRUE,
+      NULL,
       FALSE,
     ];
 
-    // Can never revert default revision.
-    $data['revert, with update access, default revision'] = [
+    // Can revert to default if it is not the latest.
+    $data['revert, with update access, default revision, not latest'] = [
+      'revert revision',
+      [
+        ['access content', TRUE],
+        ['revert all revisions', TRUE],
+        // Bypass for 'update' operation.
+        ['bypass node access', TRUE],
+      ],
+      TRUE,
+      NULL,
+      FALSE,
+    ];
+
+    // Cannot revert to latest revision.
+    $data['revert, with update access, default revision, latest'] = [
       'revert revision',
       [
         ['access content', TRUE],
@@ -236,6 +264,21 @@ class NodeOperationAccessTest extends UnitTestCase {
         ['bypass node access', TRUE],
       ],
       FALSE,
+      NULL,
+      TRUE,
+    ];
+
+    // Cannot revert to non-default if also latest.
+    $data['revert, with update access, non default, latest'] = [
+      'revert revision',
+      [
+        ['access content', TRUE],
+        ['revert all revisions', TRUE],
+        // Bypass for 'update' operation.
+        ['bypass node access', TRUE],
+      ],
+      FALSE,
+      NULL,
       TRUE,
     ];
 

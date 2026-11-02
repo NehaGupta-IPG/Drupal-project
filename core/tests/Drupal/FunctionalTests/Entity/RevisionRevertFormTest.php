@@ -6,9 +6,11 @@ namespace Drupal\FunctionalTests\Entity;
 
 use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\Entity\EntityTestRevPub;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,6 +38,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     'entity_test',
     'entity_test_revlog',
     'dblog',
+    'language',
   ];
 
   /**
@@ -56,6 +59,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $this->testAccessRevertLatestDefault();
     $this->testAccessRevertLatestForwardRevision();
     $this->testAccessRevertNonLatest();
+    $this->testAccessRevertLatestTranslationAffectedRevision();
     $this->testPrepareRevision();
   }
 
@@ -128,11 +132,14 @@ class RevisionRevertFormTest extends BrowserTestBase {
   }
 
   /**
-   * Ensures that forward revisions can be reverted.
+   * Ensures that forward revisions except the latest can be reverted.
    *
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestForwardRevision(): void {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_revpub');
+
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('revert');
@@ -145,10 +152,22 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $entity->setUnpublished();
     $entity->setNewRevision();
     $entity->save();
+    $nonLatestForwardRevisionId = $entity->getRevisionId();
+
+    $entity->isDefaultRevision(FALSE);
+    $entity->setUnpublished();
+    $entity->setNewRevision();
+    $entity->save();
+
+    $nonLatestForwardRevision = $storage->loadRevision($nonLatestForwardRevisionId);
+
+    $this->drupalGet($nonLatestForwardRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($nonLatestForwardRevision->access('revert', $this->rootUser, FALSE));
 
     $this->drupalGet($entity->toUrl('revision-revert-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertTrue($entity->access('revert', $this->rootUser, FALSE));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($entity->access('revert', $this->rootUser, FALSE));
   }
 
   /**
@@ -173,6 +192,57 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $this->drupalGet($revision->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertTrue($revision->access('revert', $this->rootUser, FALSE));
+  }
+
+  /**
+   * Tests revert access uses the latest revision affecting each translation.
+   *
+   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::access
+   */
+  protected function testAccessRevertLatestTranslationAffectedRevision(): void {
+    ConfigurableLanguage::createFromLangcode('es')->save();
+    // Rebuild the container so that URLs are generated with language prefixes.
+    $this->rebuildContainer();
+
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_mulrev');
+
+    // Revision 1 only affects the English translation.
+    $entity = EntityTestMulRev::create(['langcode' => 'en']);
+    $entity->setName('revert');
+    $entity->save();
+    $firstRevisionId = $entity->getRevisionId();
+
+    // Revisions 2 and 3 only affect the Spanish translation.
+    $translation = $entity->addTranslation('es', ['name' => 'revert,es']);
+    $translation->setNewRevision();
+    $translation->save();
+    $secondRevisionId = $translation->getRevisionId();
+
+    $translation->setName('revert,es,updated');
+    $translation->setNewRevision();
+    $translation->save();
+    $thirdRevisionId = $translation->getRevisionId();
+
+    // The first revision is neither the default nor the latest revision, but
+    // it is the latest revision affecting the English translation, so it
+    // cannot be reverted to.
+    $firstRevision = $storage->loadRevision($firstRevisionId);
+    $this->drupalGet($firstRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($firstRevision->access('revert', $this->rootUser, FALSE));
+
+    // The Spanish translation can be reverted to the second revision, but not
+    // to the third, which is the latest revision affecting it.
+    $secondRevision = $storage->loadRevision($secondRevisionId)->getTranslation('es');
+    $this->drupalGet($secondRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($secondRevision->access('revert', $this->rootUser, FALSE));
+
+    $thirdRevision = $storage->loadRevision($thirdRevisionId)->getTranslation('es');
+    $this->drupalGet($thirdRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($thirdRevision->access('revert', $this->rootUser, FALSE));
   }
 
   /**

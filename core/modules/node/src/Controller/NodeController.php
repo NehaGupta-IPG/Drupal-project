@@ -148,7 +148,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
       /** @var \Drupal\node\NodeInterface $revision */
-      $revision = $node_storage->loadRevision($vid);
+      $revision = $node_storage->loadRevision($vid)->getTranslation($langcode);
       $username = [
         '#theme' => 'username',
         '#account' => $revision->getRevisionUser(),
@@ -173,8 +173,12 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         ]))->toString();
       }
 
-      $row = [];
-      $column = [
+      $row = [
+        'data' => [],
+        'class' => $is_current_revision ? ['revision-current'] : [],
+      ];
+
+      $row['data'][] = [
         'data' => [
           '#type' => 'inline_template',
           '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
@@ -189,56 +193,40 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
           ],
         ],
       ];
-      $row[] = $column;
 
-      if ($is_current_revision) {
-        $row[] = [
-          'data' => [
-            '#prefix' => '<em>',
-            '#markup' => $this->t('Current revision'),
-            '#suffix' => '</em>',
-          ],
-        ];
-
-        $rows[] = [
-          'data' => $row,
-          'class' => ['revision-current'],
+      $links = [];
+      if ($revision->access('revert revision')) {
+        $links['revert'] = [
+          'title' => $this->t('Revert'),
+          'url' => $has_translations
+            ? Url::fromRoute('node.revision_revert_translation_confirm', [
+              'node' => $node->id(),
+              'node_revision' => $vid,
+              'langcode' => $langcode,
+            ])
+            : Url::fromRoute('node.revision_revert_confirm', [
+              'node' => $node->id(),
+              'node_revision' => $vid,
+            ]),
         ];
       }
-      else {
-        $links = [];
-        if ($revision->access('revert revision')) {
-          $links['revert'] = [
-            'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
-            'url' => $has_translations
-              ? Url::fromRoute('node.revision_revert_translation_confirm', [
-                'node' => $node->id(),
-                'node_revision' => $vid,
-                'langcode' => $langcode,
-              ])
-              : Url::fromRoute('node.revision_revert_confirm', [
-                'node' => $node->id(),
-                'node_revision' => $vid,
-              ]),
-          ];
-        }
 
-        if ($revision->access('delete revision')) {
-          $links['delete'] = [
-            'title' => $this->t('Delete'),
-            'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
-          ];
-        }
-
-        $row[] = [
-          'data' => [
-            '#type' => 'operations',
-            '#links' => $links,
-          ],
+      if ($revision->access('delete revision')) {
+        $links['delete'] = [
+          'title' => $this->t('Delete'),
+          'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
         ];
-
-        $rows[] = $row;
       }
+
+      $row['data'][] = [
+        'data' => [
+          '#type' => 'operations',
+          '#links' => $links,
+          '#prefix' => $is_current_revision ? $this->t('<em>Current revision</em>') : '',
+        ],
+      ];
+
+      $rows[] = $row;
     }
 
     $build['node_revisions_table'] = [
