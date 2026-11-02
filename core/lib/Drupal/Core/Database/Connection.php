@@ -232,7 +232,10 @@ abstract class Connection {
     // Only soft deprecation (no @trigger_error) to avoid thousands of
     // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
-    if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
+    // Explicit commits and rollbacks can still have pending callbacks while
+    // their Transaction objects remain alive. Complete them before
+    // disconnecting.
+    if (method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
     }
   }
