@@ -289,7 +289,10 @@ class Merge extends Query implements ConditionInterface {
    * If called with two arrays, the first array is taken as the fields
    * and the second array is taken as the corresponding values.
    *
-   * The fields are copied to the condition of the query and the INSERT part.
+   * The fields are copied to the condition of the query and the INSERT part;
+   * because of this, the keys() method should be called after fields() or
+   * insertFields().
+   *
    * If no other method is called, the UPDATE will become a no-op.
    *
    * @param array $fields
@@ -299,6 +302,9 @@ class Merge extends Query implements ConditionInterface {
    *   specified in the same order as the $fields array.
    *
    * @return $this
+   *
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeFieldsAfterKeys()
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeKeysAfterInsertFields()
    */
   public function keys(array $fields, array $values = []) {
     if ($values) {
@@ -317,6 +323,9 @@ class Merge extends Query implements ConditionInterface {
    * Same as \Drupal\Core\Database\Query\Merge::keys() but offering a signature
    * that is more natural for the case of a single key.
    *
+   * As with keys(), this method should be called after fields() or
+   * insertFields().
+   *
    * @param string $field
    *   The name of the field to set.
    * @param mixed $value
@@ -325,6 +334,7 @@ class Merge extends Query implements ConditionInterface {
    * @return $this
    *
    * @see \Drupal\Core\Database\Query\Merge::keys()
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeInsertFieldsAfterKey()
    */
   public function key($field, $value = NULL) {
     assert(is_string($field));
