@@ -26,6 +26,7 @@ use Drupal\media\IFrameUrlHelper;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaSourceBase;
 use Drupal\media\MediaTypeInterface;
+use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
@@ -258,7 +259,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $resource_url = $this->urlResolver->getResourceUrl($media_url);
       $resource = $this->resourceFetcher->fetchResource($resource_url);
     }
-    catch (ResourceException $e) {
+    catch (ProviderException | ResourceException $e) {
       $this->messenger->addError($e->getMessage());
       return NULL;
     }

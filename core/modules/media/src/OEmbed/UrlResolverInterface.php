@@ -39,6 +39,12 @@ interface UrlResolverInterface {
    *
    * @return string
    *   Returns the resource URL corresponding to the given media item URL.
+   *
+   * @throws \Drupal\media\OEmbed\ResourceException
+   *   If valid resource data can not be retrieved for the given media item URL.
+   * @throws \Drupal\media\OEmbed\ProviderException
+   *   If valid oEmbed provider information cannot be retrieved for the given
+   *   media item URL.
    */
   public function getResourceUrl($url, $max_width = NULL, $max_height = NULL);
 

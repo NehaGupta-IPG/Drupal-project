@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
@@ -157,7 +158,7 @@ class OEmbedForm extends AddFormBase {
         $resource_url = $this->urlResolver->getResourceUrl($url);
         $this->resourceFetcher->fetchResource($resource_url);
       }
-      catch (ResourceException $e) {
+      catch (ProviderException | ResourceException $e) {
         $form_state->setErrorByName('url', $e->getMessage());
       }
     }

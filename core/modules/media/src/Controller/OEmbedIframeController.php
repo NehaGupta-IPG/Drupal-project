@@ -12,6 +12,7 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\media\IFrameMarkup;
 use Drupal\media\IFrameUrlHelper;
+use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
@@ -213,7 +214,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
         $response->addAttachments($bubbleable_metadata->getAttachments());
       }
     }
-    catch (ResourceException $e) {
+    catch (ProviderException | ResourceException $e) {
       // Prevent the response from being cached.
       $response->getCacheableMetadata()->setCacheMaxAge(0);
 

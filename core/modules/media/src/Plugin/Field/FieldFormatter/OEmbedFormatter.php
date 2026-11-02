@@ -15,6 +15,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\media\Entity\MediaType;
 use Drupal\media\IFrameUrlHelper;
+use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
@@ -154,7 +155,7 @@ class OEmbedFormatter extends FormatterBase {
         $resource_url = $this->urlResolver->getResourceUrl($value, $max_width, $max_height);
         $resource = $this->resourceFetcher->fetchResource($resource_url);
       }
-      catch (ResourceException $exception) {
+      catch (ProviderException | ResourceException $exception) {
         $this->logger->error("Could not retrieve the remote URL (@url): %error", [
           '@url' => $value,
           '%error' => $exception->getPrevious() ? $exception->getPrevious()->getMessage() : $exception->getMessage(),
