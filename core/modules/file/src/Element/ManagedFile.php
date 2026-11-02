@@ -81,8 +81,18 @@ class ManagedFile extends FormElementBase {
         if ($element['#multiple']) {
           $fids = array_merge($fids, array_keys($files));
           $denied_fids = [];
-          foreach (File::loadMultiple($fids) as $fid => $file) {
-            if (!$file->access('download')) {
+          foreach ($fids as $fid) {
+            // For anonymous users, along the same session,
+            // uploaded files are temporarily stored in the session.
+            // @see \Drupal\file\Upload\FileUploadHandler::handleFileUpload()
+            if (\Drupal::currentUser()->isAnonymous()) {
+              $session = \Drupal::request()->getSession();
+              $allowed_ids = $session ? $session->get('anonymous_allowed_file_ids', []) : [];
+              if (!in_array($fid, $allowed_ids) && !File::load($fid)->access('download')) {
+                $denied_fids[] = $fid;
+              }
+            }
+            elseif (!File::load($fid)->access('download')) {
               $denied_fids[] = $fid;
             }
           }
