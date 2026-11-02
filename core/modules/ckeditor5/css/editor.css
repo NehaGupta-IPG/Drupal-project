@@ -29,3 +29,9 @@
 .ck-toolbar__items .ck.ck-button.ck-on {
   border: 1px solid var(--ck-color-button-on-color);
 }
+
+.ck-focused,
+.ck-blurred,
+.ck-source-editing-area {
+  word-break: break-word !important;
+}
