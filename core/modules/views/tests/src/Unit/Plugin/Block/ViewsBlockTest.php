@@ -20,6 +20,7 @@ use Drupal\views\ViewExecutableFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 
@@ -108,9 +109,6 @@ class ViewsBlockTest extends UnitTestCase {
       ->method('setDisplay')
       ->with('block_1')
       ->willReturn(TRUE);
-    $this->executable
-      ->method('getShowAdminLinks')
-      ->willReturn(FALSE);
 
     $this->view = $this->createStub(View::class);
     $this->view
@@ -158,13 +156,17 @@ class ViewsBlockTest extends UnitTestCase {
    *
    * @see \Drupal\views\Plugin\block\ViewsBlock::build()
    */
-  public function testBuild(): void {
+  #[TestWith([FALSE, FALSE, FALSE], 'links disabled')]
+  #[TestWith([FALSE, TRUE, TRUE], 'links enabled')]
+  #[TestWith([TRUE, TRUE, FALSE], 'preview with links enabled')]
+  public function testBuild(bool $in_preview, bool $show_admin_links, bool $expected_admin_links): void {
+    $this->executable->method('getShowAdminLinks')->willReturn($show_admin_links);
     $output = $this->randomMachineName(100);
     $build = [
       'view_build' => $output,
       '#view_id' => 'test_view',
       '#view_display_plugin_class' => '\Drupal\views\Plugin\views\display\Block',
-      '#view_display_show_admin_links' => FALSE,
+      '#view_display_show_admin_links' => $expected_admin_links,
       '#view_display_plugin_id' => 'block',
       '#pre_rendered' => TRUE,
     ];
@@ -180,6 +182,7 @@ class ViewsBlockTest extends UnitTestCase {
     $definition['provider'] = 'views';
     $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account, $this->contextualLinks);
 
+    $plugin->setInPreview($in_preview);
     $this->assertEquals($build, $plugin->build());
   }
 

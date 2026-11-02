@@ -88,7 +88,10 @@ class View extends RenderElementBase {
           // \Drupal\views\ContextualLinksHelper::addLinks() needs the following
           // information to be attached to the view.
           $element['#view_id'] = $view->storage->id();
-          $element['#view_display_show_admin_links'] = $view->getShowAdminLinks();
+          // @todo Restore the unconditional assignment after
+          //   https://www.drupal.org/project/drupal/issues/2884801 is committed
+          //   and block contextual links are added after View preparation.
+          $element['#view_display_show_admin_links'] ??= $view->getShowAdminLinks();
           $element['#view_display_plugin_id'] = $view->display_handler->getPluginId();
           \Drupal::service(ContextualLinksHelper::class)->addLinks($element, 'view', $view->current_display);
         }

@@ -7,6 +7,7 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -78,6 +79,11 @@ class ContextualLinksTest extends WebDriverTestBase {
   public function testContextualLinks(): void {
     $page = $this->getSession()->getPage();
 
+    $view = Views::getView('test_block_view');
+    $view->setDisplay('block_3');
+    $view->display_handler->setOption('exposed_block', TRUE);
+    $view->save();
+
     $this->drupalGet('node/1/layout');
 
     // Add a block that includes an entity contextual link.
@@ -85,6 +91,9 @@ class ContextualLinksTest extends WebDriverTestBase {
 
     // Add a block that includes a views contextual link.
     $this->addBlock('Recent content');
+
+    // Views' exposed filter block must recognize preview mode and omit its contextual links.
+    $this->addBlock('Exposed form: test_block_view-block_3');
 
     // Ensure the contextual links are correct before the layout is saved.
     $this->assertCorrectContextualLinksInUi();
@@ -158,6 +167,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.block-views-blocktest-block-view-block-2'));
+    $assert_session->elementExists('css', '.block-views-exposed-filter-blocktest-block-view-block-3 form');
 
     $layout_builder_specific_contextual_links = $page->findAll('css', '[data-contextual-id*=\'layout_builder_block:\']');
     $this->assertNotEmpty($layout_builder_specific_contextual_links);
