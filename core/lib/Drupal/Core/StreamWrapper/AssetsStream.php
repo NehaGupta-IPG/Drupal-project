@@ -49,6 +49,10 @@ class AssetsStream extends PublicStream {
    * {@inheritdoc}
    */
   public static function baseUrl(): string {
+    $settings_base_url = Settings::get('file_assets_base_url', '');
+    if ($settings_base_url) {
+      return (string) $settings_base_url;
+    }
     $public_path = Settings::get('file_public_path', 'sites/default/files');
     $path = Settings::get('file_assets_path', $public_path);
     if ($path === $public_path) {

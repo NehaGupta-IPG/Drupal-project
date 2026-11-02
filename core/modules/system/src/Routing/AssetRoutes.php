@@ -39,10 +39,10 @@ class AssetRoutes implements ContainerInjectionInterface {
    */
   public function routes(): array {
     $routes = [];
-    // Generate assets. If clean URLs are disabled image derivatives will always
+    // Generate assets. If clean URLs are disabled optimized assets will always
     // be served through the routing system. If clean URLs are enabled and the
-    // image derivative already exists, PHP will be bypassed.
-    $directory_path = $this->streamWrapperManager->getViaScheme('assets')->getDirectoryPath();
+    // optimized asset already exists, PHP will be bypassed.
+    $directory_path = parse_url($this->streamWrapperManager->getViaScheme('assets')->baseUrl(), PHP_URL_PATH);
 
     $routes['system.css_asset'] = new Route(
       '/' . $directory_path . '/css/{file_name}',
