@@ -72,10 +72,18 @@ class Datetime extends DateElementBase {
         [$date_input, $time_input] = explode('T', $input['date']);
       }
       else {
-        $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
-        $time_input = $element['#date_time_element'] != 'none' && !empty($input['time']) ? $input['time'] : '';
         $date_format = $element['#date_date_element'] != 'none' && $element['#date_date_format'] != 'none' ? static::getHtml5DateFormat($element) : '';
         $time_format = $element['#date_time_element'] != 'none' && $element['#date_time_format'] != 'none' ? static::getHtml5TimeFormat($element) : '';
+        if ($input instanceof DrupalDateTime) {
+          $values = [
+            'date' => $input->format($date_format),
+            'time' => $input->format($time_format),
+          ];
+          $input = $values;
+        }
+
+        $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
+        $time_input = $element['#date_time_element'] != 'none' && !empty($input['time']) ? $input['time'] : '';
       }
 
       // Seconds will be omitted in a post in case there's no entry.
