@@ -177,6 +177,10 @@ class LanguageThemeHooks {
   public function preprocessBlock(&$variables): void {
     if ($variables['configuration']['provider'] == 'language') {
       $variables['attributes']['role'] = 'navigation';
+      if (empty($variables['attributes']['aria-label']) && empty($variables['attributes']['aria-labelledby'])) {
+        $block_label = $variables['label'] ?: ($variables['configuration']['label'] ?? '');
+        $variables['attributes']['aria-label'] = $block_label ?: $this->t('Language switcher');
+      }
     }
   }
 

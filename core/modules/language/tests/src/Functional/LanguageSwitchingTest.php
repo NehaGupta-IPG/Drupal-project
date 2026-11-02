@@ -98,6 +98,18 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlock404($block->label(), 'system/404');
     $this->drupalLogin($this->drupalCreateUser());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
+
+    // Hide the configured label. The heading is no longer rendered, but the
+    // navigation landmark keeps the configured label as its accessible name.
+    $block->getPlugin()->setConfigurationValue('label_display', '0');
+    $block->save();
+    $this->drupalGet('<front>');
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="block-test-language-block"]/h2');
+    $language_switcher_nav = $this->getNodeElementsByXpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+      ':id' => 'block-test-language-block',
+      ':label' => $block->label(),
+    ]);
+    $this->assertNotEmpty($language_switcher_nav);
   }
 
   /**
@@ -115,6 +127,13 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->DrupalGet('<front>');
     // The language switcher block should display.
     $this->assertSession()->pageTextContains($block_label);
+
+    $language_switcher_nav = $this->getNodeElementsByXpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+      ':id' => 'block-test-language-block',
+      ':label' => $block_label,
+    ]);
+    $this->assertNotEmpty($language_switcher_nav);
+
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
     $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
