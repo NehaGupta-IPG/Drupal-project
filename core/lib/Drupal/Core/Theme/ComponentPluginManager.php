@@ -15,6 +15,8 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\Plugin\FilteredPluginManagerInterface;
+use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 use Drupal\Core\Theme\Component\ComponentValidator;
 use Drupal\Core\Theme\Component\SchemaCompatibilityChecker;
 use Drupal\Core\Plugin\Component;
@@ -30,9 +32,10 @@ use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
  *
  * @see plugin_api
  */
-class ComponentPluginManager extends DefaultPluginManager implements CategorizingPluginManagerInterface {
+class ComponentPluginManager extends DefaultPluginManager implements CategorizingPluginManagerInterface, FilteredPluginManagerInterface {
 
   use CategorizingPluginManagerTrait;
+  use FilteredPluginManagerTrait;
 
   /**
    * {@inheritdoc}
@@ -89,6 +92,13 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // related to a component is in the single directory. If the alteration of a
     // component is necessary, component replacement is the preferred tool for
     // that.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getType(): string {
+    return 'component';
   }
 
   /**

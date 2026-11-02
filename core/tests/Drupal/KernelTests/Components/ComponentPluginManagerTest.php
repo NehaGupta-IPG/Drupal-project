@@ -51,4 +51,20 @@ class ComponentPluginManagerTest extends ComponentKernelTestBase {
     $this->manager->find('sdc_theme_test:mismatching-folder-name');
   }
 
+  /**
+   * Tests that component definitions can be filtered per consumer.
+   */
+  public function testGetFilteredDefinitions(): void {
+    $definitions = $this->manager->getDefinitions();
+    $this->assertArrayHasKey('sdc_test:my-banner', $definitions);
+
+    // The "Banner" component is removed for the sdc_test consumer.
+    // @see \Drupal\sdc_test\Hook\SdcTestHooks::pluginFilterComponentSdcTestAlter()
+    unset($definitions['sdc_test:my-banner']);
+    $this->assertSame(array_keys($definitions), array_keys($this->manager->getFilteredDefinitions('sdc_test')));
+
+    // The original definitions are unchanged.
+    $this->assertArrayHasKey('sdc_test:my-banner', $this->manager->getDefinitions());
+  }
+
 }

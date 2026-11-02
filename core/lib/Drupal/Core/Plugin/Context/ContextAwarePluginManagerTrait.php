@@ -20,6 +20,9 @@ trait ContextAwarePluginManagerTrait {
   /**
    * Determines plugins whose constraints are satisfied by a set of contexts.
    *
+   * @return array
+   *   An array of plugin definitions.
+   *
    * @see \Drupal\Core\Plugin\Context\ContextAwarePluginManagerInterface::getDefinitionsForContexts()
    */
   public function getDefinitionsForContexts(array $contexts = []) {
