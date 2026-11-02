@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Serialization\PhpSerialize;
+use Drupal\Component\Serialization\IgbinarySerialize;
 use Drupal\Core\Cache\CacheTagsChecksumInterface;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Cache\DatabaseBackendFactory;
@@ -35,7 +35,7 @@ class DatabaseBackendFactoryTest extends UnitTestCase {
       $this->createStub(Connection::class),
       $this->prophesize(CacheTagsChecksumInterface::class)->reveal(),
       new Settings($settings),
-      new PhpSerialize(),
+      new IgbinarySerialize(),
       $this->prophesize(TimeInterface::class)->reveal(),
     );
 

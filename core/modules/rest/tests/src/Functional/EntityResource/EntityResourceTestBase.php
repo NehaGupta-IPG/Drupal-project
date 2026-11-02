@@ -632,8 +632,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertLessThanOrEqual(2, count($cache_items));
       $found_cached_200_response = FALSE;
       $other_cached_responses_are_4xx = TRUE;
+      $serializer = $this->container->get('serialization.cache_data');
       foreach ($cache_items as $cache_item) {
-        $cached_response = unserialize($cache_item->data);
+        $cached_response = $serializer::decode($cache_item->data);
         if (!$cached_response instanceof CacheRedirect) {
           if ($cached_response->getStatusCode() === 200) {
             $found_cached_200_response = TRUE;

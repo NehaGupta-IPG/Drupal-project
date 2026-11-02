@@ -78,7 +78,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
       ->addArgument(new Reference('settings'))
-      ->addArgument(new Reference('serialization.phpserialize'))
+      ->addArgument(new Reference('serialization.cache_data'))
       ->addArgument(new Reference(TimeInterface::class));
   }
 
