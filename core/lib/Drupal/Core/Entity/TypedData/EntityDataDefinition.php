@@ -163,7 +163,9 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    */
   public function __sleep(): array {
     $this->dataType = NULL;
-    return parent::__sleep();
+    $vars = get_object_vars($this);
+    unset($vars['propertyDefinitions'], $vars['typedDataManager']);
+    return array_keys($vars);
   }
 
 }
