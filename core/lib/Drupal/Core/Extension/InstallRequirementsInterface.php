@@ -1,9 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Extension;
+
+// phpcs:ignore SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
+// phpcs:ignore SlevomatCodingStandard.Namespaces.UnusedUses.UnusedUse
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides method for checking requirements during install time.
+ *
+ * @phpstan-type RequirementInfo array{
+ *   'title'?: TranslatableMarkup,
+ *   'value'?: TranslatableMarkup|array<string,mixed>|string,
+ *   'description'?: TranslatableMarkup|array<string,mixed>,
+ *   'severity'?: RequirementSeverity,
+ * }
  */
 interface InstallRequirementsInterface {
 
@@ -29,14 +43,15 @@ interface InstallRequirementsInterface {
    * During installation, if you need to load a class from your module,
    * you'll need to include the class file directly.
    *
-   * @return array
+   * @return array<string,RequirementInfo>
    *   An associative array where the keys are arbitrary but must be unique (it
-   *   is suggested to use the module short name as a prefix) and the values are
-   *   themselves associative arrays with the following elements:
-   *   - title: The name of the requirement.
-   *   - value: This should only be used for version numbers, do not set it if
-   *     not applicable.
-   *   - description: The description of the requirement/status.
+   *   is suggested to use the module short name as a prefix) and the values
+   *   are themselves associative arrays with the following elements:
+   *   - title: (optional) The name of the requirement.
+   *   - value: (optional) The current value (e.g., version, time, level,
+   *     status, etc). During install phase, this should only be used for
+   *     version numbers, do not set it if not applicable.
+   *   - description: (optional) The description of the requirement/status.
    *   - severity: (optional) An instance of
    *     \Drupal\Core\Extension\Requirement\RequirementSeverity enum. Defaults
    *     to RequirementSeverity::OK when installing.
