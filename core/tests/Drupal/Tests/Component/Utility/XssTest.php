@@ -117,6 +117,20 @@ class XssTest extends TestCase {
         'Custom element with dashes in tag name.',
         ['test-element'],
       ],
+      // Self-closing tags without whitespace.
+      [
+        '<br/>',
+        '<br />',
+        'br tag without whitespace',
+        ['br'],
+      ],
+      // Self-closing tags with non-standard whitespace.
+      [
+        "<br/><img/><br  /><img\t />",
+        '<br /><img /><br /><img />',
+        'self-closing tags with non-standard whitespace.',
+        ['br', 'img'],
+      ],
     ];
   }
 

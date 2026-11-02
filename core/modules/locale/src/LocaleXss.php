@@ -60,7 +60,11 @@ class LocaleXss {
     // XSS filter, as it looks like an invalid HTML tag while it's a Drupalism.
     $string = str_replace('<front>', '', $string);
 
-    return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, [
+    // \Drupal\Component\Utility\Xss::filter() normalizes the HTML. That can
+    // change the number of spaces, causing false negative string comparisons.
+    // Normalize the strings by removing all spaces.
+    $normalize = fn(string $string): string => str_replace(' ', '', Html::decodeEntities($string));
+    return $normalize($string) === $normalize(Xss::filter($string, [
       'a',
       'abbr',
       'acronym',
