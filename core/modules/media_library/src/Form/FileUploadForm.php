@@ -18,6 +18,7 @@ use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\media\MediaInterface;
 use Drupal\media\MediaTypeInterface;
 use Drupal\media_library\MediaLibraryUiBuilder;
@@ -159,12 +160,25 @@ class FileUploadForm extends AddFormBase {
     ];
 
     $process = (array) $this->elementInfo->getInfoProperty('managed_file', '#process', []);
+    $validators = $item->getUploadValidators();
+    if ($item instanceof ImageItem) {
+      $field_definition = $media_type->getSource()->getSourceFieldDefinition($media_type);
+      $max = $field_definition->getSetting('max_resolution');
+      $min = $field_definition->getSetting('min_resolution');
+      if ($max || $min) {
+        $validators['FileImageDimensions'] = [
+          'maxDimensions' => $max,
+          'minDimensions' => $min,
+        ];
+      }
+    }
+
     $form['container']['upload'] = [
       '#type' => 'managed_file',
       '#title' => $this->formatPlural($slots, 'Add file', 'Add files'),
       // @todo Move validation in https://www.drupal.org/node/2988215
       '#process' => array_merge(['::validateUploadElement'], $process, ['::processUploadElement']),
-      '#upload_validators' => $item->getUploadValidators(),
+      '#upload_validators' => $validators,
       // Set multiple to true only if available slots is not exactly one
       // to ensure correct language (singular or plural) in UI.
       '#multiple' => $slots != 1 ? TRUE : FALSE,
@@ -352,6 +366,9 @@ class FileUploadForm extends AddFormBase {
   protected function createFileItem(MediaTypeInterface $media_type) {
     $field_definition = $media_type->getSource()->getSourceFieldDefinition($media_type);
     $data_definition = FieldItemDataDefinition::create($field_definition);
+    if ($media_type->get('source') === 'image') {
+      return new ImageItem($data_definition);
+    }
     return new FileItem($data_definition);
   }
 
