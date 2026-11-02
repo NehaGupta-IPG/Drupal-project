@@ -180,7 +180,7 @@ class GDToolkit extends ImageToolkitBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configFactory->getEditable('system.image.gd')
       ->set('jpeg_quality', $form_state->getValue(['gd', 'jpeg_quality_wrapper', 'image_jpeg_quality']))
-      ->set('webp_lossless', $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_lossless'])
+      ->set('webp_lossless', $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_lossless']))
       ->set('webp_quality', $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_quality']))
       ->save();
   }
