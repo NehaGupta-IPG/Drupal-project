@@ -76,6 +76,7 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 
+    $this->installEntitySchema('user');
     $this->installEntitySchema($this->entityTypeId);
     ConfigurableLanguage::createFromLangcode($this->translationLangcode)->save();
   }
@@ -122,6 +123,75 @@ class ContentTranslationHandlerTest extends KernelTestBase {
     $actual = $handler->entityFormSharedElements($element, $form_state, $element);
 
     $this->assertEquals($expected, $actual);
+  }
+
+  /**
+   * Tests entityFormAlter() on a duplicated entity in a non-default language.
+   *
+   * A duplicate created with createDuplicate() is new but carries
+   * TRANSLATION_EXISTING status on every translation, so isNewTranslation()
+   * returns FALSE. Altering the form in the non-default language must not try
+   * to build a delete-translation URL for the unsaved entity, which would
+   * throw an EntityMalformedException.
+   *
+   * @legacy-covers ::entityFormAlter
+   */
+  public function testEntityFormAlterDuplicateTranslation(): void {
+    $this->state->set('entity_test.translation', TRUE);
+    // Enabling content translation installs the content_translation_status
+    // base field, which the published-status checkbox in entityFormAlter()
+    // reads through the metadata wrapper.
+    $this->container->get('content_translation.manager')
+      ->setEnabled($this->entityTypeId, $this->entityTypeId, TRUE);
+    $this->entityTypeBundleInfo->clearCachedBundles();
+
+    // Create and save an entity with a translation, then duplicate it. The
+    // duplicate is new (has no ID) but keeps the existing-translation status.
+    $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $storage->create(['name' => 'Original']);
+    $entity->addTranslation($this->translationLangcode, ['name' => 'Original translation']);
+    $entity->save();
+
+    $duplicate = $entity->createDuplicate();
+    $this->assertTrue($duplicate->isNew());
+    $translation = $duplicate->getTranslation($this->translationLangcode);
+    $this->assertFalse($translation->isNewTranslation());
+
+    $form_object = $this->entityTypeManager->getFormObject($this->entityTypeId, 'default');
+    $form_object->setEntity($translation);
+
+    $form_state = new FormState();
+    $form_state->addBuildInfo('callback_object', $form_object);
+    $form_state->set('langcode', $this->translationLangcode);
+    $form_state->set('entity_default_langcode', $entity->getUntranslated()->language()->getId());
+
+    // Mimic the actions a real entity form provides, including the #submit
+    // arrays the handler prepends its own submit callback to.
+    $form = [
+      'actions' => [
+        'submit' => [
+          '#type' => 'submit',
+          '#weight' => 5,
+          '#submit' => [],
+        ],
+        'delete' => [
+          '#type' => 'submit',
+          '#weight' => 10,
+          '#submit' => [],
+        ],
+      ],
+    ];
+
+    /** @var \Drupal\content_translation\ContentTranslationHandler $handler */
+    $handler = $this->entityTypeManager->getHandler($this->entityTypeId, 'translation');
+    // Without the isNew() guard this throws EntityMalformedException.
+    $handler->entityFormAlter($form, $form_state, $translation);
+
+    // The delete-translation action must not be added for an unsaved entity.
+    $this->assertArrayNotHasKey('delete_translation', $form['actions']);
+    // The delete button is always removed on a translation form.
+    $this->assertArrayNotHasKey('delete', $form['actions']);
   }
 
   /**
