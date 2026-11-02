@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\PhpStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Site\Settings;
@@ -41,6 +42,15 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $php = PhpStorageFactory::get('test');
     // This should be the default class used.
     $this->assertInstanceOf(MTimeProtectedFileStorage::class, $php);
+
+    // Test that the $configuration parameter is used as the default when no
+    // settings override exists.
+    $php = PhpStorageFactory::get('test', [
+      'class' => MockPhpStorage::class,
+      'directory' => 'temporary://',
+      'secret' => 'test',
+    ]);
+    $this->assertInstanceOf(MockPhpStorage::class, $php);
   }
 
   /**
@@ -50,6 +60,15 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $this->setSettings();
     $php = PhpStorageFactory::get('test');
     $this->assertInstanceOf(MockPhpStorage::class, $php);
+
+    // Test that an explicit $configuration takes precedence over the 'default'
+    // settings entry.
+    $php = PhpStorageFactory::get('test', [
+      'class' => MTimeProtectedFileStorage::class,
+      'directory' => 'temporary://',
+      'secret' => 'test',
+    ]);
+    $this->assertInstanceOf(MTimeProtectedFileStorage::class, $php);
   }
 
   /**
@@ -87,6 +106,40 @@ class PhpStorageFactoryTest extends KernelTestBase {
     $this->setSettings('test', ['secret' => NULL]);
     $php = PhpStorageFactory::get('test');
     $this->assertSame('mock hash salt', $php->getConfigurationValue('secret'), 'The default secret is used if one is not set in the overridden settings.');
+
+    // Test that temporary:// in the directory is replaced with
+    // FileSystem::getOsTemporaryDirectory().
+    $this->setSettings('test', ['directory' => 'temporary://drupal']);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame(FileSystem::getOsTemporaryDirectory() . '/drupal', $php->getConfigurationValue('directory'), 'temporary:// prefix was replaced with FileSystem::getOsTemporaryDirectory().');
+
+    // Test temporary:// alone (no subdirectory suffix).
+    $this->setSettings('test', ['directory' => 'temporary://']);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame(FileSystem::getOsTemporaryDirectory(), $php->getConfigurationValue('directory'), 'temporary:// alone resolves to FileSystem::getOsTemporaryDirectory().');
+
+    // Test that file_temp_path takes priority over the OS temporary directory
+    // when resolving the temporary:// prefix.
+    $custom_temp = '/custom_tmp/' . $this->randomMachineName();
+    $this->setSettings('test', ['directory' => 'temporary://drupal']);
+    $this->setSetting('file_temp_path', $custom_temp);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame($custom_temp . '/drupal', $php->getConfigurationValue('directory'), 'file_temp_path setting takes priority over OS temporary directory.');
+
+    // Test temporary:// alone (no subdirectory) with file_temp_path set.
+    $this->setSettings('test', ['directory' => 'temporary://']);
+    $this->setSetting('file_temp_path', $custom_temp);
+    $php = PhpStorageFactory::get('test');
+    $this->assertSame($custom_temp, $php->getConfigurationValue('directory'), 'temporary:// alone resolves to file_temp_path when set.');
+
+    // Test that name-specific settings override the $configuration parameter.
+    $this->setSettings('test');
+    $php = PhpStorageFactory::get('test', [
+      'class' => MTimeProtectedFileStorage::class,
+      'directory' => '/ignored',
+      'secret' => 'ignored',
+    ]);
+    $this->assertInstanceOf(MockPhpStorage::class, $php);
   }
 
   /**
@@ -100,7 +153,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
   protected function setSettings($name = 'default', array $configuration = []): void {
     $settings['php_storage'][$name] = $configuration + [
       'class' => 'Drupal\system\PhpStorage\MockPhpStorage',
-      'directory' => 'tmp://',
+      'directory' => 'temporary://',
       'secret' => $this->randomString(),
       'bin' => 'test',
     ];

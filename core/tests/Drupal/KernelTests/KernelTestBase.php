@@ -475,7 +475,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $kernel->updateModules($extensions, $extensions);
     if (static::sharesEnvironment()) {
       $kernel->setContainerNeedsRebuild(FALSE);
-      $kernel->setOverrideUseCache(TRUE);
+      $kernel->setOverrideNeedsRebuild(TRUE);
     }
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
@@ -546,11 +546,11 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     $record = $this->loadSharedDatabaseState();
-    // For each method in the test, reset the kernel container cache suffix to
-    // 0. This ensures that the initial container state is the same for each
-    // method, while container rebuilds during tests will force a new cache key.
-    $kernel->resetCacheSuffix();
-    // Reset the container so it is always reloaded from the cache and any
+    // For each method in the test, reset the kernel container ID suffix to 0.
+    // Ensures that the initial container state is the same for each method,
+    // while container rebuilds during tests will force a new identifier.
+    $kernel->resetIdSuffix();
+    // Reset the container so it is always reloaded from storage and any
     // stateful services lose their state.
     // @todo revisit as part of https://www.drupal.org/node/2218651
     $kernel->resetContainer();

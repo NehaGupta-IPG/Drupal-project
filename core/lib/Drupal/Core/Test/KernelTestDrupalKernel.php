@@ -18,67 +18,75 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class KernelTestDrupalKernel extends DrupalKernel {
 
   /**
-   * Whether the container should be retrieved from cache.
+   * Whether to load the stored container even if the module list is set.
    *
    * Only overrides when it's TRUE, FALSE does nothing.
    */
-  protected bool $overrideUseCache = FALSE;
+  protected bool $overrideNeedsRebuild = FALSE;
 
   /**
-   * A cache suffix to increment on rebuilds.
+   * An ID suffix to increment on rebuilds.
    */
-  protected int $cacheSuffix = 0;
+  protected int $idSuffix = 0;
 
   /**
-   * Sets whether the container should be rebuilt.
+   * Sets whether the container needs to be rebuilt.
+   *
+   * @param bool $rebuild
+   *   TRUE to rebuild the container when it is next initialized, FALSE to
+   *   load the stored container if possible.
    */
   public function setContainerNeedsRebuild(bool $rebuild): void {
     $this->containerNeedsRebuild = $rebuild;
   }
 
   /**
-   * Resets the cache suffix to 0.
+   * Resets the ID suffix to 0.
    */
-  public function resetCacheSuffix(): void {
-    $this->cacheSuffix = 0;
+  public function resetIdSuffix(): void {
+    $this->idSuffix = 0;
   }
 
   /**
-   * Sets whether the container should be retrieved from cache.
+   * Sets whether to load the stored container even if the module list is set.
+   *
+   * @param bool $use
+   *   TRUE to load the stored container once when the container is next
+   *   initialized, instead of rebuilding it.
    */
-  public function setOverrideUseCache(bool $use): void {
-    $this->overrideUseCache = $use;
+  public function setOverrideNeedsRebuild(bool $use): void {
+    $this->overrideNeedsRebuild = $use;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getContainerCacheKey() {
-    $key = parent::getContainerCacheKey();
+  protected function getContainerIdentifier(): string {
+    $identifier = parent::getContainerIdentifier();
     // Vary by the suffix, so that a container rebuilt during a test method is
-    // cached under its own key and does not overwrite the initial container
-    // that the other test methods of the class load.
-    $key .= ':' . $this->cacheSuffix;
-    return $key;
+    // written under its own identifier and does not overwrite the initial
+    // container that the other test methods of the class load.
+    $identifier .= ':' . $this->idSuffix;
+    return $identifier;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getContainerFromCacheIfCacheable(): ?array {
-    if ($this->overrideUseCache) {
+  protected function getContainerFromStorage(string $container_id): ?ContainerInterface {
+    if ($this->overrideNeedsRebuild) {
       // Only override once.
-      $this->overrideUseCache = FALSE;
-      return $this->getCachedContainerDefinition();
+      $this->overrideNeedsRebuild = FALSE;
+      return $this->bootstrapContainer->get('container_storage')->load($container_id);
     }
-    return parent::getContainerFromCacheIfCacheable();
+    return parent::getContainerFromStorage($container_id);
   }
 
   /**
    * {@inheritdoc}
    */
   public function rebuildContainer() {
-    $this->cacheSuffix++;
+    $this->idSuffix++;
     return parent::rebuildContainer();
   }
 
@@ -86,7 +94,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   public function resetContainer(): ContainerInterface {
-    $this->cacheSuffix++;
+    $this->idSuffix++;
     return parent::resetContainer();
   }
 

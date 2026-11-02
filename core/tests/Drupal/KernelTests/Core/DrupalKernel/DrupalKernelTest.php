@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
+use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ContainerStorageInterface;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
@@ -57,16 +64,29 @@ class DrupalKernelTest extends KernelTestBase {
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
    *   A list of modules to install on the kernel.
+   * @param string|null $site_path
+   *   (optional) The site path to set on the kernel before it boots.
+   * @param array $settings
+   *   (optional) Additional settings to set before the kernel boots.
    *
    * @return \Drupal\Core\DrupalKernel
    *   New kernel for testing.
    */
-  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL) {
+  protected function getTestKernel(Request $request, ?array $modules_enabled = NULL, ?string $site_path = NULL, array $settings = []) {
     // Manually create kernel to avoid replacing settings.
     $class_loader = require $this->root . '/autoload.php';
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
-    $this->setSetting('container_yamls', []);
-    $this->setSetting('hash_salt', $this->databasePrefix);
+    $settings += [
+      'container_yamls' => [],
+      'hash_salt' => $this->databasePrefix,
+      'container_base_class' => PhpContainer::class,
+    ];
+    foreach ($settings as $name => $value) {
+      $this->setSetting($name, $value);
+    }
+    if (isset($site_path)) {
+      $kernel->setSitePath($site_path);
+    }
     if (isset($modules_enabled)) {
       $kernel->updateModules($modules_enabled);
     }
@@ -77,31 +97,40 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Tests DIC compilation.
+   *
+   * @param string $container_base_class
+   *   The container_base_class setting.
    */
-  public function testCompileDIC(): void {
+  #[TestWith([PhpContainer::class], 'PhpContainer')]
+  #[TestWith([Container::class], 'array container')]
+  public function testCompileDIC(string $container_base_class): void {
     // @todo Write a memory based storage backend for testing.
     $modules_enabled = [
       'system' => 'system',
       'user' => 'user',
     ];
+    $settings = ['container_base_class' => $container_base_class];
 
     $request = Request::createFromGlobals();
-    $this->getTestKernel($request, $modules_enabled);
+    $this->getTestKernel($request, $modules_enabled, NULL, $settings);
 
     // Instantiate it a second time and we should get the compiled Container
     // class.
-    $kernel = $this->getTestKernel($request);
+    $kernel = $this->getTestKernel($request, NULL, NULL, $settings);
     $container = $kernel->getContainer();
+    $this->assertInstanceOf($container_base_class, $container);
     $refClass = new \ReflectionClass($container);
     $is_compiled_container = !$refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder');
     $this->assertTrue($is_compiled_container);
+    // Only the PHP dumped container is written to PHP storage.
+    $this->assertSame($container_base_class === PhpContainer::class, is_dir($kernel->getSitePath() . '/files/php/service_container'));
     // Verify that the list of modules is the same for the initial and the
     // compiled container.
     $module_list = array_keys($container->get('module_handler')->getModuleList());
     $this->assertEquals(array_values($modules_enabled), $module_list);
 
     // Get the container another time, simulating a "production" environment.
-    $container = $this->getTestKernel($request)
+    $container = $this->getTestKernel($request, NULL, NULL, $settings)
       ->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -127,11 +156,11 @@ class DrupalKernelTest extends KernelTestBase {
     // Add another module so that we can test that the new module's bundle is
     // registered to the new container.
     $modules_enabled['service_provider_test'] = 'service_provider_test';
-    $this->getTestKernel($request, $modules_enabled);
+    $this->getTestKernel($request, $modules_enabled, NULL, $settings);
 
     // Instantiate it a second time and we should not get a ContainerBuilder
     // class because we are loading the container definition from cache.
-    $kernel = $this->getTestKernel($request, $modules_enabled);
+    $kernel = $this->getTestKernel($request, $modules_enabled, NULL, $settings);
     $container = $kernel->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -381,6 +410,266 @@ class DrupalKernelTest extends KernelTestBase {
     $this->getTestKernel($request);
     // Kernel environment locale should be UTF-8.
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
+  }
+
+  /**
+   * Tests that a new container is created when the site path changes.
+   */
+  public function testNewContainerOnSitePathChange(): void {
+    $request = Request::createFromGlobals();
+
+    // Boot a kernel with a module list so that the container is compiled and
+    // dumped.
+    $kernel = $this->getTestKernel($request, ['system' => 'system'], $this->siteDirectory);
+    $container = $kernel->getContainer();
+    $this->assertInstanceOf(PhpContainer::class, $container);
+    $this->assertSame($this->siteDirectory, $container->getParameter('site.path'));
+    $this->assertSame(['system'], array_keys($container->getParameter('container.modules')));
+
+    // Boot a kernel with the same site path and no module list. The dumped
+    // container is loaded; a newly compiled container would have no modules.
+    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory);
+    $this->assertSame($container::class, $kernel->getContainer()::class);
+    $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
+
+    // Boot a kernel with a different site path and no module list. The site
+    // path is part of the container identifier, so a new container is compiled.
+    $kernel = $this->getTestKernel($request, NULL, $this->siteDirectory . '/different');
+    $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
+    $this->assertSame([], $kernel->getContainer()->getParameter('container.modules'));
+  }
+
+  /**
+   * Tests that a container is dumped when the container is invalidated.
+   */
+  public function testInvalidationDoesNotCauseFurtherContainerBuildsToNotDump(): void {
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request, ['system' => 'system']);
+    $container = $kernel->getContainer();
+    $container_file = (new \ReflectionClass($container))->getFileName();
+    $kernel->invalidateContainer();
+    $this->assertFileExists($container_file);
+    // This should cause the container to be dumped again.
+    $kernel->updateModules(['system' => 'system']);
+    // Containers should be different objects.
+    $this->assertNotSame($container, $kernel->getContainer());
+    $this->assertSame($container::class, $kernel->getContainer()::class);
+    // The containers have the same hash, so should use the same file.
+    $this->assertSame($container_file, (new \ReflectionClass($kernel->getContainer()))->getFileName());
+
+    $kernel->invalidateContainer();
+    // This should cause the container to be dumped again but with new modules
+    // resulting in a new hash.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $this->assertNotSame($container, $kernel->getContainer());
+    $this->assertNotSame($container::class, $kernel->getContainer()::class);
+    // The containers have different hashes, so should use different files.
+    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertNotSame($container_file, $new_container_file);
+    $this->assertFileExists($new_container_file);
+
+    $kernel->garbageCollection();
+    // Only the old container file should be deleted.
+    $this->assertFileDoesNotExist($container_file);
+    $this->assertFileExists($new_container_file);
+  }
+
+  /**
+   * Tests that garbage collection removes superseded container files.
+   *
+   * Some kernels, such as UpdateKernel, are not allowed to dump the container.
+   * Garbage collection must still clean up the real storage for them.
+   */
+  public function testGarbageCollection(): void {
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
+    $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+
+    // Switch modules so a second, superseded container file exists on disk.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertNotSame($container_file, $new_container_file);
+    $this->assertFileExists($container_file);
+    $this->assertFileExists($new_container_file);
+
+    // Garbage collection does not depend on whether dumping is allowed.
+    (new \ReflectionProperty($kernel, 'allowDumping'))->setValue($kernel, FALSE);
+
+    $kernel->garbageCollection();
+    $this->assertFileDoesNotExist($container_file);
+    $this->assertFileExists($new_container_file);
+  }
+
+  /**
+   * Tests that a container class already in memory is not included again.
+   *
+   * After garbage collection deletes a container file, dumping the same
+   * container again saves the file under a new mtime-based path. The class is
+   * still in memory, so including the new file would redeclare the class.
+   *
+   * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage::load()
+   */
+  public function testContainerClassInMemoryIsReused(): void {
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernel($request, ['system' => 'system']);
+    $container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+
+    // Switch to a different container and delete the first container's file.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $kernel->garbageCollection();
+    $this->assertFileDoesNotExist($container_file);
+
+    // Wait one second so the directory mtime, and therefore the file path,
+    // changes when the first container is saved again.
+    sleep(1);
+    $kernel->updateModules(['system' => 'system']);
+
+    // The file was saved again under a new path.
+    $this->assertFileDoesNotExist($container_file);
+    $this->assertCount(1, glob(dirname($container_file) . '/*.php'));
+    // The class in memory was reused, so it still reports the original path.
+    $this->assertSame($container_file, (new \ReflectionClass($kernel->getContainer()))->getFileName());
+  }
+
+  /**
+   * Tests bootstrap_container_definition is merged.
+   */
+  public function testBootstrapContainerDefinitionMissingServices(): void {
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
+
+    $customStorageClass = $this->createCustomStorageClass();
+
+    // Set a custom bootstrap_container_definition that only has the legacy
+    // services (missing all new container storage services) plus our custom
+    // container_storage override.
+    $settings = Settings::getAll();
+    $settings['bootstrap_container_definition'] = [
+      'parameters' => [],
+      'services' => [
+        'database' => [
+          'class' => 'Drupal\Core\Database\Connection',
+          'factory' => 'Drupal\Core\Database\Database::getConnection',
+          'arguments' => ['default'],
+        ],
+        'cache.container' => [
+          'class' => '\Drupal\Core\Cache\DatabaseBackend',
+          'arguments' => [
+            '@database',
+            '@cache_tags_provider.container',
+            'container',
+            '@serialization.phpserialize',
+            '@datetime.time',
+            DatabaseBackend::MAXIMUM_NONE,
+          ],
+        ],
+        'cache_tags_provider.container' => [
+          'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
+          'arguments' => ['@database'],
+        ],
+        'serialization.phpserialize' => [
+          'class' => '\Drupal\Component\Serialization\PhpSerialize',
+        ],
+        'request_stack' => [
+          'class' => 'Symfony\Component\HttpFoundation\RequestStack',
+        ],
+        'datetime.time' => [
+          'class' => 'Drupal\Component\Datetime\Time',
+          'arguments' => ['@request_stack'],
+        ],
+        'container_storage' => [
+          'class' => $customStorageClass,
+        ],
+      ],
+    ];
+    new Settings($settings);
+
+    // Shutdown and reboot the kernel so boot() reads the custom
+    // bootstrap_container_definition from settings.
+    $kernel->shutdown();
+    // Preserve the module list.
+    $kernel->updateModules(['system' => 'system']);
+    $this->assertFalse($customStorageClass::$loadCalled, 'Custom container storage load() should not have been called yet');
+    $this->assertFalse($customStorageClass::$dumpCalled, 'Custom container storage dump() should not have been called yet');
+    $kernel->boot();
+
+    $this->assertTrue($customStorageClass::$loadCalled, 'Custom container storage load() should have been called');
+    $this->assertTrue($customStorageClass::$dumpCalled, 'Custom container storage dump() should have been called');
+  }
+
+  /**
+   * Tests container loading when dumping is disabled.
+   */
+  public function testLoadIsCalledWhenDumpingIsNotAllowed(): void {
+    $class_loader = require $this->root . '/autoload.php';
+    $kernel = DrupalKernel::createFromRequest(Request::createFromGlobals(), $class_loader, 'testing', FALSE);
+
+    $customStorageClass = $this->createCustomStorageClass();
+
+    // Set a custom bootstrap_container_definition that uses our custom
+    // container_storage override.
+    $settings = Settings::getAll();
+    $settings['bootstrap_container_definition'] = [
+      'services' => [
+        'container_storage' => [
+          'class' => $customStorageClass,
+        ],
+      ],
+    ];
+    new Settings($settings);
+    $kernel->boot();
+
+    $this->assertTrue($customStorageClass::$loadCalled, 'Custom container storage load() should been called');
+    $this->assertFalse($customStorageClass::$dumpCalled, 'Custom container storage dump() should not have been called');
+  }
+
+  /**
+   * Creates a custom container storage that records load() and dump() calls.
+   *
+   * @return string
+   *   The class name of the custom container storage.
+   */
+  private function createCustomStorageClass(): string {
+    return get_class(new class () implements ContainerStorageInterface {
+
+      /**
+       * Determines whether the container has been loaded.
+       */
+      public static bool $loadCalled = FALSE;
+
+      /**
+       * Determines whether the container has been dumped.
+       */
+      public static bool $dumpCalled = FALSE;
+
+      /**
+       * {@inheritdoc}
+       */
+      public function load(string $identifier): ?ContainerInterface {
+        static::$loadCalled = TRUE;
+        return NULL;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function dump(ContainerBuilder $container, string $identifier): void {
+        static::$dumpCalled = TRUE;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function invalidate(): void {
+        // No-op.
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function garbageCollection(string $identifier): void {
+        // No-op.
+      }
+
+    });
   }
 
 }

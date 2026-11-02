@@ -716,11 +716,28 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 /**
  * Override the default service container class.
  *
- * This is useful for example to trace the service container for performance
- * tracking purposes, for testing a service container with an error condition or
- * to test a service container that throws an exception.
+ * When this is not set, the container uses the PHP array-based container
+ * (\Drupal\Core\DependencyInjection\Container). Setting this to
+ * \Drupal\Core\DependencyInjection\PhpContainer (or a subclass) switches
+ * to Symfony's PhpDumper, which generates a compiled PHP class stored via
+ * PhpStorage. The compiled container benefits from OPcache and can improve
+ * performance. Existing sites default to the array-based container for
+ * backward compatibility.
+ *
+ * The compiled container is stored by default in the public files directory.
+ * To store it elsewhere - for example, a local temporary directory on each web
+ * server to avoid a shared filesystem - override the 'service_container' PHP
+ * storage bin. The directory must resolve to a unique location per site: sites
+ * sharing one container storage directory will delete each other's compiled
+ * containers.
+ *
+ * @code
+ * $settings['php_storage']['service_container'] = [
+ *   'directory' => 'temporary://drupal-container/my-site-id',
+ * ];
+ * @endcode
  */
-# $settings['container_base_class'] = '\Drupal\Core\DependencyInjection\Container';
+$settings['container_base_class'] = \Drupal\Core\DependencyInjection\PhpContainer::class;
 
 /**
  * Trusted host configuration.
