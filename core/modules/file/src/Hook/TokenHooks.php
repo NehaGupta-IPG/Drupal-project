@@ -61,7 +61,7 @@ class TokenHooks {
             break;
 
           case 'size':
-            $replacements[$original] = ByteSizeMarkup::create($file->getSize());
+            $replacements[$original] = $file->getSize() !== NULL ? ByteSizeMarkup::create($file->getSize()) : '';
             break;
 
           case 'url':
