@@ -75,26 +75,27 @@ class Tasks extends InstallTasks {
       // Attempt to create the database if it is not found.
       if ($e->getCode() == Connection::DATABASE_NOT_FOUND) {
         // Remove the database string from connection info.
-        $connection_info = Database::getConnectionInfo();
-        $database = $connection_info['default']['database'];
-
-        // We cannot use \Drupal::service('file_system')->getTempDirectory()
-        // here because we haven't yet successfully connected to the database.
-        $connection_info['default']['database'] = \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite');
+        $liveParameters = Database::getConnectionParameters()['default'];
+        $liveDatabase = $liveParameters->database;
 
         // In order to change the Database::$databaseInfo array, need to remove
         // the active connection, then re-add it with the new info.
+        // We cannot use \Drupal::service('file_system')->getTempDirectory()
+        // here because we haven't yet successfully connected to the
+        // database.
+        $attemptParameters = $liveParameters->with([
+          'database' => \Drupal::service('file_system')->tempnam(sys_get_temp_dir(), 'sqlite'),
+        ]);
         Database::removeConnection('default');
-        Database::addConnectionInfo('default', 'default', $connection_info['default']);
+        Database::addConnectionInfo('default', 'default', $attemptParameters);
 
         try {
-          Database::getConnection()->createDatabase($database);
+          Database::getConnection()->createDatabase($liveDatabase);
           Database::closeConnection();
 
           // Now, restore the database config.
           Database::removeConnection('default');
-          $connection_info['default']['database'] = $database;
-          Database::addConnectionInfo('default', 'default', $connection_info['default']);
+          Database::addConnectionInfo('default', 'default', $liveParameters);
 
           // Check the database connection.
           Database::getConnection();
@@ -104,7 +105,7 @@ class Tasks extends InstallTasks {
           // Still no dice; probably a permission issue. Raise the error to the
           // installer.
           $this->fail($this->t('Failed to open or create database file %database. The database engine reports the following message when attempting to create the database: %error.', [
-            '%database' => $database,
+            '%database' => $liveDatabase,
             '%error' => $e->getMessage(),
           ]));
         }

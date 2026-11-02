@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
@@ -13,6 +14,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate\Row;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -1017,12 +1019,14 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * Tests the getQualifiedMapTable method with a prefixed database.
    */
   public function testGetQualifiedMapTablePrefix(): void {
-    $connection_options = [
+    $connection_parameters = ConnectionParametersFactory::createFromOptionsArray([
+      'driver' => 'sqlite',
       'database' => ':memory:',
       'prefix' => 'prefix',
-    ];
-    $pdo = Connection::open($connection_options);
-    $this->database = new Connection($pdo, $connection_options);
+    ]);
+    $pdo = Connection::openWithParameters($connection_parameters);
+    $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
+    $this->database = new Connection($pdo, $connection_parameters);
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();
     // The SQLite driver is a special flower. It will prefix tables with
     // PREFIX.TABLE, instead of the standard PREFIXTABLE.

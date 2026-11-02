@@ -138,7 +138,7 @@ class ConnectionTest extends UnitTestCase {
       ],
       [
         'Drupal\Tests\Core\Database\Stub\Select',
-        NULL,
+        'Drupal\Tests\Core\Database\Stub',
         'Select',
       ],
       // Tests with the CoreFake database driver. This driver has no custom
@@ -637,7 +637,7 @@ class ConnectionTest extends UnitTestCase {
    */
   public function testFindCallerFromDebugBacktrace(): void {
     Database::addConnectionInfo('default', 'default', [
-      'driver' => 'test',
+      'driver' => 'stub',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
       'autoload' => __DIR__ . '/Stub/',
       'database' => 'test',

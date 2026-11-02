@@ -48,7 +48,10 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupaldriver-testdriverdatabasedrivertestpgsql"]', 'PostgreSQL by the driver_test module');
 
     $settings = $this->parameters['forms']['install_settings_form'];
-
+    unset(
+      $settings[$driverNamespace]['dependencies'],
+      $settings[$driverNamespace]['module'],
+    );
     $settings['driver'] = $testDriverNamespace;
     $settings[$testDriverNamespace] = $settings[$driverNamespace];
     unset($settings[$driverNamespace]);

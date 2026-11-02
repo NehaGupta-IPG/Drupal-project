@@ -5,6 +5,8 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
+use Drupal\Core\Database\ConnectionParametersFactory;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
@@ -14,6 +16,8 @@ use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
+ *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 class Connection extends DatabaseConnection implements SupportsTemporaryTablesInterface {
 
@@ -72,11 +76,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
-  public function __construct(SqliteConnection $connection, array $connection_options) {
+  public function __construct(SqliteConnection $connection, ConnectionParameters $connection_options) {
     parent::__construct($connection, $connection_options);
 
     // Empty prefix means query the main database -- no need to attach anything.
-    $prefix = $this->connectionOptions['prefix'] ?? '';
+    $prefix = $this->connectionOptions->prefix;
     if ($prefix !== '') {
       $this->attachDatabase($prefix);
       // Add a ., so queries become prefix.table, which is proper syntax for
@@ -89,21 +93,24 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
-   * {@inheritdoc}
+   * Opens a client connection.
+   *
+   * @param \Drupal\Core\Database\ConnectionParametersInterface $connectionParameters
+   *   The database connection settings.
+   *
+   * @return object
+   *   A client connection object.
    */
-  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
-    // Allow PDO options to be overridden.
-    $connection_options += [
-      'pdo' => [],
-    ];
-    $connection_options['pdo'] += [
+  public static function openWithParameters(ConnectionParametersInterface $connectionParameters): SqliteConnection {
+    // Defaults for the options parameter.
+    $pdo_options = $connectionParameters->pdo + [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
       // Convert numeric values to strings when fetching.
       \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
     ];
 
     try {
-      $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
+      $sqlite = new SqliteConnection('sqlite:' . $connectionParameters->database, '', '', $pdo_options);
     }
     catch (\PDOException $e) {
       if ($e->getCode() == static::DATABASE_NOT_FOUND) {
@@ -138,22 +145,30 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Create a user-space case-insensitive collation with UTF-8 support.
     $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
 
-    // Set SQLite init_commands if not already defined. Enable the Write-Ahead
-    // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and
+    // Execute init_commands.
+    // Enable the Write-Ahead Logging (WAL) for SQLite if not set. See
+    // https://www.drupal.org/node/2348137 and
     // https://www.sqlite.org/wal.html.
-    $connection_options += [
-      'init_commands' => [],
-    ];
-    $connection_options['init_commands'] += [
+    $init_commands = $connectionParameters->init_commands + [
       'wal' => "PRAGMA journal_mode=WAL",
     ];
-
-    // Execute sqlite init_commands.
-    if (isset($connection_options['init_commands'])) {
-      $sqlite->exec(implode('; ', $connection_options['init_commands']));
-    }
+    $sqlite->exec(implode('; ', $init_commands));
 
     return $sqlite;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ::openWithParameters() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
+   */
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::openWithParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options */
+    return static::openWithParameters(ConnectionParametersFactory::createFromOptionsArray($connection_options));
   }
 
   /**
@@ -175,11 +190,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
           ])->fetchField();
 
           // We can prune the database file if it doesn't have any tables.
-          if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
+          if ($count == 0 && $this->connectionOptions->database != ':memory:' && file_exists($this->connectionOptions->database . '-' . $prefix)) {
             // Detach the database.
             $this->query('DETACH DATABASE :schema', [':schema' => $prefix]);
             // Destroy the database file.
-            unlink($this->connectionOptions['database'] . '-' . $prefix);
+            unlink($this->connectionOptions->database . '-' . $prefix);
           }
         }
         catch (\Exception) {
@@ -200,7 +215,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       // In memory database use ':memory:' as database name. According to
       // http://www.sqlite.org/inmemorydb.html it will open a unique database so
       // attaching it twice is not a problem.
-      $database_file = $this->connectionOptions['database'] !== ':memory:' ? $this->connectionOptions['database'] . '-' . $database : $this->connectionOptions['database'];
+      $database_file = $this->connectionOptions->database !== ':memory:' ? $this->connectionOptions->database . '-' . $database : $this->connectionOptions->database;
       $this->query('ATTACH DATABASE :database_file AS :database', [
         ':database_file' => $database_file,
         ':database' => $database,
@@ -441,47 +456,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Don't include the SQLite database file name as part of the table name.
     return $prefix . $table;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createConnectionOptionsFromUrl($url) {
-    $database = parent::createConnectionOptionsFromUrl($url);
-
-    // A SQLite database path with two leading slashes indicates a system path.
-    // Otherwise the path is relative to the Drupal root.
-    $url_components = parse_url($url);
-    if ($url_components['path'][0] === '/') {
-      $url_components['path'] = substr($url_components['path'], 1);
-    }
-    $database['database'] = $url_components['path'];
-
-    // User credentials and system port are irrelevant for SQLite.
-    unset(
-      $database['username'],
-      $database['password'],
-      $database['port']
-    );
-
-    return $database;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createUrlFromConnectionOptions(array $connection_options) {
-    if (!isset($connection_options['driver'], $connection_options['database'])) {
-      throw new \InvalidArgumentException("As a minimum, the connection options array must contain at least the 'driver' and 'database' keys");
-    }
-
-    $db_url = 'sqlite://localhost/' . $connection_options['database'] . '?module=sqlite';
-
-    if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
-      $db_url .= '#' . $connection_options['prefix'];
-    }
-
-    return $db_url;
   }
 
   /**

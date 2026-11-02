@@ -16,8 +16,11 @@ use Drupal\Core\Cache\NullBackend;
  * shepherding of database connections into a single location without the use of
  * globals.
  *
+ * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
+ *
  * @phpstan-type UnprocessedConnectionInfoArray array{
- *   'driver': string,
+ *   'driver'?: string,
+ *   'module'?: string,
  *   'autoload'?: string,
  *   'namespace'?: string,
  *   'database': string,
@@ -29,32 +32,22 @@ use Drupal\Core\Cache\NullBackend;
  *   'collation'?: string,
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
- *   'init_commands'?: list<string>,
+ *   'init_commands'?: array<string|int,string|int>,
  *   'dependencies'?: array<string,array{
  *     'autoload': string,
  *     'namespace': string,
  *   }>,
  * }
- * @phpstan-type ConnectionInfoArray array{
+ * @phpstan-type ConnectionInfoBaseArray array{
  *   'driver': string,
- *   'autoload': string,
+ *   'module': string,
  *   'namespace': string,
+ *   'autoload': string,
  *   'database': string,
- *   'username'?: string,
- *   'password'?: string,
- *   'host'?: string,
- *   'port'?: string|int,
  *   'prefix': string,
- *   'collation'?: string,
- *   'pdo'?: array<mixed>,
- *   'isolation_level'?: int|string,
- *   'init_commands'?: list<string>,
- *   'dependencies'?: array<string,array{
- *     'autoload': string,
- *     'namespace': string,
- *   }>,
+ *   'unknownOptions': array<string|int,scalar|array|null>,
+ *   ...
  * }
- * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
  * @final
  */
@@ -68,9 +61,9 @@ abstract class Database {
   protected static array $connections = [];
 
   /**
-   * A processed copy of the database connection information from settings.php.
+   * The connection parameters of the connections, parsed from settings.php.
    *
-   * @var array<string|int,array<string|int,ConnectionInfoArray>>
+   * @var array<string|int,array<string|int,ConnectionParametersInterface>>
    */
   protected static array $databaseInfo = [];
 
@@ -248,65 +241,23 @@ abstract class Database {
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
+   * @param \Composer\Autoload\ClassLoader|null $class_loader
+   *   (optional) The class loader. Used for adding the database driver to the
+   *   autoloader if $info['autoload'] is set.
+   * @param string|null $app_root
+   *   (optional) The app root.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   A validated connection info array.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ConnectionParametersFactory::createFromArrayOptions() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
-  final public static function parseConnectionInfo(array $info): array {
-    // If there is no "driver" property, then we assume it's an array of
-    // possible connections for this target. Pick one at random. That allows
-    // us to have, for example, multiple replica servers.
-    if (empty($info['driver'])) {
-      $info_pick = $info[mt_rand(0, count($info) - 1)];
-    }
-
-    /** @var UnprocessedConnectionInfoArray $connection_info */
-    $connection_info = $info_pick ?? $info;
-
-    // Prefix information, default to an empty prefix.
-    $connection_info['prefix'] = $connection_info['prefix'] ?? '';
-
-    // Backwards compatibility layer for Drupal 8 style database connection
-    // arrays. Those have the wrong 'namespace' key set, or not set at all
-    // for core supported database drivers.
-    if (empty($connection_info['namespace']) || str_starts_with($connection_info['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      switch (strtolower($connection_info['driver'])) {
-        case 'mysql':
-          $connection_info['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
-          break;
-
-        case 'pgsql':
-          $connection_info['namespace'] = 'Drupal\\pgsql\\Driver\\Database\\pgsql';
-          break;
-
-        case 'sqlite':
-          $connection_info['namespace'] = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
-          break;
-      }
-    }
-    // Backwards compatibility layer for Drupal 8 style database connection
-    // arrays. Those do not have the 'autoload' key set for core database
-    // drivers.
-    if (empty($connection_info['autoload']) && isset($connection_info['namespace'])) {
-      switch (trim($connection_info['namespace'], '\\')) {
-        case "Drupal\\mysql\\Driver\\Database\\mysql":
-          $connection_info['autoload'] = "core/modules/mysql/src/Driver/Database/mysql/";
-          break;
-
-        case "Drupal\\pgsql\\Driver\\Database\\pgsql":
-          $connection_info['autoload'] = "core/modules/pgsql/src/Driver/Database/pgsql/";
-          break;
-
-        case "Drupal\\sqlite\\Driver\\Database\\sqlite":
-          $connection_info['autoload'] = "core/modules/sqlite/src/Driver/Database/sqlite/";
-          break;
-      }
-    }
-
-    assert(isset($connection_info['namespace']));
-    assert(isset($connection_info['autoload']));
-
-    return $connection_info;
+  final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromArrayOptions() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root)->toArray();
   }
 
   /**
@@ -327,47 +278,34 @@ abstract class Database {
    *   The database key.
    * @param string $target
    *   The database target name.
-   * @param UnprocessedConnectionInfoArray $info
+   * @param \Drupal\Core\Database\ConnectionParametersInterface|ConnectionInfoBaseArray|UnprocessedConnectionInfoArray $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
    * @param \Composer\Autoload\ClassLoader|null $class_loader
    *   (optional) The class loader. Used for adding the database driver to the
    *   autoloader if $info['autoload'] is set.
-   * @param string $app_root
+   * @param string|null $app_root
    *   (optional) The app root.
    *
    * @see \Drupal\Core\Database\Database::setActiveConnection
    */
-  final public static function addConnectionInfo(string|int $key, string|int $target, array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
+  final public static function addConnectionInfo(string|int $key, string|int $target, ConnectionParametersInterface|array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
     if (is_int($key)) {
       @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     if (is_int($target)) {
       @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
-    if (empty(self::$databaseInfo[$key][$target])) {
-      $connection_info = self::parseConnectionInfo($info);
-      self::$databaseInfo[$key][$target] = $connection_info;
-
-      // If the database driver is provided by a module, then its code may need
-      // to be instantiated prior to when the module's root namespace is added
-      // to the autoloader, because that happens during service container
-      // initialization but the container definition is likely in the database.
-      // Therefore, allow the connection info to specify an autoload directory
-      // for the driver.
-      if ($class_loader && $app_root) {
-        $class_loader->addPsr4($connection_info['namespace'] . '\\', $app_root . '/' . $connection_info['autoload']);
-
-        // When the database driver is extending from other database drivers,
-        // then add autoload directory for the parent database driver modules
-        // as well.
-        if (!empty($connection_info['dependencies'])) {
-          foreach ($connection_info['dependencies'] as $dependency) {
-            $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
-          }
-        }
-      }
+    if (!empty(self::$databaseInfo[$key][$target])) {
+      return;
+    }
+    if (is_array($info)) {
+      /** @var UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info */
+      self::$databaseInfo[$key][$target] = ConnectionParametersFactory::createFromOptionsArray($info, $class_loader, $app_root);
+    }
+    else {
+      self::$databaseInfo[$key][$target] = $info;
     }
   }
 
@@ -378,11 +316,40 @@ abstract class Database {
    *   (optional) The connection key for which to return information. If not
    *   specified, the 'default' connection key will be returned.
    *
-   * @return array<string|int,ConnectionInfoArray>
+   * @return array<string|int,ConnectionInfoBaseArray>
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ::getConnectionParameters() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   final public static function getConnectionInfo(string|int $key = 'default'): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::getConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    if (is_int($key)) {
+      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
+    $targets = self::getConnectionParameters($key);
+    $tmp = [];
+    foreach ($targets as $target => $parameters) {
+      $tmp[$target] = $parameters->toArray();
+    }
+    return $tmp;
+  }
+
+  /**
+   * Gets parameters for the specified database connection.
+   *
+   * @param string $key
+   *   (optional) The connection key for which to return information. If not
+   *   specified, the 'default' connection key will be returned.
+   *
+   * @return array<string|int,ConnectionParametersInterface>
+   *   An associative array of database connection parameters, keyed by target.
+   *   Defaults to an empty array.
+   */
+  final public static function getConnectionParameters(string|int $key = 'default'): array {
     if (is_int($key)) {
       @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
@@ -395,11 +362,35 @@ abstract class Database {
   /**
    * Gets connection information for all available databases.
    *
-   * @return array<string|int,array<string|int,ConnectionInfoArray>>
+   * @return array<string|int,array<string|int,ConnectionInfoBaseArray>>
    *   An associative array of database information for all available database,
    *   keyed by the database key and target. Defaults to an empty array.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ::getAllConnectionParameters() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   final public static function getAllConnectionInfo(): array {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ::getAllConnectionParameters() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    $targets = self::getAllConnectionParameters();
+    $tmp = [];
+    foreach (self::$databaseInfo as $key => $targets) {
+      foreach ($targets as $target => $parameters) {
+        $tmp[$key][$target] = $parameters->toArray();
+      }
+    }
+    return $tmp;
+  }
+
+  /**
+   * Gets connection parameters for all available databases.
+   *
+   * @return array<string|int,array<string|int,ConnectionParametersInterface>>
+   *   An associative array of database parameters for all available database,
+   *   keyed by the database key and target.
+   */
+  final public static function getAllConnectionParameters(): array {
     return self::$databaseInfo;
   }
 
@@ -505,14 +496,18 @@ abstract class Database {
       throw new ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
     }
 
-    if (!self::$databaseInfo[$key][$target]['driver']) {
-      throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
-    }
+    $connection_parameters = self::$databaseInfo[$key][$target];
 
-    $driver_class = self::$databaseInfo[$key][$target]['namespace'] . '\\Connection';
-    $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
-    $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]);
-    assert($new_connection instanceof Connection);
+    $driver_class = $connection_parameters->getConnectionClass();
+    if (method_exists($driver_class, 'openWithParameters')) {
+      $client_connection = $driver_class::openWithParameters($connection_parameters);
+      $new_connection = new $driver_class($client_connection, $connection_parameters);
+    }
+    else {
+      $options = $connection_parameters->toArray();
+      $client_connection = $driver_class::open($options);
+      $new_connection = new $driver_class($client_connection, $options);
+    }
     $new_connection->setTarget((string) $target);
     $new_connection->setKey((string) $key);
 
@@ -604,7 +599,7 @@ abstract class Database {
    *   directories are excluded in the search. When NULL will be determined by
    *   the extension_discovery_scan_tests setting.
    *
-   * @return ConnectionInfoArray
+   * @return ConnectionInfoBaseArray
    *   The database connection info.
    *
    * @throws \InvalidArgumentException
@@ -612,67 +607,15 @@ abstract class Database {
    *   requirements.
    * @throws \RuntimeException
    *   Exception thrown when a module provided database driver does not exist.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   ConnectionParametersFactory::createFromUrl() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   public static function convertDbUrlToConnectionInfo(string $url, ?bool $include_test_drivers = NULL): array {
-    // Check that the URL is well formed, starting with 'scheme://', where
-    // 'scheme' is a database driver name.
-    if (preg_match('/^(.*):\/\//', $url, $matches) !== 1) {
-      throw new \InvalidArgumentException("Missing scheme in URL '$url'");
-    }
-    $driverName = $matches[1];
-
-    // Determine if the database driver is provided by a module.
-    // @todo https://www.drupal.org/project/drupal/issues/3250999. Refactor when
-    // all database drivers are provided by modules.
-    $url_components = parse_url($url);
-    $url_component_query = $url_components['query'] ?? '';
-    parse_str($url_component_query, $query);
-
-    // Use the driver name as the module name when the module name is not
-    // provided.
-    $module = $query['module'] ?? $driverName;
-    assert(is_string($module));
-
-    $driverNamespace = "Drupal\\{$module}\\Driver\\Database\\{$driverName}";
-
-    /** @var \Drupal\Core\Extension\DatabaseDriver $driver */
-    $driver = self::getDriverList()
-      ->includeTestDrivers($include_test_drivers)
-      ->get($driverNamespace);
-
-    // Set up an additional autoloader. We don't use the main autoloader as
-    // this method can be called before Drupal is installed and is never
-    // called during regular runtime.
-    $additional_class_loader = new ClassLoader();
-    $additional_class_loader->addPsr4($driverNamespace . '\\', $driver->getPath());
-    $additional_class_loader->register();
-    $connection_class = $driverNamespace . '\\Connection';
-    if (!class_exists($connection_class)) {
-      throw new \InvalidArgumentException("Can not convert '$url' to a database connection, class '$connection_class' does not exist");
-    }
-
-    // When the database driver is extending another database driver, then
-    // add autoload info for the parent database driver as well.
-    $autoloadInfo = $driver->getAutoloadInfo();
-    if (isset($autoloadInfo['dependencies'])) {
-      foreach ($autoloadInfo['dependencies'] as $dependency) {
-        $additional_class_loader->addPsr4($dependency['namespace'] . '\\', $dependency['autoload']);
-      }
-    }
-
-    $additional_class_loader->register(TRUE);
-
-    /** @var ConnectionInfoArray $options */
-    $options = $connection_class::createConnectionOptionsFromUrl($url);
-
-    // Add the necessary information to autoload code.
-    // @see \Drupal\Core\Site\Settings::initialize()
-    $options['autoload'] = $driver->getPath() . DIRECTORY_SEPARATOR;
-    if (isset($autoloadInfo['dependencies'])) {
-      $options['dependencies'] = $autoloadInfo['dependencies'];
-    }
-
-    return $options;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use ConnectionParametersFactory::createFromUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    return ConnectionParametersFactory::createFromUrl($url, $include_test_drivers)->toArray();
   }
 
   /**
@@ -702,21 +645,19 @@ abstract class Database {
    *
    * @throws \RuntimeException
    *   When the database connection is not defined.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   Database::getConnectionInfo()['default']->asUrl() instead.
+   *
+   * @see https://www.drupal.org/node/3626243
    */
   public static function getConnectionInfoAsUrl(string|int $key = 'default'): string {
-    $db_info = static::getConnectionInfo($key);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use Database::getConnectionInfo()[\'default\']->asUrl() instead. See https://www.drupal.org/node/3626243', E_USER_DEPRECATED);
+    $db_info = static::getConnectionParameters($key);
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
     }
-    $namespace = $db_info['default']['namespace'];
-    // Add the module name to the connection options to make it easy for the
-    // connection class's createUrlFromConnectionOptions() method to add it to
-    // the URL.
-    $db_info['default']['module'] = explode('\\', $namespace)[1];
-    $connection_class = $namespace . '\\Connection';
-    $url = $connection_class::createUrlFromConnectionOptions($db_info['default']);
-    assert(is_string($url));
-    return $url;
+    return $db_info['default']->asUrl();
   }
 
   /**

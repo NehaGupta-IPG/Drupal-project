@@ -30,7 +30,10 @@ class ConnectionTest extends UnitTestCase {
     $pdo->expects($this->never())->method('query');
     $pdo->expects($this->never())->method('prepare');
 
-    new Connection($pdo, []);
+    new Connection($pdo, [
+      'driver' => 'pgsql',
+      'database' => 'test',
+    ]);
   }
 
   /**
@@ -43,6 +46,8 @@ class ConnectionTest extends UnitTestCase {
       ->with("SET timezone = 'UTC'");
 
     new Connection($pdo, [
+      'driver' => 'pgsql',
+      'database' => 'test',
       'init_commands' => [
         "SET timezone = 'UTC'",
       ],

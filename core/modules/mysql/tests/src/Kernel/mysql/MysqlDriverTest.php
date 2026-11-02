@@ -23,7 +23,10 @@ class MysqlDriverTest extends DriverSpecificKernelTestBase {
    * @legacy-covers \Drupal\mysql\Driver\Database\mysql\Connection
    */
   public function testConnection(): void {
-    $connection = new Connection($this->createStub(Mysql::class), []);
+    $connection = new Connection(
+      $this->createStub(Mysql::class),
+      ['driver' => 'mysql', 'database' => 'foo'],
+    );
     $this->assertInstanceOf(Connection::class, $connection);
   }
 
