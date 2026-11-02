@@ -375,10 +375,11 @@ form_test.redirect:
     _access: 'TRUE'
 
 form_test.label:
-  path: '/form_test/form-labels'
+  path: '/form_test/form-labels/{test_id_as_array}'
   defaults:
     _form: '\Drupal\form_test\Form\FormTestLabelForm'
     _title: 'Form label test'
+    test_id_as_array: false
   requirements:
     _access: 'TRUE'
 
