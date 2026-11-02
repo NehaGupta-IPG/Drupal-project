@@ -807,8 +807,10 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:langcode'
+        - 'url.query_args:title'
+        - 'url.query_args:type'
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
@@ -826,8 +828,10 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:langcode'
+        - 'url.query_args:title'
+        - 'url.query_args:type'
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }

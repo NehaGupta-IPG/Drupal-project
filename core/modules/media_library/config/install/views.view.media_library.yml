@@ -471,9 +471,12 @@ display:
       max-age: 0
       contexts:
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:langcode'
+        - 'url.query_args:name'
         - 'url.query_args:sort_by'
+        - 'url.query_args:status'
+        - 'url.query_args:type'
         - user
         - user.permissions
       tags: {  }
@@ -768,9 +771,12 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:langcode'
+        - 'url.query_args:name'
         - 'url.query_args:sort_by'
+        - 'url.query_args:status'
+        - 'url.query_args:type'
         - user
         - user.permissions
       tags: {  }
@@ -1089,6 +1095,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - 'url.query_args:name'
         - 'url.query_args:sort_by'
         - user.permissions
       tags: {  }
@@ -1386,6 +1393,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - 'url.query_args:name'
         - 'url.query_args:sort_by'
         - user.permissions
       tags: {  }

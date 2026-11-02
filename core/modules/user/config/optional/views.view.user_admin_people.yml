@@ -879,8 +879,11 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:permission'
+        - 'url.query_args:role'
+        - 'url.query_args:status'
+        - 'url.query_args:user'
         - user.permissions
       tags: {  }
   page_1:
@@ -912,7 +915,10 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url
         - url.query_args
+        - 'url.query_args:permission'
+        - 'url.query_args:role'
+        - 'url.query_args:status'
+        - 'url.query_args:user'
         - user.permissions
       tags: {  }

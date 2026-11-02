@@ -316,7 +316,7 @@ class ExposedFormTest extends ViewTestBase {
     $element = $this->assertSession()->elementExists('xpath', $xpath);
 
     // Test that the correct option is selected after form submission.
-    $this->assertCacheContext('url');
+    $this->assertCacheContext('url.query_args');
     $this->assertTrue($this->assertSession()->optionExists('Content: Type', 'All')->isSelected());
     $arguments = [
       'All' => ['article', 'page'],
@@ -326,7 +326,7 @@ class ExposedFormTest extends ViewTestBase {
     foreach ($arguments as $argument => $bundles) {
       $element->find('css', 'select')->selectOption($argument);
       $element->findButton('Apply')->click();
-      $this->assertCacheContext('url');
+      $this->assertCacheContext('url.query_args');
       $this->assertTrue($this->assertSession()->optionExists('Content: Type', $argument)->isSelected());
       $this->assertNodesExist($bundles);
     }
