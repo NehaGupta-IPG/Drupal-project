@@ -584,4 +584,21 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
     Cache::invalidateTags([OptionsAllowedValues::CACHE_TAG]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function label(): string {
+    return $this->getPossibleOptions()[$this->get('value')->getValue()];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __get($name) {
+    if ($name === 'label') {
+      return $this->label();
+    }
+    return parent::__get($name);
+  }
+
 }

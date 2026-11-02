@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
+use Drupal\options\Plugin\Field\FieldType\ListItemBase;
 
 /**
  * Represents an entity field; that is, a list of field item objects.
@@ -136,6 +137,9 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    */
   public function __isset($property_name) {
     if ($item = $this->first()) {
+      if ($item instanceof ListItemBase && $property_name === 'label') {
+        return TRUE;
+      }
       return $item->__isset($property_name);
     }
     return FALSE;
