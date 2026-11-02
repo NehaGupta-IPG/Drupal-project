@@ -193,6 +193,9 @@
     "libraryDefinition": {
       "type": "object",
       "properties": {
+        "header": {
+          "type": "boolean"
+        },
         "dependencies": {
           "type": "array",
           "items": {
