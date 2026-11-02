@@ -70,6 +70,18 @@ class ViewsTokensHooks {
       'name' => $this->t('Page count'),
       'description' => $this->t('The total page count.'),
     ];
+    $info['tokens']['view']['start'] = [
+      'name' => $this->t('Start'),
+      'description' => $this->t('The initial record number in the set.'),
+    ];
+    $info['tokens']['view']['end'] = [
+      'name' => $this->t('End'),
+      'description' => $this->t('The last record number in the set.'),
+    ];
+    $info['tokens']['view']['current_record_count'] = [
+      'name' => $this->t('Current record count'),
+      'description' => $this->t('The current page record count.'),
+    ];
     return $info;
   }
 
@@ -142,6 +154,58 @@ class ViewsTokensHooks {
             // If there are no items per page, set this to 1 for the division.
             $per_page = $view->getItemsPerPage() ?: 1;
             $replacements[$original] = max(1, (int) ceil($view->total_rows / $per_page));
+            break;
+
+          case 'start':
+            $per_page = (int) $view->getItemsPerPage();
+            $total = $view->total_rows ?? count($view->result);
+            $start_offset = empty($total) ? 0 : 1;
+            if ($per_page === 0) {
+              $replacements[$original] = $start_offset;
+            }
+            else {
+              $current_page = (int) $view->getCurrentPage() + 1;
+              $replacements[$original] = ($current_page - 1) * $per_page + $start_offset;
+            }
+            break;
+
+          case 'end':
+            // Calculate the page totals.
+            $current_page = (int) $view->getCurrentPage() + 1;
+            $per_page = (int) $view->getItemsPerPage();
+            $total = $view->total_rows ?? count($view->result);
+            if ($per_page === 0) {
+              $replacements[$original] = $total;
+            }
+            else {
+              $total_count = $current_page * $per_page;
+              if ($total_count > $total) {
+                $total_count = $total;
+              }
+              $replacements[$original] = $total_count;
+            }
+            break;
+
+          case 'current_record_count':
+            // Calculate the page totals.
+            $current_page = (int) $view->getCurrentPage() + 1;
+            $per_page = (int) $view->getItemsPerPage();
+            $total = $view->total_rows ?? count($view->result);
+            $start_offset = empty($total) ? 0 : 1;
+            if ($per_page === 0) {
+              $start = $start_offset;
+              $end = $total;
+            }
+            else {
+              $total_count = $current_page * $per_page;
+              if ($total_count > $total) {
+                $total_count = $total;
+              }
+              $start = ($current_page - 1) * $per_page + $start_offset;
+              $end = $total_count;
+            }
+            $replacements[$original] = ($end - $start) + $start_offset;
+
             break;
         }
       }
