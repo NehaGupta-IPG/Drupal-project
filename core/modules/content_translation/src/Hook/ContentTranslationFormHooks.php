@@ -74,6 +74,49 @@ class ContentTranslationFormHooks {
       if (isset($form['footer'])) {
         $form['footer']['#multilingual'] = TRUE;
       }
+      // Load the language content settings and check which entities
+      // and bundles has the 'untranslatable fields disabled' option active.
+      if ($entity instanceof ContentEntityInterface && $entity->isTranslatable()) {
+        $storage = \Drupal::entityTypeManager()->getStorage('language_content_settings');
+        $ids = \Drupal::entityQuery('language_content_settings')->execute();
+        $list = $storage->loadMultiple($ids);
+        $entities = [];
+        foreach ($list as $entity_settings) {
+          $third_party_settings = $entity_settings->get('third_party_settings');
+          if (isset($third_party_settings)) {
+            if (isset($third_party_settings['content_translation']['bundle_settings']['untranslatable_fields_disabled']) &&
+              $third_party_settings['content_translation']['bundle_settings']['untranslatable_fields_disabled']) {
+              $entity_type_id = $entity_settings->get('target_entity_type_id');
+              $bundle = $entity_settings->get('target_bundle');
+              $entities[$entity_type_id][] = $bundle;
+            }
+          }
+        }
+        // Check if the current entity type and bundle is included in the list
+        // of entities that has the option active and if the current form is
+        // a translation form.
+        $entity_type_id = $entity->getEntityTypeId();
+        if (method_exists($entity, 'bundle')) {
+          $bundle = $entity->bundle();
+        }
+        else {
+          $bundle = $entity_type_id;
+        }
+        if (!$entity->isDefaultTranslation() && isset($entities[$entity_type_id]) && in_array($bundle, $entities[$entity_type_id])) {
+          $fields = $entity->getFields();
+          $translatable_fields = $entity->getTranslatableFields();
+          // Discard the translatable fields.
+          foreach ($translatable_fields as $key => $field) {
+            unset($fields[$key]);
+          }
+          // Set the #disabled property to untranslatable fields.
+          foreach ($fields as $key => $field) {
+            if (isset($form[$key])) {
+              $form[$key]['#disabled'] = TRUE;
+            }
+          }
+        }
+      }
     }
   }
 
