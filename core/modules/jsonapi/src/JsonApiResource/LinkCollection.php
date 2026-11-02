@@ -3,6 +3,7 @@
 namespace Drupal\jsonapi\JsonApiResource;
 
 use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Utility\UrlHelper;
 
 /**
  * Contains a set of JSON:API Link objects.
@@ -192,6 +193,8 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * Ensures that a link key is valid.
    *
+   * @see https://datatracker.ietf.org/doc/html/rfc8288#section-3.3
+   *
    * @param string $key
    *   A key name.
    *
@@ -199,7 +202,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   TRUE if the key is valid, FALSE otherwise.
    */
   protected static function validKey($key) {
-    return is_string($key) && !is_numeric($key) && !str_contains($key, ':');
+    return preg_match('/[a-z0-9-.]*/', strtolower($key)) || UrlHelper::validateUri($key);
   }
 
 }
