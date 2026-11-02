@@ -16,6 +16,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -132,6 +133,35 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertBigPipeNoJsCookieExists('0');
     $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
+  }
+
+  /**
+   * Tests that missing or empty destinations result in a 400 response.
+   *
+   * @param array $query
+   *   The request query parameters.
+   */
+  #[DataProvider('providerNoJsCookieInvalidDestination')]
+  public function testNoJsCookieInvalidDestination(array $query): void {
+    $this->drupalLogin($this->rootUser);
+    $this->assertSessionCookieExists('1');
+    $this->assertBigPipeNoJsCookieExists('0');
+
+    $this->drupalGet('big_pipe/no-js', ['query' => $query]);
+    $this->assertSession()->statusCodeEquals(400);
+
+    // The rejected request must not set the no-JS cookie.
+    $this->assertBigPipeNoJsCookieExists('0');
+  }
+
+  /**
+   * Provides invalid destinations for the no-JS cookie controller.
+   */
+  public static function providerNoJsCookieInvalidDestination(): array {
+    return [
+      'missing destination' => [[]],
+      'empty destination' => [['destination' => '']],
+    ];
   }
 
   /**
