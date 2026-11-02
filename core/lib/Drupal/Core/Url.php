@@ -10,6 +10,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Template\Attribute\TwigAllowed;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -742,6 +743,7 @@ class Url implements TrustedCallbackInterface {
    *
    * @return $this
    */
+  #[TwigAllowed]
   public function setAbsolute($absolute = TRUE) {
     $this->options['absolute'] = $absolute;
     return $this;

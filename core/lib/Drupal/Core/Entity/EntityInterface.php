@@ -5,6 +5,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Template\Attribute\TwigAllowed;
 
 /**
  * Defines a common interface for all entity objects.
@@ -31,6 +32,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *   The entity identifier, or NULL if the object does not yet have an
    *   identifier.
    */
+  #[TwigAllowed]
   public function id();
 
   /**
@@ -85,6 +87,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *   The bundle of the entity. Defaults to the entity type ID if the entity
    *   type does not make use of different bundles.
    */
+  #[TwigAllowed]
   public function bundle();
 
   /**
@@ -93,6 +96,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
    *   The label of the entity, or NULL if there is no label defined.
    */
+  #[TwigAllowed]
   public function label();
 
   /**
@@ -133,6 +137,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @throws \Drupal\Core\Entity\EntityMalformedException
    * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
    */
+  #[TwigAllowed]
   public function toUrl($rel = NULL, array $options = []);
 
   /**
@@ -153,6 +158,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @throws \Drupal\Core\Entity\EntityMalformedException
    * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
    */
+  #[TwigAllowed]
   public function toLink($text = NULL, $rel = 'canonical', array $options = []);
 
   /**
