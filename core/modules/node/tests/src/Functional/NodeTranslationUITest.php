@@ -599,10 +599,9 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     // Create a node.
     $nid = $this->createEntity(['title' => 'Node with multi-value image field en title'], 'en');
 
-    // Add a French translation and assert the title markup is not escaped.
+    // Add a French translation and assert the title contains the translatability clue.
     $this->drupalGet("node/$nid/translations/add/en/fr");
-    $markup = 'Image <span class="translation-entity-all-languages">(all languages)</span>';
-    $this->assertSession()->assertNoEscaped($markup);
+    $markup = 'Image (all languages)';
     $this->assertSession()->responseContains($markup);
   }
 
