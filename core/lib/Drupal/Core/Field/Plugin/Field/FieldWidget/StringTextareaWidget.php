@@ -73,6 +73,11 @@ class StringTextareaWidget extends WidgetBase {
       '#rows' => $this->getSetting('rows'),
       '#placeholder' => $this->getSetting('placeholder'),
       '#attributes' => ['class' => ['js-text-full', 'text-full']],
+      // Since field values submitted via JSON:API will not have "\r\n"
+      // normalized to "\n", do not normalize the newlines in the form element,
+      // so that field values saved to storage are the same whether submitted
+      // by form or JSON:API.
+      '#normalize_newlines' => FALSE,
     ];
 
     return $element;

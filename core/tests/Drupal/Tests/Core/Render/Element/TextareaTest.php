@@ -22,8 +22,7 @@ class TextareaTest extends UnitTestCase {
    * Tests value callback.
    */
   #[DataProvider('providerTestValueCallback')]
-  public function testValueCallback($expected, $input): void {
-    $element = [];
+  public function testValueCallback(?string $expected, mixed $input, array $element = []): void {
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, Textarea::valueCallback($element, $input, $form_state));
   }
@@ -32,14 +31,43 @@ class TextareaTest extends UnitTestCase {
    * Data provider for testValueCallback().
    */
   public static function providerTestValueCallback(): array {
-    $data = [];
-    $data[] = [NULL, FALSE];
-    $data[] = [NULL, NULL];
-    $data[] = ['', ['test']];
-    $data[] = ['test', 'test'];
-    $data[] = ['123', 123];
-
-    return $data;
+    return [
+      'False' => [
+        NULL,
+        FALSE,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'NULL' => [
+        NULL,
+        NULL,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'empty array' => [
+        '',
+        ['test'],
+        ['#normalize_newlines' => TRUE],
+      ],
+      'string' => [
+        'test',
+        'test',
+        ['#normalize_newlines' => TRUE],
+      ],
+      'integer' => [
+        '123',
+        123,
+        ['#normalize_newlines' => TRUE],
+      ],
+      'normalize new lines' => [
+        "some\ndifferent\nline\nendings",
+        "some\r\ndifferent\rline\nendings",
+        ['#normalize_newlines' => TRUE],
+      ],
+      'do not normalize new lines' => [
+        "some\r\ndifferent\rline\nendings",
+        "some\r\ndifferent\rline\nendings",
+        ['#normalize_newlines' => FALSE],
+      ],
+    ];
   }
 
 }
