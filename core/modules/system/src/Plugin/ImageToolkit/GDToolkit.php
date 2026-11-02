@@ -142,18 +142,17 @@ class GDToolkit extends ImageToolkitBase {
     // provides a constant IMG_WEBP_LOSSLESS. When this constant is passed to
     // the imagewebp function, it enables lossless compression of a GdImage
     // object.
-    $webp_lossless = $this->configFactory->getEditable('system.image.gd')->get('webp_lossless', FALSE);
     $form['webp_quality_wrapper'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('WebP quality'),
     ];
-    $form['webp_quality_wrapper']['image_webp_compression'] = [
+    $form['webp_quality_wrapper']['image_webp_lossless'] = [
       '#type' => 'radios',
       '#options' => [
-        'lossless' => $this->t('Lossless compression'),
-        'lossy' => $this->t('Lossy compression'),
+        1 => $this->t('Lossless compression'),
+        0 => $this->t('Lossy compression'),
       ],
-      '#default_value' => $webp_lossless ? 'lossless' : 'lossy',
+      '#default_value' => $this->configFactory->getEditable('system.image.gd')->get('webp_lossless', FALSE),
     ];
     $form['webp_quality_wrapper']['image_webp_quality'] = [
       '#type' => 'number',
@@ -162,11 +161,11 @@ class GDToolkit extends ImageToolkitBase {
       '#min' => 0,
       '#max' => 100,
       '#default_value' => $this->configFactory->getEditable('system.image.gd')
-        ->get('webp_quality', FALSE),
+        ->get('webp_quality', 75),
       '#field_suffix' => $this->t('%'),
       '#states' => [
         'visible' => [
-          ':input[name="gd[webp_quality_wrapper][image_webp_compression]"]' => ['value' => 'lossy'],
+          ':input[name="gd[webp_quality_wrapper][image_webp_lossless]"]' => ['value' => 0],
         ],
       ],
       '#prefix' => '<div style="margin-left: 1.5em;">',
@@ -179,12 +178,9 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $compression_type = $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_compression']);
-    $webp_lossless = ($compression_type === 'lossless');
-
     $this->configFactory->getEditable('system.image.gd')
       ->set('jpeg_quality', $form_state->getValue(['gd', 'jpeg_quality_wrapper', 'image_jpeg_quality']))
-      ->set('webp_lossless', $webp_lossless)
+      ->set('webp_lossless', $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_lossless'])
       ->set('webp_quality', $form_state->getValue(['gd', 'webp_quality_wrapper', 'image_webp_quality']))
       ->save();
   }
@@ -311,7 +307,7 @@ class GDToolkit extends ImageToolkitBase {
           $webp_quality = $this->configFactory->get('system.image.gd')->get('webp_lossless')
             ? constant('IMG_WEBP_LOSSLESS')
             : $this->configFactory->get('system.image.gd')->get('webp_quality');
-          $success = $function($this->getImage(), $destination, $webp_quality);
+          $success = $function($this->getImage(), $destination, $webp_quality ?? 75);
         }
         else {
           $success = $function($this->getImage(), $destination);
