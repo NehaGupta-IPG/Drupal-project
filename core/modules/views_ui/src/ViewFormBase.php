@@ -161,7 +161,12 @@ abstract class ViewFormBase extends EntityForm {
    */
   public function getDisplayLabel(ViewUI $view, $display_id, $check_changed = TRUE) {
     $display = $view->get('display');
-    $title = $display_id == 'default' ? $this->t('Default') : $display[$display_id]['display_title'];
+    $title = $display_id == 'default' ? $this->t('Default') : ($display[$display_id]['display_title'] ?? '');
+    if ($title === '') {
+      $plugin_id = $display[$display_id]['display_plugin'] ?? NULL;
+      $definition = $plugin_id ? \Drupal::service('plugin.manager.views.display')->getDefinition($plugin_id, FALSE) : NULL;
+      $title = $definition['title'] ?? $this->t('Broken');
+    }
     $title = Unicode::truncate($title, 25, FALSE, TRUE);
 
     if ($check_changed && !empty($view->changed_display[$display_id])) {
