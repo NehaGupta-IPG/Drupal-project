@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Component\Utility\EmailAddress;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
@@ -73,7 +74,7 @@ class Email extends FormElementBase {
    * already.
    */
   public static function validateEmail(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = trim($element['#value']);
+    $value = EmailAddress::normalizeDomainSeparators(trim($element['#value']));
     $form_state->setValueForElement($element, $value);
 
     if ($value !== '' && !\Drupal::service('email.validator')->isValid($value)) {

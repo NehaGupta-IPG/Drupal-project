@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Utility;
 
+// cspell:ignore UASG
+
 use Drupal\Component\Utility\EmailValidator;
+use Drupal\Tests\EmailTestDataTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\TestTools\PhpUnitCompatibility\ForwardCompatibilityTrait;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -18,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('Utility')]
 class EmailValidatorTest extends TestCase {
 
+  use EmailTestDataTrait;
   use ForwardCompatibilityTrait;
 
   /**
@@ -36,6 +41,19 @@ class EmailValidatorTest extends TestCase {
   }
 
   /**
+   * Tests the SMTP mailbox syntax contract.
+   */
+  #[DataProvider('internationalizedMailboxProvider')]
+  #[DataProvider('uasgMailboxProvider')]
+  public function testMailboxSyntax(string $mailbox, bool $valid): void {
+    $validator = new EmailValidator();
+    $this->assertSame($valid, $validator->isValid($mailbox));
+    if (!$valid) {
+      $this->assertNotNull($validator->getError());
+    }
+  }
+
+  /**
    * Tests is valid exception.
    */
   public function testIsValidException(): void {
@@ -43,6 +61,16 @@ class EmailValidatorTest extends TestCase {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessageIs('Calling \Drupal\Component\Utility\EmailValidator::isValid() with the second argument is not supported. See https://www.drupal.org/node/2997196');
     $validator->isValid('example@example.com', (new NoRFCWarningsValidation()));
+  }
+
+  /**
+   * Tests recognition of supported domain input by the shared validator.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testDomainSeparatorValidation(string $mailbox, string $normalized): void {
+    $validator = new EmailValidator();
+    $this->assertTrue($validator->isValid($normalized));
+    $this->assertTrue($validator->isValid($mailbox));
   }
 
 }

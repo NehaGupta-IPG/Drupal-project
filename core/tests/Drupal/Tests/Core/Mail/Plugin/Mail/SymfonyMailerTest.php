@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Mail\Plugin\Mail;
 
+// cspell:ignore UASG IDNA
+
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\Plugin\Mail\SymfonyMailer;
 use Drupal\Core\Render\Markup;
 use Drupal\Tests\UnitTestCase;
+use Drupal\Tests\EmailTestDataTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -21,6 +25,8 @@ use Symfony\Component\Mime\Email;
 #[CoversClass(SymfonyMailer::class)]
 #[Group('Mail')]
 class SymfonyMailerTest extends UnitTestCase {
+
+  use EmailTestDataTrait;
 
   /**
    * Tests that mixed plain text and html body is converted correctly.
@@ -203,6 +209,92 @@ class SymfonyMailerTest extends UnitTestCase {
           'subject' => 'test subject',
         ],
       ],
+    ];
+  }
+
+  /**
+   * Tests historical UASG addresses through the mail backend and envelope.
+   */
+  #[DataProvider('uasgEnvelopeProvider')]
+  public function testUasgRecipient(string $mailbox, bool $valid, string $encoded): void {
+    $captured = [];
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($valid ? $this->once() : $this->never())->method('send')->willReturnCallback(
+      static function (Email $email) use (&$captured): void {
+        foreach (Envelope::create($email)->getRecipients() as $recipient) {
+          $captured[] = $recipient->getEncodedAddress();
+        }
+      }
+    );
+    $logger = $this->createStub(LoggerInterface::class);
+    $plugin = new SymfonyMailer($logger, $mailer);
+    $this->assertSame($valid, $plugin->mail([
+      'to' => $mailbox,
+      'headers' => ['From' => 'sender@example.org'],
+      'subject' => 'Internationalized recipient test',
+      'body' => 'No real transport is used.',
+    ]));
+    $this->assertSame($valid ? [$encoded] : [], $captured);
+  }
+
+  /**
+   * Tests separator mapping and exact local-part preservation in the envelope.
+   */
+  #[DataProvider('normalizedDomainMailboxProvider')]
+  public function testNormalizedDomainRecipient(string $mailbox, string $normalized): void {
+    $captured = [];
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($this->once())->method('send')->willReturnCallback(
+      static function (Email $email) use (&$captured): void {
+        foreach (Envelope::create($email)->getRecipients() as $recipient) {
+          $captured[] = $recipient->getEncodedAddress();
+        }
+      }
+    );
+    $plugin = new SymfonyMailer($this->createStub(LoggerInterface::class), $mailer);
+    $this->assertTrue($plugin->mail([
+      'to' => $mailbox,
+      'headers' => ['From' => 'sender@example.org'],
+      'subject' => 'Domain separator test',
+      'body' => 'No real transport is used.',
+    ]));
+    // This fixture domain has a fixed IDNA form. Do not normalize the local part.
+    // cspell:ignore fsqu
+    $encoded = str_replace('@例子.测试', '@xn--fsqu00a.xn--0zwm56d', $normalized);
+    $this->assertSame([$encoded], $captured);
+  }
+
+  /**
+   * Tests accepted and rejected local-part lengths before transport delivery.
+   */
+  #[DataProvider('recipientLengthProvider')]
+  public function testRecipientLength(string $mailbox, bool $valid, string $header): void {
+    $mailer = $this->createMock(MailerInterface::class);
+    $mailer->expects($valid ? $this->once() : $this->never())->method('send');
+    $plugin = new SymfonyMailer($this->createStub(LoggerInterface::class), $mailer);
+    $headers = ['From' => 'sender@example.org'];
+    if ($header !== 'To') {
+      $headers[$header] = $mailbox;
+    }
+    $this->assertSame($valid, $plugin->mail([
+      'to' => $header === 'To' ? $mailbox : 'recipient@example.org',
+      'headers' => $headers,
+      'subject' => 'Mailbox length test',
+      'body' => 'No real transport is used.',
+    ]));
+  }
+
+  /**
+   * Provides octet boundaries, including copied and blind copied recipients.
+   */
+  public static function recipientLengthProvider(): array {
+    return [
+      '64 ASCII octets' => [str_repeat('a', 64) . '@example.org', TRUE, 'To'],
+      '65 ASCII octets' => [str_repeat('a', 65) . '@example.org', FALSE, 'To'],
+      '64 UTF-8 octets' => [str_repeat('é', 32) . '@example.org', TRUE, 'To'],
+      '66 UTF-8 octets' => [str_repeat('é', 33) . '@example.org', FALSE, 'To'],
+      'Overlong Cc' => [str_repeat('a', 65) . '@example.org', FALSE, 'Cc'],
+      'Overlong Bcc' => [str_repeat('é', 33) . '@example.org', FALSE, 'Bcc'],
     ];
   }
 

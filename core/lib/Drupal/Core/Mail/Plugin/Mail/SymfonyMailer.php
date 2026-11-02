@@ -3,6 +3,7 @@
 namespace Drupal\Core\Mail\Plugin\Mail;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\EmailAddress;
 use Drupal\Core\Mail\Attribute\Mail;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\MailInterface;
@@ -149,6 +150,15 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
         ->to(...$recipients)
         ->subject($message['subject'])
         ->text($message['body']);
+
+      // MIME validation permits length warnings. SMTP recipients must still
+      // respect the local-part octet limit before reaching the transport.
+      $recipients = [...$email->getTo(), ...$email->getCc(), ...$email->getBcc()];
+      foreach ($recipients as $recipient) {
+        if (!EmailAddress::hasValidLocalPartLength($recipient->getAddress())) {
+          throw new \InvalidArgumentException('SMTP recipient local parts must not exceed 64 octets.');
+        }
+      }
 
       $mailer = $this->getMailer();
       $mailer->send($email);
