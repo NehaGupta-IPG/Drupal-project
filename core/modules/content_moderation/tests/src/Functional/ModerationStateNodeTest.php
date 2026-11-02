@@ -6,6 +6,7 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -202,6 +203,32 @@ class ModerationStateNodeTest extends ModerationStateTestBase {
     // in the h1 tag.
     $this->assertSession()->pageTextMatchesCount(2, '/Test moderated node content - draft/ui');
     $this->assertSession()->elementNotExists('css', 'article h2');
+  }
+
+  /**
+   * Tests the version history route with a deleted moderation state.
+   */
+  public function testVersionHistoryWithDeletedModerationState(): void {
+    $node = $this->drupalCreateNode([
+      'type' => 'moderated_content',
+      'title' => 'Test moderated node content',
+      'moderation_state' => 'draft',
+    ]);
+    $node->setNewRevision(TRUE);
+    $node->set('moderation_state', 'published')->save();
+    $node->setNewRevision(TRUE);
+    $node->set('moderation_state', 'archived')->save();
+
+    $user = $this->drupalCreateUser(array_merge($this->permissions, ['view all revisions']));
+
+    // Delete the archived state.
+    $workflow = Workflow::load('editorial');
+    $workflow->getTypePlugin()->deleteState('archived');
+    $workflow->save();
+
+    $this->drupalLogin($user);
+    $this->drupalGet($node->toUrl('version-history'));
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }
