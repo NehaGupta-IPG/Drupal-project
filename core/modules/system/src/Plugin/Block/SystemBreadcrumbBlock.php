@@ -64,6 +64,11 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function build() {
+    if ($this->inPreview) {
+      return [
+        '#markup' => $this->getPreviewFallbackString(),
+      ];
+    }
     return $this->breadcrumbManager->build($this->routeMatch)->toRenderable();
   }
 
