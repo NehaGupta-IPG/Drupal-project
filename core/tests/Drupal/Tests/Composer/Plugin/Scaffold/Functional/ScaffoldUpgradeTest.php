@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * is subsequently modified by a `composer update` operation, then any
  * post-update hook (& etc.) may run with inconsistent code, leading to
  * runtime errors. This test ensures that it is possible to upgrade from the
- * last available stable 8.8.x tag to the current Scaffold plugin code (e.g. in
+ * last available stable 9.5.0 tag to the current Scaffold plugin code (e.g. in
  * the current patch-under-test).
  */
 #[Group('Scaffold')]
@@ -60,8 +60,6 @@ class ScaffoldUpgradeTest extends TestCase {
    * Tests upgrading the Composer Scaffold plugin.
    */
   public function testScaffoldUpgrade(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3150040');
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->fixtures->projectRoot()];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
@@ -73,30 +71,27 @@ class ScaffoldUpgradeTest extends TestCase {
     $this->mustExec("composer install --no-ansi", $sut);
     $this->assertScaffoldedFile($sut . '/sites/default/default.settings.php', FALSE, 'A settings.php fixture file scaffolded from the scaffold-override-fixture');
 
-    // Next, bring back packagist.org and install core-composer-scaffold:8.8.0.
-    // Packagist is disabled in the fixture; we bring it back by removing the
-    // line that disables it.
-    $this->mustExec("composer config --unset repositories.packagist.org", $sut);
+    // Next, install the stable release of core-composer-scaffold that this
+    // test upgrades from. Use a local copy of the plugin source so that the
+    // test does not depend on packagist.org.
+    $scaffoldPluginStable = $this->fixturesDir . '/composer-scaffold-plugin-stable';
+    $this->copyPluginVersion($scaffoldPluginStable, '9.5.0', FALSE);
+    $this->mustExec("composer config repositories.composer-scaffold-stable path $scaffoldPluginStable", $sut);
     $this->mustExec("composer config --unset repositories.composer-scaffold", $sut);
     $stdout = $this->mustExec("composer require --no-ansi drupal/core-composer-scaffold:9.5.0 --no-plugins 2>&1", $sut);
-    $this->assertStringContainsString("  - Installing drupal/core-composer-scaffold (9.5.0):", $stdout);
+    $this->assertStringContainsString("=> 9.5.0):", $stdout);
 
-    // We can't force the path repo to re-install over the stable version
-    // without removing it, and removing it masks the bugs we are testing for.
-    // We will therefore make a git repo so that we can tag an explicit version
-    // to require.
+    // Upgrade back to the Scaffold plugin under test by re-pointing the
+    // composer-scaffold repository at a copy of the plugin source with an
+    // explicit version.
     $testVersion = '99.99.99';
-    $scaffoldPluginTmpRepo = $this->createTmpRepo($this->fixtures->projectRoot(), $this->fixturesDir, $testVersion);
-
-    // Disable packagist.org and upgrade back to the Scaffold plugin under test.
-    // This puts the `"packagist.org": false` config line back in composer.json
-    // so that Packagist will no longer be used.
-    $this->mustExec("composer config repositories.packagist.org false", $sut);
-    $this->mustExec("composer config repositories.composer-scaffold vcs 'file:///$scaffoldPluginTmpRepo'", $sut);
+    $scaffoldPluginUnderTest = $this->fixturesDir . '/composer-scaffold-plugin-under-test';
+    $this->copyPluginVersion($scaffoldPluginUnderTest, $testVersion, FALSE);
+    $this->mustExec("composer config repositories.composer-scaffold path $scaffoldPluginUnderTest", $sut);
 
     // Using 'mustExec' was giving a strange binary string here.
     $output = $this->mustExec("composer require --no-ansi drupal/core-composer-scaffold:$testVersion 2>&1", $sut);
-    $this->assertStringContainsString("Installing drupal/core-composer-scaffold ($testVersion)", $output);
+    $this->assertStringContainsString("=> $testVersion):", $output);
 
     // Remove a scaffold file and run the scaffold command again to prove that
     // scaffolding is still working.
@@ -215,32 +210,6 @@ PHP;
     $contents = file_get_contents($path);
     $this->assertStringContainsString($search, $contents, "Expected code not found in $path; update this test to match the current code.");
     file_put_contents($path, str_replace($search, $replace, $contents));
-  }
-
-  /**
-   * Copy the provided source directory and create a temporary git repository.
-   *
-   * @param string $source
-   *   Path to directory to copy.
-   * @param string $destParent
-   *   Path to location to create git repository.
-   * @param string $version
-   *   Version to tag the repository with.
-   *
-   * @return string
-   *   Path to temporary git repository.
-   */
-  protected function createTmpRepo(string $source, string $destParent, $version): string {
-    $target = $destParent . '/' . basename($source);
-    $filesystem = new Filesystem();
-    $filesystem->copy($source, $target);
-    $this->mustExec("git init", $target);
-    $this->mustExec('git config user.email "scaffoldtest@example.com"', $target);
-    $this->mustExec('git config user.name "Scaffold Test"', $target);
-    $this->mustExec("git add .", $target);
-    $this->mustExec("git commit -m 'Initial commit'", $target);
-    $this->mustExec("git tag $version", $target);
-    return $target;
   }
 
 }
