@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Asset;
 
 use Drupal\Component\Utility\Crypt;
@@ -54,11 +56,11 @@ class AssetDumper implements AssetDumperUriInterface {
     $this->fileSystem->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
     try {
       if (!file_exists($uri) && !$this->fileSystem->saveData($data, $uri, FileExists::Replace)) {
-        return FALSE;
+        return '';
       }
     }
     catch (FileException) {
-      return FALSE;
+      return '';
     }
     // If CSS/JS gzip compression is enabled then create a gzipped version of
     // this file. This file is served conditionally to browsers that accept gzip
@@ -71,20 +73,20 @@ class AssetDumper implements AssetDumperUriInterface {
     if ($config->get($file_extension . '.compress') || $config->get($file_extension . '.gzip')) {
       try {
         if (!file_exists($uri . '.gz') && !$this->fileSystem->saveData(gzencode($data, 9, FORCE_GZIP), $uri . '.gz', FileExists::Replace)) {
-          return FALSE;
+          return '';
         }
       }
       catch (FileException) {
-        return FALSE;
+        return '';
       }
       if (extension_loaded('brotli')) {
         try {
           if (!file_exists($uri . '.br') && !$this->fileSystem->saveData(brotli_compress($data, 11, BROTLI_TEXT), $uri . '.br', FileExists::Replace)) {
-            return FALSE;
+            return '';
           }
         }
         catch (FileException) {
-          return FALSE;
+          return '';
         }
       }
     }

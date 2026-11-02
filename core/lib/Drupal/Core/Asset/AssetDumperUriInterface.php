@@ -18,7 +18,8 @@ interface AssetDumperUriInterface extends AssetDumperInterface {
    *   The URI to dump to.
    *
    * @return string
-   *   An URI to access the dumped asset.
+   *   An URI to access the dumped asset, or an empty string if the asset could
+   *   not be saved.
    */
   public function dumpToUri(string $data, string $file_extension, string $uri): string;
 
