@@ -142,15 +142,24 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   protected function hasSynchronizedPropertyChanges(ContentEntityInterface $entity, ContentEntityInterface $original, array $synchronized_properties) {
     foreach ($synchronized_properties as $field_name => $properties) {
       foreach ($properties as $property) {
-        $items = $entity->get($field_name)->getValue();
-        $original_items = $original->get($field_name)->getValue();
+        // Empty items are never saved, so a field that is empty on both sides
+        // has no changes, no matter how many empty items each side holds.
+        // @see \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator::hasUntranslatableFieldsChanges()
+        $items = $entity->get($field_name)->filterEmptyItems()->getValue();
+        $original_items = $original->get($field_name)->filterEmptyItems()->getValue();
         if (count($items) !== count($original_items)) {
           return TRUE;
         }
         foreach ($items as $delta => $item) {
+          // A property that is not among the item's values has not been
+          // changed. Properties computed on save, such as image width and
+          // height, are missing from values submitted through an entity form.
+          if (!array_key_exists($property, $item)) {
+            continue;
+          }
           // @todo This loose comparison is not fully reliable. Revisit this
           //   after https://www.drupal.org/project/drupal/issues/2941092.
-          if ($items[$delta][$property] != $original_items[$delta][$property]) {
+          if ($item[$property] != ($original_items[$delta][$property] ?? NULL)) {
             return TRUE;
           }
         }
