@@ -312,8 +312,16 @@ class ThemeManager implements ThemeManagerInterface {
       }
       // Invoke preprocess callbacks that are not in the invoke map, such as
       // those from an alter hook.
-      elseif (is_callable($preprocessor_function)) {
-        call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+      else {
+        try {
+          if (!is_callable($preprocessor_function)) {
+            $preprocessor_function = $this->callableResolver->getCallableFromDefinition($preprocessor_function);
+          }
+          call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+        }
+        catch (\InvalidArgumentException $e) {
+          \Drupal::logger('theme')->warning('Preprocess callback is not valid: %error.', ['%error' => $e->getMessage()]);
+        }
       }
       return $variables;
     };

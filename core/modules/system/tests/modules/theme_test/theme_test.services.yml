@@ -14,3 +14,6 @@ services:
     class: Drupal\theme_test\Theme\HighPriorityThemeNegotiator
     tags:
       - { name: theme_negotiator, priority: 1000 }
+
+  theme_test.preprocess_service:
+    class: Drupal\theme_test\ThemeTestPreprocessService

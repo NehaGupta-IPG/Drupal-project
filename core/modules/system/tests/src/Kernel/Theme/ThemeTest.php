@@ -210,4 +210,11 @@ class ThemeTest extends KernelTestBase {
     $this->assertNotContains('test_theme_depending_on_modules_post_update_foo', \Drupal::service('keyvalue')->get('post_update')->get('existing_updates'));
   }
 
+  /**
+   * Tests that service notation works in preprocess functions.
+   */
+  public function testPreprocessFunctionsCallableResolver(): void {
+    $this->assertThemeOutput('theme_test_preprocess_service', ['foo' => 'initial'], 'Preprocessed via service!');
+  }
+
 }

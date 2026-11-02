@@ -115,6 +115,12 @@ class ThemeTestHooks {
         ],
       ],
     ];
+    $items['theme_test_preprocess_service'] = [
+      'variables' => ['foo' => ''],
+      'preprocess functions' => [
+        'theme_test.preprocess_service:preprocessServiceCallback',
+      ],
+    ];
     return $items;
   }
 
