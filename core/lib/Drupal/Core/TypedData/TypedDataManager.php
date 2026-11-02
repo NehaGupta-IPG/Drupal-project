@@ -297,6 +297,13 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * {@inheritdoc}
    */
+  public function clearCachedPrototypes(): void {
+    $this->prototypes = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCanonicalRepresentation(TypedDataInterface $data) {
     $data_definition = $data->getDataDefinition();
     // In case a list is passed, respect the 'wrapped' key of its data type.

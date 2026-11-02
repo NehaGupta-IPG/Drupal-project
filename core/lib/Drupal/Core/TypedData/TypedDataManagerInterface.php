@@ -244,4 +244,14 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    */
   public function getCanonicalRepresentation(TypedDataInterface $data);
 
+  /**
+   * Clears statically cached prototypes, keeping the data type definitions.
+   *
+   * Prototypes hold data definitions, so they must be cleared when a data
+   * definition changes, for example when a field definition is updated. Data
+   * type definitions only depend on entity types, bundles and field type
+   * plugins, so they do not need to be rediscovered in that case.
+   */
+  public function clearCachedPrototypes(): void;
+
 }

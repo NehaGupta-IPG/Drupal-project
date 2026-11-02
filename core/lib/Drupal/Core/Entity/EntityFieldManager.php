@@ -654,8 +654,9 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     $this->baseFieldOverrides = NULL;
     Cache::invalidateTags(['entity_field_info']);
     // The typed data manager statically caches prototype objects with injected
-    // definitions, clear those as well.
-    $this->typedDataManager->clearCachedDefinitions();
+    // definitions, clear those as well. The data type definitions themselves
+    // do not depend on field definitions, so keep them.
+    $this->typedDataManager->clearCachedPrototypes();
   }
 
   /**
