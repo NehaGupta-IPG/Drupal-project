@@ -109,10 +109,9 @@ class Drupal {
    *   the status report and various fatal errors occur on various pages.
    *
    * Note: To prevent the installer from having fatal errors on older versions
-   * of PHP, the value of this constant is hardcoded twice in core/install.php:
-   * - Once as a parameter of version_compare()
-   * - Once in the error message printed to the user immediately after.
-   * Remember to update both whenever this constant is updated.
+   * of PHP, the value of this constant is hardcoded in core/install.php as a
+   * parameter of version_compare(). Remember to update it whenever this
+   * constant is updated.
    */
   const MINIMUM_PHP = '8.5.0';
 
