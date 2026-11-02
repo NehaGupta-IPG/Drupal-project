@@ -114,18 +114,13 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
    */
   public function testLanguageFieldVisibility(): void {
     // Creates a node to test Language field visibility feature.
-    $edit = [
-      'title[0][value]' => $this->randomMachineName(8),
-      'body[0][value]' => $this->randomMachineName(16),
-    ];
-    $this->drupalGet('node/add/article');
-    $this->submitForm($edit, 'Save');
-    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->assertNotEmpty($node, 'Node found in database.');
-
+    $node = $this->drupalCreateNode([
+      'title' => $this->randomMachineName(16),
+      'type' => 'article',
+    ]);
     // Loads node page and check if Language field is hidden by default.
-    $this->drupalGet('node/' . $node->id());
-    $this->assertSession()->elementNotExists('xpath', '//div[@id="field-language-display"]/div');
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->pageTextNotContains('English');
 
     // Configures Language field formatter and check if it is saved.
     $edit = [
@@ -137,8 +132,38 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
     $this->drupalGet('admin/structure/types/manage/article/display/default');
     $this->assertTrue($this->assertSession()->optionExists('edit-fields-langcode-type', 'language')->isSelected());
 
-    // Loads node page and check if Language field is shown.
-    $this->drupalGet('node/' . $node->id());
+    $display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('node.article.default');
+    $display->setComponent('langcode', [
+      'label' => 'above',
+      'type' => 'language',
+      'settings' => [
+        'link_to_entity' => FALSE,
+        'native_language' => FALSE,
+      ],
+      'third_party_settings' => [],
+      'region' => 'content',
+    ])->save();
+
+    // Loads the node page and checks if the Language field is shown.
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->pageTextContains('English');
+    $this->assertSession()->elementExists('xpath', '//div[@id="field-language-display"]/div');
+
+    // Configure the Language field formatter to be displayed as a link.
+    $display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('node.article.default');
+    $display->setComponent('langcode', [
+      'label' => 'above',
+      'type' => 'language',
+      'settings' => [
+        'link_to_entity' => TRUE,
+        'native_language' => TRUE,
+      ],
+      'third_party_settings' => [],
+      'region' => 'content',
+    ])->save();
+    // Loads the node page and checks if the Language field is shown as a link.
+    $this->drupalGet($node->toUrl());
+    $this->assertSession()->linkExists('English');
     $this->assertSession()->elementExists('xpath', '//div[@id="field-language-display"]/div');
   }
 
