@@ -65,7 +65,7 @@ class ProcessedText extends RenderElementBase {
   public static function preRenderText($element) {
     $format_id = $element['#format'];
     $filter_types_to_skip = $element['#filter_types_to_skip'];
-    $text = $element['#text'];
+    $text = is_string($element['#text']) ? $element['#text'] : '';
     $langcode = $element['#langcode'];
 
     if (!isset($format_id)) {
