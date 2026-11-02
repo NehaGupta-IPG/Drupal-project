@@ -60,6 +60,14 @@ class Http4xxController extends ControllerBase {
     requirements: ['_access' => 'TRUE'],
   )]
   public function on403() {
+    // @todo Temporary. Rework this to the dependency injection.
+    $request = \Drupal::request();
+    if ($request->query->has('_exception_message')) {
+      $message = $request->query->get('_exception_message');
+      return [
+        '#markup' => $this->t($message),
+      ];
+    }
     return [
       '#markup' => $this->t('You are not authorized to access this page.'),
     ];
