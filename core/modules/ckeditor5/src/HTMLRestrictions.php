@@ -1146,7 +1146,7 @@ final class HTMLRestrictions {
   private static function resolveWildcards(HTMLRestrictions $r): HTMLRestrictions {
     // Start by resolving the wildcards in a naive, simple way: generate
     // tags, attributes and attribute values they support.
-    $naively_resolved_wildcard_elements = [];
+    $naive_resolution = self::emptySet();
     foreach ($r->elements as $tag_name => $tag_config) {
       if (self::isWildcardTag($tag_name)) {
         $wildcard_tags = self::getWildcardTags($tag_name);
@@ -1156,12 +1156,12 @@ final class HTMLRestrictions {
         // values on already supported tags.
         foreach ($wildcard_tags as $wildcard_tag) {
           if (isset($r->elements[$wildcard_tag])) {
-            $naively_resolved_wildcard_elements[$wildcard_tag] = $tag_config;
+            $naive_resolution = $naive_resolution
+              ->merge(new self([$wildcard_tag => $tag_config]));
           }
         }
       }
     }
-    $naive_resolution = new self($naively_resolved_wildcard_elements);
 
     // Now merge the naive resolution's elements with the original elements, to
     // let ::merge() pick the most permissive one.
