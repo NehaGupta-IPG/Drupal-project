@@ -142,9 +142,6 @@ class LocaleJs {
    * @param string $filepath
    *   File name to parse.
    *
-   * @throws \Exception
-   *   If a non-local file is attempted to be parsed.
-   *
    * @internal
    */
   public function parseJsFile(string $filepath): void {
@@ -180,9 +177,8 @@ class LocaleJs {
     $parsedUrl = UrlHelper::parse($filepath);
     $filepath = $parsedUrl['path'];
 
-    // If there is still a protocol component in the path, reject that.
-    if (strpos($filepath, ':')) {
-      throw new \Exception('Only local files should be passed to LocaleJs::parseJsFile().');
+    if (!is_file($filepath)) {
+      return;
     }
 
     // Load the JavaScript file.
