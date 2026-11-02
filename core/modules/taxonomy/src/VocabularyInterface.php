@@ -34,6 +34,24 @@ interface VocabularyInterface extends ConfigEntityInterface, RevisionableEntityB
   public function getDescription();
 
   /**
+   * Gets the vocabulary weight.
+   *
+   * @return int
+   *   The vocabulary weight.
+   */
+  public function getWeight();
+
+  /**
+   * Sets the vocabulary weight.
+   *
+   * @param int $weight
+   *   The vocabulary weight.
+   *
+   * @return $this
+   */
+  public function setWeight($weight);
+
+  /**
    * Sets whether a new revision should be created by default.
    *
    * @param bool $new_revision

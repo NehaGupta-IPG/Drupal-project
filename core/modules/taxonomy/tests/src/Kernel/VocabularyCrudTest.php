@@ -125,6 +125,23 @@ class VocabularyCrudTest extends KernelTestBase {
   }
 
   /**
+   * Tests the getWeight() and setWeight() accessors.
+   */
+  public function testGetSetWeight(): void {
+    // createVocabulary() assigns a random weight, so set it explicitly here
+    // to have a known starting point.
+    $vocabulary = $this->createVocabulary(['weight' => 0]);
+    $this->assertSame(0, $vocabulary->getWeight());
+
+    $this->assertSame($vocabulary, $vocabulary->setWeight(5));
+    $this->assertSame(5, $vocabulary->getWeight());
+
+    $vocabulary->save();
+    $vocabulary = Vocabulary::load($vocabulary->id());
+    $this->assertSame(5, $vocabulary->getWeight());
+  }
+
+  /**
    * Tests uninstall and reinstall of the taxonomy module.
    */
   public function testUninstallReinstall(): void {
