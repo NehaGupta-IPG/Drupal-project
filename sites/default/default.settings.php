@@ -568,6 +568,18 @@ $settings['update_free_access'] = FALSE;
 # $settings['sa_core_2023_004_phpinfo_flags'] = ~ (INFO_VARIABLES | INFO_ENVIRONMENT);
 
 /**
+ * Status report warning:
+ *
+ * Users with the 'administer site configuration' permission get a warning on
+ * the Configuration page (admin/config) when the status report contains
+ * errors. On complex sites this can slow down the page.
+ *
+ * Set this to FALSE to remove the warning and the checks from the page. The
+ * status report at admin/reports/status is not affected.
+ */
+# $settings['status_report_warning'] = FALSE;
+
+/**
  * Private file path:
  *
  * A local file system path where private files will be stored. This directory
