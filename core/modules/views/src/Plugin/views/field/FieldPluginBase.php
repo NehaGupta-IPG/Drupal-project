@@ -1917,6 +1917,49 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     return $this->renderer;
   }
 
+  /**
+   * Properties holding state for the row currently being rendered.
+   */
+  protected const ROW_RENDER_STATE_PROPERTIES = [
+    'last_render',
+    'last_render_text',
+    'last_tokens',
+    'original_value',
+    'lastRenderIndex',
+  ];
+
+  /**
+   * Gets the state of the row currently being rendered.
+   *
+   * @return array
+   *   Property values keyed by property name. Uninitialized properties are
+   *   omitted.
+   *
+   * @internal
+   */
+  public function getRowRenderState(): array {
+    return array_intersect_key(get_object_vars($this), array_flip(static::ROW_RENDER_STATE_PROPERTIES));
+  }
+
+  /**
+   * Restores state previously returned by ::getRowRenderState().
+   *
+   * @param array $state
+   *   The state to restore.
+   *
+   * @internal
+   */
+  public function setRowRenderState(array $state): void {
+    foreach (static::ROW_RENDER_STATE_PROPERTIES as $property) {
+      if (array_key_exists($property, $state)) {
+        $this->$property = $state[$property];
+      }
+      else {
+        unset($this->$property);
+      }
+    }
+  }
+
 }
 
 /**

@@ -596,7 +596,7 @@ class ThemeManager implements ThemeManagerInterface {
   public function getDefaultTemplateVariables(): array {
     if (!isset($this->defaultVariables)) {
       // Variables that don't depend on a database connection.
-      $this->defaultVariables = [
+      $default_variables = [
         'attributes' => [],
         'title_attributes' => [],
         'content_attributes' => [],
@@ -608,9 +608,11 @@ class ThemeManager implements ThemeManagerInterface {
       ];
 
       // Give modules a chance to alter default template variables.
-      $this->moduleHandler->alter('template_preprocess_default_variables', $this->defaultVariables);
+      $this->moduleHandler->alter('template_preprocess_default_variables', $default_variables);
       // Tell all templates where they are located.
-      $this->defaultVariables['directory'] = $this->getActiveTheme()->getPath();
+      $default_variables['directory'] = $this->getActiveTheme()->getPath();
+      // Only assign to object variable when complete so function is re-entrant.
+      $this->defaultVariables = $default_variables;
     }
     return $this->defaultVariables;
   }

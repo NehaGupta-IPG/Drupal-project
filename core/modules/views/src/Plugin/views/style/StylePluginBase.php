@@ -6,9 +6,11 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Plugin\views\wizard\WizardInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
+use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -508,10 +510,11 @@ abstract class StylePluginBase extends PluginBase {
       // Render as a record set.
       else {
         if ($this->usesRowPlugin()) {
+          $fibers = [];
           foreach ($set['rows'] as $index => $row) {
-            $this->view->row_index = $index;
-            $set['rows'][$index] = $this->view->rowPlugin->render($row);
+            $fibers[$index] = new \Fiber(fn () => $this->view->rowPlugin->render($row));
           }
+          $set['rows'] = $this->runRowFibers($fibers);
         }
 
         $single_output = $this->renderRowGroup($set['rows']);
@@ -669,73 +672,86 @@ abstract class StylePluginBase extends PluginBase {
       $this->view->row_index = 0;
       $field_ids = array_keys($this->view->field);
 
-      // Only tokens relating to field handlers preceding the one we invoke
-      // ::getRenderTokens() on are returned, so here we need to pick the last
-      // available field handler.
-      $render_tokens_field_id = end($field_ids);
-
       // If all fields have a field::access FALSE there might be no fields, so
       // there is no reason to execute this code.
       if (!empty($field_ids)) {
-        $renderer = $this->getRenderer();
-        /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
-        $cache_plugin = $this->view->display_handler->getPlugin('cache');
-        $max_age = $cache_plugin->getCacheMaxAge();
-
-        /** @var \Drupal\views\ResultRow $row */
+        $fibers = [];
         foreach ($result as $index => $row) {
-          $this->view->row_index = $index;
-
-          $data = [
-            '#pre_render' => [[$this, 'elementPreRenderRow']],
-            '#row' => $row,
-            '#cache' => [
-              'tags' => $cache_plugin->getRowCacheTags($row),
-              'max-age' => $max_age,
-            ],
-          ];
-          $renderer->addCacheableDependency($data, $this->view->storage);
-          // Views may be rendered both inside and outside a render context:
-          // - HTML views are rendered inside a render context: then we want to
-          //   use ::render(), so that attachments and cacheability are bubbled.
-          // - non-HTML views are rendered outside a render context: then we
-          //   want to use ::renderInIsolation(), so that no bubbling happens.
-          if ($renderer->hasRenderContext()) {
-            $renderer->render($data);
-          }
-          else {
-            $renderer->renderInIsolation($data);
-          }
-
-          // Extract field output from the render array and post process it.
-          $fields = $this->view->field;
-          $rendered_fields = &$this->rendered_fields[$index];
-          $post_render_tokens = [];
-          foreach ($field_ids as $id) {
-            $rendered_fields[$id] = $data[$id]['#markup'];
-            $tokens = $fields[$id]->postRender($row, $rendered_fields[$id]);
-            if ($tokens) {
-              $post_render_tokens += $tokens;
-            }
-          }
-
-          // Populate row tokens.
-          $this->rowTokens[$index] = $this->view->field[$render_tokens_field_id]->getRenderTokens([]);
-
-          // Replace post-render tokens.
-          if ($post_render_tokens) {
-            $placeholders = array_keys($post_render_tokens);
-            $values = array_values($post_render_tokens);
-            foreach ($this->rendered_fields[$index] as &$rendered_field) {
-              // Placeholders and rendered fields have been processed by the
-              // render system and are therefore safe.
-              $rendered_field = ViewsRenderPipelineMarkup::create(str_replace($placeholders, $values, $rendered_field));
-            }
-          }
+          $fibers[$index] = new \Fiber(fn () => $this->renderFieldRow($index, $row, $field_ids));
         }
+        $this->runRowFibers($fibers);
       }
+    }
 
-      unset($this->view->row_index);
+    unset($this->view->row_index);
+  }
+
+  /**
+   * Render an individual field row.
+   *
+   * @param int $index
+   *   The index of this row within the result.
+   * @param \Drupal\views\ResultRow $row
+   *   The row to be rendered.
+   * @param array $field_ids
+   *   The field IDs present in this row.
+   */
+  protected function renderFieldRow(int $index, ResultRow $row, array $field_ids): void {
+    // Only tokens relating to field handlers preceding the one we invoke
+    // ::getRenderTokens() on are returned, so here we need to pick the last
+    // available field handler.
+    $render_tokens_field_id = end($field_ids);
+
+    $cache_plugin = $this->view->display_handler->getPlugin('cache');
+    $max_age = $cache_plugin->getCacheMaxAge();
+    $renderer = $this->getRenderer();
+    $this->view->row_index = $index;
+
+    $data = [
+      '#pre_render' => [[$this, 'elementPreRenderRow']],
+      '#row' => $row,
+      '#cache' => [
+        'tags' => $cache_plugin->getRowCacheTags($row),
+        'max-age' => $max_age,
+      ],
+    ];
+    $renderer->addCacheableDependency($data, $this->view->storage);
+    // Views may be rendered both inside and outside a render context:
+    // - HTML views are rendered inside a render context: then we want to
+    //   use ::render(), so that attachments and cacheability are bubbled.
+    // - non-HTML views are rendered outside a render context: then we
+    //   want to use ::renderInIsolation(), so that no bubbling happens.
+    if ($renderer->hasRenderContext()) {
+      $renderer->render($data);
+    }
+    else {
+      $renderer->renderInIsolation($data);
+    }
+
+    // Extract field output from the render array and post process it.
+    $fields = $this->view->field;
+    $rendered_fields = &$this->rendered_fields[$index];
+    $post_render_tokens = [];
+    foreach ($field_ids as $id) {
+      $rendered_fields[$id] = $data[$id]['#markup'];
+      $tokens = $fields[$id]->postRender($row, $rendered_fields[$id]);
+      if ($tokens) {
+        $post_render_tokens += $tokens;
+      }
+    }
+
+    // Populate row tokens.
+    $this->rowTokens[$index] = $this->view->field[$render_tokens_field_id]->getRenderTokens([]);
+
+    // Replace post-render tokens.
+    if ($post_render_tokens) {
+      $placeholders = array_keys($post_render_tokens);
+      $values = array_values($post_render_tokens);
+      foreach ($this->rendered_fields[$index] as &$rendered_field) {
+        // Placeholders and rendered fields have been processed by the
+        // render system and are therefore safe.
+        $rendered_field = ViewsRenderPipelineMarkup::create(str_replace($placeholders, $values, $rendered_field));
+      }
     }
   }
 
@@ -834,6 +850,86 @@ abstract class StylePluginBase extends PluginBase {
     if (isset($this->view->rowPlugin)) {
       $this->view->rowPlugin->query();
     }
+  }
+
+  /**
+   * Captures the render state of the row currently being rendered.
+   *
+   * @return array
+   *   The current row index and the state of each field handler.
+   */
+  protected function captureRowState(): array {
+    $state = [
+      'row_index' => $this->view->row_index ?? NULL,
+      'fields' => [],
+    ];
+    foreach ($this->view->field as $id => $field) {
+      if ($field instanceof FieldPluginBase) {
+        $state['fields'][$id] = $field->getRowRenderState();
+      }
+    }
+    return $state;
+  }
+
+  /**
+   * Restores state previously returned by ::captureRowState().
+   *
+   * @param array $state
+   *   The state to restore.
+   */
+  protected function restoreRowState(array $state): void {
+    $this->view->row_index = $state['row_index'];
+    foreach ($state['fields'] as $id => $field_state) {
+      $this->view->field[$id]->setRowRenderState($field_state);
+    }
+  }
+
+  /**
+   * Runs one Fiber per row, keeping each row's render state separate.
+   *
+   * @param \Fiber[] $fibers
+   *   Fibers that have yet to start, keyed by row index.
+   *
+   * @return array
+   *   The return value of each Fiber, keyed by row index in the original order.
+   */
+  protected function runRowFibers(array $fibers): array {
+    $results = array_fill_keys(array_keys($fibers), NULL);
+    $last_index = array_key_last($fibers);
+    $initial_state = $this->captureRowState();
+    $states = [];
+    $iterations = 0;
+    while ($fibers) {
+      foreach ($fibers as $index => $fiber) {
+        $this->restoreRowState($states[$index] ?? ['row_index' => $index] + $initial_state);
+        if (!$fiber->isStarted()) {
+          $fiber->start();
+        }
+        elseif ($fiber->isSuspended()) {
+          $fiber->resume();
+        }
+        $states[$index] = $this->captureRowState();
+        if ($fiber->isTerminated()) {
+          $results[$index] = $fiber->getReturn();
+          unset($fibers[$index]);
+          if ($index !== $last_index) {
+            unset($states[$index]);
+          }
+          continue;
+        }
+        // If we've iterated through all rows and we're still waiting, let other
+        // fibres take control.
+        if ($iterations && ($parent = \Fiber::getCurrent()) !== NULL) {
+          $parent->suspend();
+        }
+      }
+      $iterations++;
+    }
+    // Leave object with original row state restored.
+    if ($last_index !== NULL) {
+      $this->restoreRowState($states[$last_index]);
+    }
+    return $results;
   }
 
 }
