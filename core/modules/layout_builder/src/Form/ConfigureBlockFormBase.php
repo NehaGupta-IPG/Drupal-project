@@ -172,6 +172,7 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
     $form['settings'] = [];
     $subform_state = SubformState::createForSubform($form['settings'], $form, $form_state);
     $form['settings'] = $this->getPluginForm($this->block)->buildConfigurationForm($form['settings'], $subform_state);
+    $form['settings']['label_display']['#default_value'] = FALSE;
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
