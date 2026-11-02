@@ -83,7 +83,7 @@ final class DuplicateInfoFileValidator implements EventSubscriberInterface {
     // Use the official extension discovery mechanism, but tweak it, because by
     // default it resolves duplicates.
     // @see \Drupal\Core\Extension\ExtensionDiscovery::process()
-    $duplicate_aware_extension_discovery = new class($dir, FALSE, []) extends ExtensionDiscovery {
+    $duplicate_aware_extension_discovery = new class($dir, []) extends ExtensionDiscovery {
 
       /**
        * {@inheritdoc}

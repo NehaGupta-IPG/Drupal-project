@@ -37,13 +37,13 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $this->assertFileExists($root . '/core/modules/system/system.info.yml');
 
     // Create an ExtensionDiscovery with $root.
-    $extension_discovery = new ExtensionDiscovery($root, FALSE, NULL, 'sites/default');
+    $extension_discovery = new ExtensionDiscovery($root, NULL, 'sites/default');
 
     /** @var \Drupal\Core\Extension\Extension[][] $extensions_by_type */
     $extensions_by_type = [];
     $files_by_type_and_name = [];
     foreach (['profile', 'module', 'theme'] as $type) {
-      $extensions_by_type[$type] = $extension_discovery->scan($type, FALSE);
+      $extensions_by_type[$type] = $extension_discovery->scan($type);
       foreach ($extensions_by_type[$type] as $name => $extension) {
         $files_by_type_and_name[$type][$name] = $extension->getPathname();
       }
@@ -67,7 +67,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
    * @legacy-covers ::scan
    */
   public function testExtensionDiscoveryTypeComment(): void {
-    $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], 'sites/default');
+    $extension_discovery = new ExtensionDiscovery($this->root, [], 'sites/default');
     $modules = $extension_discovery->scan('module', TRUE);
     $this->assertArrayHasKey('module_info_type_comment', $modules);
   }
@@ -96,24 +96,35 @@ class ExtensionDiscoveryTest extends UnitTestCase {
       // Override the core instance of the 'test_theme' theme.
       'sites/default/themes/test_theme/test_theme.info.yml' => [
         'type' => 'theme',
+        'core_version_requirement' => '*',
       ],
       // Override the core instance of the 'minimal' profile.
       'sites/default/profiles/minimal/minimal.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
       'profiles/my_profile/my_profile.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
-      'profiles/my_profile/modules/my_profile_nested_module/my_profile_nested_module.info.yml' => [],
+      'profiles/my_profile/modules/my_profile_nested_module/my_profile_nested_module.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'profiles/other_profile/other_profile.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
       'core/modules/user/user.info.yml' => [],
-      'profiles/other_profile/modules/other_profile_nested_module/other_profile_nested_module.info.yml' => [],
+      'profiles/other_profile/modules/other_profile_nested_module/other_profile_nested_module.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'core/modules/system/system.info.yml' => [],
-      'modules/devel/devel.info.yml' => [],
+      'modules/devel/devel.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'modules/poorly_placed_theme/poorly_placed_theme.info.yml' => [
         'type' => 'theme',
+        'core_version_requirement' => '*',
       ],
     ];
 

@@ -129,6 +129,8 @@ class FixtureManipulator {
       $project_info_data = [
         'name' => $package['name'],
         'project' => $project_name,
+        'type' => 'module',
+        'core_version_requirement' => '*',
       ];
       $extra_files["$project_name.info.yml"] = Yaml::encode($project_info_data);
     }
@@ -280,7 +282,12 @@ class FixtureManipulator {
     if ($file_name === NULL) {
       $file_name = "$project_name.info.yml";
     }
-    assert(file_put_contents("$path/$file_name", Yaml::encode(['project' => $project_name])) !== FALSE);
+    assert(file_put_contents("$path/$file_name", Yaml::encode([
+      'project' => $project_name,
+      'type' => 'module',
+      'core_version_requirement' => '*',
+      'name' => 'Name',
+    ])) !== FALSE);
     return $this;
   }
 

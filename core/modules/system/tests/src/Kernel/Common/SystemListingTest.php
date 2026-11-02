@@ -58,7 +58,7 @@ class SystemListingTest extends KernelTestBase {
    * Tests that directories matching file_scan_ignore_directories are ignored.
    */
   public function testFileScanIgnoreDirectory(): void {
-    $listing = new ExtensionDiscovery($this->root, FALSE);
+    $listing = new ExtensionDiscovery($this->root);
     $listing->setProfileDirectories(['core/profiles/tests/testing']);
     $files = $listing->scan('module');
     $this->assertArrayHasKey('drupal_system_listing_compatible_test', $files);
@@ -69,7 +69,7 @@ class SystemListingTest extends KernelTestBase {
     $reflected_property->setValue($reflected_class, []);
 
     $this->setSetting('file_scan_ignore_directories', ['drupal_system_listing_compatible_test']);
-    $listing = new ExtensionDiscovery($this->root, FALSE);
+    $listing = new ExtensionDiscovery($this->root);
     $listing->setProfileDirectories(['core/profiles/tests/testing']);
     $files = $listing->scan('module');
     $this->assertArrayNotHasKey('drupal_system_listing_compatible_test', $files);
