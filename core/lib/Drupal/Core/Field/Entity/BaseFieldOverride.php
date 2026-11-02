@@ -164,6 +164,13 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * {@inheritdoc}
    */
+  public function getDefault(): mixed {
+    return $this->getBaseFieldDefinition()->getDefault();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getClass() {
     return $this->getBaseFieldDefinition()->getClass();
   }
