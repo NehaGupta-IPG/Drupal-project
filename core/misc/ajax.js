@@ -365,7 +365,15 @@
    *   Type of progress element, core provides `'bar'`, `'throbber'` and
    *   `'fullscreen'`.
    * @prop {string} [progress.message=Drupal.t('Processing...')]
-   *   Custom message to be used with the bar indicator.
+   *   Message shown with the progress indicator and announced to assistive
+   *   technology.
+   * @prop {boolean} [progress.announce=true]
+   *   Whether to announce the progress message to assistive technology.
+   * @prop {number} [progress.announceDelay=1000]
+   *   Milliseconds before the first announcement. Faster requests are not
+   *   announced.
+   * @prop {number} [progress.announceInterval=2000]
+   *   Milliseconds between repeated announcements.
    * @prop {object} [submit]
    *   Extra data to be sent with the Ajax request.
    * @prop {boolean} [submit.js=true]
@@ -607,6 +615,8 @@
       },
       error(xmlhttprequest, status, error) {
         ajax.ajaxing = false;
+        // Requests that time out or are aborted do not reach ajax.error().
+        ajax.clearProgressAnnouncement();
       },
       complete(xmlhttprequest, status) {
         if (status === 'error' || status === 'parsererror') {
@@ -922,6 +932,7 @@
       typeof this[progressIndicatorMethod] === 'function'
     ) {
       this[progressIndicatorMethod].call(this);
+      this.announceProgress();
     }
   };
 
@@ -1026,6 +1037,44 @@
   };
 
   /**
+   * Announces the progress message to assistive technology until completion.
+   */
+  Drupal.Ajax.prototype.announceProgress = function () {
+    this.clearProgressAnnouncement();
+    if (this.progress.announce === false) {
+      return;
+    }
+    // Custom progress settings replace the defaults and may lack a message.
+    const message = this.progress.message || Drupal.t('Processing...');
+    let count = 0;
+    const announce = () => {
+      // Screen readers skip unchanged text, so alternate a trailing
+      // non-breaking space. Disabling the element moves focus, which can
+      // silence a polite first announcement.
+      Drupal.announce(
+        message + '\u00A0'.repeat(count % 2),
+        count === 0 ? 'assertive' : 'polite',
+      );
+      count += 1;
+    };
+    this.progressAnnounceTimeout = setTimeout(() => {
+      announce();
+      this.progressAnnounceInterval = setInterval(
+        announce,
+        this.progress.announceInterval ?? 2000,
+      );
+    }, this.progress.announceDelay ?? 1000);
+  };
+
+  /**
+   * Stops announcing the progress message to assistive technology.
+   */
+  Drupal.Ajax.prototype.clearProgressAnnouncement = function () {
+    clearTimeout(this.progressAnnounceTimeout);
+    clearInterval(this.progressAnnounceInterval);
+  };
+
+  /**
    * Helper method to make sure commands are executed in sequence.
    *
    * @param {Array.<Drupal.AjaxCommands~commandDefinition>} response
@@ -1074,6 +1123,7 @@
     if (this.progress.object) {
       this.progress.object.stopMonitoring();
     }
+    this.clearProgressAnnouncement();
     $(this.element).prop('disabled', false);
 
     // Save element's ancestors tree so if the element is removed from the dom
@@ -1211,6 +1261,7 @@
     if (this.progress.object) {
       this.progress.object.stopMonitoring();
     }
+    this.clearProgressAnnouncement();
     // Undo hide.
     $(this.wrapper).show();
     // Re-enable the element.
