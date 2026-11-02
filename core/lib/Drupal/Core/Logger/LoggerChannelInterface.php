@@ -35,6 +35,98 @@ use Symfony\Component\HttpFoundation\RequestStack;
 interface LoggerChannelInterface extends LoggerInterface {
 
   /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function emergency(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function alert(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function critical(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function error(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function warning(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function notice(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function info(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function debug(string|\Stringable $message, array $context = []): void;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param mixed $level
+   *   The log level.
+   * @param literal-string $message
+   *   The message to log.
+   * @param mixed[] $context
+   *   The context data to log.
+   */
+  public function log($level, string|\Stringable $message, array $context = []): void;
+
+  /**
    * Sets the request stack.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack|null $requestStack
