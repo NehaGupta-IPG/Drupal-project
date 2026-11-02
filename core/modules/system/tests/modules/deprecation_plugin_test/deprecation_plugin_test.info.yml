@@ -1,0 +1,5 @@
+name: Plugin deprecation test
+type: module
+description: Test module for plugin deprecations.
+package: Testing
+version: VERSION
