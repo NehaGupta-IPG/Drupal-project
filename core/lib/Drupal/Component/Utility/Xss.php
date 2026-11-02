@@ -270,6 +270,23 @@ class Xss {
   }
 
   /**
+   * Applies a very permissive XSS/HTML filter to an attribute value.
+   *
+   * @param string $value
+   *   Attribute value.
+   *
+   * @return string
+   *   Sanitized attribute value
+   */
+  protected static function filterAttributeValue(string $value): string {
+    // The attribute contain an HTML-encoded value, so we need to
+    // decode the value, apply XSS filtering and then re-save as encoded
+    // value.
+    $value = Html::decodeEntities($value);
+    return Html::escape(Xss::filterAdmin($value));
+  }
+
+  /**
    * Processes a string of HTML attributes.
    *
    * @param string $attributes
@@ -284,6 +301,7 @@ class Xss {
     $attribute_name = '';
     $skip = FALSE;
     $skip_protocol_filtering = FALSE;
+    $filter_attribute_value = FALSE;
 
     while (strlen($attributes) != 0) {
       // Was the last operation successful?
@@ -321,6 +339,7 @@ class Xss {
               'class',
               'datetime',
             ], TRUE);
+            $filter_attribute_value = str_starts_with($attribute_name, 'data-');
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
@@ -354,6 +373,7 @@ class Xss {
           // Attribute value, a URL after href= for instance.
           if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";
@@ -364,6 +384,7 @@ class Xss {
 
           if (preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name='$value'";
@@ -374,6 +395,7 @@ class Xss {
 
           if (preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
+            $value = $filter_attribute_value ? self::filterAttributeValue($value) : $value;
 
             if (!$skip) {
               $attributes_array[] = "$attribute_name=\"$value\"";

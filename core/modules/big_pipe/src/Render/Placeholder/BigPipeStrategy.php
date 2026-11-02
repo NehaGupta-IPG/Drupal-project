@@ -5,6 +5,7 @@ namespace Drupal\big_pipe\Render\Placeholder;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
@@ -224,7 +225,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
     }
 
     return [
-      '#prefix' => '<span data-big-pipe-placeholder-id="' . Html::escape($big_pipe_placeholder_id) . '">',
+      '#prefix' => Markup::create('<span data-big-pipe-placeholder-id="' . Html::escape($big_pipe_placeholder_id) . '">'),
       'interface_preview' => $interface_preview,
       '#suffix' => '</span>',
       '#cache' => [
@@ -264,7 +265,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    */
   protected static function createBigPipeNoJsPlaceholder($original_placeholder, array $placeholder_render_array, $placeholder_must_be_attribute_safe = FALSE) {
     if (!$placeholder_must_be_attribute_safe) {
-      $big_pipe_placeholder = '<span data-big-pipe-nojs-placeholder-id="' . Html::escape(static::generateBigPipePlaceholderId($original_placeholder, $placeholder_render_array)) . '"></span>';
+      $big_pipe_placeholder = Markup::create('<span data-big-pipe-nojs-placeholder-id="' . Html::escape(static::generateBigPipePlaceholderId($original_placeholder, $placeholder_render_array)) . '"></span>');
     }
     else {
       $big_pipe_placeholder = 'big_pipe_nojs_placeholder_attribute_safe:' . Html::escape($original_placeholder);
@@ -280,7 +281,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       ],
       '#attached' => [
         'big_pipe_nojs_placeholders' => [
-          $big_pipe_placeholder => $placeholder_render_array,
+          (string) $big_pipe_placeholder => $placeholder_render_array,
         ],
       ],
     ];

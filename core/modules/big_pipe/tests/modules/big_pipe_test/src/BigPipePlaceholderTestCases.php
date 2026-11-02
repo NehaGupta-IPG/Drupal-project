@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Drupal\big_pipe_test;
 
 use Drupal\big_pipe\Render\BigPipeMarkup;
+use Drupal\Core\Render\Markup;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -63,7 +64,7 @@ class BigPipePlaceholderTestCases {
     $status_messages->bigPipePlaceholderId = 'callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA';
     $status_messages->bigPipePlaceholderRenderArray = [
       // cspell:disable-next-line
-      '#prefix' => '<span data-big-pipe-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA">',
+      '#prefix' => Markup::create('<span data-big-pipe-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA">'),
       'interface_preview' => [
         '#theme' => 'big_pipe_interface_preview',
         '#callback' => 'Drupal\Core\Render\Element\StatusMessages::renderMessages',
@@ -89,7 +90,7 @@ class BigPipePlaceholderTestCases {
     $status_messages->bigPipeNoJsPlaceholder = '<span data-big-pipe-nojs-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA"></span>';
     $status_messages->bigPipeNoJsPlaceholderRenderArray = [
       // cspell:disable-next-line
-      '#markup' => '<span data-big-pipe-nojs-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA"></span>',
+      '#markup' => Markup::create('<span data-big-pipe-nojs-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA"></span>'),
       '#cache' => $cacheability_depends_on_session_and_nojs_cookie,
       '#attached' => [
         'big_pipe_nojs_placeholders' => [

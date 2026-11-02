@@ -57,6 +57,19 @@ class BigPipeStrategyTest extends UnitTestCase {
     if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option && $request_has_session && !$sub_request) {
       $this->assertSameSize($expected_big_pipe_placeholders, $processed_placeholders, 'BigPipe is able to deliver all placeholders.');
       foreach (array_keys($placeholders) as $placeholder) {
+        // Comparing strings is easier than comparing objects.
+        if (isset($expected_big_pipe_placeholders[$placeholder]['#markup'])) {
+          $expected_big_pipe_placeholders[$placeholder]['#markup'] = (string) $expected_big_pipe_placeholders[$placeholder]['#markup'];
+        }
+        if (isset($processed_placeholders[$placeholder]['#markup'])) {
+          $processed_placeholders[$placeholder]['#markup'] = (string) $processed_placeholders[$placeholder]['#markup'];
+        }
+        if (isset($expected_big_pipe_placeholders[$placeholder]['#prefix'])) {
+          $expected_big_pipe_placeholders[$placeholder]['#prefix'] = (string) $expected_big_pipe_placeholders[$placeholder]['#prefix'];
+        }
+        if (isset($processed_placeholders[$placeholder]['#prefix'])) {
+          $processed_placeholders[$placeholder]['#prefix'] = (string) $processed_placeholders[$placeholder]['#prefix'];
+        }
         $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
       }
     }

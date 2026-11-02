@@ -594,6 +594,13 @@ class XssTest extends TestCase {
         ['time'],
       ],
       [
+        '<a data-title="&lt;img src=x onerror=alert()&gt;" href="https://example.com">Click me</a>',
+        '<a data-title="&lt;img src=&quot;x&quot;&gt;" href="https://example.com">Click me</a>',
+        '<a data-title="&lt;img src=&quot;x&quot;&gt;" href="https://example.com">Click me</a>',
+        'HTML in data attribute',
+        ['a'],
+      ],
+      [
         '<a -dummy=\': href=javascript:alert("oh\x20no")//\'>I\'m magic, click me!</a>',
         '<a>I\'m magic, click me!</a>',
         '<a>I\'m magic, click me!</a>',
