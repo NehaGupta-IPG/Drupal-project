@@ -184,18 +184,81 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
    * Gets the path of scaffold files, for example 'index.php' and 'robots.txt'.
    *
    * @return string[]
-   *   The paths of scaffold files provided by `drupal/core`, relative to the
+   *   The paths of scaffold files provided by project, relative to the
    *   project root.
-   *
-   * @todo Intelligently load scaffold files in https://drupal.org/i/3343802.
    */
   private function getScaffoldFiles(): array {
     $project_root = $this->pathLocator->getProjectRoot();
     $packages = $this->composerInspector->getInstalledPackagesList($project_root);
-    $extra = Json::decode($this->composerInspector->getConfig('extra', $packages['drupal/core']->path . '/composer.json'));
+    $extra = Json::decode($this->composerInspector->getConfig('extra', $project_root . '/composer.json'));
 
-    $scaffold_files = $extra['drupal-scaffold']['file-mapping'] ?? [];
-    return str_replace('[project-root]', '', array_keys($scaffold_files));
+    $allowed_packages = ['drupal/core'];
+    if (isset($extra['drupal-scaffold']['allowed-packages'])) {
+      $allowed_packages = array_merge($allowed_packages, ['drupal-scaffold']['allowed-packages']);
+    }
+
+    $scaffold_files = $this->fileMappingToList($extra['drupal-scaffold']['file-mapping'] ?? [], '');
+    foreach ($allowed_packages as $allowed_package) {
+      if (isset($packages[$allowed_package])) {
+        $scaffold_files = array_merge($scaffold_files, $this->getScaffoldFilesForPackage($packages[$allowed_package]->path, $project_root));
+      }
+    }
+    return str_replace('[project-root]/', '', array_keys($scaffold_files));
+  }
+
+  /**
+   * Gets a list of scaffold files for the provided package path.
+   *
+   * @param string $package_path
+   *   The path to the package to get scaffolded files for.
+   * @param string $project_root
+   *   The path to the project root.
+   *
+   * @return string[]
+   *   The paths of scaffold files provided by a package, relative to the
+   *   project root.
+   */
+  private function getScaffoldFilesForPackage(string $package_path, string $project_root): array {
+    $extra = Json::decode($this->composerInspector->getConfig('extra', $package_path . '/composer.json'));
+    return $this->fileMappingToList($extra['drupal-scaffold']['file-mapping'] ?? [], Path::makeRelative($package_path, $project_root));
+  }
+
+  /**
+   * Converts a Drupal scaffold file mapping into a list of files.
+   *
+   * @param array $file_mapping
+   *   An array of file mappings from the project.
+   * @param string $package_path
+   *   The path to the package relative to project root.
+   *
+   * @return string[]
+   *   The paths of scaffold files provided by a package, relative to the
+   *   project root.
+   */
+  private function fileMappingToList(array $file_mapping, string $package_path): array {
+    $scaffold_files = array_keys($file_mapping);
+    foreach ($file_mapping as $scaffold_file) {
+      if (isset($scaffold_file['path'])) {
+        $scaffold_files[] = $scaffold_file['path'];
+      }
+      if (isset($scaffold_file['prepend'])) {
+        $scaffold_files[] = $scaffold_file['prepend'];
+      }
+      if (isset($scaffold_file['append'])) {
+        $scaffold_files[] = $scaffold_file['append'];
+      }
+    }
+    if (!empty($package_path)) {
+      // Append the package path as paths are relative to the package.
+      $scaffold_files = array_map(function ($path) use ($package_path) {
+        if (str_starts_with($path, '[')) {
+          return $path;
+        }
+        return $package_path . '/' . $path;
+      }, $scaffold_files);
+    }
+
+    return $scaffold_files;
   }
 
 }
