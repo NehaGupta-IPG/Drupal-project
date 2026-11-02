@@ -14,6 +14,7 @@ return Rector\Config\RectorConfig::configure()
       ClassPropertyAssignToConstructorPromotionRector::INLINE_PUBLIC => TRUE,
     ]
   )
+  ->withParallel(300, 4)
   ->withPaths([
     'composer',
     'core',
