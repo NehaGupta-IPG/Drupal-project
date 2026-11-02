@@ -16,3 +16,7 @@ field.formatter.settings.responsive_image_test:
         attribute:
           type: string
           label: 'Loading attribute'
+        fetchpriority:
+          type: string
+          label: 'Fetch priority'
+          nullable: true
