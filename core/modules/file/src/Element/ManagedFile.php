@@ -393,6 +393,20 @@ class ManagedFile extends FormElementBase {
       $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = $extension_list;
     }
 
+    // The wrapper rendered by file_managed_file keeps #attributes, including
+    // data-drupal-states, so visibility states already apply to the whole
+    // element. The required state marks the label of the element that carries
+    // #states, so copy #states to the upload control, or to the file IDs
+    // element when a file is present and the upload control is not rendered.
+    if (!empty($element['#states'])) {
+      if ($fids) {
+        $element['fids']['#states'] = $element['#states'];
+      }
+      else {
+        $element['upload']['#states'] = $element['#states'];
+      }
+    }
+
     // Prefix and suffix used for Ajax replacement.
     $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
     $element['#suffix'] = '</div>';
