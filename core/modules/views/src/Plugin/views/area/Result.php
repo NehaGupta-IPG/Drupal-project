@@ -52,7 +52,7 @@ class Result extends AreaPluginBase {
       '#type' => 'textarea',
       '#rows' => 3,
       '#default_value' => $this->options['content'],
-      '#description' => $this->t('You may use HTML code in this field. The following tokens are supported:') . $list,
+      '#description' => $this->t('You may use HTML code in this field. The following tokens are supported:') . $list . $this->t('Additional tokens may be provided by other modules.'),
     ];
   }
 
@@ -111,6 +111,8 @@ class Result extends AreaPluginBase {
     $replacements['@current_page'] = (string) $current_page;
     $replacements['@current_record_count'] = (string) $current_record_count;
     $replacements['@page_count'] = (string) $page_count;
+    // Allow modules to provide additional replacement tokens.
+    \Drupal::moduleHandler()->alter('views_area_result_replacements', $replacements, $this->view, $this);
     // Send the output.
     if (!empty($total) || !empty($this->options['empty'])) {
       $output .= str_replace(array_keys($replacements), $replacements, $format);
