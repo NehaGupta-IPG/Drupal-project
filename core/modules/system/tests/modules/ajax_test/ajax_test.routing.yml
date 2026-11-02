@@ -22,6 +22,21 @@ ajax_test.dialog_form:
   requirements:
     _access: 'TRUE'
 
+ajax_test.get_form:
+  path: '/ajax-test/get-form'
+  defaults:
+    _title: 'Ajax GET Form'
+    _form: '\Drupal\ajax_test\Form\AjaxTestGetForm'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.get_callback:
+  path: '/ajax-test/get-callback'
+  defaults:
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::getCallback'
+  requirements:
+    _access: 'TRUE'
+
 ajax_test.dialog:
   path: '/ajax-test/dialog'
   defaults:

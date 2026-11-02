@@ -44,8 +44,13 @@
         // Use jQuery selector instead of a native selector for
         // backwards compatibility.
         once('drupal-ajax', $(elementSettings.selector)).forEach((el) => {
+          const $element = $(el);
           elementSettings.element = el;
           elementSettings.base = base;
+          const httpMethod = $element.data('ajax-http-method');
+          if (httpMethod) {
+            elementSettings.httpMethod = httpMethod;
+          }
           Drupal.ajax(elementSettings);
         });
       }

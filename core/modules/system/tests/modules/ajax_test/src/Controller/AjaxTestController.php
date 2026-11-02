@@ -20,6 +20,21 @@ use Symfony\Component\HttpFoundation\Response;
 class AjaxTestController {
 
   /**
+   * Returns the request method in an AJAX response.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The AJAX response.
+   */
+  public function getCallback(Request $request): AjaxResponse {
+    $response = new AjaxResponse();
+    $response->addCommand(new HtmlCommand('#ajax-test-request-method', $request->getMethod()));
+    return $response;
+  }
+
+  /**
    * Example content for dialog testing.
    *
    * @return array
