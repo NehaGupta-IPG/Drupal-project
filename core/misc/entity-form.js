@@ -48,7 +48,7 @@
           const $translationContext = $(context);
           let translate;
           let $checkbox = $translationContext.find(
-            '.js-form-item-translation-translate input',
+            '.js-form-item-content-translation-outdated input',
           );
 
           if ($checkbox.length) {
@@ -57,7 +57,7 @@
               : Drupal.t('Does not need to be updated');
           } else {
             $checkbox = $translationContext.find(
-              '.js-form-item-translation-retranslate input',
+              '.js-form-item-content-translation-retranslate input',
             );
             translate = $checkbox[0]?.checked
               ? Drupal.t('Flag other translations as outdated')
