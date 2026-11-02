@@ -2676,7 +2676,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     if (str_starts_with($route_name, 'views_ui.')) {
       return;
     }
-    $this->view->initHandlers();
+    $this->view->execute();
 
     if ($this->usesExposed() && $this->getOption('exposed_block')) {
       /** @var \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginInterface $exposed_form */
