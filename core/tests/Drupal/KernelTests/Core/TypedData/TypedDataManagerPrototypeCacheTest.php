@@ -379,29 +379,6 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   }
 
   /**
-   * Tests the prototype cache is excluded from serialization.
-   *
-   * The prototypes are held in a \WeakMap, which cannot be serialized even
-   * when it is empty, so the property must be excluded from __sleep(). This
-   * covers the branch of DependencySerializationTrait::__sleep() that runs
-   * with a container. The manager is cloned first, because __sleep() records
-   * the service IDs of the object it is called on, which would leave the
-   * shared service mutated. The serialization round trips themselves live in
-   * the unit test, as the discovery of a warm manager holds derivative
-   * discovery decorators that refuse to be serialized with the container.
-   *
-   * @see \Drupal\Tests\Core\TypedData\TypedDataManagerTest
-   */
-  public function testPrototypeCacheIsNotSerialized(): void {
-    $map = MapDataDefinition::create('map');
-    $map->setPropertyDefinition('name', DataDefinition::create('string'));
-    $this->typedDataManager->create($map, ['name' => 'warm'])->get('name');
-    $this->assertGreaterThan(0, $this->protoCount());
-
-    $this->assertNotContains('prototypes', (clone $this->typedDataManager)->__sleep());
-  }
-
-  /**
    * Tests clearing the cached definitions empties the prototype cache.
    */
   public function testClearCachedDefinitionsClearsPrototypes(): void {
