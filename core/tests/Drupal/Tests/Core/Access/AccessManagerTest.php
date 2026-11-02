@@ -14,6 +14,8 @@ use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\CheckProvider;
 use Drupal\Core\Access\DefaultAccessCheck;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -80,6 +82,11 @@ class AccessManagerTest extends UnitTestCase {
   protected $checkProvider;
 
   /**
+   * The language manager.
+   */
+  protected LanguageManagerInterface $languageManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -110,6 +117,13 @@ class AccessManagerTest extends UnitTestCase {
     $this->account = $this->createStub(AccountInterface::class);
     $this->currentUser = $this->createStub(AccountInterface::class);
     $this->checkProvider = new CheckProvider([], $this->container);
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
+    $this->languageManager->method('getDefinedLanguageTypesInfo')
+      ->willReturn([
+        LanguageInterface::TYPE_INTERFACE => [],
+        LanguageInterface::TYPE_CONTENT => [],
+        LanguageInterface::TYPE_URL => [],
+      ]);
   }
 
   /**
@@ -172,6 +186,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     // Construct route match objects.
@@ -229,6 +244,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->assertTrue($accessManager->check($route_match));
@@ -316,6 +332,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager
     );
 
     $route_match = new RouteMatch($name, $route, [], []);
@@ -338,6 +355,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->checkProvider->setChecks($this->routeCollection);
@@ -422,6 +440,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->assertEquals(FALSE, $accessManager->checkNamedRoute('test_route_1', ['value' => 'example'], $this->account));
@@ -478,6 +497,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->assertEquals(FALSE, $accessManager->checkNamedRoute('test_route_1', [], $this->account));
@@ -497,6 +517,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->createStub(AccessArgumentsResolverFactoryInterface::class),
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->setupAccessChecker();
@@ -551,6 +572,7 @@ class AccessManagerTest extends UnitTestCase {
       $this->argumentsResolverFactory,
       $this->currentUser,
       $this->checkProvider,
+      $this->languageManager,
     );
 
     $this->expectException(AccessException::class);

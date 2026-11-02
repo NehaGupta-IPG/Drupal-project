@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\ParamConverter;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -67,8 +67,13 @@ class EntityRevisionParamConverter implements ParamConverterInterface {
 
     // If the entity type is translatable, ensure we return the proper
     // translation object for the current context.
-    if ($entity instanceof EntityInterface && $entity instanceof TranslatableInterface) {
-      $entity = $this->entityRepository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
+    if ($entity instanceof TranslatableInterface) {
+      // If the 'language_content_' property is set on route defaults, use that
+      // as the langcode for the entity translation to load. The trailing
+      // underscore is used to avoid collisions with other route parameters or
+      // defaults.
+      $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? NULL;
+      $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode, ['operation' => 'entity_upcast']);
     }
 
     return $entity;

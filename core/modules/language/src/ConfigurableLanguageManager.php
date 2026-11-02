@@ -11,7 +11,6 @@ use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\FiberResumeType;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -423,7 +422,6 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     if ($this->negotiator) {
       foreach ($this->negotiator->getNegotiationMethods($type) as $method_id => $method) {
         if (is_subclass_of($method['class'], LanguageSwitcherInterface::class)) {
-          $original_languages = $this->negotiatedLanguages;
           $result = $this->negotiator->getNegotiationMethodInstance($method_id)->getLanguageSwitchLinks($this->requestStack->getCurrentRequest(), $type, $url);
 
           if (!empty($result)) {
@@ -433,42 +431,16 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
             $result = array_filter($result, function (array $link): bool {
               $url = $link['url'] ?? NULL;
               $language = $link['language'] ?? NULL;
-              if ($language instanceof LanguageInterface) {
-                $this->negotiatedLanguages[LanguageInterface::TYPE_CONTENT] = $language;
-                $this->negotiatedLanguages[LanguageInterface::TYPE_INTERFACE] = $language;
+              if ($url instanceof Url && $language instanceof LanguageInterface) {
+                $url->setOption('language', $language);
               }
-
-              $check_access_fn = function () use ($url) {
-                try {
-                  return $url instanceof Url && $url->access();
-                }
-                catch (\Exception) {
-                  return FALSE;
-                }
-              };
-              // If this method is running in a Fiber, contain the URL access
-              // checks to within child fibers. This is to prevent the
-              // negotiated languages changes from escaping to other fibers
-              // where rendering or other processes could run in the context of
-              // the wrong languages.
-              if (\Fiber::getCurrent()) {
-                $fiber = new \Fiber($check_access_fn);
-                $fiber->start();
-                while (!$fiber->isTerminated()) {
-                  if ($fiber->isSuspended()) {
-                    $resume_type = $fiber->resume();
-                    if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-                      usleep(500);
-                    }
-                  }
-                }
-                return $fiber->getReturn();
+              try {
+                return $url instanceof Url && $url->access();
               }
-
-              // If not running in a fiber, check URL access as usual.
-              return $check_access_fn();
+              catch (\Exception) {
+                return FALSE;
+              }
             });
-            $this->negotiatedLanguages = $original_languages;
 
             $links = (object) ['links' => $result, 'method_id' => $method_id];
             break;
