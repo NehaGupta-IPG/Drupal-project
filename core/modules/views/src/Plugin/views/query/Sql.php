@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -1702,7 +1703,17 @@ class Sql extends QueryPluginBase {
           $entity = $entities[$id];
         }
         else {
-          $entity = NULL;
+          // If main entity failed to load then this is either a race condition
+          // where the entity was deleted since the query was executed or the
+          // database is inconsistent. Drop that row and log an warning.
+          if ($relationship_id == 'none') {
+            @trigger_error("Failed to load entity {$id} for view {$this->view->id()}. If this warning persists then it indicates that the database has inconsistent entity data.", E_USER_WARNING);
+            unset($results[$index]);
+            break;
+          }
+          else {
+            $entity = NULL;
+          }
         }
 
         if ($relationship_id == 'none') {
@@ -1752,11 +1763,13 @@ class Sql extends QueryPluginBase {
   protected function getAllEntities() {
     $entities = [];
     foreach ($this->view->result as $row) {
-      if ($row->_entity) {
+      if ($row->_entity instanceof EntityInterface) {
         $entities[] = $row->_entity;
       }
       foreach ($row->_relationship_entities as $entity) {
-        $entities[] = $entity;
+        if ($entity instanceof EntityInterface) {
+          $entities[] = $entity;
+        }
       }
     }
 

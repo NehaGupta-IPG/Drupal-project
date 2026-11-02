@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Unit\Plugin\query;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
@@ -320,6 +321,99 @@ class SqlTest extends UnitTestCase {
     $query->loadEntities($result);
 
     $this->assertSame($entities['first'][1], $result[0]->_entity);
+    $this->assertSame($entities['first'][2], $result[1]->_entity);
+    $this->assertSame($entities['first'][2], $result[2]->_entity);
+  }
+
+  /**
+   * Tests loading entities when the entity is missing.
+   *
+   * @legacy-covers ::loadEntities
+   * @legacy-covers ::assignEntitiesToResult
+   */
+  public function testLoadEntitiesWithMissingEntity(): void {
+    $view = $this->prophesize(ViewExecutable::class);
+    $view->id()->willReturn('test');
+    $view_entity = $this->prophesize(ViewEntityInterface::class);
+    $view_entity->get('base_table')->willReturn('entity_first');
+    $view_entity->get('base_field')->willReturn('id');
+    $view->storage = $view_entity->reveal();
+
+    $entities = [
+      'first' => [
+        2 => $this->prophesize(EntityInterface::class)->reveal(),
+      ],
+    ];
+
+    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
+    $entity_type0 = new EntityType([
+      'label' => 'First',
+      'id' => 'first',
+      'base_table' => 'entity_first',
+      'revision_table' => 'entity_first__revision',
+      'entity_keys' => [
+        'id' => 'id',
+        'revision' => 'vid',
+      ],
+    ]);
+
+    $entity_type_manager->getDefinitions()->willReturn([
+      'first' => $entity_type0,
+      'base_table' => 'entity_second',
+    ]);
+
+    $entity_type_manager->getDefinition('first')->willReturn($entity_type0);
+
+    // Setup the views data corresponding to the entity types.
+    $views_data = $this->prophesize(ViewsData::class);
+    $views_data->get('entity_first')->willReturn([
+      'table' => [
+        'entity type' => 'first',
+        'entity revision' => FALSE,
+      ],
+    ]);
+    $views_data->get('entity_first__revision')->willReturn([
+      'table' => [
+        'entity type' => 'first',
+        'entity revision' => TRUE,
+      ],
+    ]);
+    $this->setupViewsData($views_data->reveal());
+
+    // Setup the loading of entities and entity revisions.
+    $entity_storage = $this->prophesize(EntityStorageInterface::class);
+    $entity_storage->load(1)->willReturn(NULL);
+    $entity_storage->load(2)->willReturn($entities['first'][2]);
+    $entity_storage->loadMultiple([1, 2])->willReturn($entities['first']);
+
+    $entity_type_manager->getStorage('first')->willReturn($entity_storage);
+
+    $this->setupEntityTypeManager($entity_type_manager->reveal());
+
+    $date_sql = $this->prophesize(DateSqlInterface::class);
+    $messenger = $this->prophesize(MessengerInterface::class);
+
+    $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal());
+    $query->view = $view->reveal();
+
+    $result = [];
+    $result[] = new ResultRow([
+      'id' => 1,
+    ]);
+    // Note: Let the same entity be returned multiple times, for example to
+    // support the translation use case.
+    $result[] = new ResultRow([
+      'id' => 2,
+    ]);
+    $result[] = new ResultRow([
+      'id' => 2,
+    ]);
+
+    $query->addField('entity_first', 'id', 'id');
+    $query->loadEntities($result);
+
+    $this->assertCount(2, $result);
+    $this->assertFalse(isset($result[0]));
     $this->assertSame($entities['first'][2], $result[1]->_entity);
     $this->assertSame($entities['first'][2], $result[2]->_entity);
   }

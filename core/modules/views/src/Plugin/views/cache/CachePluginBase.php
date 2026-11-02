@@ -295,9 +295,11 @@ abstract class CachePluginBase extends PluginBase {
     // Clone each row object and remove any loaded entities, to keep the
     // original result rows intact.
     foreach ($result as $key => $row) {
-      $clone = clone $row;
-      $clone->resetEntityData();
-      $return[$key] = $clone;
+      if ($row instanceof ResultRow) {
+        $clone = clone $row;
+        $clone->resetEntityData();
+        $return[$key] = $clone;
+      }
     }
 
     return $return;
@@ -325,7 +327,7 @@ abstract class CachePluginBase extends PluginBase {
     $tags = !empty($row->_entity) ? $row->_entity->getCacheTags() : [];
 
     if (!empty($row->_relationship_entities)) {
-      foreach ($row->_relationship_entities as $entity) {
+      foreach (array_filter($row->_relationship_entities) as $entity) {
         $tags = Cache::mergeTags($tags, $entity->getCacheTags());
       }
     }
