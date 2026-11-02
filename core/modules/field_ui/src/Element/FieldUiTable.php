@@ -20,8 +20,9 @@ class FieldUiTable extends Table {
     $info = parent::getInfo();
     $info['#regions'] = ['' => []];
     $info['#theme'] = 'field_ui_table';
+    $class = get_class($this);
     // Prepend FieldUiTable's prerender callbacks.
-    array_unshift($info['#pre_render'], [$this, 'tablePreRender'], [$this, 'preRenderRegionRows']);
+    array_unshift($info['#pre_render'], [$class, 'tablePreRender'], [$class, 'preRenderRegionRows']);
     return $info;
   }
 
