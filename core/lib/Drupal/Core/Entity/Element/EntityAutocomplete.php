@@ -6,11 +6,14 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocompleteLabelsInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides an entity autocomplete form element.
@@ -115,7 +118,7 @@ class EntityAutocomplete extends Textfield {
 
         // Extract the labels from the passed-in entity objects, taking access
         // checks into account.
-        return static::getEntityLabels($element['#default_value']);
+        return static::getEntityLabels($element['#default_value'], $element);
       }
     }
 
@@ -204,12 +207,7 @@ class EntityAutocomplete extends Textfield {
 
     // Check the value for emptiness, but allow the use of (string) "0".
     if (!empty($element['#value']) || (is_string($element['#value']) && strlen($element['#value']))) {
-      $options = $element['#selection_settings'] + [
-        'target_type' => $element['#target_type'],
-        'handler' => $element['#selection_handler'],
-      ];
-      /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
-      $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
+      $handler = self::getSelectionHandlerForElement($element);
       $autocreate = (bool) $element['#autocreate'] && $handler instanceof SelectionWithAutocreateInterface;
 
       // GET forms might pass the validated data around on the next request, in
@@ -371,26 +369,54 @@ class EntityAutocomplete extends Textfield {
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   An array of entity objects.
+   * @param array|null $element
+   *   The form element.
    *
    * @return string
    *   A string of entity labels separated by commas.
    */
-  public static function getEntityLabels(array $entities) {
+  public static function getEntityLabels(array $entities, ?array $element = NULL) {
     /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
     $entity_repository = \Drupal::service('entity.repository');
+    $labels_data = NULL;
+
+    // Check to see if the Selection handler can supply entity labels.
+    if ($element != NULL) {
+      $handler = self::getSelectionHandlerForElement($element);
+      if ($handler instanceof SelectionWithAutocompleteLabelsInterface) {
+        $labels_data = $handler->getAutocompleteLabels($entities, $element);
+      }
+    }
+
+    if ($labels_data === NULL) {
+      $labels_data = [];
+      // Fallback to legacy/default behavior for handlers that don't expose
+      // the new interface for getting autocomplete labels.
+      foreach ($entities as $entity) {
+        // Set the entity in the correct language for display.
+        $entity = $entity_repository->getTranslationFromContext($entity);
+
+        // Use the special view label, since some entities allow the label to be
+        // viewed, even if the entity is not allowed to be viewed.
+        $label = ($entity->access('view label')) ? $entity->label() : new TranslatableMarkup('- Restricted access -');
+
+        // Take into account "autocreated" entities.
+        $id = $entity->isNew() ? NULL : $entity->id();
+
+        $labels_data[] = [
+          'id' => $id,
+          'label' => $label,
+        ];
+      }
+    }
 
     $entity_labels = [];
-    foreach ($entities as $entity) {
-      // Set the entity in the correct language for display.
-      $entity = $entity_repository->getTranslationFromContext($entity);
+    foreach ($labels_data as $label_data) {
+      $id = $label_data['id'];
+      $label = $label_data['label'];
 
-      // Use the special view label, since some entities allow the label to be
-      // viewed, even if the entity is not allowed to be viewed.
-      $label = ($entity->access('view label')) ? $entity->label() : t('- Restricted access -');
-
-      // Take into account "autocreated" entities.
-      if (!$entity->isNew()) {
-        $label .= ' (' . $entity->id() . ')';
+      if ($id !== NULL) {
+        $label .= ' (' . $id . ')';
       }
 
       // Labels containing commas or quotes must be wrapped in quotes.
@@ -420,6 +446,33 @@ class EntityAutocomplete extends Textfield {
     }
 
     return $match;
+  }
+
+  /**
+   * Gets the entity reference selection plug-in for a form element.
+   *
+   * @param array $element
+   *   The render array for the entity auto-complete form element for which the
+   *   selection plug-in is desired. The settings of this form element will be
+   *   used to locate and initialize the handler instance.
+   *
+   * @return \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface|false
+   *   Either the entity reference selection handler for the form element, or
+   *   FALSE if it could not be loaded.
+   */
+  protected static function getSelectionHandlerForElement(array $element) {
+    $options = $element['#selection_settings'] + [
+      'target_type' => $element['#target_type'],
+      'handler'     => $element['#selection_handler'],
+    ];
+
+    // @todo switch to using DI in
+    // https://www.drupal.org/project/drupal/issues/3423053. This method and the
+    // methods that call it will need to become instance methods.
+    $plugin_manager = \Drupal::service('plugin.manager.entity_reference_selection');
+    assert($plugin_manager instanceof SelectionPluginManagerInterface);
+
+    return $plugin_manager->getInstance($options);
   }
 
 }

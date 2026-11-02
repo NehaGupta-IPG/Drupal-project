@@ -6,7 +6,7 @@ namespace Drupal\Tests\field\Functional\EntityReference\Views;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Utility\Html;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\BrowserTestBase;
@@ -59,15 +59,27 @@ class SelectionTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Create content types and nodes.
-    $type1 = $this->drupalCreateContentType()->id();
-    $type2 = $this->drupalCreateContentType()->id();
-    // Add some characters that should be escaped but not double escaped.
-    $node1 = $this->drupalCreateNode(['type' => $type1, 'title' => 'Test first node &<>']);
-    $node2 = $this->drupalCreateNode(['type' => $type1, 'title' => 'Test second node &&&']);
-    $node3 = $this->drupalCreateNode(['type' => $type2, 'title' => 'Test third node <span />']);
+    $web_user = $this->drupalCreateUser([
+      'view test entity',
+      'administer entity_test content',
+    ]);
+    $this->drupalLogin($web_user);
 
-    foreach ([$node1, $node2, $node3] as $node) {
+    // Create a variety of content types for testing.
+    for ($i = 0; $i <= 2; ++$i) {
+      $content_types[] = $this->drupalCreateContentType()->id();
+    }
+
+    // Create nodes having title characters that should be escaped but not
+    // double-escaped.
+    $nodes = [
+      $this->drupalCreateNode(['type' => $content_types[0], 'title' => 'Test first node &<>']),
+      $this->drupalCreateNode(['type' => $content_types[0], 'title' => 'Test second node &&&']),
+      $this->drupalCreateNode(['type' => $content_types[1], 'title' => 'Test third node <span />']),
+      $this->drupalCreateNode(['type' => $content_types[1], 'title' => "I'm in your demo, making you smile"]),
+    ];
+
+    foreach ($nodes as $node) {
       $this->nodes[$node->id()] = $node;
     }
 
@@ -83,7 +95,16 @@ class SelectionTest extends BrowserTestBase {
       ],
     ];
     $this->handlerSettings = $handler_settings;
-    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', $this->randomString(), 'node', 'views', $handler_settings);
+    $this->createEntityReferenceField('entity_test', 'test_bundle', 'test_field', 'Reference', 'node', 'views', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'test_bundle')
+      ->setComponent('test_field', [
+        'type' => 'entity_reference_autocomplete_tags',
+        'weight' => -4,
+      ])
+      ->save();
   }
 
   /**
@@ -111,23 +132,99 @@ class SelectionTest extends BrowserTestBase {
     $selection_settings_key = Crypt::hmacBase64(serialize($selection_settings) . $target_type . $selection_handler, Settings::getHashSalt());
     \Drupal::keyValue('entity_autocomplete')->set($selection_settings_key, $selection_settings);
 
-    $result = Json::decode($this->drupalGet('entity_reference_autocomplete/' . $target_type . '/' . $selection_handler . '/' . $selection_settings_key, ['query' => ['q' => 't']]));
+    $autocomplete_response =
+      $this->drupalGet(
+        sprintf("entity_reference_autocomplete/%s/%s/%s", $target_type, $selection_handler, $selection_settings_key),
+        ['query' => ['q' => 't']]);
+
+    $result = Json::decode($autocomplete_response);
 
     $expected = [
       0 => [
-        'value' => $this->nodes[1]->bundle() . ': ' . $this->nodes[1]->label() . ' (' . $this->nodes[1]->id() . ')',
-        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[1]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">' . Html::escape($this->nodes[1]->label()) . '</span></span>',
+        'value' => sprintf("%s: Test first node &<> (%s)", $this->nodes[1]->bundle(), $this->nodes[1]->id()),
+        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[1]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">Test first node &amp;&lt;&gt;</span></span>',
       ],
       1 => [
-        'value' => $this->nodes[2]->bundle() . ': ' . $this->nodes[2]->label() . ' (' . $this->nodes[2]->id() . ')',
-        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[2]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">' . Html::escape($this->nodes[2]->label()) . '</span></span>',
+        'value' => sprintf("%s: Test second node &&& (%s)", $this->nodes[2]->bundle(), $this->nodes[2]->id()),
+        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[2]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">Test second node &amp;&amp;&amp;</span></span>',
       ],
       2 => [
-        'value' => $this->nodes[3]->bundle() . ': ' . $this->nodes[3]->label() . ' (' . $this->nodes[3]->id() . ')',
-        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[3]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">' . Html::escape($this->nodes[3]->label()) . '</span></span>',
+        'value' => sprintf("%s: Test third node <span /> (%s)", $this->nodes[3]->bundle(), $this->nodes[3]->id()),
+        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[3]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">Test third node &lt;span /&gt;</span></span>',
       ],
     ];
     $this->assertEquals($expected, $result, 'The autocomplete result of the Views entity reference selection handler contains the proper output.');
+
+    $autocomplete_response =
+      $this->drupalGet(
+        sprintf("entity_reference_autocomplete/%s/%s/%s", $target_type, $selection_handler, $selection_settings_key),
+        ['query' => ['q' => "I'm"]]);
+
+    $result = Json::decode($autocomplete_response);
+
+    $expected = [
+      0 => [
+        'value' => sprintf('"%s: I\'m in your demo, making you smile (%s)"', $this->nodes[4]->bundle(), $this->nodes[4]->id()),
+        'label' => '<span class="views-field views-field-type"><span class="field-content">' . $this->nodes[4]->bundle() . '</span></span>: <span class="views-field views-field-title"><span class="field-content">I&#039;m in your demo, making you smile</span></span>',
+      ],
+    ];
+    $this->assertEquals($expected, $result, 'The autocomplete result of the Views entity reference selection handler contains the proper output.');
+
+    // Test that the Views output is used for the default value when
+    // re-rendering the form.
+    $expected_label = sprintf(
+      "%s: %s (%s)",
+      $this->nodes[1]->bundle(),
+      $this->nodes[1]->label(),
+      $this->nodes[1]->id());
+
+    $this->drupalGet('entity_test/add/test_bundle');
+    $edit = [
+      'test_field[target_id]' => sprintf('node (%d)', $this->nodes[1]->id()),
+    ];
+    $this->submitForm($edit, 'Save');
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $id = $match[1];
+    $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
+    $this->assertEquals($expected_label, $this->getSession()->getPage()->findField('test_field[target_id]')->getValue());
+
+    // Test that the Views output is used for the default value when entity is
+    // edited through a fresh copy of the edit form.
+    $this->drupalGet('entity_test/manage/' . $id . '/edit');
+    $this->assertEquals($expected_label, $this->getSession()->getPage()->findField('test_field[target_id]')->getValue());
+
+    // Test that the Views output is used for all values when re-rendering the
+    // form after multiple entities have been selected.
+    $expected_label = sprintf(
+      '%s: %s (%d), %s: %s (%d), "%s: %s (%d)"',
+      $this->nodes[1]->bundle(),
+      $this->nodes[1]->label(),
+      $this->nodes[1]->id(),
+      $this->nodes[2]->bundle(),
+      $this->nodes[2]->label(),
+      $this->nodes[2]->id(),
+      $this->nodes[4]->bundle(),
+      $this->nodes[4]->label(),
+      $this->nodes[4]->id());
+
+    $this->drupalGet('entity_test/add/test_bundle');
+    $edit = [
+      'test_field[target_id]' => sprintf(
+        'node (%d), node (%d), "I\'m in your demo, making you smile (%d)"',
+        $this->nodes[1]->id(),
+        $this->nodes[2]->id(),
+        $this->nodes[4]->id()),
+    ];
+    $this->submitForm($edit, 'Save');
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $id = $match[1];
+    $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
+    $this->assertEquals($expected_label, $this->getSession()->getPage()->findField('test_field[target_id]')->getValue());
+
+    // Test that the Views output is used for the default value when entity is
+    // edited through a fresh copy of the edit form.
+    $this->drupalGet('entity_test/manage/' . $id . '/edit');
+    $this->assertEquals($expected_label, $this->getSession()->getPage()->findField('test_field[target_id]')->getValue());
   }
 
 }

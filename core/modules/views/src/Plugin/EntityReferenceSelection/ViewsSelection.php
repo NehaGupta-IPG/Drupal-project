@@ -2,9 +2,11 @@
 
 namespace Drupal\views\Plugin\EntityReferenceSelection;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocompleteLabelsInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -12,11 +14,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\Views;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.
@@ -27,7 +29,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
   group: "views",
   weight: 0
 )]
-class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface {
+class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface, SelectionWithAutocompleteLabelsInterface {
   use StringTranslationTrait;
 
   /**
@@ -329,6 +331,58 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
       'arguments' => $arguments,
     ];
     $form_state->setValueForElement($element, $value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAutocompleteLabels(array $entities, array $element): array {
+    // Use the rendered view row to display the referenced entity.
+    $display_name = $element['#selection_settings']['view']['display_name'];
+    $arguments = $element['#selection_settings']['view']['arguments'] ?? NULL;
+    $view_name = $element['#selection_settings']['view']['view_name'];
+
+    // Check that the view is valid and the display still exists.
+    $view = Views::getView($view_name);
+
+    if (!$view) {
+      $this->messenger()->addWarning(
+        $this->t('The reference view %view_name cannot be found.', ['%view_name' => $view_name])
+      );
+      return [];
+    }
+    if (!$view->access($display_name)) {
+      $this->messenger()->addWarning(
+        $this->t('You do no have access to the reference view %view_name.', ['%view_name' => $view_name])
+      );
+      return [];
+    }
+    $view->setDisplay($display_name);
+
+    $entity_ids = [];
+    foreach ($entities as $entity) {
+      $entity_ids[] = $entity->id();
+    }
+
+    $view->displayHandlers->get($display_name)->setOption('entity_reference_options', [
+      'limit' => 0,
+      'ids' => $entity_ids,
+    ]);
+
+    $results = $view->executeDisplay($display_name, $arguments);
+    $entity_labels = [];
+
+    foreach ($results as $entity_id => $result) {
+      $label = Html::decodeEntities(
+        strip_tags($this->renderer->renderInIsolation($result)));
+
+      $entity_labels[] = [
+        'id' => $entity_id,
+        'label' => $label,
+      ];
+    }
+
+    return $entity_labels;
   }
 
 }
