@@ -60,7 +60,7 @@ class ToolkitSetupFormTest extends BrowserTestBase {
 
     // Test changing the webp image quality with lossy compression.
     $edit = [
-      'gd[webp_quality_wrapper][image_webp_compression]' => 'lossy',
+      'gd[webp_quality_wrapper][image_webp_lossless]' => 0,
       'gd[webp_quality_wrapper][image_webp_quality]' => '80',
     ];
     $this->submitForm($edit, 'Save configuration');
