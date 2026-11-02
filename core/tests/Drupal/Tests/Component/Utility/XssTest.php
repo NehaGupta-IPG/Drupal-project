@@ -137,7 +137,7 @@ class XssTest extends TestCase {
    *   \Drupal\Component\Utility\Xss::filter().
    */
   #[DataProvider('providerTestFilterXssNotNormalized')]
-  public function testFilterXssNotNormalized($value, string $expected, string $message, ?array $allowed_tags = NULL): void {
+  public function testFilterXssNotNormalized(string $value, string $expected, string $message, ?array $allowed_tags = NULL): void {
     if ($allowed_tags === NULL) {
       $value = Xss::filter($value);
     }
@@ -161,7 +161,7 @@ class XssTest extends TestCase {
    *       \Drupal\Component\Utility\Xss::filter().
    */
   public static function providerTestFilterXssNotNormalized(): array {
-    $cases = [
+    return [
       // Tag stripping, different ways to work around removal of HTML tags.
       [
         '<script>alert(0)</script>',
@@ -440,8 +440,19 @@ class XssTest extends TestCase {
         'HTML filter attributes removal -- srcdoc attribute.',
         ['iframe'],
       ],
+      [
+        '<a href="foo" data-hx-on-click="alert(document.domain)">Click me!</a>',
+        'alert',
+        'HTML filter attributes removal -- data-hx-* attributes.',
+        ['a'],
+      ],
+      [
+        '<a href="foo" hx-on-click="alert(document.domain)">Click me!</a>',
+        'alert',
+        'HTML filter attributes removal -- hx-* attributes.',
+        ['a'],
+      ],
     ];
-    return $cases;
   }
 
   /**

@@ -26,8 +26,6 @@ class FieldTypePluginManagerTest extends UnitTestCase {
 
   /**
    * The field type plugin manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManager
    */
   protected FieldTypePluginManager $fieldTypeManager;
 
@@ -83,10 +81,10 @@ class FieldTypePluginManagerTest extends UnitTestCase {
    */
   public function testGetGroupedDefinitions(): void {
     $this->discovery->getDefinitions()->willReturn([
-      'telephone' => [
+      'field_test' => [
         'category' => 'general',
-        'label' => 'Telephone',
-        'id' => 'telephone',
+        'label' => 'field_test',
+        'id' => 'field_test',
       ],
       'string' => [
         'category' => 'text',

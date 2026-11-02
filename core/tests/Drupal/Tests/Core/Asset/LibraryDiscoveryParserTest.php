@@ -275,7 +275,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(IncompleteLibraryDefinitionException::class);
-    $this->expectExceptionMessage("Incomplete library definition for definition 'example' in extension 'example_module_missing_information'");
+    $this->expectExceptionMessageIs("Incomplete library definition for definition 'example' in extension 'example_module_missing_information'");
     $this->libraryDiscoveryParser->buildByExtension('example_module_missing_information');
   }
 
@@ -545,7 +545,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(LibraryDefinitionMissingLicenseException::class);
-    $this->expectExceptionMessage("Missing license information in library definition for definition 'no-license-info-but-remote' extension 'licenses_missing_information': it has a remote, but no license.");
+    $this->expectExceptionMessageIs("Missing license information in library definition for definition 'no-license-info-but-remote' extension 'licenses_missing_information': it has a remote, but no license.");
     $this->libraryDiscoveryParser->buildByExtension('licenses_missing_information');
   }
 
@@ -760,7 +760,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->libraryDiscoveryParser->buildByExtension($extension);
   }
 
@@ -771,7 +771,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     return [
       'css_bad_category' => [
         'css_bad_category',
-        'See https://www.drupal.org/node/2274843.',
+        'Invalid CSS category: bad_category. See https://www.drupal.org/node/2274843.',
       ],
       'Improper CSS nesting' => [
         'css_bad_nesting',
@@ -891,15 +891,15 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
   /**
    * The valid URIs.
    *
-   * @var array
+   * @var array<string,bool>
    */
-  protected $validUris;
+  protected array $validUris;
 
-  protected function fileValidUri($source) {
+  protected function fileValidUri($source): bool {
     return $this->validUris[$source] ?? FALSE;
   }
 
-  public function setFileValidUri($source, $valid): void {
+  public function setFileValidUri(string $source, bool $valid): void {
     $this->validUris[$source] = $valid;
   }
 

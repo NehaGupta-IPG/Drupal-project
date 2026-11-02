@@ -90,8 +90,6 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * The test logger.
-   *
-   * @var \ColinODell\PsrTestLogger\TestLogger
    */
   protected TestLogger $logger;
 
@@ -723,7 +721,7 @@ class RouteProviderTest extends KernelTestBase {
     $result = $provider->getRoutesByPattern($path_to_test);
     $this->assertEquals(1, $result->count());
     // We can't compare the values of the routes directly, nor use
-    // spl_object_hash() because they are separate instances.
+    // object identity because they are separate instances.
     $this->assertEquals(serialize($collection->get('long_pattern')), serialize($result->get('long_pattern')), 'The right route was found.');
     // We now have a single candidate outline.
     $candidates = $provider->getCandidateOutlines(explode('/', trim($path_to_test, '/')));
@@ -774,6 +772,14 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
     $this->assertEquals('route_c is deprecated!', $deprecation['message']);
+  }
+
+  /**
+   * Performs basic smoke test on the lazy route provider used in kernel tests.
+   */
+  public function testKernelTestLazyRouteProvider(): void {
+    $routes = \iterator_to_array(\Drupal::service('router.route_provider')->getAllRoutes());
+    self::assertArrayHasKey('language.negotiation_url', $routes);
   }
 
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
+use Drupal\locale\LocaleSource;
+use Drupal\locale\Model\SourceType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -32,16 +34,6 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
   protected $existingSyncDirectory = TRUE;
 
   /**
-   * Installer step: Select installation profile.
-   */
-  protected function setUpProfile(): void {
-    // Ensure the site name 'Multilingual' appears as expected in the 'Use
-    // existing configuration' radio description.
-    $this->assertSession()->pageTextContains('Install Multilingual using existing configuration.');
-    parent::setUpProfile();
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function getConfigLocation(): string {
@@ -56,9 +48,9 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
     // Place custom local translations in the translations directory and fix up
     // configuration.
     mkdir($this->publicFilesDirectory . '/translations', 0777, TRUE);
-    file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $this->getPo('es'));
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.es.po', $this->getPo('es'));
     $locale_settings = Yaml::decode(file_get_contents($this->siteDirectory . '/config/sync/locale.settings.yml'));
-    $locale_settings['translation']['use_source'] = 'local';
+    $locale_settings['translation']['use_source'] = SourceType::Local->value;
     file_put_contents($this->siteDirectory . '/config/sync/locale.settings.yml', Yaml::encode($locale_settings));
   }
 
@@ -80,7 +72,7 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
       'create' => [],
       // The view was untranslated but the translation exists so the installer
       // performs the translation.
-      'update' => ['views.view.who_s_new'],
+      'update' => ['views.view.watchdog'],
       'delete' => [],
       'rename' => [],
     ];
@@ -113,15 +105,13 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
 
     /** @var \Drupal\language\Config\LanguageConfigOverride $view_config */
     // Ensure that views are translated as expected.
-    $view_config = \Drupal::languageManager()->getLanguageConfigOverride('es', 'views.view.who_s_new');
-    $this->assertSame('Aplicar', $view_config->get('display.default.display_options.exposed_form.options.submit_button'));
     $view_config = \Drupal::languageManager()->getLanguageConfigOverride('es', 'views.view.archive');
     $this->assertSame('Aplicar', $view_config->get('display.default.display_options.exposed_form.options.submit_button'));
 
     // Manually update the translation status so can re-run the import.
-    $status = locale_translation_get_status();
-    $status['drupal']['es']->type = 'local';
-    $status['drupal']['es']->files['local']->timestamp = time();
+    $status = \Drupal::service(LocaleSource::class)->loadSources();
+    $status['drupal']['es']->type = SourceType::Local->value;
+    $status['drupal']['es']->files[SourceType::Local->value]->timestamp = time();
     \Drupal::keyValue('locale.translation_status')->set('drupal', $status['drupal']);
     // Run the translation import.
     $this->drupalGet('admin/reports/translations');
@@ -133,7 +123,7 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
       'create' => [],
       // The view was untranslated but the translation exists so the installer
       // performs the translation.
-      'update' => ['views.view.who_s_new'],
+      'update' => ['views.view.watchdog'],
       'delete' => [],
       'rename' => [],
     ];
@@ -151,12 +141,12 @@ msgid "Apply"
 msgstr "Aplicar New"
 
 PO;
-    file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $po);
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.es.po', $po);
 
     // Manually update the translation status so can re-run the import.
-    $status = locale_translation_get_status();
-    $status['drupal']['es']->type = 'local';
-    $status['drupal']['es']->files['local']->timestamp = time();
+    $status = \Drupal::service(LocaleSource::class)->loadSources();
+    $status['drupal']['es']->type = SourceType::Local->value;
+    $status['drupal']['es']->files[SourceType::Local->value]->timestamp = time();
     \Drupal::keyValue('locale.translation_status')->set('drupal', $status['drupal']);
     // Run the translation import.
     $this->drupalGet('admin/reports/translations');
@@ -173,12 +163,7 @@ PO;
       // All views with 'Aplicar' will have been changed to use the new
       // translation.
       'update' => [
-        'views.view.archive',
-        'views.view.content_recent',
-        'views.view.frontpage',
-        'views.view.glossary',
-        'views.view.who_s_new',
-        'views.view.who_s_online',
+        'views.view.watchdog',
       ],
       'delete' => [],
       'rename' => [],

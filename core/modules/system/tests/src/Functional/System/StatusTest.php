@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Utility\Bytes;
+use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -23,12 +24,17 @@ class StatusTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['update_test_postupdate', 'update'];
+  protected static $modules = ['update_test_postupdate', 'update', 'experimental_module_requirements_test'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
 
   /**
    * {@inheritdoc}
@@ -65,6 +71,13 @@ class StatusTest extends BrowserTestBase {
 
     // Verify that the PHP version is shown on the page.
     $this->assertSession()->pageTextContains(phpversion());
+
+    // Test that the experimental modules requirement is reported as info (in
+    // the "Checked" group), rather than as a warning.
+    $elements = $this->getNodeElementsByXpath('//div[h3[@id="checked"]]//summary[contains(@class, "system-status-report__status-title") and contains(text(), :text)]', [
+      ':text' => 'Experimental modules installed',
+    ]);
+    $this->assertCount(1, $elements);
 
     if (function_exists('phpinfo')) {
       $this->assertSession()->linkByHrefExists(Url::fromRoute('system.php')->toString());
@@ -117,9 +130,34 @@ class StatusTest extends BrowserTestBase {
     $this->assertSession()->elementExists('xpath', '//details[contains(@class, "system-status-report__entry")]//div[contains(text(), "Cron has not run recently")]');
     \Drupal::state()->set('system.cron_last', $cron_last_run);
 
+    // Check the connection information.
+    $this->assertSession()->pageTextContains('Database connection');
+    $connection = Database::getConnection();
+    $options = $connection->getConnectionOptions();
+    if ($connection->databaseType() === 'sqlite') {
+      $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+        ':text' => 'Database: ',
+      ]);
+      $this->assertCount(1, $elements);
+    }
+    else {
+      $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+        ':text' => 'Host: ',
+      ]);
+      $this->assertCount(1, $elements);
+      $this->assertSession()->pageTextContains('Host: ' . $options['host']);
+    }
+    $this->assertSession()->pageTextContains('Database: ' . $options['database']);
+    if ($options['prefix']) {
+      $this->assertSession()->pageTextContains('Prefix: ' . $options['prefix']);
+    }
+    else {
+      $this->assertSession()->pageTextContains('No prefix');
+    }
+
     // Check if JSON database support is enabled.
     $this->assertSession()->pageTextContains('Database support for JSON');
-    $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+    $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
       ':text' => 'Drupal requires databases that support JSON storage.',
     ]);
     $this->assertCount(1, $elements);
@@ -187,12 +225,12 @@ class StatusTest extends BrowserTestBase {
 
     // Check that the installation profile information is displayed.
     $this->drupalGet('admin/reports/status');
-    $this->assertSession()->pageTextContains('Testing (testing-' . \Drupal::VERSION . ')');
+    $this->assertSession()->pageTextContains('Testing locale (testing_locale-' . \Drupal::VERSION . ')');
 
     // Check if pg_trgm extension is enabled on postgres.
     if (\Drupal::database()->databaseType() == 'pgsql') {
       $this->assertSession()->pageTextContains('PostgreSQL pg_trgm extension');
-      $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
+      $elements = $this->getNodeElementsByXpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
         ':text' => 'The pg_trgm PostgreSQL extension is present.',
       ]);
       $this->assertCount(1, $elements);
@@ -200,7 +238,7 @@ class StatusTest extends BrowserTestBase {
     }
 
     // Test APCu status.
-    $elements = $this->xpath('//details[summary[contains(@class, "system-status-report__status-title") and normalize-space(text()) = "PHP APCu caching"]]/div[@class="system-status-report__entry__value"]/text()');
+    $elements = $this->getNodeElementsByXpath('//details[summary[contains(@class, "system-status-report__status-title") and normalize-space(text()) = "PHP APCu caching"]]/div[@class="system-status-report__entry__value"]/text()');
     // Ensure the status is not a warning if APCu size is greater than or equal
     // to the recommended size.
     if (preg_match('/^Enabled \((.*)\)$/', $elements[0]->getText(), $matches)) {
@@ -227,7 +265,7 @@ class StatusTest extends BrowserTestBase {
     $this->assertNotEquals(count($error_elements), 0, 'Errors are listed on the page.');
     $expected_text = new PluralTranslatableMarkup(count($error_elements), 'Error', 'Errors');
     $expected_text = count($error_elements) . ' ' . $expected_text;
-    $this->assertSession()->responseContains((string) $expected_text);
+    $this->assertSession()->responseContains($expected_text);
   }
 
   /**
@@ -247,7 +285,7 @@ class StatusTest extends BrowserTestBase {
     $this->assertNotEquals(count($warning_elements), 0, 'Warnings are listed on the page.');
     $expected_text = new PluralTranslatableMarkup(count($warning_elements), 'Warning', 'Warnings');
     $expected_text = count($warning_elements) . ' ' . $expected_text;
-    $this->assertSession()->responseContains((string) $expected_text);
+    $this->assertSession()->responseContains($expected_text);
   }
 
 }

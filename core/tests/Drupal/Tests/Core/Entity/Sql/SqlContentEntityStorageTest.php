@@ -1364,6 +1364,9 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->entityType
       ->method('isPersistentlyCacheable')
       ->willReturn(TRUE);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(TRUE);
     $this->entityType->expects($this->atLeastOnce())
       ->method('id')
       ->willReturn($this->entityTypeId);
@@ -1390,6 +1393,68 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->getActiveDefinition($this->entityType->id())
       ->willReturn($this->entityType);
 
+    $memory_cache = new MemoryCache(new Time());
+    $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
+      ->setConstructorArgs([
+        $this->entityType,
+        $this->connection,
+        $this->entityFieldManager->reveal(),
+        $this->cache,
+        $this->languageManager,
+        $memory_cache, $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(),
+      ])
+      ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
+      ->getMock();
+    $entity_storage->method('invokeStorageLoadHook')
+      ->willReturn(NULL);
+    $entity_storage->method('initTableLayout')
+      ->willReturn(NULL);
+    $entity_storage->expects($this->once())
+      ->method('getFromStorage')
+      ->with([$id])
+      ->willReturn([$id => $entity]);
+
+    $entities = $entity_storage->loadMultiple([$id]);
+    $this->assertEquals($entity, $entities[$id]);
+    // A not-found record should keep the ID out of storage queries for the rest
+    // of the request.
+    $this->assertFalse($memory_cache->get('not_found:' . $key));
+  }
+
+  /**
+   * Tests load multiple with no result.
+   */
+  public function testLoadMultipleNoResult(): void {
+    $this->setUpModuleHandlerNoImplementations();
+    $this->setUpMockEntityType();
+
+    $this->entityType
+      ->method('isPersistentlyCacheable')
+      ->willReturn(TRUE);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(TRUE);
+    $this->entityType->expects($this->atLeastOnce())
+      ->method('id')
+      ->willReturn($this->entityTypeId);
+
+    // Override the cache backend so we can set expectations.
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    // When the entity is not loaded at all, this will be recorded in the
+    // static cache but not the persistent cache.
+    $id = 1;
+    $key = 'values:' . $this->entityTypeId . ':1';
+    $this->cache->expects($this->once())
+      ->method('getMultiple')
+      ->with([$key])
+      ->willReturn([]);
+    $this->cache->expects($this->never())
+      ->method('setMultiple');
+
+    $this->entityTypeManager
+      ->getActiveDefinition($this->entityType->id())
+      ->willReturn($this->entityType);
+
     $entity_storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
       ->setConstructorArgs([
         $this->entityType,
@@ -1408,10 +1473,13 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $entity_storage->expects($this->once())
       ->method('getFromStorage')
       ->with([$id])
-      ->willReturn([$id => $entity]);
+      ->willReturn([]);
 
+    // Loading the same missing entity ID twice should only result in a
+    // single persistent cache get.
     $entities = $entity_storage->loadMultiple([$id]);
-    $this->assertEquals($entity, $entities[$id]);
+    $entities = $entity_storage->loadMultiple([$id]);
+    $this->assertSame($entities, []);
   }
 
   /**

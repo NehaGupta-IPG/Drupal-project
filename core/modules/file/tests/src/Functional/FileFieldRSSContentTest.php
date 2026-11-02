@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,6 +15,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('file')]
 #[RunTestsInSeparateProcesses]
 class FileFieldRSSContentTest extends FileFieldTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -29,6 +32,8 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
    * Tests RSS enclosure formatter display for RSS feeds.
    */
   public function testFileFieldRSSContent(): void {
+    $this->enablePromotedContentView();
+
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $field_name = $this->randomMachineName();
     $type_name = 'article';
@@ -52,7 +57,7 @@ class FileFieldRSSContentTest extends FileFieldTestBase {
     ];
     $this->submitForm($edit, 'Save');
 
-    // Create a new node with a file field set. Promote to frontpage
+    // Create a new node with a file field set. Promoted
     // needs to be set so this node will appear in the RSS feed.
     $node = $this->drupalCreateNode(['type' => $type_name, 'promote' => 1]);
     $test_file = $this->getTestFile('text');
