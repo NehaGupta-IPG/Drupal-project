@@ -1683,7 +1683,7 @@
     const marker = Drupal.theme('tableDragChangedMarker');
     const cell = $(this.element).find('td:first-of-type');
     if (cell.find('abbr.tabledrag-changed').length === 0) {
-      cell.append(marker);
+      cell.find('.tabledrag-handle').after(marker);
     }
     Drupal.tableDrag[this.table.id].changedRowIds.add(this.element.id);
   };
