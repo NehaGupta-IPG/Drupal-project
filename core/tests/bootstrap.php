@@ -9,67 +9,35 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
 /**
- * Finds all valid extension directories recursively within a given directory.
- *
- * @param string $scan_directory
- *   The directory that should be recursively scanned.
- *
- * @return array
- *   An associative array of extension directories found within the scanned
- *   directory, keyed by extension name.
- */
-function drupal_phpunit_find_extension_directories($scan_directory): array {
-  $extensions = [];
-  $dirs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scan_directory, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
-  foreach ($dirs as $dir) {
-    if (str_contains($dir->getPathname(), '.info.yml')) {
-      // Cut off ".info.yml" from the filename for use as the extension name. We
-      // use getRealPath() so that we can scan extensions represented by
-      // directory aliases.
-      $extensions[substr($dir->getFilename(), 0, -9)] = $dir->getPathInfo()
-        ->getRealPath();
-    }
-  }
-  return $extensions;
-}
-
-/**
- * Returns directories under which contributed extensions may exist.
+ * Returns directories from which test extensions may be discovered.
  *
  * @param string $root
  *   (optional) Path to the root of the Drupal installation.
  *
  * @return array
- *   An array of directories under which contributed extensions may exist.
+ *   A list of directories from which test extensions may be discovered.
  */
 function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
   $paths = [
-    $root . '/core/modules',
-    $root . '/core/profiles',
-    $root . '/core/themes',
-    $root . '/modules',
-    $root . '/profiles',
-    $root . '/themes',
+    $root . '/core',
+    $root,
   ];
   $sites_path = $root . '/sites';
-  // Note this also checks sites/../modules and sites/../profiles.
   foreach (scandir($sites_path) as $site) {
-    if ($site[0] === '.' || $site === 'simpletest') {
+    if ($site[0] === '.' || $site === 'simpletest' || !is_dir("$sites_path/$site")) {
       continue;
     }
-    $path = "$sites_path/$site";
-    $paths[] = is_dir("$path/modules") ? realpath("$path/modules") : NULL;
-    $paths[] = is_dir("$path/profiles") ? realpath("$path/profiles") : NULL;
-    $paths[] = is_dir("$path/themes") ? realpath("$path/themes") : NULL;
+    $paths[] = "$sites_path/$site";
   }
-  return array_filter($paths);
+  return $paths;
 }
 
 /**
@@ -130,8 +98,12 @@ function drupal_phpunit_populate_class_loader() {
     // Scan for arbitrary extension namespaces from core and contrib.
     $extension_roots = drupal_phpunit_contrib_extension_directory_roots();
 
-    $dirs = array_map('drupal_phpunit_find_extension_directories', $extension_roots);
-    $dirs = array_reduce($dirs, 'array_merge', []);
+    $dirs = [];
+    foreach ($extension_roots as $extension_root) {
+      foreach (ExtensionDiscovery::getExtensionDirectoryIterator($extension_root, ['node_modules'], TRUE) ?? [] as $file) {
+        $dirs[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
+      }
+    }
     $GLOBALS['namespaces'] = drupal_phpunit_get_extension_namespaces($dirs);
   }
   foreach ($GLOBALS['namespaces'] as $prefix => $paths) {
