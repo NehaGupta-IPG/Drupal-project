@@ -147,9 +147,6 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       'config' => [
         'taxonomy.vocabulary.tags',
       ],
-      'content' => [
-        'taxonomy_term:tags:' . Term::load(2)->uuid(),
-      ],
       'module' => [
         'node',
         'taxonomy',
@@ -157,6 +154,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
       ],
     ];
     $this->assertSame($expected, $view->calculateDependencies()->getDependencies());
+
+    // Tests that the configuration saved has the uuid of the term, not the ID
+    // after saving.
+    $view_config = $this->config('views.view.test_filter_taxonomy_index_tid');
+    $values = $view_config->get('display.default.display_options.filters.tid.value');
+    $this->assertSame(['3dec3e87-5e46-455d-b49c-1695fb74b756'], $values);
   }
 
   /**
@@ -181,6 +184,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $node4 = $this->drupalCreateNode([
       $field_name => [['target_id' => $this->terms[2][0]->id()]],
     ]);
+
+    // Set the selected term to Term 1.0.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_taxonomy_index_tid/default/filter/tid');
+    $this->submitForm(['options[value][]' => [2]], 'Apply');
+    // Save the view.
+    $this->submitForm([], 'Save');
 
     // Only the nodes with the selected term should be shown.
     $this->drupalGet('test-filter-taxonomy-index-tid');
@@ -417,13 +426,13 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // Case 1:
     // - filter "tid" with multiple terms as "is none of"
     // - filter "tid_2" with a single term as "is one of"
-    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
-    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->id();
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->uuid();
+    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->uuid();
     $display['display_options']['filters']['tid']['operator'] = 'not';
     $display['display_options']['filters']['tid']['group'] = 2;
     $display['display_options']['filters']['tid_2'] = $display['display_options']['filters']['tid'];
     $display['display_options']['filters']['tid_2']['id'] = 'tid_2';
-    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->id();
+    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->uuid();
     $display['display_options']['filters']['tid_2']['operator'] = 'or';
     $display['display_options']['filters']['tid_2']['group'] = 2;
     $display['display_options']['filter_groups'] = [
@@ -448,13 +457,13 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // - filter "tid_2" with a single term as "is one of"
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
-    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
-    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->id();
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->uuid();
+    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->uuid();
     $display['display_options']['filters']['tid']['operator'] = 'or';
     $display['display_options']['filters']['tid']['group'] = 2;
     $display['display_options']['filters']['tid_2'] = $display['display_options']['filters']['tid'];
     $display['display_options']['filters']['tid_2']['id'] = 'tid_2';
-    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->id();
+    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->uuid();
     $display['display_options']['filters']['tid_2']['operator'] = 'or';
     $display['display_options']['filters']['tid_2']['group'] = 2;
     $view->save();
@@ -474,12 +483,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'] = [];
-    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->uuid();
     $display['display_options']['filters']['tid']['operator'] = 'not';
     $display['display_options']['filters']['tid']['group'] = 2;
     $display['display_options']['filters']['tid_2'] = $display['display_options']['filters']['tid'];
     $display['display_options']['filters']['tid_2']['id'] = 'tid_2';
-    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->id();
+    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->uuid();
     $display['display_options']['filters']['tid_2']['operator'] = 'or';
     $display['display_options']['filters']['tid_2']['group'] = 2;
     $view->save();
@@ -498,12 +507,12 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $view = View::load('test_filter_taxonomy_index_tid');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'] = [];
-    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->uuid();
     $display['display_options']['filters']['tid']['operator'] = 'or';
     $display['display_options']['filters']['tid']['group'] = 2;
     $display['display_options']['filters']['tid_2'] = $display['display_options']['filters']['tid'];
     $display['display_options']['filters']['tid_2']['id'] = 'tid_2';
-    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->id();
+    $display['display_options']['filters']['tid_2']['value'][0] = $this->terms[2][0]->uuid();
     $view->save();
 
     $this->drupalGet('test-filter-taxonomy-index-tid');
@@ -520,13 +529,13 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // as "is one of".
     $view = View::load('test_filter_taxonomy_index_tid');
     $display = &$view->getDisplay('default');
-    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();
-    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->id();
+    $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->uuid();
+    $display['display_options']['filters']['tid']['value'][1] = $this->terms[1][1]->uuid();
     $display['display_options']['filters']['tid']['operator'] = 'or';
     $display['display_options']['filters']['tid']['group'] = 2;
     $display['display_options']['filters']['taxonomy_other_tags_target_id'] = $display['display_options']['filters']['tid'];
     $display['display_options']['filters']['taxonomy_other_tags_target_id']['id'] = 'taxonomy_other_tags_target_id';
-    $display['display_options']['filters']['taxonomy_other_tags_target_id']['value'][0] = $this->terms[3][0]->id();
+    $display['display_options']['filters']['taxonomy_other_tags_target_id']['value'][0] = $this->terms[3][0]->uuid();
     $display['display_options']['filters']['taxonomy_other_tags_target_id']['operator'] = 'or';
     $display['display_options']['filters']['taxonomy_other_tags_target_id']['group'] = 2;
     $display['display_options']['filters']['taxonomy_other_tags_target_id']['table'] = 'node__taxonomy_other_tags';

@@ -3,6 +3,7 @@
 namespace Drupal\views;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -69,7 +70,11 @@ class ViewsConfigUpdater {
   public function updateAll(ViewEntityInterface $view) {
     return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
       // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
+      $changed = FALSE;
+      if ($this->processTaxonomyTermViewsFilterUpdate($handler, $handler_type)) {
+        $changed = TRUE;
+      }
+      return $changed;
     });
   }
 
@@ -174,6 +179,51 @@ class ViewsConfigUpdater {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Checks if a view's taxonomy term filter values need converting to UUIDs.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if any filter needs the update.
+   */
+  public function needsTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
+      return $this->processTaxonomyTermViewsFilterUpdate($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Converts taxonomy term filter values from entity IDs to UUIDs.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processTaxonomyTermViewsFilterUpdate(array &$handler, string $handler_type): bool {
+    if ($handler_type !== 'filter') {
+      return FALSE;
+    }
+    if (!isset($handler['plugin_id']) || $handler['plugin_id'] !== 'taxonomy_index_tid' || !isset($handler['value'])) {
+      return FALSE;
+    }
+    // Filter all the IDs and UUIDs.
+    $valid_uuids = array_filter($handler['value'], fn($v) => Uuid::isValid($v));
+    $ids_to_load = array_filter($handler['value'], fn($v) => !Uuid::isValid($v));
+    if (empty($ids_to_load)) {
+      return FALSE;
+    }
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadMultiple($ids_to_load);
+    $loaded_uuids = array_map(fn($term) => $term->uuid(), $terms);
+    $handler['value'] = array_merge($valid_uuids, $loaded_uuids);
+    return TRUE;
   }
 
 }
