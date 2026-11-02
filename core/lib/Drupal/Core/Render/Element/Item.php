@@ -27,6 +27,7 @@ class Item extends FormElementBase {
       '#input' => TRUE,
       '#markup' => '',
       '#theme_wrappers' => ['form_element'],
+      '#states_attributes_target_key' => '#wrapper_attributes',
     ];
   }
 

@@ -10,12 +10,14 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\Core\Form\FormHelper.
  */
 #[CoversClass(FormHelper::class)]
 #[Group('Form')]
+#[IgnoreDeprecations]
 class FormHelperTest extends UnitTestCase {
 
   /**
@@ -91,8 +93,11 @@ class FormHelperTest extends UnitTestCase {
    * Tests process states.
    */
   #[DataProvider('providerElements')]
-  public function testProcessStates(array $elements, string $key): void {
+  public function testProcessStates(array $elements, string $key, $expect_deprecation = FALSE): void {
     $json = Json::encode($elements['#states']);
+    if ($expect_deprecation) {
+      $this->expectUserDeprecationMessage('Automatic detection of the #states attribute target is deprecated in drupal:11.5.0 and removed in drupal:13.0.0. Set the #states_attributes_target_key explicitly. See https://www.drupal.org/node/3572685');
+    }
     FormHelper::processStates($elements);
     $this->assertEquals(['core/drupal.states'], $elements['#attached']['library']);
     $this->assertEquals($json, $elements[$key]['data-drupal-states']);
@@ -103,7 +108,7 @@ class FormHelperTest extends UnitTestCase {
    */
   public static function providerElements(): array {
     return [
-      [
+      'date' => [
         [
           '#type' => 'date',
           '#states' => [
@@ -114,7 +119,114 @@ class FormHelperTest extends UnitTestCase {
         ],
         '#attributes',
       ],
-      [
+      'container' => [
+        [
+          '#type' => 'container',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          [
+            '#type' => 'textfield',
+          ],
+        ],
+        '#attributes',
+      ],
+      'empty item' => [
+        [
+          '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => '',
+        ],
+        '#wrapper_attributes',
+      ],
+      'empty item with input' => [
+        [
+          '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => '',
+          '#input' => TRUE,
+        ],
+        '#wrapper_attributes',
+      ],
+      'item with markup' => [
+        [
+          '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => 'a non empty string value',
+        ],
+        '#wrapper_attributes',
+      ],
+      'item with markup and input' => [
+        [
+          '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => 'a non empty string value',
+          '#input' => TRUE,
+        ],
+        '#wrapper_attributes',
+      ],
+      'password_confirm' => [
+        [
+          '#type' => 'password_confirm',
+          '#states_attributes_target_key' => '#wrapper_attributes',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+        ],
+        '#wrapper_attributes',
+      ],
+      'arbitrary states target key' => [
+        [
+          '#type' => 'date',
+          '#states_attributes_target_key' => '#arbitrary_target',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+        ],
+        '#arbitrary_target',
+      ],
+      'empty item no target key' => [
+        [
+          '#type' => 'item',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => '',
+        ],
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
+        '#attributes',
+      ],
+      'empty item with input no target key' => [
         [
           '#type' => 'item',
           '#states' => [
@@ -125,7 +237,43 @@ class FormHelperTest extends UnitTestCase {
           '#markup' => '',
           '#input' => TRUE,
         ],
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
         '#wrapper_attributes',
+        // Flag that we expect a deprecation from this code.
+        TRUE,
+      ],
+      'item with markup no target key' => [
+        [
+          '#type' => 'item',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => 'a non empty string value',
+        ],
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
+        '#attributes',
+      ],
+      'item with markup and input no target key' => [
+        [
+          '#type' => 'item',
+          '#states' => [
+            'visible' => [
+              ':input[name="foo"]' => ['value' => 'bar'],
+            ],
+          ],
+          '#markup' => 'a non empty string value',
+          '#input' => TRUE,
+        ],
+        // Note that this is testing the incorrect heuristic, that was added in
+        // 10.3.7, still works. This test case can be removed when that
+        // heuristic is also removed, see: https://www.drupal.org/node/3490435
+        '#attributes',
       ],
     ];
   }

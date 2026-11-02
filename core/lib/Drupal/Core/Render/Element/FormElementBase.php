@@ -72,6 +72,12 @@ use Drupal\Core\Url;
  * - #states: (array) Information about JavaScript states, such as when to
  *   hide or show the element based on input on other elements.
  *   See \Drupal\Core\Form\FormHelper::processStates() for documentation.
+ * - #states_attributes_target_key: (string) The location in the element that
+ *   \Drupal\Core\Form\FormHelper::processStates() should add the
+ *   'data-drupal-states' attribute and computed data to. Defaults to
+ *   '#attributes'. Elements like 'item' that are not actual form input elements
+ *   or those like 'password_confirm' that have child elements, might need to
+ *   set this to '#wrapper_attributes'.
  * - #title: (string) Title of the form element. Should be translated.
  * - #title_display: (string) Where and how to display the #title. Possible
  *   values:
