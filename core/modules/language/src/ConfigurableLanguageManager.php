@@ -368,9 +368,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     // necessary.
     if (reset($locked_languages)->getWeight() <= $max_weight) {
       foreach ($locked_languages as $language) {
+        $configurable_language = ConfigurableLanguage::load($language->getId());
+        if (!$configurable_language instanceof ConfigurableLanguage) {
+          continue;
+        }
         // Update system languages weight.
         $max_weight++;
-        ConfigurableLanguage::load($language->getId())
+        $configurable_language
           ->setWeight($max_weight)
           ->save();
       }
