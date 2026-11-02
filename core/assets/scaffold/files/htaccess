@@ -25,17 +25,6 @@ AddEncoding gzip svgz
 # Add correct encoding for webp.
 AddType image/webp .webp
 
-# PHP settings that cannot be changed at runtime can be set here. See
-# sites/default/default.settings.php and
-# Drupal\Core\DrupalKernel::bootEnvironment() for settings that can be
-# changed at runtime.
-<IfModule mod_php.c>
-  # It is strongly recommended that you set zend.assertions to 1 on development
-  # machines and to 0 or -1 in production.
-  # See https://www.php.net/manual/en/ini.core.php#ini.zend.assertions
-  php_value zend.assertions 0
-</IfModule>
-
 # Requires mod_expires to be enabled.
 <IfModule mod_expires.c>
   # Enable expirations.
