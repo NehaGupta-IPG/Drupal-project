@@ -9,6 +9,9 @@ administer media types:
 view media:
   title: 'View media'
 
+view any standalone media URL:
+  title: 'View any standalone media URL'
+
 # @todo: Deprecate some permissions in https://www.drupal.org/project/drupal/issues/2925459
 update media:
   title: 'Update own media'
