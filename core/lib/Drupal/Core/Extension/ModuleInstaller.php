@@ -6,6 +6,7 @@ use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
+use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -408,7 +409,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
     foreach ($module_list as $module) {
       // Install default configuration of the module.
       $config_installer = \Drupal::service('config.installer');
-      $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+      try {
+        $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+      }
+      catch (SchemaIncompleteException $e) {
+        throw new SchemaIncompleteException("Error installing default configuration for module '$module': " . $e->getMessage(), $e->getCode(), $e);
+      }
 
       // Set the schema version to the number of the last update provided by
       // the module, or the minimum core schema version.
@@ -468,7 +474,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $config_installer = \Drupal::service('config.installer');
     foreach ($module_list as $module) {
       // Create config entities a module has in the /install directory.
-      $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
+      try {
+        $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
+      }
+      catch (SchemaIncompleteException $e) {
+        throw new SchemaIncompleteException("Error installing configuration entities for module '$module': " . $e->getMessage(), $e->getCode(), $e);
+      }
 
       // Allow the module to perform install tasks.
       $this->invoke($module, 'install', [$sync_status]);
@@ -481,14 +492,24 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // been properly installed. This is often where soft dependencies lie.
     // @todo This code fixes \Drupal\Tests\help\Functional\HelpTest::testHelp().
     foreach ($module_list as $module) {
-      $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::Optional);
+      try {
+        $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::Optional);
+      }
+      catch (SchemaIncompleteException $e) {
+        throw new SchemaIncompleteException("Error installing optional configuration for module '$module': " . $e->getMessage(), $e->getCode(), $e);
+      }
     }
     // Install optional configuration from other modules once all the modules
     // have been properly installed. This is often where soft dependencies lie.
     // @todo This code fixes
     //   \Drupal\Tests\forum\Functional\Module\DependencyTest::testUninstallDependents().
     foreach ($module_list as $module) {
-      $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::SiteOptional);
+      try {
+        $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::SiteOptional);
+      }
+      catch (SchemaIncompleteException $e) {
+        throw new SchemaIncompleteException("Error installing site optional configuration for module '$module': " . $e->getMessage(), $e->getCode(), $e);
+      }
     }
 
     if (count($module_list) > 1) {
