@@ -225,9 +225,12 @@ class CssOptimizer implements AssetOptimizerInterface {
       $double_quot = '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
       // Regexp to match single quoted strings.
       $single_quot = "'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
-      // Strip all comment blocks, but keep double/single quoted strings.
+      // Regexp to match non-empty unquoted url().
+      $url_unquot = 'url\(\s*(?:\\\\.|[^ \n\r\f\)\'"\\\\])[^\)\\\\]*(?:\\\\.[^\)\\\\]*)*\)';
+      // Strip all comment blocks, but keep double/single quoted strings and
+      // unquoted url().
       $contents = preg_replace(
-        "<($double_quot|$single_quot)|$comment>Ss",
+        "<($double_quot|$single_quot|$url_unquot)|$comment>Ss",
         "$1",
         $contents
       );
