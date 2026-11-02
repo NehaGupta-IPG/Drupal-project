@@ -132,7 +132,25 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $resource_commands = [];
     if ($css_assets) {
       $css_render_array = $this->cssCollectionRenderer->render($css_assets);
-      $resource_commands[] = new AddCssCommand(array_column($css_render_array, '#attributes'));
+      $external_css_render_array = [];
+      $inline_css_render_array = [];
+      foreach (array_keys($css_render_array) as $i => $key) {
+        $next_key = array_keys($css_render_array)[$i + 1] ?? NULL;
+        if ($this->isExternalAsset($css_render_array[$key])) {
+          $external_css_render_array[] = $css_render_array[$key];
+          if (!isset($next_key) || $this->isInlineAsset($css_render_array[$next_key])) {
+            $resource_commands[] = new AddCssCommand(array_column($external_css_render_array, '#attributes'));
+            $external_css_render_array = [];
+          }
+        }
+        if ($this->isInlineAsset($css_render_array[$key])) {
+          $inline_css_render_array[] = $css_render_array[$key];
+          if (!isset($next_key) || $this->isExternalAsset($css_render_array[$next_key])) {
+            $resource_commands[] = new AppendCommand('head', $this->renderer->renderPlain($inline_css_render_array));
+            $inline_css_render_array = [];
+          }
+        }
+      }
     }
     if ($js_assets_header) {
       $js_header_render_array = $this->jsCollectionRenderer->render($js_assets_header);
@@ -162,6 +180,32 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $this->moduleHandler->alter('ajax_render', $commands);
 
     return $commands;
+  }
+
+  /**
+   * Determines whether the given asset is an inline asset.
+   *
+   * @param array $asset
+   *   The render array to check.
+   *
+   * @return bool
+   *   TRUE if the asset is inline, FALSE otherwise.
+   */
+  protected function isInlineAsset(array $asset): bool {
+    return isset($asset['#value']) && !isset($asset['#attributes']['href']);
+  }
+
+  /**
+   * Determines whether the given asset is an external asset.
+   *
+   * @param array $asset
+   *   The render array to check.
+   *
+   * @return bool
+   *   TRUE if the asset is external, FALSE otherwise.
+   */
+  protected function isExternalAsset(array $asset): bool {
+    return isset($asset['#attributes']['href']);
   }
 
 }
