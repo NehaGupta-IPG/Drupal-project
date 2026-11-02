@@ -348,48 +348,56 @@ class ImageThemeHooks {
   public function preprocessImageStyle(array &$variables): void {
     $style = ImageStyle::load($variables['style_name']);
 
-    // Determine the dimensions of the styled image.
-    $dimensions = [
-      'width' => $variables['width'],
-      'height' => $variables['height'],
-    ];
-
-    $style->transformDimensions($dimensions, $variables['uri']);
-
-    $variables['image'] = [
-      '#theme' => 'image',
-      '#width' => $dimensions['width'],
-      '#height' => $dimensions['height'],
-      '#attributes' => $variables['attributes'],
-      '#style_name' => $variables['style_name'],
-    ];
-
-    // If the current image toolkit supports this file type, prepare the URI for
-    // the derivative image. If not, just use the original image resized to the
-    // dimensions specified by the style.
-    if ($style->supportsUri($variables['uri'])) {
-      $variables['image']['#uri'] = $style->buildUrl($variables['uri']);
-    }
-    else {
-      $variables['image']['#uri'] = $variables['uri'];
-      // Don't render the image by default, but allow other preprocess functions
-      // to override that if they need to.
-      $variables['image']['#access'] = FALSE;
-
+    if (!$style) {
       // Inform the site builders why their image didn't work.
-      ($this->imageLogger)()->warning('Could not apply @style image style to @uri because the style does not support it.', [
-        '@style' => $style->label(),
-        '@uri' => $variables['uri'],
+      ($this->imageLogger)()->warning('Image style (@style) missing for @image. Add the missing style under /admin/config/media/image-styles.', [
+        '@style' => $variables['style_name'],
+        '@image' => $variables['uri'],
       ]);
     }
+    else {
+      // Determine the dimensions of the styled image.
+      $dimensions = [
+        'width' => $variables['width'],
+        'height' => $variables['height'],
+      ];
 
-    if (\array_key_exists('alt', $variables)) {
-      $variables['image']['#alt'] = $variables['alt'];
-    }
-    if (\array_key_exists('title', $variables)) {
-      $variables['image']['#title'] = $variables['title'];
-    }
+      $style->transformDimensions($dimensions, $variables['uri']);
 
+      $variables['image'] = [
+        '#theme' => 'image',
+        '#width' => $dimensions['width'],
+        '#height' => $dimensions['height'],
+        '#attributes' => $variables['attributes'],
+        '#style_name' => $variables['style_name'],
+      ];
+
+      // If the current image toolkit supports this file type, prepare the URI
+      // for the derivative image. If not, just use the original image resized
+      // to the dimensions specified by the style.
+      if (isset($variables['uri']) && $style->supportsUri($variables['uri'])) {
+        $variables['image']['#uri'] = $style->buildUrl($variables['uri']);
+      }
+      else {
+        $variables['image']['#uri'] = $variables['uri'] ?? NULL;
+        // Don't render the image by default, but allow other preprocess
+        // functions to override that if they need to.
+        $variables['image']['#access'] = FALSE;
+
+        // Inform the site builders why their image didn't work.
+        ($this->imageLogger)()->warning('Could not apply @style image style to @uri because the style does not support it.', [
+          '@style' => $style->label(),
+          '@uri' => $variables['uri'],
+        ]);
+      }
+
+      if (\array_key_exists('alt', $variables)) {
+        $variables['image']['#alt'] = $variables['alt'];
+      }
+      if (\array_key_exists('title', $variables)) {
+        $variables['image']['#title'] = $variables['title'];
+      }
+    }
   }
 
 }

@@ -197,6 +197,14 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $this->setRawContent($renderer->renderRoot($element));
     $elements = $this->getSimpleXmlElementsByXpath('//img[@src=:url]', [':url' => $url]);
     $this->assertCount(1, $elements, 'theme_image_style() renders an image correctly with a NULL value for the alt option.');
+
+    // Test with an image style that does not exist.
+    $element = [
+      '#theme' => 'image_style',
+      '#style_name' => 'does_not_exist',
+      '#uri' => $original_uri,
+    ];
+    $this->assertEquals('', trim((string) $renderer->renderRoot($element)));
   }
 
   /**
