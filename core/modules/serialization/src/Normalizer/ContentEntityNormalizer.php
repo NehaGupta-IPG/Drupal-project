@@ -29,10 +29,23 @@ class ContentEntityNormalizer extends EntityNormalizer {
     ];
 
     $attributes = [];
-    /** @var \Drupal\Core\Entity\Entity $entity */
-    foreach (TypedDataInternalPropertiesHelper::getNonInternalProperties($entity->getTypedData()) as $name => $field_items) {
-      if ($field_items->access('view', $context['account'])) {
-        $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
+    if (!empty($context['sparse_fieldset'])) {
+      foreach ($context['sparse_fieldset'] as $name) {
+        if ($entity->hasField($name)) {
+          $field_items = $entity->get($name);
+          if (!$field_items->getDataDefinition()->isInternal() && $field_items->access('view', $context['account'])) {
+            $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
+          }
+        }
+      }
+    }
+    else {
+      /** @var \Drupal\Core\Entity\Entity $entity */
+      foreach (TypedDataInternalPropertiesHelper::getNonInternalProperties($entity->getTypedData()) as $name => $field_items) {
+        if ($field_items->access('view', $context['account'])
+        ) {
+          $attributes[$name] = $this->serializer->normalize($field_items, $format, $context);
+        }
       }
     }
 

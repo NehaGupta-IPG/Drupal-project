@@ -94,7 +94,7 @@ class EntityNormalizerTest extends UnitTestCase {
 
     $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['getFields'])
+      ->onlyMethods(['getFields', 'getTypedData'])
       ->getMock();
     $content_entity->expects($this->once())
       ->method('getFields')
@@ -107,6 +107,34 @@ class EntityNormalizerTest extends UnitTestCase {
     $this->entityNormalizer->setSerializer($serializer->reveal());
 
     $this->entityNormalizer->normalize($content_entity, 'test_format');
+  }
+
+  /**
+   * Tests the normalize() method with sparse_fieldset.
+   */
+  public function testNormalizeSparseFieldset(): void {
+    $this->entityFieldManager->expects($this->never())
+      ->method('getBaseFieldDefinitions');
+    $this->entityTypeManager->expects($this->never())
+      ->method('getDefinition');
+    $this->entityTypeManager->expects($this->never())
+      ->method('getStorage');
+
+    $list_item_1 = $this->createStub(FieldItemListInterface::class);
+    $content_entity = $this->getMockBuilder(ContentEntityBaseMockableClass::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods(['get'])
+      ->getMock();
+
+    $content_entity->expects($this->once())
+      ->method('get')
+      ->willReturn($list_item_1);
+    $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
+    $serializer->normalize($list_item_1, 'test_format', ['sparse_fieldset' => ['field_1']])->shouldBeCalled();
+
+    $this->entityNormalizer->setSerializer($serializer->reveal());
+
+    $this->entityNormalizer->normalize($content_entity, 'test_format', ['sparse_fieldset' => ['field_1']]);
   }
 
   /**
