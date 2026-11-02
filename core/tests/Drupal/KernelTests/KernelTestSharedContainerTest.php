@@ -31,7 +31,15 @@ class KernelTestSharedContainerTest extends KernelTestBase {
   #[TestWith([2, 1])]
   #[TestWith([3, 1])]
   public function testContainerRebuilds($iteration, $container_rebuilds): void {
-    $this->assertSame($container_rebuilds, $this->container->get('state')->get('container_rebuild_test.count', 0), 'Container rebuilt once, iteration ' . $iteration);
+    $count = $this->container->get('keyvalue')
+      ->get('container_rebuild_test')
+      ->get('count', 0);
+
+    $this->assertSame(
+      $container_rebuilds,
+      $count,
+      'Container rebuilt once, iteration ' . $iteration
+    );
   }
 
 }
