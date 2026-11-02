@@ -219,6 +219,16 @@ class DateTimeItemTest extends FieldKernelTestBase {
     $entity = EntityTest::load($id);
     $this->assertEquals($value, $entity->field_datetime[0]->value, 'DateTimeItem::setValue() works with array value.');
     $this->assertEquals(DateTimeItemInterface::STORAGE_TIMEZONE, $entity->field_datetime->date->getTimeZone()->getName());
+
+    // Test DateTimeItem::setValue() using an empty date-list value.
+    $entity = EntityTest::create();
+    $item = $entity->get('field_datetime')->appendItem();
+    $item->value = [
+      'date' => '',
+      'object' => NULL,
+    ];
+
+    $this->assertNull($item->date);
   }
 
   /**
