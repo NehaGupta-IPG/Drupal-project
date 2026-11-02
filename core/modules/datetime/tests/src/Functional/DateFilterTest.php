@@ -127,6 +127,8 @@ class DateFilterTest extends ViewTestBase {
     $this->assertSession()->fieldExists('edit-field-date-value-value');
     $this->assertSession()->fieldExists('edit-field-date-value-min');
     $this->assertSession()->fieldExists('edit-field-date-value-max');
+    $this->assertSession()->pageTextContains('From');
+    $this->assertSession()->pageTextContains('To');
 
     // Set the default to an excluded operator.
     $edit = [];

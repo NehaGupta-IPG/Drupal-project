@@ -56,6 +56,14 @@ class Date extends NumericFilter {
       ];
     }
     parent::valueForm($form, $form_state);
+    if ($form_state->get('exposed')) {
+      if (isset($form['value']['min'])) {
+        $form['value']['min']['#title'] = $this->t('From');
+      }
+      if (isset($form['value']['max'])) {
+        $form['value']['max']['#title'] = $this->t('To');
+      }
+    }
   }
 
   /**
@@ -245,6 +253,23 @@ class Date extends NumericFilter {
     // This is safe because we are manually scrubbing the value. It is necessary
     // to do it this way because $value is a formula when using an offset.
     $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function operators() {
+    $operators = parent::operators();
+    $operators['<']['title'] = $this->t('Before');
+    $operators['<=']['title'] = $this->t('Before or On');
+    $operators['=']['title'] = $this->t('On');
+    $operators['!=']['title'] = $this->t('Not On');
+    $operators['>=']['title'] = $this->t('On or After');
+    $operators['>']['title'] = $this->t('After');
+    $operators['between']['title'] = $this->t('Between');
+    $operators['not between']['title'] = $this->t('Not Between');
+
+    return $operators;
   }
 
 }
