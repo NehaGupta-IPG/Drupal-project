@@ -23,3 +23,6 @@ node.type.*.third_party.menu_ui:
     parent:
       type: string
       label: 'Parent'
+    link_enabled:
+      type: boolean
+      label: 'Enable menu link'

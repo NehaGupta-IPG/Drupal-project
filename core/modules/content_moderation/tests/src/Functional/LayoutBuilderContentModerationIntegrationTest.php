@@ -117,6 +117,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
       'title' => 'bar',
       'menu_name' => 'main',
       'description' => 'view bar',
+      'link_enabled' => TRUE,
       'parent' => '',
     ]);
 

@@ -222,6 +222,13 @@ class MenuUiHooks {
       '#default_value' => $defaults['weight'],
       '#description' => $this->t('Menu links with lower weights are displayed before links with higher weights.'),
     ];
+    $form['menu']['link']['link_enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enabled'),
+      '#description' => $this->t('A flag for whether the link should be enabled in menus or hidden.'),
+      '#default_value' => $defaults['enabled'] ?? TRUE,
+    ];
+
     foreach (array_keys($form['actions']) as $action) {
       if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
         $form['actions'][$action]['#submit'][] = static::class . ':formNodeFormSubmit';
@@ -392,6 +399,11 @@ class MenuUiHooks {
       ],
     ];
     $options_cacheability->applyTo($form['menu']['menu_parent']);
+    $form['menu']['link_enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable menu link (default)'),
+      '#default_value' => $type->getThirdPartySetting('menu_ui', 'link_enabled', TRUE),
+    ];
     $form['#validate'][] = static::class . ':formNodeTypeFormValidate';
     $form['#entity_builders'][] = static::class . ':formNodeTypeFormBuilder';
   }
@@ -404,6 +416,7 @@ class MenuUiHooks {
   public function formNodeTypeFormBuilder(string $entity_type, NodeTypeInterface $type, array &$form, FormStateInterface $form_state): void {
     $type->setThirdPartySetting('menu_ui', 'available_menus', array_values(array_filter($form_state->getValue('menu_options'))));
     $type->setThirdPartySetting('menu_ui', 'parent', $form_state->getValue('menu_parent'));
+    $type->setThirdPartySetting('menu_ui', 'link_enabled', $form_state->getValue('link_enabled'));
   }
 
   /**

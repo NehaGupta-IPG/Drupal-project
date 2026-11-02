@@ -55,6 +55,14 @@ class MenuUiUtility {
         'link' => ['uri' => 'entity:node/' . $node->id()],
         'langcode' => $node->language()->getId(),
       ]);
+    }
+    if (isset($values['link_enabled'])) {
+      $values['link_enabled']
+        ? $entity->setPublished()
+        : $entity->setUnpublished();
+    }
+    else {
+      // Nothing in the form values; default new links to published.
       $entity->setPublished();
     }
     $entity->title->value = trim($values['title']);
@@ -157,6 +165,7 @@ class MenuUiUtility {
           'menu_name' => $menu_link->getMenuName(),
           'parent' => $menu_link->getParentId(),
           'weight' => $menu_link->getWeight(),
+          'enabled' => $menu_link->isEnabled(),
         ];
       }
     }
@@ -177,6 +186,7 @@ class MenuUiUtility {
         'menu_name' => $menu_name,
         'parent' => '',
         'weight' => 0,
+        'enabled' => $node_type->getThirdPartySetting('menu_ui', 'link_enabled', !empty($menu_name)),
       ];
     }
     return $defaults;
