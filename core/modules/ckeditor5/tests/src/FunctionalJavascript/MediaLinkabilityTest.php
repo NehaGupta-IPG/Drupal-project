@@ -149,7 +149,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     // exists, then assert the link exists. Then assert the expected DOM
     // structure in detail.
     $assert_session->elementExists('css', '.ck-content a[href="http://linking-embedded-media.com"]');
-    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > a[href="http://linking-embedded-media.com"] > div[aria-label] > article > div > img[src*="image-test.png"]');
+    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > a[href="http://linking-embedded-media.com"] > div[aria-label] > article > div > img[src*="image-test."]');
 
     // Assert the "dataDowncast" HTML after making changes.
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
@@ -179,8 +179,8 @@ class MediaLinkabilityTest extends MediaTestBase {
 
     // Assert the HTML the end user sees.
     $assert_session->elementExists('css', $unrestricted
-      ? 'a[href="http://linking-embedded-media.com"].trusted img[src*="image-test.png"]'
-      : 'a[href="http://linking-embedded-media.com"] img[src*="image-test.png"]');
+      ? 'a[href="http://linking-embedded-media.com"].trusted img[src*="image-test."]'
+      : 'a[href="http://linking-embedded-media.com"] img[src*="image-test."]');
 
     // Go back to edit the now *linked* <drupal-media>. Everything from this
     // point onwards is effectively testing "upcasting" and proving there is no
@@ -214,7 +214,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     // exists, then assert no link exists. Then assert the expected DOM
     // structure in detail.
     $assert_session->elementNotExists('css', '.ck-content a');
-    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > div[aria-label] > article > div > img[src*="image-test.png"]');
+    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > div[aria-label] > article > div > img[src*="image-test."]');
 
     // Ensure that figcaption exists.
     // @see https://www.drupal.org/project/drupal/issues/3268318

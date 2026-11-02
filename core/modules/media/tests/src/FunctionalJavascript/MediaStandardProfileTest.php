@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\media_test_oembed\Controller\ResourceController;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
@@ -256,7 +257,7 @@ class MediaStandardProfileTest extends MediaJavascriptTestBase {
     $image_element = $assert_session->elementExists('css', '#block-default-admin-content img');
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/' . $image_media_name))->toString();
+    $expected_image_src = $file_url_generator->generate(ImageStyle::load('large')->buildUri(\Drupal::token()->replace('public://[date:custom:Y]-[date:custom:m]/' . $image_media_name)))->toString();
 
     $this->assertStringContainsString($expected_image_src, $image_element->getAttribute('src'));
     $assert_session->elementExists('css', '#block-default-admin-content div.visually-hidden');
@@ -289,7 +290,7 @@ class MediaStandardProfileTest extends MediaJavascriptTestBase {
     // src attribute uses the large image style, the label is visually hidden,
     // and there is no link to the image file.
     $image_element = $assert_session->elementExists('css', '#block-default-admin-content img');
-    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/' . $image_media_name_updated))->toString();
+    $expected_image_src = $file_url_generator->generate(ImageStyle::load('large')->buildUri(\Drupal::token()->replace('public://[date:custom:Y]-[date:custom:m]/' . $image_media_name_updated)))->toString();
     $this->assertStringContainsString($expected_image_src, $image_element->getAttribute('src'));
     $assert_session->elementExists('css', '#block-default-admin-content div.visually-hidden');
     $assert_session->elementNotExists('css', '#block-default-admin-content img a');
