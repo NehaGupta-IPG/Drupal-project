@@ -362,7 +362,13 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getCommentedEntity() {
-    return $this->get('entity_id')->entity;
+    $language = $this->language()->getId();
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $this->get('entity_id')->entity;
+    if ($entity?->hasTranslation($language)) {
+      return $entity->getTranslation($language);
+    }
+    return $entity;
   }
 
   /**
