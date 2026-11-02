@@ -58,7 +58,7 @@ abstract class CommentTypeResourceTestBase extends ConfigEntityResourceTestBase 
    */
   protected function getExpectedNormalizedEntity() {
     return [
-      'dependencies' => [],
+      'dependencies' => ['module' => ['node']],
       'description' => 'Camelids are large, strictly herbivorous animals with slender necks and long legs.',
       'id' => 'camelids',
       'label' => 'Camelids',

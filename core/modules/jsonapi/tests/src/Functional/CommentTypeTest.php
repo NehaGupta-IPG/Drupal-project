@@ -92,7 +92,7 @@ class CommentTypeTest extends ConfigEntityResourceTestBase {
           'self' => ['href' => $self_url],
         ],
         'attributes' => [
-          'dependencies' => [],
+          'dependencies' => ['module' => ['node']],
           'description' => 'Camelids are large, strictly herbivorous animals with slender necks and long legs.',
           'label' => 'Camelids',
           'langcode' => 'en',
