@@ -8,6 +8,7 @@ use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Path\PathValidator;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\Routing\AccessAwareRouterInterface;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
@@ -356,6 +357,49 @@ class PathValidatorTest extends UnitTestCase {
       ->willReturnArgument(0);
 
     $this->assertFalse($this->pathValidator->isValid('test-path'));
+  }
+
+  /**
+   * Tests that an uncaught exception does not prevent context restoration.
+   *
+   * @legacy-covers ::getPathAttributes
+   */
+  public function testRouterContextRestoredOnUnhandledException(): void {
+    $this->setUpMockAccessAwareRouter();
+    $this->setUpMockAccount();
+    $this->setUpMockInboundPathProcessor();
+
+    $initial_context = new RequestContext();
+    $context = $initial_context;
+    $this->account->expects($this->once())
+      ->method('hasPermission')
+      ->with('link to any page')
+      ->willReturn(FALSE);
+    $this->accessAwareRouter->method('getContext')
+      ->willReturnCallback(function () use (&$context) {
+        return $context;
+      });
+    $this->accessAwareRouter->expects($this->exactly(2))
+      ->method('setContext')
+      ->willReturnCallback(function (RequestContext $new_context) use (&$context): void {
+        $context = $new_context;
+      });
+    $this->accessAwareRouter->expects($this->once())
+      ->method('match')
+      ->with('/test-path')
+      ->willThrowException(new \RuntimeException('Unhandled'));
+    $this->pathProcessor->expects($this->once())
+      ->method('processInbound')
+      ->willReturnArgument(0);
+
+    try {
+      $this->pathValidator->isValid('test-path');
+      $this->fail('The exception from the router was not thrown.');
+    }
+    catch (\RuntimeException $e) {
+      $this->assertSame('Unhandled', $e->getMessage());
+    }
+    $this->assertSame($initial_context, $context);
   }
 
   /**
