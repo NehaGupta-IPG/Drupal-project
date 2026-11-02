@@ -5,6 +5,7 @@ namespace Drupal\file\Plugin\Field\FieldFormatter;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -15,8 +16,10 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageDerivativeUtilities;
+use Drupal\media\MediaInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -46,7 +49,9 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       $configuration['third_party_settings'],
       $container->get('current_user'),
       $container->get('entity_type.manager')->getStorage('image_style'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('module_handler'),
+      $container->get('entity_type.manager')->getStorage('file')
     );
   }
 
@@ -61,8 +66,20 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     protected AccountInterface $currentUser,
     protected EntityStorageInterface $imageStyleStorage,
     protected EntityFieldManagerInterface $entityFieldManager,
+    protected ?ModuleHandlerInterface $moduleHandler = NULL,
+    protected ?EntityStorageInterface $fileStorage = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+    // The last two arguments are optional to avoid a BC break; they become
+    // required next major. Deprecate omission and fall back to the container.
+    if ($this->moduleHandler === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      $this->moduleHandler = \Drupal::moduleHandler();
+    }
+    if ($this->fileStorage === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      $this->fileStorage = \Drupal::entityTypeManager()->getStorage('file');
+    }
   }
 
   /**
@@ -92,11 +109,16 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $fields = $this->entityFieldManager->getFieldDefinitions($form['#entity_type'], $form['#bundle']);
 
-    // Get all image fields for html5 poster.
-    $image_fields = [];
+    // Eligible poster fields are image fields, plus media reference fields when
+    // the media module is enabled, kept optional to avoid a media dependency.
+    $poster_fields = [];
+    $media_enabled = $this->moduleHandler->moduleExists('media');
     foreach ($fields as $field) {
       if ($field->getType() == 'image') {
-        $image_fields[$field->getName()] = $field->getLabel();
+        $poster_fields[$field->getName()] = $field->getLabel();
+      }
+      elseif ($media_enabled && $field->getType() === 'entity_reference' && $field->getSetting('target_type') === 'media') {
+        $poster_fields[$field->getName()] = $field->getLabel();
       }
     }
     $image_styles = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
@@ -139,9 +161,9 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       'poster' => [
         '#type' => 'select',
         '#title' => $this->t('Poster field'),
-        '#description' => $this->t('An image field to use as the source of the poster attribute'),
+        '#description' => $this->t('An image field, or a media reference field whose media has an image, to use as the source of the poster attribute.'),
         '#default_value' => $this->getSetting('poster'),
-        '#options' => $image_fields,
+        '#options' => $poster_fields,
         '#empty_option' => $this->t('- None -'),
       ],
       'poster_image_style' => [
@@ -209,7 +231,50 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     if (!empty($this->getSetting('poster')) && !$entity->get($this->getSetting('poster'))->isEmpty()) {
       $poster_file_item = $entity->get($this->getSetting('poster'))[0];
 
-      $poster_file_entity = $poster_file_item->entity;
+      $referenced = $poster_file_item->entity;
+      $poster_file_entity = NULL;
+      if ($referenced instanceof FileInterface) {
+        // The selected field references the poster file directly (image field).
+        $poster_file_entity = $referenced;
+      }
+      elseif ($referenced instanceof MediaInterface) {
+        // Depend on the media now so a later non-image to image change
+        // invalidates the host render cache on both success and bail-out paths.
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($referenced))
+          ->applyTo($elements);
+        // Loading the source file directly bypasses media access control, so
+        // check 'view' access and bubble its cacheability before resolving it.
+        $access = $referenced->access('view', $this->currentUser, TRUE);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($access))
+          ->applyTo($elements);
+        if ($access->isAllowed()) {
+          // Use the media translation matching the display language so a
+          // per-translation poster source field value is honored.
+          if ($referenced instanceof TranslatableInterface && $referenced->hasTranslation($langcode)) {
+            $referenced = $referenced->getTranslation($langcode);
+          }
+          // Resolve its source file and accept it only when it is an image.
+          $source = $referenced->getSource();
+          if ($source !== NULL) {
+            $source_value = $source->getSourceFieldValue($referenced);
+            if ($source_value !== NULL) {
+              $file = $this->fileStorage->load($source_value);
+              if ($file instanceof FileInterface && str_starts_with((string) $file->getMimeType(), 'image/')) {
+                $poster_file_entity = $file;
+              }
+            }
+          }
+        }
+      }
+
+      // Bail out when no usable image poster could be resolved (for example a
+      // non-image media reference).
+      if ($poster_file_entity === NULL) {
+        return $elements;
+      }
+
       // Set the entity in the correct language for display.
       if ($poster_file_entity instanceof TranslatableInterface && $poster_file_entity->hasTranslation($langcode)) {
         $poster_file_entity = $poster_file_entity->getTranslation($langcode);
@@ -219,14 +284,18 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       if (!empty($poster_image_style_id)) {
         // With imagecache selected:
         $poster_image_style = $this->imageStyleStorage->load($poster_image_style_id);
-        CacheableMetadata::createFromObject($poster_image_style)->applyTo($elements);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($poster_image_style))
+          ->applyTo($elements);
         $poster_url = $poster_image_style->buildUrl($poster_file_entity->getFileUri());
       }
       else {
         // Without imagecache:
         $poster_url = $poster_file_entity->createFileUrl();
       }
-      CacheableMetadata::createFromObject($poster_file_entity)->applyTo($elements);
+      CacheableMetadata::createFromRenderArray($elements)
+        ->merge(CacheableMetadata::createFromObject($poster_file_entity))
+        ->applyTo($elements);
 
       $poster_attributes = new Attribute();
       $poster_attributes->setAttribute('poster', $poster_url);
@@ -275,9 +344,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     if ($style_id && $style = ImageStyle::load($style_id)) {
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         $replacement_id = $this->imageStyleStorage->getReplacementId($style_id);
-        // If a valid replacement has been provided in the storage, replace the
-        // image style with the replacement and signal that the formatter plugin
-        // settings were updated.
+        // If the storage provides a valid replacement, swap the image style and
+        // signal that the formatter plugin settings were updated.
         if (!empty($replacement_id) && ImageStyle::load($replacement_id)) {
           $this->setSetting('poster_image_style', $replacement_id);
           $changed = TRUE;
