@@ -298,8 +298,17 @@ class EntityAutocomplete extends Textfield {
       // Use only the last value if the form element does not support multiple
       // matches (tags).
       if (!$element['#tags'] && !empty($value)) {
-        $last_value = $value[count($value) - 1];
-        $value = $last_value['target_id'] ?? $last_value;
+        // Check if there is only one value in the autocomplete or multiple.
+        $has_multiple = is_string($element['#value'])
+          ? count(Tags::explode($element['#value'])) > 1
+          : count($value) > 1;
+
+        if ($has_multiple) {
+          $form_state->setError($element, t('This element can only have one value'));
+        }
+        else {
+          $value = $value[0]['target_id'] ?? $value[0];
+        }
       }
     }
 
