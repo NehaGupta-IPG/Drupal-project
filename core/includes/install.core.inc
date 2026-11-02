@@ -1787,18 +1787,10 @@ function install_download_additional_translations_operations(&$install_state): v
   }
   $language->save();
 
-  // If a non-English language was selected, change the default language and
-  // remove English.
   if ($langcode != 'en') {
-    \Drupal::configFactory()->getEditable('system.site')
-      ->set('langcode', $langcode)
-      ->set('default_langcode', $langcode)
-      ->save();
     \Drupal::service('language.default')->set($language);
     if (empty($install_state['profile_info']['keep_english'])) {
-      if ($lang = ConfigurableLanguage::load('en')) {
-        $lang->delete();
-      }
+      ConfigurableLanguage::load('en')?->delete();
     }
   }
 
@@ -1859,8 +1851,8 @@ function install_finish_translations(&$install_state): array {
     $batches[] = _install_config_locale_overrides();
   }
 
-  // Creates configuration translations.
-  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), [], TRUE);
+  // Update configuration with translations.
+  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), []);
   return $batches;
 }
 
@@ -1909,17 +1901,6 @@ function _install_module_batch(array $modules, array $module_names, array $insta
   \Drupal::service('module_installer')->install($modules, FALSE);
   $context['results'] = array_merge($context['results'], $modules);
   $context['message'] = \Drupal::translation()->formatPlural(count($module_names), 'Installed %module module.', 'Installed %module modules.', ['%module' => implode(', ', $module_names)]);
-
-  // If installing system module, set the langcode to the one chosen in the
-  // installer.
-  if (in_array('system', $modules)) {
-    if (isset($install_state['parameters']['langcode'])) {
-      \Drupal::configFactory()->getEditable('system.site')
-        ->set('langcode', (string) $install_state['parameters']['langcode'])
-        ->set('default_langcode', (string) $install_state['parameters']['langcode'])
-        ->save();
-    }
-  }
 }
 
 /**

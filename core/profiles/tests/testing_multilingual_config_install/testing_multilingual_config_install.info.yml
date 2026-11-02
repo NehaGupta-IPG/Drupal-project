@@ -1,0 +1,8 @@
+name: 'Testing multilingual config install'
+type: profile
+description: 'Minimal profile for testing that a multilingual install profile can ship configuration in a language other than the one chosen for installation.'
+version: VERSION
+hidden: true
+install:
+  - language
+  - config_test

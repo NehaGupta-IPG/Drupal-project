@@ -40,6 +40,21 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
   /**
    * {@inheritdoc}
    */
+  protected function setUpDefaultLanguage(): void {
+    // Setting the site's default language here, before setUp() installs
+    // locale_test's shipped configuration, means ConfigInstaller updates that
+    // configuration's langcode to 'hu' directly as it installs it (see
+    // \Drupal\Core\Config\ConfigInstaller::createConfiguration()). Then the
+    // locale module translates the configuration.
+    parent::setUpDefaultLanguage();
+    $this->config('system.site')
+      ->set('default_langcode', 'hu')
+      ->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUpLocale(): void {
     parent::setUpLocale();
     $this->setUpTranslation('locale_test.translation', 'test', 'English test', 'Hungarian test', 'hu', TRUE);
@@ -119,6 +134,43 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
     $this->deleteLocaleTranslationData($config_name, 'test', 'English test', 'hu');
     // Deleting the locale translation should not change active config.
     $this->assertEquals('Hungarian test', $this->configFactory->getEditable($config_name)->get('test'));
+  }
+
+  /**
+   * Tests a customized value in imported new configuration is stored in locale.
+   *
+   * A config import that installs a module also creates the module's shipped
+   * configuration. When that configuration contains an edited value, it must
+   * be stored as a customized translation. Otherwise a locale update replaces
+   * it.
+   */
+  public function testImportedNewConfigCustomizedTranslationIsStored(): void {
+    $config_name = 'locale_test.translation';
+    $active = $this->container->get('config.storage');
+    $sync = $this->container->get('config.storage.sync');
+    $this->config('system.site')->set('uuid', \Drupal::service('uuid')->generate())->save();
+    $this->copyConfig($active, $sync);
+
+    // Edit the translatable value in the sync storage. The configuration was
+    // installed from locale_test, so the export contains the hash.
+    $data = $sync->read($config_name);
+    $this->assertNotEmpty($data['_core']['default_config_hash']);
+    $data['test'] = 'Customized Hungarian test';
+    $sync->write($config_name, $data);
+
+    // Delete the active configuration, so the import creates it.
+    $this->configFactory->getEditable($config_name)->delete();
+
+    $this->configImporter()->import();
+    $this->assertEquals('Customized Hungarian test', $this->configFactory->get($config_name)->get('test'));
+
+    // The imported value is stored as a customized translation.
+    $this->assertTranslation($config_name, 'Customized Hungarian test', 'hu');
+
+    // The next locale configuration update does not change the edited value.
+    $this->localeConfigManager->reset();
+    $this->localeConfigManager->updateConfigTranslations([$config_name], ['hu']);
+    $this->assertEquals('Customized Hungarian test', $this->configFactory->getEditable($config_name)->get('test'));
   }
 
   /**

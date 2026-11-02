@@ -291,8 +291,7 @@ function locale_config_batch_update_components(array $options, array $langcodes 
  *   - 'finish_feedback': Whether or not to give feedback to the user when the
  *     batch is finished. Defaults to TRUE.
  * @param bool $update_default_config_langcodes
- *   Determines whether default configuration langcodes should be updated. This
- *   Should only happen during site and extension install.
+ *   (deprecated) No longer used.
  *
  * @return array
  *   The batch definition.
@@ -313,8 +312,8 @@ function locale_config_batch_build(array $names, array $langcodes, array $option
     ->setInitMessage(t('Starting configuration update'))
     ->setErrorMessage(t('Error updating configuration translations'));
 
-  if ($update_default_config_langcodes && \Drupal::languageManager()->getDefaultLanguage()->getId() !== 'en') {
-    $batch_builder->addOperation(LocaleConfigBatch::class . ':batchUpdateDefaultConfigLangcodes');
+  if ($update_default_config_langcodes) {
+    @trigger_error('Calling locale_config_batch_build() with $update_default_config_langcodes set to TRUE is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
   }
 
   // Chunking the array of names into batches of 20 for better performance.

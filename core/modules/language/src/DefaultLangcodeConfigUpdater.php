@@ -1,0 +1,246 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\language;
+
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\TraversableTypedDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\language\Config\LanguageConfigOverride;
+use Drupal\language\Event\DefaultLangcodeConfigReconcileEvent;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
+/**
+ * Builds the batch that reconciles configuration langcode with a new default.
+ */
+class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterface {
+
+  /**
+   * Whether configuration is being reconciled.
+   */
+  protected bool $reconciling = FALSE;
+
+  public function __construct(
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly TypedConfigManagerInterface $typedConfigManager,
+    protected readonly EventDispatcherInterface $eventDispatcher,
+    #[Autowire(service: 'config.storage')]
+    protected readonly StorageInterface $configStorage,
+  ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildBatch(string $old_langcode, string $new_langcode): BatchBuilder {
+    $batch = new BatchBuilder()
+      ->setTitle(new TranslatableMarkup('Updating configuration for the new default language'))
+      ->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
+
+    return $batch;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
+    if (!isset($context['sandbox']['names'])) {
+      $context['sandbox']['names'] = $this->configFactory->listAll();
+      $context['sandbox']['max'] = count($context['sandbox']['names']);
+    }
+
+    $old_override_storage = $this->configStorage->createCollection('language.' . $old_langcode);
+    $new_override_storage = $this->configStorage->createCollection('language.' . $new_langcode);
+    $names = array_splice($context['sandbox']['names'], 0, Settings::get('entity_update_batch_size', 50));
+    $this->reconciling = TRUE;
+    try {
+      foreach ($names as $name) {
+        if (!$this->typedConfigManager->hasConfigSchema($name)) {
+          continue;
+        }
+
+        $config = $this->configFactory->getEditable($name);
+        $data = $config->getRawData();
+        if (!array_key_exists('langcode', $data)) {
+          // The configuration does not have a langcode, so it is not
+          // translatable.
+          continue;
+        }
+        $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
+        if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+          // The configuration schema does not have a langcode, so it is not
+          // translatable.
+          continue;
+        }
+        if ($data['langcode'] === $old_langcode) {
+          $translatable_data = static::extractTranslatableData($typed_config);
+          $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
+          $override_data = $override->isNew() ? [] : $override->get();
+
+          // Merge the override for the new default langcode into the data to
+          // save. The new default langcode cannot have an override.
+          $event = new DefaultLangcodeConfigReconcileEvent(
+            $name,
+            $old_langcode,
+            $new_langcode,
+            NestedArray::mergeDeepArray([$data, $override_data], TRUE),
+            static::extractUntranslatedKeys($translatable_data, $override_data),
+          );
+          $this->eventDispatcher->dispatch($event);
+          if ($event->isSkipped()) {
+            continue;
+          }
+
+          if ($translatable_data !== []) {
+            // Preserve the translations for the old langcode in a new config
+            // override.
+            $this->getRawLanguageConfigOverride($old_override_storage, $name)
+              ->setData($translatable_data)
+              ->save();
+          }
+          $config->setData($event->getData())
+            ->set('langcode', $new_langcode)
+            ->save();
+          if (!$override->isNew()) {
+            $override->delete();
+          }
+          $context['results']['updated_names'][] = $name;
+        }
+      }
+    }
+    finally {
+      $this->reconciling = FALSE;
+    }
+
+    $context['sandbox']['progress'] = ($context['sandbox']['progress'] ?? 0) + count($names);
+    $context['finished'] = empty($context['sandbox']['max']) ? 1 : $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isReconciling(): bool {
+    return $this->reconciling;
+  }
+
+  /**
+   * Gets a language override.
+   *
+   * This method does not use LanguageConfigFactoryOverride::getStorage()
+   * because that method skips loading overrides when English is the default
+   * language and the passed in langcode is English. That assumption breaks
+   * here: switching to English needs to be able to access existing 'en'
+   * overrides.
+   *
+   * @param StorageInterface $storage
+   *   The config storage in the language's collection.
+   * @param string $name
+   *   The configuration object name.
+   *
+   * @return \Drupal\language\Config\LanguageConfigOverride
+   *   The language override object, reflecting whatever is actually in
+   *   storage.
+   *
+   * @see \Drupal\language\Config\LanguageConfigFactoryOverride::getStorage()
+   */
+  protected function getRawLanguageConfigOverride(StorageInterface $storage, string $name): LanguageConfigOverride {
+    $override = new LanguageConfigOverride($name, $storage, $this->typedConfigManager, $this->eventDispatcher);
+    $data = $storage->read($name);
+    if (!empty($data)) {
+      $override->initWithData($data);
+    }
+    return $override;
+  }
+
+  /**
+   * Extracts the translatable portion of a config object's current data.
+   *
+   * Mirrors the shape a language config override normally has, a nested
+   * array containing only the values under keys the schema marks translatable,
+   * built from this element's actual current values.
+   *
+   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
+   *   The typed config element to walk.
+   *
+   * @return array
+   *   A nested array matching the structure under $element, containing
+   *   only the values under keys the schema marks translatable. Empty if
+   *   there is nothing translatable.
+   */
+  protected static function extractTranslatableData(TraversableTypedDataInterface $element): array {
+    $translatable = [];
+    foreach ($element as $key => $property) {
+      $value = static::extractTranslatableValue($property);
+      if ($value !== []) {
+        $translatable[$key] = $value;
+      }
+    }
+    return $translatable;
+  }
+
+  /**
+   * Extracts the translatable value of a typed config element.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   *   The typed config element.
+   *
+   * @return array|string|bool|int|float
+   *   If the element is traversable, recurses via
+   *   self::extractTranslatableData() and returns a nested array. If the
+   *   element is not traversable but is translatable, the element's value is
+   *   returned. An empty array is returned if the value is not translatable.
+   */
+  private static function extractTranslatableValue(TypedDataInterface $element): array|string|bool|int|float {
+    if ($element instanceof TraversableTypedDataInterface) {
+      return static::extractTranslatableData($element);
+    }
+    $definition = $element->getDataDefinition();
+    $value = $element->getValue();
+    if (!empty($definition['translatable']) && $value !== '' && $value !== NULL) {
+      return $value;
+    }
+    return [];
+  }
+
+  /**
+   * Finds the translatable key paths an override's data does not cover.
+   *
+   * @param array $translatable_data
+   *   A nested array in the shape self::extractTranslatableData() produces:
+   *   every translatable key path this configuration currently has a
+   *   non-empty value under.
+   * @param array $override_data
+   *   A nested array of the key paths present in the override data. May be
+   *   empty.
+   *
+   * @return array
+   *   A nested array matching the structure of $translatable_data, containing
+   *   only the key paths not present in $override_data. Empty if $override_data
+   *   accounts for everything in $translatable_data.
+   */
+  protected static function extractUntranslatedKeys(array $translatable_data, array $override_data): array {
+    $untranslated = [];
+    foreach ($translatable_data as $key => $value) {
+      if (is_array($value)) {
+        $override_value = is_array($override_data[$key] ?? NULL) ? $override_data[$key] : [];
+        $diff = static::extractUntranslatedKeys($value, $override_value);
+        if ($diff !== []) {
+          $untranslated[$key] = $diff;
+        }
+      }
+      elseif (!array_key_exists($key, $override_data)) {
+        $untranslated[$key] = $value;
+      }
+    }
+    return $untranslated;
+  }
+
+}

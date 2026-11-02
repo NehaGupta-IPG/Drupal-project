@@ -101,7 +101,8 @@ class LanguageListTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/language');
     $this->clickLink('Edit');
     $this->assertSession()->titleEquals('Edit language | Drupal');
-    // Edit a language.
+    // Edit a language, while it is still the site default.
+    $original_name = $name;
     $name = $this->randomMachineName(16);
     $edit = [
       'label' => $name,
@@ -118,6 +119,18 @@ class LanguageListTest extends BrowserTestBase {
     $this->drupalGet($path);
     $this->submitForm($edit, 'Save configuration');
     $this->rebuildContainer();
+
+    // Swapping back 'en' will marge the 'en' translation override back into
+    // the default configuration and preserve the 'xx' translation as a language
+    // config override.
+    $this->assertSession()->pageTextContains($original_name);
+    $this->assertSession()->pageTextNotContains($name);
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+    $override = $language_manager->getLanguageConfigOverride($langcode, 'language.entity.' . $langcode);
+    $this->assertFalse($override->isNew());
+    $this->assertSame($name, $override->get('label'));
+
     // Ensure 'delete' link works.
     $this->drupalGet('admin/config/regional/language');
     $this->clickLink('Delete');
@@ -127,12 +140,12 @@ class LanguageListTest extends BrowserTestBase {
     // First test the 'cancel' link.
     $this->clickLink('Cancel');
     $this->assertSession()->addressEquals(Url::fromRoute('entity.configurable_language.collection', [], ['language' => $english]));
-    $this->assertSession()->pageTextContains($name);
+    $this->assertSession()->pageTextContains($original_name);
     // Delete the language for real. This a confirm form, we do not need any
     // fields changed.
     $this->drupalGet('admin/config/regional/language/delete/' . $langcode);
     $this->submitForm([], 'Delete');
-    $this->assertSession()->statusMessageContains("The {$name} ({$langcode}) language has been removed.", 'status');
+    $this->assertSession()->statusMessageContains("The {$original_name} ({$langcode}) language has been removed.", 'status');
     $this->assertSession()->addressEquals(Url::fromRoute('entity.configurable_language.collection', [], ['language' => $english]));
     // Verify that language is no longer found.
     $this->drupalGet('admin/config/regional/language/delete/' . $langcode);

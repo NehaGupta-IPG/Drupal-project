@@ -68,7 +68,6 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
     // or normal environment.
     // @see locale_modules_installed()
     $locale_config_manager = \Drupal::service('locale.config_manager');
-    $locale_config_manager->updateDefaultConfigLangcodes();
     $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);
@@ -216,6 +215,45 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
 
     // Verify the override is still intact.
     $this->assertConfigOverride($config_name, 'test', 'German test', 'de');
+  }
+
+  /**
+   * Tests translation is created for new config without a default config hash.
+   *
+   * Configuration created outside the installer is not stamped with
+   * '_core.default_config_hash'. Its translatable values should be fed back to
+   * locale storage.
+   */
+  public function testNewConfigWithoutDefaultConfigHashFeedsBackTranslation(): void {
+    $config_name = 'locale_test.no_translation';
+
+    $this->configFactory->getEditable($config_name)->delete();
+    $this->configFactory->getEditable($config_name)
+      ->setData(['langcode' => 'de', 'test' => 'Test (German)'])
+      ->save();
+
+    $this->assertTranslation($config_name, 'Test (German)', 'de');
+  }
+
+  /**
+   * Tests no translation is created for new config with a default config hash.
+   *
+   * Configuration stamped with '_core.default_config_hash' was created by
+   * the installer, so its values are shipped defaults, not a manual edit.
+   */
+  public function testNewConfigWithDefaultConfigHashSkipsTranslationFeedback(): void {
+    $config_name = 'locale_test.no_translation';
+
+    $this->configFactory->getEditable($config_name)->delete();
+    $this->configFactory->getEditable($config_name)
+      ->setData([
+        '_core' => ['default_config_hash' => str_repeat('a', 43)],
+        'langcode' => 'de',
+        'test' => 'Test (German)',
+      ])
+      ->save();
+
+    $this->assertNoTranslation($config_name, 'de');
   }
 
   /**

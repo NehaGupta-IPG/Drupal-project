@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -281,10 +283,97 @@ class ConfigInstallTest extends KernelTestBase {
     $this->assertTrue(!isset($data['langcode']));
     $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
-    // Test imported configuration with explicit language code.
+    // Test imported configuration with an explicit, non-English language
+    // code. It installs with that langcode even though the language module
+    // is not installed and no language.entity.fr exists on this site.
     $data = $storage->read('config_test.dynamic.dotted.french');
     $this->assertEquals('fr', $data['langcode']);
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entity_storage */
+    $entity_storage = \Drupal::entityTypeManager()->getStorage('config_test');
+    $this->assertNotNull($entity_storage->load('dotted.french'));
+  }
+
+  /**
+   * Tests installing configuration with no langcode.
+   *
+   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
+   */
+  public function testInstallingConfigWithNoLangcode(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['system', 'language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $this->installModules(['config_test_language']);
+
+    // config_test.dynamic.dotted.english ships with no langcode: it must be
+    // updated to the site's configuration default, not left as 'en'.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
+
+    // config_test.dynamic.dotted.french ships with its own explicit
+    // langcode: it must be left alone.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
+
+    // A translatable simple configuration object with no langcode of its own
+    // must be updated the same way as a config entity.
+    $this->assertEquals('fr', $this->config('config_test.langcode_test')->get('langcode'));
+  }
+
+  /**
+   * Tests a shipped langcode matching a non-English site default installs.
+   *
+   * No language module is installed here: the site's configuration default
+   * language can only ever come from system.site:default_langcode.
+   *
+   * @see \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
+   */
+  public function testLanguageShippedLangcodeMatchingSiteDefault(): void {
+    $this->installConfig(['system']);
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+    $this->installModules(['config_test_language']);
+    $this->assertNotNull($this->config('config_test.dynamic.dotted.french')->get('id'));
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entity_storage */
+    $entity_storage = \Drupal::entityTypeManager()->getStorage('config_test');
+    $this->assertNotNull($entity_storage->load('dotted.french'));
+  }
+
+  /**
+   * Tests the config hash is unaffected by langcode updating on install.
+   *
+   * _core.default_config_hash must be calculated from the configuration as
+   * shipped by the extension, before ConfigInstaller resolves its langcode
+   * to the site's default. Otherwise the same shipped configuration would
+   * hash differently depending on the site's default language, breaking any
+   * comparison against a hash calculated from the shipped file.
+   *
+   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
+   */
+  public function testUpdatingLangcodeDoesNotAffectConfigHash(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['system', 'language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $this->installModules(['config_test_language']);
+
+    // config_test.dynamic.dotted.english ships with no langcode of its own,
+    // so it gets updated to the site's non-English default.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
+
+    // The stored hash must still match a hash calculated from the shipped
+    // file's own data, which has no langcode key at all - not from data
+    // that includes the langcode 'fr' resolves to.
+    $shipped_data = (new InstallStorage())->read('config_test.dynamic.dotted.english');
+    $expected_hash = Crypt::hashBase64(serialize($shipped_data));
+    $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.english')->get('_core.default_config_hash'));
+
+    // config_test.dynamic.dotted.french ships with its own explicit
+    // langcode, so it is left alone and its hash is unaffected either way -
+    // included here to confirm this case never regresses.
+    $shipped_data = (new InstallStorage())->read('config_test.dynamic.dotted.french');
+    $expected_hash = Crypt::hashBase64(serialize($shipped_data));
+    $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.french')->get('_core.default_config_hash'));
   }
 
   /**
