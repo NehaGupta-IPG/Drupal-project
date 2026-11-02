@@ -23,6 +23,10 @@ interface SerializationInterface {
   /**
    * Decodes data from the serialization format.
    *
+   * Implementations must throw InvalidDataTypeException if the data cannot be
+   * decoded. NULL and FALSE are valid decoded values and must not be used to
+   * indicate a decoding failure.
+   *
    * @param string $raw
    *   The raw data string to decode.
    *
@@ -30,6 +34,7 @@ interface SerializationInterface {
    *   The decoded data.
    *
    * @throws \Drupal\Component\Serialization\Exception\InvalidDataTypeException
+   *   If the data cannot be decoded.
    */
   public static function decode($raw);
 
