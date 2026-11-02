@@ -274,4 +274,32 @@ class ConfigActionManager extends DefaultPluginManager {
     return $instance;
   }
 
+  /**
+   * Replaces placeholders recursively.
+   *
+   * @param mixed $data
+   *   The data to process. If this is an array, it'll be processed recursively.
+   * @param array $replacements
+   *   An array whose keys are the placeholders to replace in the data, and
+   *   whose values are the the replacements.
+   *
+   * @return mixed
+   *   The given $data, with the placeholders replaced.
+   */
+  public static function replacePlaceholders(mixed $data, array $replacements): mixed {
+    if (is_string($data)) {
+      return strtr($data, $replacements);
+    }
+    elseif (is_array($data)) {
+      foreach ($data as $old_key => $value) {
+        $new_key = self::replacePlaceholders($old_key, $replacements);
+        $data[$new_key] = self::replacePlaceholders($value, $replacements);
+        if ($old_key !== $new_key) {
+          unset($data[$old_key]);
+        }
+      }
+    }
+    return $data;
+  }
+
 }
