@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
 use Drupal\Core\TypedData\Plugin\DataType\DecimalData;
@@ -70,6 +71,45 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a declared default value is annotated on the JSON schema.
+   */
+  public function testNormalizeJsonSchemaDefault(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setDefault('test');
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayHasKey('default', $schema);
+    $this->assertSame('test', $schema['default']);
+
+    $definition = DataDefinition::createFromDataType('integer');
+    $definition->setDefault(5);
+    $integer = new IntegerData($definition, 'integer');
+    $schema = $this->normalizer->normalize($integer, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertSame(5, $schema['default']);
+
+    // Stringable defaults are cast to their string representation.
+    $definition = DataDefinition::createFromDataType('string');
+    $definition->setDefault(new FormattableMarkup('@greeting world', ['@greeting' => 'Hello']));
+    $markup = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($markup, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertSame('Hello world', $schema['default']);
+  }
+
+  /**
+   * Tests that no default is annotated when the definition declares none.
+   */
+  public function testNormalizeJsonSchemaWithoutDefault(): void {
+    $definition = DataDefinition::createFromDataType('string');
+    $string = new StringData($definition, 'string');
+    $schema = $this->normalizer->normalize($string, 'json_schema');
+    $this->assertIsArray($schema);
+    $this->assertArrayNotHasKey('default', $schema);
+  }
+
+  /**
    * Data provider for testNormalize().
    */
   public static function dataProviderPrimitiveData(): array {
@@ -129,6 +169,10 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
     // TimeSpan normalizes to an integer, however Iso8601 matches a format.
     $duration = new DurationIso8601(DataDefinition::createFromDataType('duration_iso8601'));
     $duration->setValue('P1D');
+    $with_default_definition = DataDefinition::createFromDataType('string');
+    $with_default_definition->setDefault('default value');
+    $with_default = new StringData($with_default_definition, 'string');
+    $with_default->setValue('test');
 
     return [
       'email' => [$email],
@@ -136,6 +180,7 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
       'uri' => [$uri],
       'decimal' => [$decimal],
       'duration' => [$duration],
+      'string with default' => [$with_default],
       ...array_map(fn (array $value): array => [$value[0]], static::dataProviderPrimitiveData()),
     ];
   }
