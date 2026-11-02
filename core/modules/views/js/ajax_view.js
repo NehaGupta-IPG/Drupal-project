@@ -19,7 +19,28 @@
         views: { ajaxViews },
       } = settings;
       Object.keys(ajaxViews || {}).forEach((i) => {
-        Drupal.views.instances[i] = new Drupal.views.ajaxView(ajaxViews[i]);
+        const selector = `.js-view-dom-id-${ajaxViews[i].view_dom_id}`;
+        // Only bind once per view DOM element. When the view is re-rendered
+        // via AJAX the wrapper is replaced so `once` allows re-binding on the
+        // new element; when behaviors are re-run against the existing DOM
+        // (for example, after an unrelated AJAX response) re-binding is
+        // skipped so Drupal.Ajax instances do not accumulate.
+        once('ajax-view', selector).forEach(() => {
+          // The previous instance's Drupal.Ajax is bound to the old DOM
+          // element that was just replaced. Release it so it can be garbage
+          // collected instead of lingering in Drupal.ajax.instances for the
+          // lifetime of the page.
+          const previous = Drupal.views.instances[i];
+          if (
+            previous &&
+            previous.refreshViewAjax &&
+            previous.refreshViewAjax.instanceIndex !== false
+          ) {
+            Drupal.ajax.instances[previous.refreshViewAjax.instanceIndex] =
+              null;
+          }
+          Drupal.views.instances[i] = new Drupal.views.ajaxView(ajaxViews[i]);
+        });
       });
     }
   };
@@ -63,6 +84,9 @@
   Drupal.views.ajaxView = function (settings) {
     const selector = `.js-view-dom-id-${settings.view_dom_id}`;
     this.$view = $(selector);
+    if (this.$view.length === 0) {
+      return;
+    }
     this.$exposed_form = $(
       `form#views-exposed-form-${settings.view_name.replace(
         /_/g,
