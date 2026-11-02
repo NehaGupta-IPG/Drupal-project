@@ -268,7 +268,7 @@ final class LinksetController extends ControllerBase {
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    return $this->menuTree->transform($tree, $manipulators);
+    return $this->menuTree->transform($tree, $manipulators, $this);
   }
 
 }

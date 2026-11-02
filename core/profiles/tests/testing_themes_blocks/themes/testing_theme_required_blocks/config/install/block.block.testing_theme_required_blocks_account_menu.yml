@@ -17,4 +17,5 @@ settings:
   level: 1
   depth: 1
   expand_all_items: false
+  hide_untranslated_menu_links: false
 visibility: {  }

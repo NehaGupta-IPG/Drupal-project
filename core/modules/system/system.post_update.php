@@ -5,6 +5,9 @@
  * Post update functions for System.
  */
 
+use Drupal\block\BlockInterface;
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -90,4 +93,24 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config = \Drupal::configFactory()->getEditable('system.site');
   $config->clear('admin_compact_mode');
   $config->save();
+}
+
+/**
+ * Set hide_untranslated_menu_links config.
+ */
+function system_post_update_implement_schema_for_hide_untranslated_menu_links(&$sandbox = NULL): void {
+  if (!\Drupal::moduleHandler()->moduleExists('block')) {
+    return;
+  }
+
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'block', function (BlockInterface $block) {
+      if (strpos($block->getPluginId(), 'system_menu_block:') === 0) {
+        $block_settings = $block->get('settings');
+        $block_settings['hide_untranslated_menu_links'] = isset($block_settings['hide_untranslated_menu_links']) ? (bool) $block_settings['hide_untranslated_menu_links'] : FALSE;
+        $block->set('settings', $block_settings);
+        return TRUE;
+      }
+      return FALSE;
+    });
 }

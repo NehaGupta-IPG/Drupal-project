@@ -6,12 +6,15 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Plugin\Derivative\SystemMenuBlock as SystemMenuBlockDeriver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a generic Menu block.
@@ -22,7 +25,7 @@ use Drupal\system\Plugin\Derivative\SystemMenuBlock as SystemMenuBlockDeriver;
   category: new TranslatableMarkup("Menus"),
   deriver: SystemMenuBlockDeriver::class,
 )]
-class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterface, OnlyShowTranslatedMenuLinksInterface {
 
   /**
    * The menu link tree service.
@@ -51,11 +54,32 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   The menu tree service.
    * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menu_active_trail
    *   The active menu trail service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface|null $languageManager
+   *   The language manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail, protected ?LanguageManagerInterface $languageManager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->menuTree = $menu_tree;
     $this->menuActiveTrail = $menu_active_trail;
+
+    if ($this->languageManager === NULL) {
+      @trigger_error('Calling SystemMenuBlock::__construct() without the $languageManager argument is deprecated in drupal:12.0.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3392737', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service('language_manager');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('menu.link_tree'),
+      $container->get('menu.active_trail'),
+      $container->get('language_manager')
+    );
   }
 
   /**
@@ -101,6 +125,13 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       '#title' => $this->t('Expand all menu links'),
       '#default_value' => !empty($config['expand_all_items']),
       '#description' => $this->t('Override the option found on each menu link used for expanding children and instead display the whole menu tree as expanded.'),
+    ];
+    $form['hide_untranslated_menu_links'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Hide untranslated custom menu links'),
+      '#description' => $this->t('When selected, custom menu links without translation in the current language are hidden.'),
+      '#default_value' => !empty($config['hide_untranslated_menu_links']),
+      '#access' => $this->languageManager->isMultilingual(),
     ];
 
     // When only the first level of links are shown, or if all links are
@@ -167,6 +198,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     $this->configuration['level'] = $form_state->getValue('level');
     $this->configuration['depth'] = $form_state->getValue('depth') ?: NULL;
     $this->configuration['expand_all_items'] = $form_state->getValue('expand_all_items');
+    $this->configuration['hide_untranslated_menu_links'] = $form_state->getValue('hide_untranslated_menu_links');
 
     // Reverse the form checkbox value to match the configuration name. While
     // this is counter-intuitive, it simplifies both the UI and the API logic
@@ -233,7 +265,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->transform($tree, $manipulators, $this);
     return $this->menuTree->build($tree);
   }
 
@@ -245,6 +277,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       'level' => 1,
       'depth' => NULL,
       'expand_all_items' => FALSE,
+      'hide_untranslated_menu_links' => FALSE,
     ];
   }
 
@@ -309,6 +342,13 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    */
   protected function shouldSetActiveTrail(): bool {
     return empty($this->configuration['ignore_active_trail']) || $this->configuration['level'] !== 1 || (empty($this->configuration['expand_all_items']) && $this->configuration['depth'] !== 1);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hideUntranslated(): bool {
+    return $this->configuration['hide_untranslated_menu_links'];
   }
 
 }

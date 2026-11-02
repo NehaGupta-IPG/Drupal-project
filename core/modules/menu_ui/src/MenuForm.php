@@ -241,7 +241,7 @@ class MenuForm extends EntityForm {
       ['callable' => 'menu_ui.menu_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->transform($tree, $manipulators, $this);
     $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     // Determine the delta; the number of weights to be made available.

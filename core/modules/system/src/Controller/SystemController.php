@@ -76,7 +76,7 @@ class SystemController extends ControllerBase {
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $this->menuLinkTree->transform($tree, $manipulators);
+    $tree = $this->menuLinkTree->transform($tree, $manipulators, $this);
     $tree_access_cacheability = new CacheableMetadata();
     $blocks = [];
     foreach ($tree as $key => $element) {

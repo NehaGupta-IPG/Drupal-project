@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Core\Menu\InaccessibleMenuLink;
+use Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -12,6 +13,7 @@ use Drupal\Core\Session\UserSession;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -224,7 +226,7 @@ class MenuLinkTreeTest extends KernelTestBase {
       ];
 
       $tree = $this->linkTree->load('mock', $parameters);
-      $this->linkTree->transform($tree, $manipulators);
+      $this->linkTree->transform($tree, $manipulators, $this);
 
       return array_keys(
         array_filter($tree, function (MenuLinkTreeElement $element): bool {
@@ -240,6 +242,65 @@ class MenuLinkTreeTest extends KernelTestBase {
     // Ensure that also user 1 does not see the login link.
     $account_switcher->switchTo(new UserSession(['uid' => 1]));
     $this->assertSame(['user_logout_example'], $get_accessible_links());
+  }
+
+  /**
+   * Tests transforming a link tree from a contextual manipulator.
+   */
+  public function testContextualManipulator(): void {
+    /** @var \Drupal\system\MenuStorage $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('menu');
+    $storage->create(['id' => 'menu1', 'label' => 'Menu 1'])->save();
+
+    \Drupal::entityTypeManager()->getStorage('menu_link_content')->create([
+      'link' => ['uri' => 'internal:/menu_name_test'],
+      'menu_name' => 'menu1',
+      'bundle' => 'menu_link_content',
+      'title' => 'Link test',
+    ])->save();
+    \Drupal::entityTypeManager()->getStorage('menu_link_content')->create([
+      'link' => ['uri' => 'internal:/menu_name_test'],
+      'menu_name' => 'menu1',
+      'bundle' => 'menu_link_content',
+      'title' => 'Link test',
+    ])->save();
+    $output = $this->linkTree->load('menu1', new MenuTreeParameters());
+    $this->assertCount(2, $output);
+
+    // Add contextual manipulator that applies.
+    $context = new \stdClass();
+    $contextual_manipulator = $this->prophesize(MenuLinkTreeContextualManipulatorInterface::class);
+    $contextual_manipulator->applies($output, $context)->willReturn(TRUE);
+    $contextual_manipulator->process($output, $context)->willReturn([$output[array_key_first($output)]]);
+    $contextual_manipulator->getCacheContexts()->willReturn([]);
+    $contextual_manipulator->getCacheTags()->willReturn([]);
+    $contextual_manipulator->getCacheMaxAge()->willReturn(1337);
+    $this->linkTree->addContextualManipulator($contextual_manipulator->reveal());
+
+    // Add contextual manipulator that doesn't apply.
+    $context = new \stdClass();
+    $non_applicable_manipulator = $this->prophesize(MenuLinkTreeContextualManipulatorInterface::class);
+    $non_applicable_manipulator->applies([$output[array_key_first($output)]], $context)->willReturn(FALSE);
+    $this->linkTree->addContextualManipulator($non_applicable_manipulator->reveal());
+
+    $this->assertCount(1, $this->linkTree->transform($output, [], $context));
+
+    $render_array = $this->linkTree->build($output);
+    $this->assertSame(1337, $render_array['#cache']['max-age']);
+  }
+
+  /**
+   * Tests transforming a link tree.
+   */
+  #[Group('legacy')]
+  #[IgnoreDeprecations]
+  public function testTransformWithoutContext(): void {
+    /** @var \Drupal\system\MenuStorage $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('menu');
+    $storage->create(['id' => 'menu1', 'label' => 'Menu 1'])->save();
+    $output = $this->linkTree->load('menu1', new MenuTreeParameters());
+    $this->expectUserDeprecationMessage('Transforming menu links without $context is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3380512');
+    $this->linkTree->transform($output, []);
   }
 
 }

@@ -70,3 +70,7 @@ services:
     arguments: ['@menu.link_tree', '@cache.memory']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber
+  menu.language_menu_link_tree_manipulator:
+    class: Drupal\system\Menu\LanguageMenuLinkTreeManipulator
+    tags:
+      - { name: menu_tree_contextual_manipulator }

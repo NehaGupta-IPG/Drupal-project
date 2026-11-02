@@ -148,7 +148,7 @@ class AdminTest extends BrowserTestBase {
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:flatten'],
     ];
-    return $menu_tree->transform($tree, $manipulators);
+    return $menu_tree->transform($tree, $manipulators, $this);
   }
 
   /**

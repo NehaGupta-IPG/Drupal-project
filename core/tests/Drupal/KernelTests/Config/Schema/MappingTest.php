@@ -190,6 +190,7 @@ class MappingTest extends KernelTestBase {
         'depth',
         'expand_all_items',
         'ignore_active_trail',
+        'hide_untranslated_menu_links',
       ],
       'block.settings.local_tasks_block' => [
         'primary',

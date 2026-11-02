@@ -157,7 +157,7 @@ class SystemManager {
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->transform($tree, $manipulators, $this);
     foreach ($tree as $key => $element) {
       // Only render accessible links.
       if (!$element->access->isAllowed()) {

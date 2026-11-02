@@ -80,11 +80,19 @@ interface MenuLinkTreeInterface {
    *     ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
    *   ];
    *   @endcode
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new method parameters before drupal:12.0.0.
+   * @see https://www.drupal.org/project/drupal/issues/3354672
+   *
+   * @param mixed $context
+   *   Context related to the current transformation. This is usually the object
+   *   triggering the menu link tree transformation.
+   * phpcs:enable
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
-  public function transform(array $tree, array $manipulators);
+  public function transform(array $tree, array $manipulators /* , mixed $context */);
 
   /**
    * Builds a renderable array from a menu tree.

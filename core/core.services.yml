@@ -886,6 +886,8 @@ services:
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
     arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver']
+    tags:
+      - { name: service_collector, tag: menu_tree_contextual_manipulator, call: addContextualManipulator }
   Drupal\Core\Menu\MenuLinkTreeInterface: '@menu.link_tree'
   menu.default_tree_manipulators:
     class: Drupal\Core\Menu\DefaultMenuLinkTreeManipulators

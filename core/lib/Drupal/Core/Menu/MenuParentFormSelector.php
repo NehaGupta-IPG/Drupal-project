@@ -67,7 +67,7 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
         ['callable' => 'menu.default_tree_manipulators:checkAccess'],
         ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
       ];
-      $tree = $this->menuLinkTree->transform($tree, $manipulators);
+      $tree = $this->menuLinkTree->transform($tree, $manipulators, $this);
       $this->parentSelectOptionsTreeWalk($tree, $menu_name, '--', $options, $id, $depth_limit, $cacheability);
     }
     return $options;

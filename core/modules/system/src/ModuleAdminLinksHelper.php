@@ -58,7 +58,7 @@ class ModuleAdminLinksHelper {
         ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
         ['callable' => 'menu.default_tree_manipulators:flatten'],
       ];
-      $menuTree = $this->menuLinkTree->transform($menuTree, $manipulators);
+      $menuTree = $this->menuLinkTree->transform($menuTree, $manipulators, $this);
       $this->memoryCache->set(self::ADMIN_LINKS_MENU_TREE, $menuTree);
     }
 

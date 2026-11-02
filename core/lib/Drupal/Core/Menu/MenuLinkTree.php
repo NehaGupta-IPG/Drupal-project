@@ -4,6 +4,7 @@ namespace Drupal\Core\Menu;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
@@ -57,6 +58,13 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   }
 
   /**
+   * The contextual menu link tree manipulators.
+   *
+   * @var \Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface[]
+   */
+  private array $contextualManipulators = [];
+
+  /**
    * {@inheritdoc}
    */
   public function load($menu_name, MenuTreeParameters $parameters) {
@@ -101,7 +109,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * {@inheritdoc}
    */
-  public function transform(array $tree, array $manipulators) {
+  public function transform(array $tree, array $manipulators, $context = NULL) {
     foreach ($manipulators as $manipulator) {
       $callable = $this->callableResolver->getCallableFromDefinition($manipulator['callable']);
       // Prepare the arguments for the menu tree manipulator callable; the first
@@ -114,6 +122,30 @@ class MenuLinkTree implements MenuLinkTreeInterface {
         $tree = call_user_func($callable, $tree);
       }
     }
+
+    if (is_null($context)) {
+      @trigger_error('Transforming menu links without $context is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3380512', E_USER_DEPRECATED);
+
+      $context = [];
+    }
+
+    // Apply contextual menu link tree manipulators.
+    foreach ($this->contextualManipulators as $manipulator) {
+      assert($manipulator instanceof MenuLinkTreeContextualManipulatorInterface);
+      if (!$manipulator->applies($tree, $context)) {
+        continue;
+      }
+      $tree = $manipulator->process($tree, $context);
+      foreach ($tree as $key => $link) {
+        // Add manipulator as a cacheable dependency to all link tree elements
+        // to make sure cacheable metadata bubbles up.
+        if (!$tree[$key]->access) {
+          $tree[$key]->access = new AccessResultNeutral();
+        }
+        $tree[$key]->access->addCacheableDependency($manipulator);
+      }
+    }
+
     return $tree;
   }
 
@@ -267,6 +299,16 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    */
   public function getExpanded($menu_name, array $parents) {
     return $this->treeStorage->getExpanded($menu_name, $parents);
+  }
+
+  /**
+   * Add a manipulator to the list of manipulators.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface $manipulator
+   *   A menu link tree manipulator.
+   */
+  public function addContextualManipulator(MenuLinkTreeContextualManipulatorInterface $manipulator): void {
+    $this->contextualManipulators[] = $manipulator;
   }
 
 }

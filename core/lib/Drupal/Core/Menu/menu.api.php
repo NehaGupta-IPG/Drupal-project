@@ -162,6 +162,21 @@
  * @todo Derivatives are in flux for these; when they are more stable, add
  *   documentation here.
  *
+ * @section Menu Link Tree Manipulators
+ *  When rendering menu link trees, the menu links are transformed into an
+ *  actual link tree that is ready for output. There are two categories of
+ *  menu link tree manipulators involved in this process:
+ *
+ *  Explicit Manipulators: These are deliberately added during rendering of the
+ *  menu link tree. For example, access checking is commonly done using an
+ *  explicit manipulator.
+ *
+ *  Contextual Manipulators: Introduced by other modules, these manipulators are
+ *  added based on the context where the links are rendered. These are usually
+ *  needed for side effects that a module needs to introduce. For example, a
+ *  module might add a manipulator to remove untranslated links from the menu
+ *  link tree.
+ *
  * @section sec_rendering Rendering menus
  * Once you have created menus (that contain menu links), you want to render
  * them. Drupal provides a block (Drupal\system\Plugin\Block\SystemMenuBlock) to
@@ -204,7 +219,7 @@
  *   // Use the default sorting of menu links.
  *   ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
  * ];
- * $tree = $menu_tree->transform($tree, $manipulators);
+ * $tree = $menu_tree->transform($tree, $manipulators, $this);
  *
  * // Finally, build a renderable array from the transformed tree.
  * $menu = $menu_tree->build($tree);

@@ -451,7 +451,10 @@ block.settings.system_menu_block:*:
       type: boolean
       label: 'Ignore active trail'
       requiredKey: false
-
+    hide_untranslated_menu_links:
+      type: boolean
+      label: Hide untranslated custom menu links
+      nullable: true
 block.settings.local_tasks_block:
   type: block_settings
   label: 'Tabs block'

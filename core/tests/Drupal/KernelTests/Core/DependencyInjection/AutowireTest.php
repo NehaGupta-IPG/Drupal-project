@@ -80,6 +80,7 @@ class AutowireTest extends KernelTestBase {
                 'cache.context',
                 'context_provider',
                 'event_subscriber',
+                'menu_tree_contextual_manipulator',
               ])) {
                 continue 2;
               }
