@@ -370,9 +370,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       foreach ($locked_languages as $language) {
         // Update system languages weight.
         $max_weight++;
-        ConfigurableLanguage::load($language->getId())
-          ->setWeight($max_weight)
-          ->save();
+        $configurable_language = ConfigurableLanguage::load($language->getId());
+        if ($configurable_language) {
+          $configurable_language->setWeight($max_weight)->save();
+        }
       }
     }
   }
