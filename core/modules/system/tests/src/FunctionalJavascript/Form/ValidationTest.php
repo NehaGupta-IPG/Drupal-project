@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\Core\Render\Element;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -32,6 +33,7 @@ class ValidationTest extends WebDriverTestBase {
   /**
    * Tests partial form validation through #limit_validation_errors.
    */
+  #[DoesNotPerformAssertions]
   public function testValidateLimitErrors(): void {
     $edit = [
       'test' => 'invalid',
@@ -95,6 +97,7 @@ class ValidationTest extends WebDriverTestBase {
   /**
    * Tests #pattern validation.
    */
+  #[DoesNotPerformAssertions]
   public function testPatternValidation(): void {
     $textfield_error = 'One digit followed by lowercase letters field is not in the right format.';
     $tel_error = 'Everything except numbers field is not in the right format.';
@@ -161,6 +164,7 @@ class ValidationTest extends WebDriverTestBase {
    *
    * @see \Drupal\form_test\Form\FormTestValidateRequiredForm
    */
+  #[DoesNotPerformAssertions]
   public function testCustomRequiredError(): void {
     $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestValidateRequiredForm');
 

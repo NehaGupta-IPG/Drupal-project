@@ -48,8 +48,8 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $default_sort = ['sort' => 'drupal_internal__nid'];
 
     // 0. HEAD request allows a client to verify that JSON:API is installed.
-    $this->httpClient->request('HEAD', $this->buildUrl('/jsonapi/node/article'));
-    $this->assertSession()->statusCodeEquals(200);
+    $response = $this->httpClient->request('HEAD', $this->buildUrl('/jsonapi/node/article'));
+    $this->assertSame(200, $response->getStatusCode());
     // 1. Load all articles (1st page).
     $collection_output = Json::decode($this->drupalGet('/jsonapi/node/article', [
       'query' => $default_sort,
