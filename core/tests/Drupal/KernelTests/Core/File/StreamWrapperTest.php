@@ -155,4 +155,44 @@ class StreamWrapperTest extends FileTestBase {
     $this->assertFalse($stream_wrapper_manager->isValidScheme($stream_wrapper_manager::getScheme('foo://asdf')), 'Did not get a valid stream scheme from foo://asdf');
   }
 
+  /**
+   * Tests FileSystem::tempnam().
+   */
+  public function testTempnam(): void {
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = \Drupal::service('file_system');
+    $default_scheme = \Drupal::config('system.file')->get('default_scheme');
+    $temporary_scheme = 'temporary';
+
+    // Create a tmp file at the root of the default stream wrapper.
+    $tempnam = $file_system->tempnam($default_scheme . '://', 'tmp');
+    $this->assertNotEmpty($tempnam, 'Default stream wrapper can create temporary files');
+    $this->assertEquals($default_scheme . '://tmp', substr($tempnam, 0, strlen($default_scheme . '://tmp')), 'Temporary file was created in the root of the default stream wrapper');
+
+    // Create a tmp file in a subdirectory of the default stream wrapper.
+    $directory = $this->createDirectory();
+    $tempnam = $file_system->tempnam($directory, 'tmp');
+    $this->assertNotEmpty($tempnam, 'Default stream wrapper can create temporary files');
+    $this->assertEquals($directory, $file_system->dirname($tempnam), 'Temporary file was created in the default stream wrapper subdirectory');
+
+    // Create a tmp file in a non-existing subdirectory of the default stream wrapper.
+    $non_existing_directory = $default_scheme . '://' . $this->randomMachineName();
+    $tempnam = @$file_system->tempnam($non_existing_directory, 'tmp');
+    $this->assertFalse($tempnam, 'Default stream wrapper did not create a temporary file in missing directory');
+    $this->assertNotEquals($non_existing_directory, $file_system->dirname($tempnam), 'Temporary file was not created in the default stream wrapper subdirectory');
+    $this->assertNotEquals($default_scheme . '://', $file_system->dirname($tempnam), 'Temporary file was not created in the root of the default stream wrapper');
+
+    // Create a tmp file at the root of the default stream wrapper.
+    $tempnam = $file_system->tempnam($temporary_scheme . '://', 'tmp');
+    $this->assertNotEmpty($tempnam, 'Temporary stream wrapper can create temporary files');
+    $this->assertEquals($temporary_scheme . '://tmp', substr($tempnam, 0, strlen($temporary_scheme . '://tmp')), 'Temporary file was created in the root of the temporary stream wrapper');
+
+    // Create a tmp file in a non-existing subdirectory of the temporary stream wrapper.
+    $non_existing_directory = $temporary_scheme . '://' . $this->randomMachineName();
+    $tempnam = @$file_system->tempnam($non_existing_directory, 'tmp');
+    $this->assertNotEmpty($tempnam, 'Temporary stream wrapper can create temporary files');
+    $this->assertNotEquals($non_existing_directory, $file_system->dirname($tempnam), 'Temporary file was not created in the temporary stream wrapper subdirectory');
+    $this->assertEquals($temporary_scheme . '://', $file_system->dirname($tempnam), 'Temporary file was created in the root of the temporary stream wrapper, as fallback');
+  }
+
 }
