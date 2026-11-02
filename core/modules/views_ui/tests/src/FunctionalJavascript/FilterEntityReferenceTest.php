@@ -7,6 +7,8 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\views_ui\Traits\FilterEntityReferenceTrait;
+use Drupal\Tests\views_ui\Traits\NoAjaxFormTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class FilterEntityReferenceTest extends WebDriverTestBase {
 
   use FilterEntityReferenceTrait;
+  use NoAjaxFormTestTrait;
 
   /**
    * {@inheritdoc}
@@ -60,7 +63,8 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
   /**
    * Tests end to end creation of a Content Entity Reference filter.
    */
-  public function testAddEntityReferenceFieldWithDefaultSelectionHandler(): void {
+  #[DataProvider('providerDialogModes')]
+  public function testAddEntityReferenceFieldWithDefaultSelectionHandler(bool $new_window): void {
     $this->drupalGet('admin/structure/views/view/content');
     $assert = $this->assertSession();
     $page = $this->getSession()->getPage();
@@ -138,17 +142,28 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     $extra_settings_selector = 'a[href="' . $url . '"]';
     $element = $this->assertSession()->waitForElementVisible('css', $extra_settings_selector);
     $this->assertNotNull($element);
-    $element->click();
+    if ($new_window) {
+      $this->openDialogLinkInNewWindow($element);
+    }
+    else {
+      $element->click();
+    }
     $assert->waitForField('options[sub_handler]');
     $page->selectFieldOption('options[sub_handler]', 'views');
+    $this->assertFieldHidden('options[reference_default:node][target_bundles][article]');
     $page->selectFieldOption('options[reference_views][view][view_and_display]', 'test_entity_reference:entity_reference');
-    $page->find('xpath', "//*[contains(text(), 'Apply')]")
-      ->press();
-    $assert->assertWaitOnAjaxRequest();
+    $buttons = $new_window ? $page : $page->find('css', '.ui-dialog .ui-dialog-buttonpane');
+    $buttons->pressButton('Apply');
+    if ($new_window) {
+      $assert->addressEquals('admin/structure/views/view/content/edit/page_1');
+    }
+    else {
+      $assert->assertWaitOnAjaxRequest();
+    }
 
     // The Views Reference filter has a title Filter to a single result, so
     // ensure only that result is available as an option.
-    $assert->waitForElementRemoved('css', '.ui-dialog');
+    $assert->waitForField('field_test_target_id[]');
 
     $this->assertCount(1, $page->findAll('css', 'select[name="field_test_target_id[]"] option'));
 

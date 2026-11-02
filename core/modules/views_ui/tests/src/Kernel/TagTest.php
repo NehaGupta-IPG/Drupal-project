@@ -8,6 +8,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views_ui\Controller\ViewsUIController;
+use Drupal\views_ui\Form\Ajax\EditDetails;
+use Drupal\views_ui\ViewUI;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -34,12 +36,16 @@ class TagTest extends ViewsKernelTestBase {
       $suffix = $i % 2 ? 'odd' : 'even';
       $tag = 'autocomplete_tag_test_' . $suffix . $this->randomMachineName();
       $tags[] = $tag;
-      View::create([
+      $view = View::create([
         'tag' => $tag,
         'id' => $this->randomMachineName(),
         'label' => 'Test',
-      ])->save();
+      ]);
+      $view->save();
     }
+
+    $form = new EditDetails()->getForm(new ViewUI($view), '', 'nojs');
+    $this->assertContains('views_ui/admin.styling', $form['#attached']['library'] ?? []);
 
     // Make sure just ten results are returned.
     $controller = ViewsUIController::create($this->container);

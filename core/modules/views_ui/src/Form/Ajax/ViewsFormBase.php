@@ -198,12 +198,10 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse|string|array
-   *   Returns one of three possible values:
+   * @return \Drupal\Core\Ajax\AjaxResponse|array
+   *   Returns one of two possible values:
    *   - A \Drupal\Core\Ajax\AjaxResponse object.
-   *   - The rendered form, as a string.
-   *   - A render array with the title in #title and the rendered form in the
-   *   #markup array.
+   *   - A form render array with the title in #title.
    */
   protected function ajaxFormWrapper($form_class, FormStateInterface &$form_state) {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
@@ -233,12 +231,12 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
         ->merge($render_context->pop())
         ->applyTo($form);
     }
-    $output = $renderer->renderRoot($form);
 
     // These forms have the title built in, so set the title here:
     $title = $form_state->get('title') ?: '';
 
     if ($ajax && (!$form_state->isExecuted() || $form_state->get('rerender'))) {
+      $output = $renderer->renderRoot($form);
       // If the form didn't execute and we're using ajax, build up an
       // Ajax command list to execute.
       $response = new AjaxResponse();
@@ -277,7 +275,9 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
       return $response;
     }
 
-    return $title ? ['#title' => $title, '#markup' => $output] : $output;
+    $form['#title'] = $title;
+    $form['#attached']['library'][] = 'views_ui/admin.styling';
+    return $form;
   }
 
   /**

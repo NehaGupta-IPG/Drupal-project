@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel\Wizard;
 use Drupal\Core\Form\FormState;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views_ui\Form\Ajax\RearrangeFilter;
 use Drupal\views_ui\ViewUI;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -75,6 +76,9 @@ class WizardPluginBaseKernelTest extends ViewsKernelTestBase {
     $this->assertEquals($random_description, $view->get('description'));
     $this->assertEquals('views_test_data', $view->get('base_table'));
     $this->assertEquals('it', $view->get('langcode'));
+
+    $form = new RearrangeFilter()->getForm($view, 'default', 'nojs');
+    $this->assertContains('views_ui/admin.styling', $form['#attached']['library'] ?? []);
   }
 
 }

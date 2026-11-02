@@ -9,7 +9,9 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\SchemaCheckTestTrait;
+use Drupal\Tests\views_ui\Traits\NoAjaxFormTestTrait;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class FieldTest extends WebDriverTestBase {
   use SchemaCheckTestTrait;
+  use NoAjaxFormTestTrait;
 
   /**
    * {@inheritdoc}
@@ -80,7 +83,8 @@ class FieldTest extends WebDriverTestBase {
   /**
    * Tests custom text field modal title.
    */
-  public function testModalDialogTitle(): void {
+  #[DataProvider('providerDialogModes')]
+  public function testModalDialogTitle(bool $new_window): void {
     $web_assert = $this->assertSession();
     Node::create([
       'title' => $this->randomString(),
@@ -92,15 +96,23 @@ class FieldTest extends WebDriverTestBase {
     $this->drupalGet($url);
     $page = $this->getSession()->getPage();
     // Open the 'Add fields dialog'.
-    $page->clickLink('views-add-field');
+    $link = $page->findLink('views-add-field');
+    if ($new_window) {
+      $this->openDialogLinkInNewWindow($link);
+    }
+    else {
+      $link->click();
+    }
     $web_assert->waitForField('name[views.nothing]');
     // Select the custom text field.
     $page->checkField('name[views.nothing]');
-    $page->find('css', '.ui-dialog .ui-dialog-buttonset')->pressButton('Add and configure fields');
+    $buttons = $new_window ? $page : $page->find('css', '.ui-dialog .ui-dialog-buttonset');
+    $buttons->pressButton('Add and configure fields');
     $web_assert->waitForField('options[alter][text]');
     $page->fillField('options[alter][text]', "{{ attach_library(\"core/drupal.dialog.ajax\") }}
 <p><a class=\"use-ajax\" data-dialog-type=\"modal\" href=\"$base_path/admin/content\">Content link</a></p>");
-    $page->find('css', '.ui-dialog .ui-dialog-buttonset')->pressButton('Apply');
+    $buttons = $new_window ? $page : $page->find('css', '.ui-dialog .ui-dialog-buttonset');
+    $buttons->pressButton('Apply');
     $web_assert->waitForText('Content: body (exposed)');
     $web_assert->waitForButton('Save');
     $page->pressButton('Save');

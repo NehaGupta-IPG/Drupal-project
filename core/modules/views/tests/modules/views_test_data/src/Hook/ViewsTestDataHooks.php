@@ -22,6 +22,16 @@ class ViewsTestDataHooks {
   }
 
   /**
+   * Implements hook_form_FORM_ID_alter().
+   */
+  #[Hook('form_views_ui_rearrange_filter_form_alter')]
+  public function formViewsUiRearrangeFilterFormAlter(array &$form, FormStateInterface $form_state): void {
+    if ($library = \Drupal::state()->get('views_test_data.form_library')) {
+      $form['#attached']['library'][] = $library;
+    }
+  }
+
+  /**
    * Implements hook_ENTITY_TYPE_update() for the 'view' entity type.
    */
   #[Hook('view_update')]
