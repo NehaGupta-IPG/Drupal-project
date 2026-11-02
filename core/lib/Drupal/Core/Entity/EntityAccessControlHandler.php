@@ -66,6 +66,12 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $operation = 'view';
     }
 
+    // You cannot delete an unsaved entity. This is not cached, as the entity
+    // has no ID and hence no cache tags to invalidate once it is saved.
+    if ($operation === 'delete' && $entity->isNew()) {
+      return $return_as_object ? AccessResult::forbidden() : FALSE;
+    }
+
     // If an entity does not have a UUID, either from not being set or from not
     // having them, use the 'entity type:ID' pattern as the cache $cid.
     $cid = $entity->uuid() ?: $entity->getEntityTypeId() . ':' . $entity->id();
