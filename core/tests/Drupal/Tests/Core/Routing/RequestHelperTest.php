@@ -81,6 +81,18 @@ class RequestHelperTest extends UnitTestCase {
         self::server('/subdir/index%2Ephp/node/1', '/subdir/index.php', '/subdir/index.php/node/1'),
         FALSE,
       ],
+      'encoded SCRIPT_NAME with encoded request' => [
+        self::server('/index%2Ephp/node/1', '/index%2Ephp', '/index.php/node/1'),
+        FALSE,
+      ],
+      'encoded SCRIPT_NAME with literal request' => [
+        self::server('/index.php/node/1', '/index%2Ephp', '/index.php/node/1'),
+        FALSE,
+      ],
+      'subdirectory encoded SCRIPT_NAME' => [
+        self::server('/subdir/index%2Ephp/node/1', '/subdir/index%2Ephp', '/subdir/index.php/node/1'),
+        FALSE,
+      ],
     ];
   }
 
@@ -124,6 +136,11 @@ class RequestHelperTest extends UnitTestCase {
         self::server('/node/1', '/index.php', '/index.php'),
         '',
         FALSE,
+      ],
+      'encoded SCRIPT_NAME with encoded request' => [
+        self::server('/index%2Ephp/node/1', '/index%2Ephp', '/index.php/node/1'),
+        '',
+        TRUE,
       ],
     ];
   }
