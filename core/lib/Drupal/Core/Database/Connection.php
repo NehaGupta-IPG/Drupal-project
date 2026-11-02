@@ -65,6 +65,11 @@ abstract class Connection {
    * The name of the StatementWrapper class for this connection.
    *
    * @var string|null
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Open
+   *   StatementInterface objects directly instead.
+   *
+   * @see https://www.drupal.org/node/3633349
    */
   protected $statementWrapperClass = NULL;
 
@@ -437,6 +442,8 @@ abstract class Connection {
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
+    @trigger_error('Calling ' . __METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Each driver should implement independently, the method will become abstract. See https://www.drupal.org/node/3633349', E_USER_DEPRECATED);
+
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 

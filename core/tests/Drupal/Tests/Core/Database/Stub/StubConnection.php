@@ -22,6 +22,11 @@ class StubConnection extends Connection {
 
   /**
    * {@inheritdoc}
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Open
+   *   StatementInterface objects directly instead.
+   *
+   * @see https://www.drupal.org/node/3633349
    */
   protected $statementWrapperClass = StatementWrapperIterator::class;
 
