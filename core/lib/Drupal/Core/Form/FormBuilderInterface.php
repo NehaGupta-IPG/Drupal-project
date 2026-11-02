@@ -77,6 +77,12 @@ interface FormBuilderInterface {
    * previous page load. The form is then passed on for processing, validation,
    * and submission if there is proper input.
    *
+   * The form_parent input can identify the cached form that opened this form
+   * by its build ID. The calling form's 'form_defaults' state entry supplies
+   * default properties; properties already set by this form take precedence.
+   * The reference to the calling form is retained in form state, so it remains
+   * available during subsequent submissions and multistep rebuilds.
+   *
    * @param \Drupal\Core\Form\FormInterface|string $form_arg
    *   The value must be one of the following:
    *   - The name of a class that implements \Drupal\Core\Form\FormInterface.

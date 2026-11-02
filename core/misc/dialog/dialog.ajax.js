@@ -329,8 +329,9 @@
       progress: { type: 'throbber' },
       dialogType: 'modal',
       dialog: dialogOptions,
-      url: response.url,
       httpMethod: 'GET',
+      ...response.ajaxSettings,
+      url: response.url,
     };
     Drupal.ajax(elementSettings).execute();
   };

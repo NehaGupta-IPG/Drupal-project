@@ -116,9 +116,12 @@ class CommentTypeForm extends EntityForm {
           }
         }
       }
+      // Default to the target type supplied by the calling field settings.
+      $target_entity_type_id = $comment_type->getTargetEntityTypeId()
+        ?? $this->getRequest()->query->get('target_entity_type_id', '');
       $form['target_entity_type_id'] = [
         '#type' => 'select',
-        '#default_value' => $comment_type->getTargetEntityTypeId(),
+        '#default_value' => isset($options[$target_entity_type_id]) ? $target_entity_type_id : NULL,
         '#title' => $this->t('Target entity type'),
         '#required' => TRUE,
         '#empty_value' => '_none',

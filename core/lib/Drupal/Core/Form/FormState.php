@@ -205,16 +205,18 @@ class FormState implements FormStateInterface {
    * for the user to fill in. Then, the user fills the form in and submits it,
    * triggering a second page request in which the form must be built and
    * processed. By default, $form and $form_state are built from scratch during
-   * each of these page requests. Often, it is necessary or desired to persist
-   * the $form and $form_state variables from the initial page request to the
-   * one that processes the submission. 'cache' can be set to TRUE to do this.
-   * A prominent example is an Ajax-enabled form, in which
-   * \Drupal\Core\Render\Element\RenderElementBase::processAjaxForm()
-   * enables form caching for all forms that include an element with the #ajax
-   * property. (The Ajax handler has no way to build the form itself, so must
-   * rely on the cached version.) Note that the persistence of $form and
-   * $form_state happens automatically for (multi-step) forms having the
-   * self::$rebuild flag set, regardless of the value for self::$cache.
+   * each of these page requests. Caching allows $form and the cacheable parts
+   * of $form_state to persist across requests.
+   *
+   * Form state cannot be cached during GET or HEAD requests. Set this flag
+   * during a POST request to retain state for later submissions. An Ajax
+   * submission can build the form through its original route if no cached copy
+   * exists. Subsequent requests can reuse the cached form and cacheable form
+   * state.
+   *
+   * Persistence also happens automatically for POST forms having the
+   * self::$rebuild flag set, including multistep forms, regardless of the value
+   * for self::$cache.
    *
    * @var bool
    */
