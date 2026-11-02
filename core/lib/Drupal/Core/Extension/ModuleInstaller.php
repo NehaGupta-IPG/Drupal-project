@@ -921,17 +921,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
             return NULL;
           }
           break;
+
         case 'schema':
           if ($install_task instanceof SchemaInterface) {
             return $install_task->getSchema();
           }
           break;
+
         case 'uninstall':
           if ($install_task instanceof UninstallInterface) {
             $install_task->doUninstall(...$args);
             return NULL;
           }
           break;
+
         case 'update_last_removed':
           if ($install_task instanceof LastRemovedInterface) {
             return $install_task->getLastRemoved();

@@ -40,7 +40,7 @@ class SchemaInspector {
     $pathname = "$module_path/$module.info.yml";
     $extension = new Extension(\DRUPAL_ROOT, 'module', $pathname, NULL);
     try {
-      $class_name = install_get_fixed_class_name($extension, $directory_search);
+      $class_name = install_get_fixed_class_name($extension, 'Install/Schema');
       $install_task = \Drupal::classResolver($class_name);
       if ($install_task instanceof SchemaInterface) {
         $schema = $install_task->getSchema();
