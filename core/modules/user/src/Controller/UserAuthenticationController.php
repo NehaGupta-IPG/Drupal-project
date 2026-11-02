@@ -24,8 +24,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
+@trigger_error('Drupal\\user\\Controller\\UserAuthenticationController is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \\Drupal\\rest\\Controller\\RestAuthenticationController instead. See https://www.drupal.org/node/3552724', E_USER_DEPRECATED);
+
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ * \Drupal\rest\Controller\RestAuthenticationController instead.
+ * @see https://www.drupal.org/node/3552724
  */
 class UserAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 

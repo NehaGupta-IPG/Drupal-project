@@ -12,6 +12,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Controller\UserAuthenticationController;
 use GuzzleHttp\Cookie\CookieJar;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -101,7 +102,10 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Tests user session life cycle.
    */
+  #[IgnoreDeprecations]
   public function testLogin(): void {
+    $this->expectUserDeprecationMessage('Drupal\\user\\Controller\\UserAuthenticationController is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \\Drupal\\rest\\Controller\\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
+
     // Without the serialization module only JSON is supported.
     $this->doTestLogin('json');
 
@@ -235,7 +239,10 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Tests user password reset.
    */
+  #[IgnoreDeprecations]
   public function testPasswordReset(): void {
+    $this->expectUserDeprecationMessage('Drupal\\user\\Controller\\UserAuthenticationController is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \\Drupal\\rest\\Controller\\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
+
     // Create a user account.
     $account = $this->drupalCreateUser();
 
