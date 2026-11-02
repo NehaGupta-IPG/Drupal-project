@@ -129,7 +129,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  protected function setPrefix($prefix) {
+  public function setPrefix($prefix) {
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
     $this->prefix = $prefix;
 

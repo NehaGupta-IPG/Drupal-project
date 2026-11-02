@@ -341,10 +341,17 @@ abstract class Connection {
   /**
    * Set the prefix used by this database connection.
    *
+   * Many methods are marked @internal for the convenience of the maintainers.
+   * This is not one of those: calling this method will almost certainly lead
+   * to data corruption. Even if you think you know what you are doing, you
+   * are extremely likely to be wrong.
+   *
    * @param string $prefix
    *   A single prefix.
+   *
+   * @internal
    */
-  protected function setPrefix($prefix) {
+  public function setPrefix($prefix) {
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
     $this->prefix = $prefix;
     $this->tablePlaceholderReplacements = [

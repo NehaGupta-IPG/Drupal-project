@@ -68,6 +68,13 @@ abstract class Database {
   protected static array $connections = [];
 
   /**
+   * A copy of the unprocessed database connection information.
+   *
+   * @var array<string|int,array<string|int,UnprocessedConnectionInfoArray>>
+   */
+  protected static array $rawDatabaseInfo = [];
+
+  /**
    * A processed copy of the database connection information from settings.php.
    *
    * @var array<string|int,array<string|int,ConnectionInfoArray>>
@@ -347,6 +354,7 @@ abstract class Database {
       @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     if (empty(self::$databaseInfo[$key][$target])) {
+      self::$rawDatabaseInfo[$key][$target] = $info;
       $connection_info = self::parseConnectionInfo($info);
       self::$databaseInfo[$key][$target] = $connection_info;
 
@@ -367,6 +375,22 @@ abstract class Database {
             $class_loader->addPsr4($dependency['namespace'] . '\\', $app_root . '/' . $dependency['autoload']);
           }
         }
+      }
+    }
+    elseif (!empty(self::$connections[$key][$target])) {
+      // If this method is called repeatedly with the same database info, but
+      // with a different prefix then change the database prefix. This database
+      // information can either be UnprocessedConnectionInfoArray when the
+      // caller has a database array set up and only varies the prefix, or it
+      // can be ConnectionInfoArray when the caller passes back the information
+      // received from ::getConnectionInfo() so both needs to be checked.
+      $without_prefix = static fn (array $x): array => array_diff_key($x, ['prefix' => NULL]);
+      $info_without_prefix = $without_prefix($info);
+      if (
+        ($info_without_prefix === $without_prefix(self::$rawDatabaseInfo[$key][$target])) ||
+        ($info_without_prefix === $without_prefix(self::$databaseInfo[$key][$target]))
+      ) {
+        self::$connections[$key][$target]->setPrefix($info['prefix'] ?? '');
       }
     }
   }
