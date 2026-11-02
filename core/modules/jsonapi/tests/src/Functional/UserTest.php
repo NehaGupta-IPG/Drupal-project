@@ -90,7 +90,7 @@ class UserTest extends ResourceTestBase {
 
     switch ($method) {
       case 'GET':
-        $this->grantPermissionsToTestedRole(['access user profiles']);
+        $this->grantPermissionsToTestedRole(['access user profiles', 'view usernames']);
         break;
 
       case 'POST':
@@ -458,6 +458,83 @@ class UserTest extends ResourceTestBase {
     $doc = $this->getDocumentFromResponse($response);
     $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
     $this->assertArrayHasKey('mail', $doc['data'][2]['attributes']);
+  }
+
+  /**
+   * Tests that the username field is only visible with the right permission.
+   */
+  public function testGetUsernameFieldOnlyVisibleWithPermission(): void {
+    // Create user B, with the same roles (and hence permissions) as user A.
+    $user_a = $this->account;
+    $pass = \Drupal::service('password_generator')->generate();
+    $user_b = User::create([
+      'name' => 'sibling-of-' . $user_a->getAccountName(),
+      'mail' => 'sibling-of-' . $user_a->getAccountName() . '@example.com',
+      'pass' => $pass,
+      'status' => 1,
+      'roles' => $user_a->getRoles(),
+    ]);
+    $user_b->save();
+    $user_b->passRaw = $pass;
+
+    // Grant permission to role that both users use.
+    $this->grantPermissionsToTestedRole(['access user profiles']);
+
+    $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['sort' => 'drupal_internal__uid']]);
+    // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
+    $user_a_url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $user_a->uuid()]);
+    /* $user_a_url = $user_a->toUrl('jsonapi'); */
+    $request_options = [];
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
+
+    // Viewing user A as user A: "name" and "display_name" fields are accessible (own username).
+    $response = $this->request('GET', $user_a_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayHasKey('name', $doc['data']['attributes']);
+    $this->assertArrayHasKey('display_name', $doc['data']['attributes']);
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayHasKey('name', $doc['data'][2]['attributes'], "Own user--user resource's 'name' field is visible.");
+    $this->assertArrayHasKey('display_name', $doc['data'][2]['attributes'], "Own user--user resource's 'display_name' field is visible.");
+    $this->assertSame($user_b->uuid(), $doc['data'][count($doc['data']) - 1]['id']);
+    $this->assertArrayNotHasKey('name', $doc['data'][count($doc['data']) - 1]['attributes'], "Other user--user resource's 'name' field is not visible without permission.");
+    $this->assertArrayNotHasKey('display_name', $doc['data'][count($doc['data']) - 1]['attributes'], "Other user--user resource's 'display_name' field is not visible without permission.");
+
+    // Now request the same URLs, but as user B (same roles/permissions).
+    $this->account = $user_b;
+    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
+    // Viewing user A as user B: "name" and "display_name" fields should be inaccessible.
+    $response = $this->request('GET', $user_a_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayNotHasKey('name', $doc['data']['attributes']);
+    $this->assertArrayNotHasKey('display_name', $doc['data']['attributes']);
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayNotHasKey('name', $doc['data'][2]['attributes']);
+    $this->assertArrayNotHasKey('display_name', $doc['data'][2]['attributes']);
+    $this->assertSame($user_b->uuid(), $doc['data'][count($doc['data']) - 1]['id']);
+    $this->assertArrayHasKey('name', $doc['data'][count($doc['data']) - 1]['attributes']);
+    $this->assertArrayHasKey('display_name', $doc['data'][count($doc['data']) - 1]['attributes']);
+
+    // Now grant permission to view usernames (note: 'access user profiles' is
+    // already granted above) and verify.
+    $this->grantPermissionsToTestedRole(['view usernames']);
+    // Viewing user A as user B: "name" and "display_name" fields should be accessible.
+    $response = $this->request('GET', $user_a_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayHasKey('name', $doc['data']['attributes']);
+    $this->assertArrayHasKey('display_name', $doc['data']['attributes']);
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayHasKey('name', $doc['data'][2]['attributes']);
+    $this->assertArrayHasKey('display_name', $doc['data'][2]['attributes']);
   }
 
   /**
