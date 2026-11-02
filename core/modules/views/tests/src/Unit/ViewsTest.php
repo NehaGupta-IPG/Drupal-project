@@ -7,8 +7,12 @@ namespace Drupal\Tests\views\Unit;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\ViewsHandlerManager;
@@ -263,6 +267,150 @@ class ViewsTest extends UnitTestCase {
 
     $result = Views::handlerManager('filter');
     $this->assertSame($handler_manager, $result);
+  }
+
+  /**
+   * Tests the ::t() deprecation.
+   */
+  #[IgnoreDeprecations]
+  public function testTranslateDeprecation(): void {
+    $this->expectUserDeprecationMessage('Drupal\views\Views::t() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\Core\StringTranslation\TranslatableMarkup instead. See https://www.drupal.org/node/3626175');
+
+    $this->container->set('string_translation', $this->createTranslationManager('ja', $this->createTranslator()));
+    $result = (new \ReflectionMethod(Views::class, 't'))->invoke(NULL, '@count fields', ['@count' => 3], ['context' => 'views']);
+    $this->assertInstanceOf(TranslatableMarkup::class, $result);
+    $this->assertSame('@count fields', $result->getUntranslatedString());
+    $this->assertSame(['@count' => 3], $result->getArguments());
+    $this->assertSame('views', $result->getOption('context'));
+    $this->assertSame('JA:3 fields', (string) $result);
+  }
+
+  /**
+   * Tests that handler labels use the current container's translation service.
+   */
+  #[DataProvider('providerTestGetHandlerTypesUsesCurrentTranslation')]
+  public function testGetHandlerTypesUsesCurrentTranslation(bool $replace_container): void {
+    $translator = $this->createTranslator();
+    $this->container->set('string_translation', $this->createTranslationManager('en', $translator));
+    $english_types = Views::getHandlerTypes();
+    $this->assertSame('EN:Fields', (string) $english_types['field']['title']);
+
+    $japanese_manager = $this->createTranslationManager('ja', $translator);
+    if ($replace_container) {
+      $container = new ContainerBuilder();
+      $container->set('string_translation', $japanese_manager);
+      \Drupal::setContainer($container);
+    }
+    else {
+      $this->container->set('string_translation', $japanese_manager);
+    }
+
+    $japanese_types = Views::getHandlerTypes();
+    $this->assertSame('JA:Fields', (string) $japanese_types['field']['title']);
+    $this->assertSame('JA:no results behavior', (string) $japanese_types['empty']['ltitle']);
+    $this->assertNotSame($english_types['field']['title'], $japanese_types['field']['title']);
+    $this->assertSame('EN:Fields', (string) $english_types['field']['title']);
+  }
+
+  /**
+   * Data provider for testGetHandlerTypesUsesCurrentTranslation().
+   *
+   * @return array
+   *   An array of test data.
+   */
+  public static function providerTestGetHandlerTypesUsesCurrentTranslation(): array {
+    return [
+      'same container' => [FALSE],
+      'new container' => [TRUE],
+    ];
+  }
+
+  /**
+   * Tests that handler labels do not retain a replaced translation service.
+   */
+  public function testGetHandlerTypesReleasesTranslationManager(): void {
+    $translator = $this->createTranslator();
+    $english_manager = $this->createTranslationManager('en', $translator);
+    $reference = \WeakReference::create($english_manager);
+    $this->container->set('string_translation', $english_manager);
+    $types = Views::getHandlerTypes();
+    foreach ($types as $type) {
+      foreach (['title', 'ltitle', 'stitle', 'lstitle'] as $key) {
+        (string) $type[$key];
+      }
+    }
+
+    $this->container->set('string_translation', $this->createTranslationManager('ja', $translator));
+    unset($english_manager, $types, $type);
+    gc_collect_cycles();
+    $this->assertNull($reference->get());
+  }
+
+  /**
+   * Tests that handler type labels are translated when rendered.
+   */
+  public function testGetHandlerTypesTranslatesLazily(): void {
+    $translator = $this->createTranslator();
+    $this->container->set('string_translation', $this->createTranslationManager('en', $translator));
+
+    $types = Views::getHandlerTypes();
+    $this->assertSame(0, $translator->calls);
+    $this->assertInstanceOf(TranslatableMarkup::class, $types['sort']['stitle']);
+    $this->assertSame('Sort criterion', $types['sort']['stitle']->getUntranslatedString());
+    $this->assertSame('fields', $types['field']['plural']);
+    $this->assertArrayNotHasKey('type', $types['field']);
+    $this->assertSame('area', $types['header']['type']);
+
+    $this->assertSame('EN:Sort criterion', (string) $types['sort']['stitle']);
+    $this->assertSame(1, $translator->calls);
+  }
+
+  /**
+   * Creates a translation manager with a fixed default language.
+   *
+   * @param string $langcode
+   *   The default language code.
+   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
+   *   The translator to add.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslationManager
+   *   The translation manager.
+   */
+  protected function createTranslationManager(string $langcode, TranslatorInterface $translator): TranslationManager {
+    $manager = new TranslationManager(new LanguageDefault(['id' => $langcode]));
+    $manager->addTranslator($translator);
+    return $manager;
+  }
+
+  /**
+   * Creates a translator that prefixes strings with the language code.
+   *
+   * @return \Drupal\Core\StringTranslation\Translator\TranslatorInterface
+   *   The translator. Its public $calls property counts translations.
+   */
+  protected function createTranslator(): TranslatorInterface {
+    return new class() implements TranslatorInterface {
+
+      /**
+       * The number of translated strings.
+       */
+      public int $calls = 0;
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getStringTranslation($langcode, $string, $context) {
+        $this->calls++;
+        return strtoupper($langcode) . ':' . $string;
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function reset(): void {
+      }
+
+    };
   }
 
 }
