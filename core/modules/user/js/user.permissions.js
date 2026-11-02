@@ -94,9 +94,13 @@
   /**
    * Filters the permission list table by a text input search string.
    *
+   * Optionally, only permissions flagged as "restrict access" are shown.
+   *
    * Text search input: input.table-filter-text
+   * Restricted toggle: input.table-filter-restricted
    * Target table:      input.table-filter-text[data-table]
    * Source text:       .table-filter-text-source
+   * Restricted rows:   tr.permission-restricted
    *
    * @type {Drupal~behavior}
    */
@@ -109,6 +113,9 @@
       const tableSelector = input.getAttribute('data-table');
       const $table = $(tableSelector);
       const $rows = $table.find('tbody tr');
+      const restrictedCheckbox = document.querySelector(
+        `input.table-filter-restricted[data-table="${tableSelector}"]`,
+      );
 
       function hideEmptyPermissionHeader(index, row) {
         const tdsWithModuleClass = row.querySelectorAll('td.module');
@@ -145,45 +152,48 @@
         }
       }
 
-      function filterPermissionList(e) {
-        const query = e.target.value;
-        if (query.length === 0) {
-          // Reset table when the textbox is cleared.
-          $rows.show();
+      function filterPermissionList() {
+        const query = input.value;
+        const restrictedOnly = !!restrictedCheckbox?.checked;
+        // Filter by text if the length of the query is at least 2 characters.
+        const filterByText = query.length >= 2;
+
+        // Reset the table before applying any filters.
+        $rows.show();
+        if (!filterByText && !restrictedOnly) {
+          return;
         }
+
         // Case insensitive expression to find query at the beginning of a word.
-        const re = new RegExp(`\\b${query}`, 'i');
+        const re = filterByText ? new RegExp(`\\b${query}`, 'i') : null;
 
         function showPermissionRow(index, row) {
           const sources = row.querySelectorAll('.table-filter-text-source');
           if (sources.length > 0) {
-            const textMatch = sources[0].textContent.search(re) !== -1;
-            $(row).closest('tr').toggle(textMatch);
+            const textMatch = !re || sources[0].textContent.search(re) !== -1;
+            const restrictedMatch =
+              !restrictedOnly ||
+              row.classList.contains('permission-restricted');
+            $(row).toggle(textMatch && restrictedMatch);
           }
         }
-        // Search over all rows.
-        $rows.show();
+        $rows.each(showPermissionRow);
 
-        // Filter if the length of the query is at least 2 characters.
-        if (query.length >= 2) {
-          $rows.each(showPermissionRow);
+        // Hide the empty header if they don't have any visible rows.
+        const visibleRows = $table.find('tbody tr:visible');
+        visibleRows.each(hideEmptyPermissionHeader);
+        const rowsWithoutEmptyModuleName = $table.find('tbody tr:visible');
+        // Find elements with class "permission" within visible rows.
+        const tdsWithModuleOrPermissionClass =
+          rowsWithoutEmptyModuleName.find('.permission');
 
-          // Hide the empty header if they don't have any visible rows.
-          const visibleRows = $table.find('tbody tr:visible');
-          visibleRows.each(hideEmptyPermissionHeader);
-          const rowsWithoutEmptyModuleName = $table.find('tbody tr:visible');
-          // Find elements with class "permission" within visible rows.
-          const tdsWithModuleOrPermissionClass =
-            rowsWithoutEmptyModuleName.find('.permission');
-
-          Drupal.announce(
-            Drupal.formatPlural(
-              tdsWithModuleOrPermissionClass.length,
-              '1 permission is available in the modified list.',
-              '@count permissions are available in the modified list.',
-            ),
-          );
-        }
+        Drupal.announce(
+          Drupal.formatPlural(
+            tdsWithModuleOrPermissionClass.length,
+            '1 permission is available in the modified list.',
+            '@count permissions are available in the modified list.',
+          ),
+        );
       }
 
       function preventEnterKey(event) {
@@ -199,6 +209,13 @@
           click: debounce(filterPermissionList, 200),
           keydown: preventEnterKey,
         });
+        if (restrictedCheckbox) {
+          $(restrictedCheckbox).on('change', filterPermissionList);
+          // Apply the filter if the checkbox state was restored by the browser.
+          if (restrictedCheckbox.checked) {
+            filterPermissionList();
+          }
+        }
       }
     },
   };
