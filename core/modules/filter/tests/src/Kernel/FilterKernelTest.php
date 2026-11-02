@@ -830,6 +830,44 @@ END CUSTOM TEMPLATE OUTPUT from 'container.html.twig'
     // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $this->assertFilteredString($filter, $tests);
 
+    // The default protocol for partial URLs is HTTP.
+    $this->assertSame(
+      '<a href="http://www.example.com">www.example.com</a>',
+      $filter->process('www.example.com', Language::LANGCODE_NOT_SPECIFIED)->getProcessedText()
+    );
+
+    // The protocol for partial URLs can be configured to HTTPS.
+    $filter->setConfiguration([
+      'settings' => [
+        'filter_url_length' => 496,
+        'filter_url_secure_links' => TRUE,
+      ],
+    ]);
+    $input = 'www.example.com https://www.example.org person@example.com '
+      . '<a href="www.example.net">www.example.net</a> '
+      . '<code>www.example.code</code> <pre>www.example.pre</pre> '
+      . '<script>var url = "www.example.script";</script> '
+      . '<style>/* www.example.style */</style>';
+    $expected = '<a href="https://www.example.com">www.example.com</a> '
+      . '<a href="https://www.example.org">https://www.example.org</a> '
+      . '<a href="mailto:person@example.com">person@example.com</a> '
+      . '<a href="www.example.net">www.example.net</a> '
+      . '<code>www.example.code</code> <pre>www.example.pre</pre> '
+      . '<script>var url = "www.example.script";</script> '
+      . '<style>/* www.example.style */</style>';
+    $this->assertSame(
+      $expected,
+      $filter->process($input, Language::LANGCODE_NOT_SPECIFIED)->getProcessedText()
+    );
+
+    // Restore the default for the remaining URL filter assertions.
+    $filter->setConfiguration([
+      'settings' => [
+        'filter_url_length' => 496,
+        'filter_url_secure_links' => FALSE,
+      ],
+    ]);
+
     // Surrounding text/punctuation.
     // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [

@@ -75,3 +75,6 @@ filter_settings.filter_url:
     filter_url_length:
       type: integer
       label: 'URL length'
+    filter_url_secure_links:
+      type: boolean
+      label: 'Use secure links'
