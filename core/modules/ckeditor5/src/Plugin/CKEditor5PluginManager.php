@@ -376,6 +376,12 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
         if ($id === 'ckeditor5_sourceEditing') {
           $defined_elements = !isset($editor) ? [] : $this->getPlugin($id, $editor)->getElementsSubset();
         }
+        // ckeditor5_style is an edge case too: in its definition it declares
+        // that allows any HTML tag with the class attribute but it only allows
+        // those specific classes that are configured.
+        elseif ($id === 'ckeditor5_style' && !isset($editor)) {
+          $defined_elements = [];
+        }
         // The default case: all other plugins that implement this interface are
         // explicitly checked for compliance: only subsets are allowed. This is
         // essential for \Drupal\ckeditor5\SmartDefaultSettings to be able to
