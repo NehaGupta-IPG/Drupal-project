@@ -39,7 +39,7 @@ trait JsonSchemaReflectionTrait {
     $schemas = array_map(fn ($schema) => $schema->newInstance()->getJsonSchema(), $schemas);
 
     // A schema's type is a single type, like 'null', or a list of types, like
-    // ['string', 'null']. It can also have none, like ['enum' => ['a', NULL]].
+    // ['string', 'null'].
     $has_null_type = fn (array $schema): bool => in_array('null', (array) ($schema['type'] ?? []), TRUE);
 
     // A oneOf accepts a value only if exactly one option matches, so a second
