@@ -258,8 +258,13 @@ class MenuForm extends EntityForm {
       '#theme' => 'table__menu_overview',
       '#header' => [
         $this->t('Menu link'),
+        $this->t('Provider'),
         [
           'data' => $this->t('Enabled'),
+          'class' => ['checkbox'],
+        ],
+        [
+          'data' => $this->t('Expanded'),
           'class' => ['checkbox'],
         ],
         $this->t('Weight'),
@@ -323,6 +328,8 @@ class MenuForm extends EntityForm {
       unset($form['links']['#header'][2]);
     }
 
+    // @todo Inject the service.
+    $moduleExtensionList = \Drupal::service('extension.list.module');
     foreach (Element::children($links) as $id) {
       if (isset($links[$id]['#item'])) {
         $element = $links[$id];
@@ -357,8 +364,16 @@ class MenuForm extends EntityForm {
           ],
           $element['title'],
         ];
+        $provider = $element['#item']->link->getProvider();
+        $provider_name = $moduleExtensionList->exists($provider) ? $moduleExtensionList->getName($provider) : $provider;
+        $form['links'][$id]['provider'] = ['#markup' => $provider_name];
         $form['links'][$id]['enabled'] = $element['enabled'];
         $form['links'][$id]['enabled']['#wrapper_attributes']['class'] = ['checkbox', 'menu-enabled'];
+        $form['links'][$id]['expanded'] = [
+          '#type' => 'checkbox',
+          '#value' => $element['#item']->link->isExpanded(),
+        ];
+        $form['links'][$id]['expanded']['#wrapper_attributes']['class'] = ['checkbox', 'menu-enabled'];
 
         // Disallow changing the publishing status of a pending revision.
         if ($is_pending_menu_link) {
