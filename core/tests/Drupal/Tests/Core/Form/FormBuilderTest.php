@@ -624,7 +624,7 @@ class FormBuilderTest extends FormTestBase {
    * @legacy-covers ::buildForm
    */
   public function testExceededFileSize(): void {
-    $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
+    $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
     $request->setSession(new Session(new MockArraySessionStorage()));
     $request_stack = new RequestStack();
     $request_stack->push($request);
@@ -689,6 +689,32 @@ class FormBuilderTest extends FormTestBase {
   public function testGetAjaxRequest(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
     $request->query->set('form_id', 'different_form_id');
+    $request->setMethod('GET');
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $this->requestStack->push($request);
+
+    $form_state = (new FormState())
+      ->setUserInput([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE])
+      ->setMethod('get')
+      ->setAlwaysProcess()
+      ->disableRedirect()
+      ->set('ajax', TRUE);
+
+    $form_id = '\Drupal\Tests\Core\Form\TestForm';
+    $expected_form = (new TestForm())->buildForm([], $form_state);
+
+    $form = $this->formBuilder->buildForm($form_id, $form_state);
+    $this->assertFormElement($expected_form, $form, 'test');
+    $this->assertSame('test-form', $form['#id']);
+  }
+
+  /**
+   * Tests get ajax request without a form ID.
+   *
+   * @legacy-covers ::buildForm
+   */
+  public function testGetAjaxRequestWithoutFormId(): void {
+    $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
     $request->setMethod('GET');
     $request->setSession(new Session(new MockArraySessionStorage()));
     $this->requestStack->push($request);
