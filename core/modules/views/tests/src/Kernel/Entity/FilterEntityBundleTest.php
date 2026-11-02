@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel\Entity;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Entity\View;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -105,6 +106,46 @@ class FilterEntityBundleTest extends ViewsKernelTestBase {
     $this->executeView($view);
 
     $this->assertEmpty($view->result);
+  }
+
+  /**
+   * Tests a bundle filter whose relationship has been removed.
+   *
+   * The display reports the missing relationship rather than throwing while
+   * the filter is initialized.
+   */
+  public function testMissingRelationship(): void {
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
+    NodeType::create(['type' => 'test_bundle', 'name' => 'Test 1'])->save();
+
+    $view = Views::getView('test_entity_type_filter');
+    $view->setDisplay();
+    $filters = $view->display_handler->getOption('filters');
+    $filters['type']['relationship'] = 'removed_relationship';
+    $view->display_handler->setOption('filters', $filters);
+
+    $errors = array_map(fn ($error) => strip_tags((string) $error), $view->validate()['default']);
+    $this->assertContains('The removed_relationship relationship used in filter criterion Content: Content type is not present in the Default display.', $errors);
+  }
+
+  /**
+   * Tests adding a bundle filter to a view of a table with no entity type.
+   *
+   * The filter is initialized before a relationship can be chosen for it, so
+   * the entity type cannot come from the base table of the view.
+   */
+  public function testBaseTableWithoutEntityType(): void {
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
+    NodeType::create(['type' => 'test_bundle', 'name' => 'Test 1'])->save();
+
+    $view = View::create(['id' => 'test_bundle_no_entity_type', 'base_table' => 'views_test_data'])->getExecutable();
+    $view->setDisplay();
+    $view->addHandler('default', 'filter', 'node_field_data', 'type');
+
+    $filter = $view->display_handler->getHandler('filter', 'type');
+    $this->assertSame(['test_bundle' => 'Test 1'], $filter->getValueOptions());
   }
 
 }
