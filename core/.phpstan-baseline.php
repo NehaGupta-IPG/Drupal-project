@@ -170,30 +170,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/assets/scaffold/files/default.settings.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'require.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/index.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload_runtime\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/index.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'require.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/update.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload_runtime\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/assets/scaffold/files/update.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Queue\\\\QueueInterface\\:\\:getAllItems\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -3384,12 +3360,6 @@ $ignoreErrors[] = [
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Command/GenerateTheme.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.core\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Command/InstallCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Command\\\\ServerCommand\\:\\:openBrowser\\(\\) has no return type specified\\.$#',
@@ -40620,18 +40590,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/system.module',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/http.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/https.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\action_test\\\\Plugin\\\\Action\\\\NoType\\:\\:execute\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -62517,12 +62475,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Form/FormCacheTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in include_once\\(\\) "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'includeOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Hook/HookCollectorPassTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Offset \'\\#attributes\' does not exist on array\\{\\}\\.$#',
 	'identifier' => 'offsetAccess.notFound',
 	'count' => 4,
@@ -62595,26 +62547,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Image/ToolkitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallRequirementsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerLanguageTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @var with type Psr\\\\Http\\\\Message\\\\ResponseInterface is not subtype of native type GuzzleHttp\\\\Psr7\\\\Response\\.$#',
 	'identifier' => 'varTag.nativeType',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerTranslationDownloadTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require_once\\(\\) "core/includes/install\\.core\\.inc" is not a file or it does not exist\\.$#',
-	'identifier' => 'requireOnce.fileNotFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerTranslationDownloadTest.php',
 ];
@@ -63307,12 +63241,6 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in require\\(\\) "autoload\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'require.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteUserLoginCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\TestSite\\\\TestPreinstallInterface\\:\\:preinstall\\(\\) has no return type specified\\.$#',
