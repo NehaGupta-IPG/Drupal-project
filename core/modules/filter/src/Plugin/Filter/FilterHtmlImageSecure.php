@@ -5,6 +5,7 @@ namespace Drupal\filter\Plugin\Filter;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Attribute\Filter;
@@ -36,6 +37,7 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     $plugin_definition,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
     protected ModuleHandlerInterface $moduleHandler,
+    protected ImageFactory $imageFactory,
     #[Autowire(param: 'app.root')]
     string $root,
   ) {
@@ -52,6 +54,10 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     $base_path = base_path();
     $base_path_length = mb_strlen($base_path);
 
+    // Find the private path.
+    $private_path = $base_path . 'system/files/';
+    $private_path_length = mb_strlen($private_path);
+
     // Find the directory on the server where index.php resides.
     $local_dir = $this->root . '/';
 
@@ -64,15 +70,25 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
       // on multisite set-ups and prevent mixed content errors.
       $image->setAttribute('src', $this->fileUrlGenerator->transformRelative($src));
 
-      // Verify that $src starts with $base_path.
+      // Verify that $src starts with $base_path or $private_base_path.
       // This also ensures that external images cannot be referenced.
       $src = $image->getAttribute('src');
-      if (mb_substr($src, 0, $base_path_length) === $base_path) {
+      if ($this->isPrivateImage($src, $private_path, $private_path_length)) {
+        if ($this->isSecurePrivateImage($src, $private_path, $private_path_length)) {
+          continue;
+        }
+      }
+      elseif (mb_substr($src, 0, $base_path_length) === $base_path) {
         // Remove the $base_path to get the path relative to the Drupal root.
         // Ensure the path refers to an actual image by prefixing the image
         // source with the Drupal root and running getimagesize() on it.
         $local_image_path = $local_dir . mb_substr($src, $base_path_length);
         $local_image_path = rawurldecode($local_image_path);
+
+        // A query string is not part of the filename and would cause
+        // getimagesize() to fail even when the local image exists.
+        $local_image_path = explode('?', $local_image_path, 2)[0];
+
         if (@getimagesize($local_image_path)) {
           // The image has the right path. Invalid images are handled below.
           continue;
@@ -85,6 +101,51 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     }
 
     return new FilterProcessResult(Html::serialize($html_dom));
+  }
+
+  /**
+   * Check whether image is private.
+   *
+   * @param string $src
+   *   The image source.
+   * @param string $private_path
+   *   Drupal private file system path.
+   * @param int $private_path_length
+   *   Private path length.
+   *
+   * @return bool
+   *   Whether image is private.
+   */
+  protected function isPrivateImage(string $src, string $private_path, int $private_path_length): bool {
+    return (mb_substr($src, 0, $private_path_length) === $private_path);
+  }
+
+  /**
+   * Check whether private image is secure.
+   *
+   * @param string $src
+   *   The image source.
+   * @param string $private_path
+   *   Drupal private file system path.
+   * @param int $private_path_length
+   *   Private path length.
+   *
+   * @return bool
+   *   Whether private image is secure.
+   */
+  protected function isSecurePrivateImage(string $src, string $private_path, int $private_path_length): bool {
+    // Query strings and fragments are URL components, not part of the filename
+    // passed to the image factory. Decode only after extracting the URL path.
+    $private_image_path = mb_substr(parse_url($src, PHP_URL_PATH), $private_path_length);
+    $private_image_path = 'private://' . $private_image_path;
+    $private_image_path = rawurldecode($private_image_path);
+
+    $image_object = $this->imageFactory->get($private_image_path);
+    if ($image_object->getFileSize()) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
