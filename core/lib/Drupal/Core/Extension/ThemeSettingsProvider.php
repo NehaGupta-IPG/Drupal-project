@@ -12,6 +12,7 @@ use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Theme\ThemeSettings;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Default implementation of the theme settings provider service.
@@ -42,6 +43,8 @@ class ThemeSettingsProvider {
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     #[Autowire(service: 'cache.memory')]
     protected readonly MemoryCacheInterface $memoryCache,
+    #[Autowire(service: 'file.mime_type.guesser')]
+    protected readonly MimeTypeGuesserInterface $mimeTypeGuesser,
   ) {
   }
 
@@ -105,9 +108,11 @@ class ThemeSettingsProvider {
         }
       }
 
+      $activeTheme = $this->themeInitialization->getActiveThemeByName($theme);
+
       // Generate the path to the logo image.
       if ($themeSettings->get('logo.use_default')) {
-        $logo = $this->themeInitialization->getActiveThemeByName($theme)->getLogo();
+        $logo = $activeTheme->getLogo();
         $themeSettings->set('logo.url', $this->fileUrlGenerator->generateString($logo));
       }
       elseif ($logo_path = $themeSettings->get('logo.path')) {
@@ -118,12 +123,14 @@ class ThemeSettingsProvider {
       if ($themeSettings->get('features.favicon')) {
         $faviconPath = $themeSettings->get('favicon.path');
         if ($themeSettings->get('favicon.use_default')) {
-          if (file_exists($favicon = $themeObject->getPath() . '/favicon.ico')) {
-            $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
+          if (!file_exists($favicon = $activeTheme->getFavicon())) {
+            $favicon = 'core/misc/favicon.ico';
           }
-          else {
-            $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString('core/misc/favicon.ico'));
-          }
+          $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
+          // A theme can declare a favicon in any format in its .info.yml file,
+          // so the MIME type is derived from the file instead of assuming the
+          // configured default of image/vnd.microsoft.icon.
+          $themeSettings->set('favicon.mimetype', $this->mimeTypeGuesser->guessMimeType($favicon));
         }
         elseif ($faviconPath) {
           $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($faviconPath));

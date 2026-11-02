@@ -166,6 +166,15 @@ class ThemeInitialization implements ThemeInitializationInterface {
       $values['logo'] = $theme->getPath() . '/logo.svg';
     }
 
+    // Use the favicon declared in this themes info file, otherwise use
+    // favicon.ico from the themes root.
+    if (!empty($theme->info['favicon'])) {
+      $values['favicon'] = $theme->getPath() . '/' . $theme->info['favicon'];
+    }
+    else {
+      $values['favicon'] = $theme->getPath() . '/favicon.ico';
+    }
+
     // Prepare libraries overrides from this theme and ancestor themes. This
     // allows child themes to easily remove CSS files from base themes and
     // modules.
