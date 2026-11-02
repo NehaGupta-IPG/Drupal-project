@@ -310,6 +310,13 @@ class AssetOptimizationTest extends BrowserTestBase {
     $session->visit($this->replaceFileNamePrefix($url));
     $this->assertSession()->statusCodeEquals(400);
 
+    // Without any query arguments the request cannot come from a generated
+    // aggregate URL, for example a browser or crawler looking for a source map.
+    $session->visit(strtok($this->replaceGroupHash($url), '?'));
+    $this->assertSession()->statusCodeEquals(404);
+    $session->visit(strtok($url, '?') . '.map');
+    $this->assertSession()->statusCodeEquals(404);
+
     // When an invalid asset hash name is given.
     $session->visit($this->replaceGroupHash($url));
     $this->assertSession()->statusCodeEquals(200);
