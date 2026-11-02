@@ -223,10 +223,15 @@ class GDToolkit extends ImageToolkitBase {
     $scheme = StreamWrapperManager::getScheme($destination);
     // Work around lack of stream wrapper support in imagejpeg() and imagepng().
     if ($scheme && $this->streamWrapperManager->isValidScheme($scheme)) {
-      // If destination is not local, save image to temporary local file.
+      $permanent_destination = $destination;
       $local_wrappers = $this->streamWrapperManager->getWrappers(StreamWrapperInterface::LOCAL);
-      if (!isset($local_wrappers[$scheme])) {
-        $permanent_destination = $destination;
+      if (isset($local_wrappers[$scheme])) {
+        // Moving a temporary file from the same directory is an atomic rename,
+        // so a partially written image is never visible at the destination.
+        $destination = $this->fileSystem->dirname($destination) . '/.' . bin2hex(random_bytes(6)) . '.' . basename($destination);
+      }
+      else {
+        // If destination is not local, save image to temporary local file.
         $destination = $this->fileSystem->tempnam('temporary://', 'gd_');
       }
       // Convert stream wrapper URI to normal path.
@@ -274,13 +279,20 @@ class GDToolkit extends ImageToolkitBase {
         $success = FALSE;
       }
     }
-    // Move temporary local file to remote destination.
+
+    if (isset($permanent_destination) && !$success && file_exists($destination)) {
+      $this->fileSystem->unlink($destination);
+    }
+
     if (isset($permanent_destination) && $success) {
       try {
         $this->fileSystem->move($destination, $permanent_destination, FileExists::Replace);
         return TRUE;
       }
       catch (FileException) {
+        if (file_exists($destination)) {
+          $this->fileSystem->unlink($destination);
+        }
         return FALSE;
       }
     }
