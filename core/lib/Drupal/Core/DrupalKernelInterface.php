@@ -2,6 +2,7 @@
 
 namespace Drupal\Core;
 
+use Drupal\Component\FileSystem\VersionedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -159,5 +160,15 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    * Helper method that loads legacy Drupal include files.
    */
   public function loadLegacyIncludes();
+
+  /**
+   * Get the versioned file handler.
+   *
+   * @return \Drupal\Component\FileSystem\VersionedFile
+   *   The versioned file handler.
+   *
+   * @internal
+   */
+  public function getVersionedFile(): VersionedFile;
 
 }

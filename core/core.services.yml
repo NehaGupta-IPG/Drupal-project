@@ -1206,6 +1206,9 @@ services:
   entity.query.keyvalue:
     class: Drupal\Core\Entity\KeyValueStore\Query\QueryFactory
     arguments: ['@keyvalue']
+  rebuild_subscriber:
+    class: Drupal\Core\EventSubscriber\RebuildSubscriber
+    arguments: ['@state', '@kernel']
   router.dumper:
     class: Drupal\Core\Routing\MatcherDumper
     arguments: ['@database', '@state', '@logger.channel.router']

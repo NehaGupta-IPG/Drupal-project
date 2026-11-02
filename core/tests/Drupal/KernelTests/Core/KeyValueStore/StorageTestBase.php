@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\KeyValueStore;
 
+use Drupal\Core\KeyValueStore\IncrementableKeyValueStoreInterface;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -209,6 +210,28 @@ abstract class StorageTestBase extends KernelTestBase {
     $this->assertSame($store->get('old'), 'thing');
     $store->rename('old', 'old');
     $this->assertSame($store->get('old'), 'thing');
+  }
+
+  /**
+   * Tests the increment operation if available.
+   */
+  public function testIncrement(): void {
+    $stores = $this->createStorage();
+    $store = $stores[0];
+    if ($store instanceof IncrementableKeyValueStoreInterface) {
+      $store->increment('foo');
+      $this->assertSame(1, $store->get('foo'));
+      $store->increment('foo');
+      $this->assertSame(2, $store->get('foo'));
+      $value = mt_rand(1000, 2000);
+      $store->set('foo', $value);
+      $step = mt_rand(10, 20);
+      $store->increment('foo', $step);
+      $this->assertSame($value + $step, $store->get('foo'));
+    }
+    else {
+      $this->assertTrue(TRUE);
+    }
   }
 
   /**

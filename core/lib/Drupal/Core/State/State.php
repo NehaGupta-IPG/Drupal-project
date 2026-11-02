@@ -4,13 +4,14 @@ namespace Drupal\Core\State;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
+use Drupal\Core\KeyValueStore\IncrementableKeyValueStoreInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 
 /**
  * Provides the state system using a key value store.
  */
-class State extends CacheCollector implements StateInterface {
+class State extends CacheCollector implements IncrementableStateInterface {
 
   /**
    * Information about all deprecated state, keyed by legacy state key.
@@ -102,11 +103,27 @@ class State extends CacheCollector implements StateInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $data) {
+    $this->doSetMultiple($data);
+  }
+
+  /**
+   * Saves key/value pairs.
+   *
+   * This method always writes the caches and might write to the underlying
+   * key-value store as well.
+   *
+   * @param array $data
+   *   An associative array of key/value pairs.
+   * @param array $previous
+   *   An associative array of key/previous value pairs. When this is not
+   *   empty only the cache is written.
+   */
+  protected function doSetMultiple(array $data, array $previous = []): void {
     $lock_name = $this->getCid() . ':' . CacheCollector::class;
     $lock_acquired = $this->lock->acquire($lock_name);
     $this->lazyLoadCache();
     foreach ($data as $key => $value) {
-      $this->registerKeySetDuringRequest($key, $value, parent::get($key));
+      $this->registerKeySetDuringRequest($key, $value, $previous[$key] ?? parent::get($key));
       if (isset(self::$deprecatedState[$key])) {
         // phpcs:ignore Drupal.Semantics.FunctionTriggerError
         @trigger_error(self::$deprecatedState[$key]['message'], E_USER_DEPRECATED);
@@ -114,7 +131,9 @@ class State extends CacheCollector implements StateInterface {
         unset($data[$key]);
       }
     }
-    $this->keyValueStore->setMultiple($data);
+    if (!$previous) {
+      $this->keyValueStore->setMultiple($data);
+    }
     // If another request had a cache miss before this request, and also hasn't
     // written to cache yet, then it may already have read the previous value
     // from the database and could write it to the cache at the end of the
@@ -218,6 +237,20 @@ class State extends CacheCollector implements StateInterface {
     $this->keysSetDuringRequest[$key]['value'] = $value;
     if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function increment(string $key, int $step = 1): int {
+    if ($this->keyValueStore instanceof IncrementableKeyValueStoreInterface) {
+      $newValue = $this->keyValueStore->increment($key, $step);
+      $this->doSetMultiple([$key => $newValue], [$key => $newValue - $step]);
+      return $newValue;
+    }
+    else {
+      throw new \LogicException('The key-value store underlying state does not support increment.');
     }
   }
 
