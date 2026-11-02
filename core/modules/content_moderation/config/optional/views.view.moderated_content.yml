@@ -7,6 +7,9 @@ dependencies:
   enforced:
     module:
       - content_moderation
+      - workflows
+    config:
+      - workflows.workflow.editorial
 id: moderated_content
 label: 'Moderated content'
 module: views
