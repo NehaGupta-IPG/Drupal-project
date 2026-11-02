@@ -7,11 +7,26 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\node\NodeInterface;
+use Drupal\search_node\Plugin\Search\SearchNode;
 
 /**
  * Hooks for the Search Node module.
  */
 class SearchNodeHooks {
+
+  /**
+   * Implements hook_search_plugin_alter().
+   */
+  #[Hook('search_plugin_alter')]
+  public function searchPluginAlter(array &$definitions): void {
+    // The deprecated plugin in the node module uses the same ID. Discovery
+    // keeps the last definition that it finds, and the order depends on module
+    // weights. Always use the plugin from this module.
+    if (isset($definitions['node_search'])) {
+      $definitions['node_search']['class'] = SearchNode::class;
+      $definitions['node_search']['provider'] = 'search_node';
+    }
+  }
 
   /**
    * Implements hook_entity_predelete().
