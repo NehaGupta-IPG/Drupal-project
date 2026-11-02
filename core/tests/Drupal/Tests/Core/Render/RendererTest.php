@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore fooalert
 
@@ -1152,6 +1153,57 @@ class RendererTest extends RendererTestBase {
     // Test that the method works with no current request.
     $this->requestStack->pop();
     $this->assertFalse($this->renderer->hasRenderContext());
+  }
+
+  /**
+   * Tests that the render context collection does not retain completed requests.
+   */
+  public function testRenderContextRequestLifetime(): void {
+    // Simulate a second renderer created by a container rebuild during a request.
+    $other_renderer = clone $this->renderer;
+    foreach ([FALSE, TRUE] as $throw) {
+      $request = new Request();
+      $reference = \WeakReference::create($request);
+      $this->requestStack->push($request);
+      try {
+        $this->renderer->executeInRenderContext(new RenderContext(), function () use ($other_renderer, $throw): void {
+          // Both renderers can see active contexts, including nested contexts.
+          $this->assertTrue($other_renderer->hasRenderContext());
+          $other_renderer->executeInRenderContext(new RenderContext(), function (): void {
+            $this->assertTrue($this->renderer->hasRenderContext());
+          });
+          // A subrequest has its own context, shared by both renderers.
+          $subrequest = new Request();
+          $subrequest_reference = \WeakReference::create($subrequest);
+          $this->requestStack->push($subrequest);
+          $this->assertFalse($other_renderer->hasRenderContext());
+          $other_renderer->executeInRenderContext(new RenderContext(), function (): void {
+            $this->assertTrue($this->renderer->hasRenderContext());
+          });
+          // The collection must not keep the completed subrequest alive.
+          $this->requestStack->pop();
+          unset($subrequest);
+          $this->assertNull($subrequest_reference->get());
+          // The parent request still has an active context.
+          $this->assertTrue($other_renderer->hasRenderContext());
+          if ($throw) {
+            throw new \RuntimeException('Rendering failed.');
+          }
+        });
+        // Normal completion leaves the parent request without an active context.
+        $this->assertFalse($other_renderer->hasRenderContext());
+      }
+      catch (\RuntimeException $exception) {
+        $this->assertTrue($throw);
+        $this->assertSame('Rendering failed.', $exception->getMessage());
+        unset($exception);
+      }
+      // Release the parent request after normal completion or an exception.
+      $this->requestStack->pop();
+      unset($request);
+      gc_collect_cycles();
+      $this->assertNull($reference->get());
+    }
   }
 
   /**
