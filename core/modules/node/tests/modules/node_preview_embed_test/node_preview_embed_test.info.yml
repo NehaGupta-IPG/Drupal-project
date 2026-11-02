@@ -1,0 +1,7 @@
+name: 'Node preview embed test'
+type: module
+description: 'Support module for testing node previews embedded in another page.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:node
