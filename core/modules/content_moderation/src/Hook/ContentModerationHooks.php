@@ -363,6 +363,31 @@ class ContentModerationHooks {
   }
 
   /**
+   * Implements hook_views_data_alter().
+   *
+   * Provides a views filter for moderation state across multiple workflows.
+   * Unlike the default moderation_state_filter which uses composite
+   * workflow-state IDs (e.g. "editorial-draft"), this filter aggregates states
+   * across all content moderation workflows using plain state IDs (e.g.
+   * "draft"), which is less confusing for editors who may not know which
+   * workflow governs their content.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3382759
+   */
+  #[Hook('views_data_alter')]
+  public function viewsDataAlter(array &$data): void {
+    $data['node']['moderation_state_multiple_workflow_filter'] = [
+      'title' => $this->t('Moderation state across workflows'),
+      'filter' => [
+        'title' => $this->t('Moderation state'),
+        'help' => $this->t('Provides a filter for nodes by their moderation state across multiple workflows.'),
+        'field' => 'nid',
+        'id' => 'moderation_state_multiple_workflow_filter',
+      ],
+    ];
+  }
+
+  /**
    * Implements hook_views_post_execute().
    */
   #[Hook('views_post_execute')]
