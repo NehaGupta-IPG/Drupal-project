@@ -219,6 +219,24 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       }
       elseif (!empty($this->configuration['block_revision_id'])) {
         $entity = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
+
+        $load_by_uuid = FALSE;
+        if (!empty($this->configuration['block_uuid'])) {
+          if (empty($entity)) {
+            $load_by_uuid = TRUE;
+          }
+          else {
+            if ($entity->uuid() !== $this->configuration['block_uuid']) {
+              $load_by_uuid = TRUE;
+            }
+          }
+        }
+
+        if ($load_by_uuid) {
+          $entity = $this->entityTypeManager->getStorage('block_content')->loadByProperties(['uuid' => $this->configuration['block_uuid']]);
+          $entity = !empty($entity) ? current($entity) : NULL;
+        }
+
         $this->blockContent = $entity;
       }
       else {
@@ -264,6 +282,14 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     if ($duplicate_block) {
       if (empty($block) && !empty($this->configuration['block_revision_id'])) {
         $block = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
+
+        if (!empty($block) && $block->uuid() !== $this->configuration['block_uuid']) {
+          $block = NULL;
+        }
+      }
+      if (empty($block) && !empty($this->configuration['block_uuid'])) {
+        $entity = $this->entityTypeManager->getStorage('block_content')->loadByProperties(['uuid' => $this->configuration['block_uuid']]);
+        $block = !empty($entity) ? current($entity) : NULL;
       }
       if ($block) {
         $block = $block->createDuplicate();
@@ -277,6 +303,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
         $block->setNewRevision();
       }
       $block->save();
+      $this->configuration['block_uuid'] = $block->uuid();
       $this->configuration['block_id'] = $block->id();
       $this->configuration['block_revision_id'] = $block->getRevisionId();
       $this->configuration['block_serialized'] = NULL;
