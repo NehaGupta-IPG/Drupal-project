@@ -63,7 +63,7 @@ body:has([data-drupal-selector="edit-preview"] + .ajax-progress) :where([data-dr
 body:has([data-drupal-selector="edit-delete"] + .ajax-progress) :where([data-drupal-selector="sticky-edit-delete"]) {
   padding-inline-start: var(--admin-space-xl);
   animation: pseudo-throbber 1s linear infinite;
-  background-image: url("../../migration/media/icons/general/loader.svg");
+  background-image: var(--admin-icon-loader);
 
   &:dir(rtl) {
     padding-inline-start: unset;

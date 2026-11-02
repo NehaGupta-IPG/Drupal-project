@@ -1,63 +1,121 @@
-/* cspell:ignore toleft, totop, tmgmt, webform */
+/*
+ * Default Admin icon registry.
+ *
+ * Every --admin-icon-* custom property is a URL to a monochrome SVG in
+ * images/icons/ (or images/logos/ for brand marks). Property names are the
+ * stable public API; several names intentionally alias the same file (for
+ * example --admin-icon-add and plus.svg, --admin-icon-close/--admin-icon-remove
+ * and close.svg). Use them as mask-image values tinted by background-color.
+ * Only add a property when theme CSS uses it.
+ */
+/* cspell:ignore toleft, totop */
 :root {
-  --admin-icon-add: url("../../migration/media/icons/general/add.svg");
-  --admin-icon-announcement: url("../../migration/media/icons/navigation/announcement.svg");
-  --admin-icon-appearance: url("../../migration/media/icons/toolbar/appearance.svg");
-  --admin-icon-asterisk: url("../../migration/media/icons/form/asterisk.svg");
-  --admin-icon-bat: url("../../migration/media/icons/toolbar/bat.svg");
-  --admin-icon-blocks: url("../../migration/media/icons/navigation/blocks.svg");
-  --admin-icon-bookmarks: url("../../migration/media/icons/navigation/bookmarks.svg");
-  --admin-icon-checked: url("../../migration/media/icons/form/checked.svg");
-  --admin-icon-checkmark: url("../../migration/media/icons/action-link/checkmark.svg");
-  --admin-icon-chevron-down: url("../../migration/media/icons/navigation/chevron-down.svg");
-  --admin-icon-clock: url("../../migration/media/icons/status-report/clock.svg");
-  --admin-icon-close: url("../../migration/media/icons/general/close.svg");
-  --admin-icon-commerce: url("../../migration/media/icons/toolbar/commerce.svg");
-  --admin-icon-config: url("../../migration/media/icons/toolbar/config.svg");
-  --admin-icon-content: url("../../migration/media/icons/toolbar/content.svg");
-  --admin-icon-create: url("../../migration/media/icons/navigation/create.svg");
-  --admin-icon-database: url("../../migration/media/icons/status-report/database.svg");
-  --admin-icon-devel: url("../../migration/media/icons/toolbar-meta/devel.svg");
-  --admin-icon-drag: url("../../migration/media/icons/table/drag.svg");
-  --admin-icon-drag-y: url("../../migration/media/icons/table/drag-y.svg");
-  --admin-icon-drop: url("../../migration/media/icons/general/drop.svg");
-  --admin-icon-drupal: url("../../migration/media/icons/general/drupal.svg");
-  --admin-icon-edit: url("../../migration/media/icons/toolbar/edit.svg");
-  --admin-icon-error: url("../../migration/media/icons/messages/error.svg");
-  --admin-icon-extend-new: url("../../migration/media/icons/navigation/extend-new.svg");
-  --admin-icon-files: url("../../migration/media/icons/navigation/files.svg");
-  --admin-icon-first: url("../../migration/media/icons/pager/first.svg");
-  --admin-icon-group: url("../../migration/media/icons/toolbar/group.svg");
-  --admin-icon-hamburger: url("../../migration/media/icons/toolbar/hamburger.svg");
-  --admin-icon-handle: url("../../migration/media/icons/general/handle.svg");
-  --admin-icon-help: url("../../migration/media/icons/toolbar/help.svg");
-  --admin-icon-hide: url("../../migration/media/icons/action-link/hide.svg");
-  --admin-icon-info: url("../../migration/media/icons/messages/info.svg");
-  --admin-icon-last: url("../../migration/media/icons/pager/last.svg");
-  --admin-icon-media: url("../../migration/media/icons/navigation/media.svg");
-  --admin-icon-nav-toggle-toleft: url("../../migration/media/icons/toolbar/nav-toggle-toleft.svg");
-  --admin-icon-nav-toggle-totop: url("../../migration/media/icons/toolbar/nav-toggle-totop.svg");
-  --admin-icon-next: url("../../migration/media/icons/pager/next.svg");
-  --admin-icon-people-new: url("../../migration/media/icons/navigation/people-new.svg");
-  --admin-icon-php: url("../../migration/media/icons/status-report/php.svg");
-  --admin-icon-prev: url("../../migration/media/icons/pager/prev.svg");
-  --admin-icon-rebuild-cache: url("../../migration/media/icons/toolbar-meta/rebuild-cache.svg");
-  --admin-icon-remove: url("../../migration/media/icons/action-link/remove.svg");
-  --admin-icon-reports: url("../../migration/media/icons/toolbar/reports.svg");
-  --admin-icon-responsive-preview: url("../../migration/media/icons/toolbar-meta/responsive-preview.svg");
-  --admin-icon-search: url("../../migration/media/icons/toolbar-meta/search.svg");
-  --admin-icon-server: url("../../migration/media/icons/status-report/server.svg");
-  --admin-icon-show: url("../../migration/media/icons/action-link/show.svg");
-  --admin-icon-sort: url("../../migration/media/icons/table/sort.svg");
-  --admin-icon-sort-asc: url("../../migration/media/icons/table/sort-asc.svg");
-  --admin-icon-sort-desc: url("../../migration/media/icons/table/sort-desc.svg");
-  --admin-icon-status: url("../../migration/media/icons/messages/status.svg");
-  --admin-icon-structure: url("../../migration/media/icons/toolbar/structure.svg");
-  --admin-icon-tmgmt: url("../../migration/media/icons/toolbar/tmgmt.svg");
-  --admin-icon-toggle-unchecked: url("../../migration/media/icons/form/toggle-unchecked.svg");
-  --admin-icon-tool: url("../../migration/media/icons/general/tool.svg");
-  --admin-icon-trash-module: url("../../migration/media/icons/toolbar/trash-module.svg");
-  --admin-icon-user: url("../../migration/media/icons/toolbar-meta/user.svg");
-  --admin-icon-warning: url("../../migration/media/icons/messages/warning.svg");
-  --admin-icon-webform: url("../../migration/media/icons/toolbar/webform.svg");
+  --admin-icon-add: url("../../images/icons/plus.svg");
+  --admin-icon-appearance: url("../../images/icons/appearance.svg");
+  --admin-icon-asterisk: url("../../images/icons/required.svg");
+  --admin-icon-back-to-site: url("../../images/icons/back-to-site.svg");
+  --admin-icon-blocks: url("../../images/icons/blocks.svg");
+  --admin-icon-bookmarks: url("../../images/icons/bookmarks.svg");
+  --admin-icon-check: url("../../images/icons/check.svg");
+  --admin-icon-checked: url("../../images/icons/check.svg");
+  --admin-icon-checkmark: url("../../images/icons/check.svg");
+  --admin-icon-chevron-down: url("../../images/icons/chevron-down.svg");
+  --admin-icon-chevron-left: url("../../images/icons/chevron-left.svg");
+  --admin-icon-chevron-right: url("../../images/icons/chevron-right.svg");
+  --admin-icon-clock: url("../../images/icons/clock.svg");
+  --admin-icon-close: url("../../images/icons/close.svg");
+  --admin-icon-config: url("../../images/icons/cog.svg");
+  --admin-icon-content: url("../../images/icons/content.svg");
+  --admin-icon-database: url("../../images/icons/database.svg");
+  --admin-icon-devel: url("../../images/icons/key.svg");
+  --admin-icon-drag: url("../../images/icons/drag.svg");
+  --admin-icon-drag-y: url("../../images/icons/drag-y.svg");
+  --admin-icon-drop: url("../../images/icons/chevron-down.svg");
+  --admin-icon-drupal: url("../../images/logos/drupal.svg");
+  --admin-icon-edit: url("../../images/icons/pencil.svg");
+  --admin-icon-error: url("../../images/icons/error.svg");
+  --admin-icon-files: url("../../images/icons/files.svg");
+  --admin-icon-first: url("../../images/icons/pager-first.svg");
+  --admin-icon-grid: url("../../images/icons/grid.svg");
+  --admin-icon-hamburger: url("../../images/icons/menu.svg");
+  --admin-icon-handle: url("../../images/icons/chevron-right.svg");
+  --admin-icon-help: url("../../images/icons/help.svg");
+  --admin-icon-hide: url("../../images/icons/hide.svg");
+  --admin-icon-info: url("../../images/icons/info.svg");
+  --admin-icon-last: url("../../images/icons/pager-last.svg");
+  --admin-icon-list: url("../../images/icons/list.svg");
+  --admin-icon-loader: url("../../images/icons/loader.svg");
+  --admin-icon-media: url("../../images/icons/media.svg");
+  --admin-icon-nav-toggle-toleft: url("../../images/icons/nav-toggle-left.svg");
+  --admin-icon-nav-toggle-totop: url("../../images/icons/nav-toggle-top.svg");
+  --admin-icon-next: url("../../images/icons/pager-next.svg");
+  --admin-icon-people: url("../../images/icons/people.svg");
+  --admin-icon-php: url("../../images/logos/php.svg");
+  --admin-icon-prev: url("../../images/icons/pager-prev.svg");
+  --admin-icon-remove: url("../../images/icons/close.svg");
+  --admin-icon-reports: url("../../images/icons/reports.svg");
+  --admin-icon-required: url("../../images/icons/required.svg");
+  --admin-icon-search: url("../../images/icons/search.svg");
+  --admin-icon-server: url("../../images/icons/server.svg");
+  --admin-icon-show: url("../../images/icons/show.svg");
+  --admin-icon-sidebar: url("../../images/icons/sidebar.svg");
+  --admin-icon-sort: url("../../images/icons/sort.svg");
+  --admin-icon-sort-asc: url("../../images/icons/sort-asc.svg");
+  --admin-icon-sort-desc: url("../../images/icons/sort-desc.svg");
+  --admin-icon-status: url("../../images/icons/status.svg");
+  --admin-icon-structure: url("../../images/icons/structure.svg");
+  --admin-icon-tabledrag-handle: url("../../images/icons/tabledrag-handle.svg");
+  --admin-icon-toggle-unchecked: url("../../images/icons/toggle-unchecked.svg");
+  --admin-icon-trash: url("../../images/icons/trash.svg");
+  --admin-icon-user: url("../../images/icons/user.svg");
+  --admin-icon-warning: url("../../images/icons/warning.svg");
+}
+
+/*
+ * Pre-tinted variants.
+ *
+ * Native form controls (<select>, checkbox/radio <input>, text <input>,
+ * <input type="submit">) cannot host ::before/::after, and masking the control
+ * itself would clip its border and fill. A url() to a currentColor SVG renders
+ * black as a background-image, so these few contexts use inline data URIs that
+ * reuse the exact shapes of the files in images/icons/. Keep this list as
+ * small as possible; prefer mask-image + background-color everywhere else.
+ */
+:root {
+  --admin-icon-checked-inverse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M5.69 10.64l3.58 3.76 9.04-9.49 2.22 2.34L9.27 19.09l-5.8-6.1z'/%3E%3C/svg%3E");
+  --admin-icon-checked-disabled: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2382828c' d='M5.69 10.64l3.58 3.76 9.04-9.49 2.22 2.34L9.27 19.09l-5.8-6.1z'/%3E%3C/svg%3E");
+  --admin-icon-chevron-down-inverse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M4 8l8 8 8-8'/%3E%3C/svg%3E");
+  --admin-icon-chevron-down-disabled: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%2382828c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' d='M4 8l8 8 8-8'/%3E%3C/svg%3E");
+  --admin-icon-edit-inverse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round' d='M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z'/%3E%3C/svg%3E");
+  --admin-icon-remove-inverse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' d='M20 4L4 20M4 4l16 16'/%3E%3C/svg%3E");
+  --admin-icon-search-muted: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23868686' stroke-width='2.25' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='7'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/g%3E%3C/svg%3E");
+  --admin-icon-search-muted-rtl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23868686' stroke-width='2.25' stroke-linecap='round'%3E%3Ccircle cx='14' cy='10' r='7'/%3E%3Cpath d='M3 21l4.35-4.35'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/**
+ * Monochrome icon via CSS mask.
+ *
+ * Usage: set --admin-icon to a registry custom property above, e.g.
+ * `--admin-icon: var(--admin-icon-help);`, and optionally --admin-icon-size.
+ * The icon is tinted by background-color (currentColor by default), so it
+ * follows the text color, themes, and dark mode. Note that `fill:
+ * currentColor` inside the SVG does NOT tint a mask-image; only the element's
+ * background-color does.
+ */
+.admin-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  inline-size: var(--admin-icon-size, var(--admin-icon-size-m));
+  block-size: var(--admin-icon-size, var(--admin-icon-size-m));
+  background-color: currentColor;
+  mask-image: var(--admin-icon, none);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+@media (forced-colors: active) {
+  .admin-icon {
+    background-color: CanvasText;
+  }
 }

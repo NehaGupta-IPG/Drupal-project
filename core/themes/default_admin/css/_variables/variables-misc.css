@@ -41,6 +41,21 @@
   --admin-icon-size-sidebar-toggle: 1.3125rem;
 
   /*
+   * Canonical icon size scale for generic icons (see .admin-icon in
+   * css/base/icons.pcss.css). Component-specific sizes above stay as-is.
+   */
+  --admin-icon-size-s: 0.75rem;
+  --admin-icon-size-m: 1rem;
+  --admin-icon-size-l: 1.5rem;
+  --admin-icon-size-xl: 2rem;
+
+  /*
+   * Minimum hit area for icon-only controls (WCAG 2.2 SC 2.5.8 Target Size
+   * Minimum). 24px is the AA floor; prefer 44px where space allows.
+   */
+  --admin-icon-target-min: 1.5rem;
+
+  /*
    * Corner radii use the canonical --admin-radius-* scale. Authored in px; the
    * build's px-to-rem step converts them.
    */

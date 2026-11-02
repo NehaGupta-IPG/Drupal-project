@@ -8,6 +8,10 @@
 /**
  * @file
  * Tablesort indicator styles.
+ *
+ * Monochrome mask icons tinted via background-color so they follow theme and
+ * dark-mode tokens. In forced colors the tint switches to LinkText (the
+ * indicator sits inside a sortable header link).
  */
 
 .tablesort {
@@ -18,10 +22,11 @@
   height: var(--admin-space-m);
   margin-block-start: -0.5rem;
   opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3e%3cpath d='M1.75.25v1.5h10.5V.25zm0 3v1.5h7.5v-1.5zm0 3v1.5h4.5v-1.5z' fill='%23000f33'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: 0 50%;
-  background-size: auto;
+  background-color: var(--admin-color-text);
+  mask-image: var(--admin-icon-sort);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 
   [dir="rtl"] & {
     /* Horizontally flip the element. */
@@ -29,29 +34,27 @@
   }
 
   @media (forced-colors: active) {
-    background: linktext;
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3e%3cpath d='M1.75.25v1.5h10.5V.25zm0 3v1.5h7.5v-1.5zm0 3v1.5h4.5v-1.5z' fill='%23000f33'/%3e%3c/svg%3e");
-    mask-repeat: no-repeat;
-    mask-position: 0 50%;
+    opacity: 1;
+    background-color: LinkText;
   }
 }
 
 .tablesort--asc {
   opacity: 1;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 10 12'%3e%3cpath d='M5 .44L.719 4.718 1.78 5.78 4.25 3.313v7.937h1.5V3.312l2.469 2.47L9.28 4.718 5 .439z' fill='%23003ecc'/%3e%3c/svg%3e");
+  background-color: var(--admin-color-link);
+  mask-image: var(--admin-icon-sort-asc);
 
   @media (forced-colors: active) {
-    background: linktext;
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 10 12'%3e%3cpath d='M5 .44L.719 4.718 1.78 5.78 4.25 3.313v7.937h1.5V3.312l2.469 2.47L9.28 4.718 5 .439z' fill='%23003ecc'/%3e%3c/svg%3e");
+    background-color: LinkText;
   }
 }
 
 .tablesort--desc {
   opacity: 1;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 10 12'%3e%3cpath d='M4.25.75v7.938l-2.469-2.47L.72 7.282 5 11.561l4.281-4.28L8.22 6.22 5.75 8.687V.75h-1.5z' fill='%23003ecc'/%3e%3c/svg%3e");
+  background-color: var(--admin-color-link);
+  mask-image: var(--admin-icon-sort-desc);
 
   @media (forced-colors: active) {
-    background: linktext;
-    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 10 12'%3e%3cpath d='M4.25.75v7.938l-2.469-2.47L.72 7.282 5 11.561l4.281-4.28L8.22 6.22 5.75 8.687V.75h-1.5z' fill='%23003ecc'/%3e%3c/svg%3e");
+    background-color: LinkText;
   }
 }

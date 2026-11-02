@@ -204,7 +204,7 @@ body {
 
     @media (forced-colors: active) {
       background: linktext;
-      mask-image: url(../../images/icons/000f33/tabledrag-handle.svg);
+      mask-image: var(--admin-icon-tabledrag-handle);
       mask-repeat: no-repeat;
       mask-position: center;
 

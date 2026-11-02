@@ -66,7 +66,7 @@
       inset-block-start: calc(50% - 1px);
       inset-inline-start: 0;
       /* cspell:disable-next-line */
-      mask-image: url("../../migration/media/icons/toolbar-meta/backtosite.svg");
+      mask-image: var(--admin-icon-back-to-site);
       mask-size: 100% 100%;
       mask-position: center center;
     }

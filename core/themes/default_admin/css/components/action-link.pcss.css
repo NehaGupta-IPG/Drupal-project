@@ -154,7 +154,7 @@
 .action-link--icon-trash {
   &::before {
     content: "";
-    mask-image: url(../../images/icons/545560/trash.svg);
+    mask-image: var(--admin-icon-trash);
   }
 
   /* Trash action link rendered as a button. */
@@ -214,7 +214,7 @@
 
 .action-link--icon-chevron-left::before {
   content: "";
-  mask-image: url("../../images/icons/545560/pager-prev.svg");
+  mask-image: var(--admin-icon-prev);
 }
 
 /* @todo Maybe move these styles over to button. */

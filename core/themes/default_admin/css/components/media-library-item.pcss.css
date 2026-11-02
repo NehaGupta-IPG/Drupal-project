@@ -102,13 +102,13 @@
 .media-library-item__edit {
   inset-block-start: 0.625rem;
   inset-inline-end: 3.125rem;
-  background-image: url("../../migration/media/icons/media-library/media-edit.svg");
+  background-image: var(--admin-icon-edit);
   background-size: 0.75rem 0.75rem;
 }
 
 .media-library-item__remove,
 .media-library-item__remove.button {
-  background-image: url("../../migration/media/icons/media-library/media-remove.svg");
+  background-image: var(--admin-icon-remove);
   background-size: 0.75rem 0.75rem;
 }
 
@@ -279,13 +279,14 @@
 .media-library-item__edit {
   inset-inline-end: 40px;
   border: 1px solid var(--admin-color-border);
-  background-image: url("../../images/icons/545560/pencil.svg");
+  background-image: var(--admin-icon-edit);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 12px;
 
-  &:active {
-    background-image: url("../../../../misc/icons/ffffff/pencil.svg");
+  &:active,
+  .dark-mode & {
+    background-image: var(--admin-icon-edit-inverse);
   }
 }
 
@@ -298,7 +299,7 @@
 .media-library-item__remove.button:focus {
   inset-inline-end: 10px;
   border: 1px solid var(--admin-color-border);
-  background-image: url("../../../../misc/icons/545560/ex.svg");
+  background-image: var(--admin-icon-remove);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 12px;
@@ -308,5 +309,38 @@
 .media-library-item__remove.button:active,
 .media-library-item__remove.button:disabled:active {
   border-color: var(--admin-color-link);
-  background-image: url("../../../../misc/icons/ffffff/ex.svg");
+  background-image: var(--admin-icon-remove-inverse);
+}
+
+.dark-mode .media-library-item__remove,
+.dark-mode .media-library-item__remove.button {
+  background-image: var(--admin-icon-remove-inverse);
+}
+
+/*
+ * <input type="submit"> cannot host a masked pseudo-element, so edit/remove
+ * use pre-tinted background images. Forced colors keeps background images
+ * but repaints the button fill; Chromium reports the forced palette's
+ * luminance through prefers-color-scheme, so swap to the light glyph on dark
+ * palettes.
+ */
+@media (forced-colors: active) {
+  .media-library-item__edit,
+  .media-library-item__remove,
+  .media-library-item__remove.button {
+    border-color: ButtonText;
+  }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+  .media-library-edit__link,
+  .media-library-item__edit {
+    background-image: var(--admin-icon-edit-inverse);
+  }
+
+  .media-library-item__remove,
+  .media-library-item__remove.button,
+  .media-library-item__remove.button:active {
+    background-image: var(--admin-icon-remove-inverse);
+  }
 }

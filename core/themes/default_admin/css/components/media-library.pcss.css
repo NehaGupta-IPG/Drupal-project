@@ -71,11 +71,11 @@
   }
 
   .views-display-link-widget::before {
-    mask-image: url("../../migration/media/icons/media-library/grid.svg");
+    mask-image: var(--admin-icon-grid);
   }
 
   .views-display-link-widget_table::before {
-    mask-image: url("../../migration/media/icons/media-library/list.svg");
+    mask-image: var(--admin-icon-list);
   }
 }
 
