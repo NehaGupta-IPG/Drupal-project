@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel;
 
+use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\File\FileExists;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -197,6 +199,14 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $this->setRawContent($renderer->renderRoot($element));
     $elements = $this->getSimpleXmlElementsByXpath('//img[@src=:url]', [':url' => $url]);
     $this->assertCount(1, $elements, 'theme_image_style() renders an image correctly with a NULL value for the alt option.');
+
+    // An image style with no source URI should not log a warning.
+    $logger = new TestLogger();
+    $this->container->get('logger.factory')->get('image')->addLogger($logger);
+    $element = $base_element;
+    $element['#uri'] = NULL;
+    $renderer->renderRoot($element);
+    $this->assertFalse($logger->hasRecords(RfcLogLevel::WARNING));
   }
 
   /**

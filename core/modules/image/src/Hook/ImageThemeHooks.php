@@ -346,6 +346,15 @@ class ImageThemeHooks {
    *     the img tag.
    */
   public function preprocessImageStyle(array &$variables): void {
+    // Do not attempt to transform or render an image without a source URI.
+    if (empty($variables['uri'])) {
+      $variables['image'] = [
+        '#theme' => 'image',
+        '#access' => FALSE,
+      ];
+      return;
+    }
+
     $style = ImageStyle::load($variables['style_name']);
 
     // Determine the dimensions of the styled image.
