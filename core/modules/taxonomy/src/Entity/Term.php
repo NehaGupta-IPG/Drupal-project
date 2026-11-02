@@ -247,7 +247,11 @@ class Term extends EditorialContentEntityBase implements TermInterface {
    * {@inheritdoc}
    */
   public function setDescription($description) {
+    $format = $this->getFormat();
     $this->set('description', $description);
+    if (!empty($format)) {
+      $this->setFormat($format);
+    }
     return $this;
   }
 
