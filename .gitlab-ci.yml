@@ -43,6 +43,7 @@ default:
     - composer install --optimize-autoloader --ansi
     - composer run-script drupal-phpunit-upgrade-check
     - composer require --dev rector/rector palantirnet/drupal-rector --ansi
+    - patch -p1 -d vendor/rector/rector <rector_patch.diff
     - git config --global user.name 'rector-bot'
     - git config --global user.email 'rector-bot@rector-bot.com'
     - mkdir rector-changes
