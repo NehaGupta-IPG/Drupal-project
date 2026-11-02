@@ -58,6 +58,15 @@ class ErrorTestController extends ControllerBase {
   }
 
   /**
+   * Generates a warning whose message contains HTML.
+   */
+  public function generateHtmlWarning(): array {
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+    trigger_error('<b>HTML injection</b>', E_USER_WARNING);
+    return ['#markup' => 'done'];
+  }
+
+  /**
    * Generate fatal errors to test the error handler.
    */
   public function generateFatalErrors() {

@@ -76,6 +76,12 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains($error_user_notice);
     $this->assertNoMessages();
     $this->assertSession()->responseNotContains('<pre class="backtrace">');
+
+    $config->set('error_level', ERROR_REPORTING_DISPLAY_ALL)->save();
+    $this->drupalGet('error-test/generate-html-warning');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('<b>HTML injection</b>');
+    $this->assertSession()->responseContains('&lt;b&gt;HTML injection&lt;/b&gt;');
   }
 
   /**
@@ -118,7 +124,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%line' => 64,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
-    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()</em> (line';
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():113}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_exception);
