@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\content_moderation\Event\ContentModerationStateChangedEvent;
-use Drupal\Core\Entity\EditorialContentEntityBase;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\Constraint\Constraint;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -43,7 +39,7 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
   /**
    * A mock event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface&\PHPUnit\Framework\MockObject\MockObject
    */
   protected $eventDispatcher;
 
@@ -79,59 +75,24 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
    * Tests events for adding and updating moderation state entities.
    */
   public function testCreateUpdateStates(): void {
-    $callSequence = [
-      [[FALSE, 'draft', 1, 'en']],
-      [['draft', 'published', 2, 'en']],
-      [['published', 'archived', 3, 'en']],
-      [[NULL, 'published', 4, 'fr']],
-      [['published', 'draft', 5, 'fr']],
-    ];
-
-    $callSequenceObjects = array_map(function ($element) {
-      $entity = $this->createMock(EditorialContentEntityBase::class);
-      $language = $this->createMock(LanguageInterface::class);
-      $language->expects($this->any())
-        ->method('getId')
-        ->willReturn($element[0][3]);
-      $entity->expects($this->any())
-        ->method('getEntityTypeId')
-        ->willReturn('node');
-      $entity->expects($this->any())
-        ->method('getRevisionId')
-        ->willReturn($element[0][2]);
-      $entity->expects($this->any())
-        ->method('language')
-        ->willReturn($language);
-      return [
-        [
-          // We need to pass a constraint, as they are not the same object,
-          // so assertEquals will fail.
-          new ContentModerationStateChangedEventAreEqual(
-            new ContentModerationStateChangedEvent($entity, $element[0][1], $element[0][0], 'editorial')
-          ),
-          'content_moderation.state_changed',
-        ],
-        $this->callback(function (ContentModerationStateChangedEvent $event, $event_name) use (&$args) {
-          /** @var \Drupal\content_moderation\Event\ContentModerationStateChangedEvent $expectedEvent */
-          $expectedEvent = &$args[0];
-          $expectedEventName = &$args[1];
-
-          $this->assertSame($expectedEventName, $event_name);
-          $this->assertSame($expectedEvent->getWorkflow(), $event->getWorkflow());
-          $this->assertSame($expectedEvent->getOriginalState(), $event->getOriginalState());
-          $this->assertSame($expectedEvent->getNewState(), $event->getNewState());
-          $this->assertSame($expectedEvent->getModeratedEntity()->getEntityTypeId(), $event->getModeratedEntity()->getEntityTypeId());
-          $this->assertSame($expectedEvent->getModeratedEntity()->getRevisionId(), $event->getModeratedEntity()->getRevisionId());
-          $this->assertSame($expectedEvent->getModeratedEntity()->language()->getId(), $event->getModeratedEntity()->language()->getId());
-          return $event;
-        }),
-      ];
-    }, $callSequence);
-
+    // Record the details of each event at the time it is dispatched.
+    $dispatched = [];
     $this->eventDispatcher->expects($this->exactly(5))
       ->method('dispatch')
-      ->willReturnCallback(function (mixed ...$args) use (&$callSequenceObjects): object {
-        return $this->consecutiveCallsCallback($callSequenceObjects, $args);
+      ->willReturnCallback(function (object $event, ?string $event_name = NULL) use (&$dispatched): object {
+        $this->assertInstanceOf(ContentModerationStateChangedEvent::class, $event);
+        $entity = $event->getModeratedEntity();
+        $dispatched[] = [
+          $event_name,
+          $event->getWorkflow(),
+          $event->getOriginalState(),
+          $event->getNewState(),
+          $entity->getEntityTypeId(),
+          // The revision ID can be a string or an integer.
+          (int) $entity->getRevisionId(),
+          $entity->language()->getId(),
+        ];
+        return $event;
       });
 
     $node = Node::create([
@@ -154,103 +115,16 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
 
     $french_node->moderation_state = 'draft';
     $french_node->save();
-  }
 
-  /**
-   * Callback for consecutive calls to mocked objects.
-   */
-  protected function consecutiveCallsCallback(array &$expectedConsecutiveCalls, array $actualArgs): mixed {
-    // Return early if there are no expected calls.
-    if ($expectedConsecutiveCalls === []) {
-      return NULL;
-    }
-
-    // Get the next expected call from the stack.
-    $key = key($expectedConsecutiveCalls);
-    $call = reset($expectedConsecutiveCalls);
-    unset($expectedConsecutiveCalls[$key]);
-    $expectedArgs = $call[0];
-
-    // Check the arguments.
-    for ($i = 0; $i < count($expectedArgs); $i++) {
-      if ($expectedArgs[$i] instanceof Constraint) {
-        try {
-          $expectedArgs[$i]->evaluate($actualArgs[$i]);
-        }
-        catch (AssertionFailedError $e) {
-          throw new AssertionFailedError(sprintf('Failed argument match in consecutive call #%d, argument #%d.', $key + 1, $i + 1), $e->getCode(), $e);
-        }
-      }
-      else {
-        $this->assertEquals($expectedArgs[$i], $actualArgs[$i], sprintf('Failed argument match in consecutive call #%d, argument #%d.', $key + 1, $i + 1));
-      }
-    }
-
-    // Returns with the specified value, if defined.
-    if (array_key_exists(1, $call)) {
-      return $call[1];
-    }
-
-    return NULL;
-  }
-
-}
-
-/**
- * Constraint for checking if ContentModerationStateChangedEvent are equal.
- */
-final class ContentModerationStateChangedEventAreEqual extends Constraint {
-
-  /**
-   * Creates a ContentModerationStateChangedEventAreEqual constraint.
-   *
-   * @param \Drupal\content_moderation\Event\ContentModerationStateChangedEvent $expected
-   *   The expected ContentModerationStateChangedEvent.
-   */
-  public function __construct(protected readonly ContentModerationStateChangedEvent $expected) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public function toString(): string {
-    return 'are equal';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function matches($event): bool {
-    if (!$event instanceof ContentModerationStateChangedEvent) {
-      return FALSE;
-    }
-    return $event->getOriginalState() === $this->expected->getOriginalState() &&
-      $event->getNewState() === $this->expected->getNewState() &&
-      $event->getWorkflow() === $this->expected->getWorkflow() &&
-      $event->getModeratedEntity()->getEntityTypeId() === $this->expected->getModeratedEntity()->getEntityTypeId() &&
-      // Not strict comparison here, as revision id could be a number or a
-      // string.
-      $event->getModeratedEntity()->getRevisionId() == $this->expected->getModeratedEntity()->getRevisionId() &&
-      $event->getModeratedEntity()->language()->getId() === $this->expected->getModeratedEntity()->language()->getId();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function failureDescription($event): string {
-    return sprintf('the event with workflow %s and transition %s => %s for %s with language %s and revision %s is equal to the expected event with workflow %s and transition %s => %s for %s with language %s and revision %s',
-      $event->getWorkflow(),
-      $event->getOriginalState(),
-      $event->getNewState(),
-      $event->getModeratedEntity()->getEntityTypeId(),
-      $event->getModeratedEntity()->language()->getId(),
-      $event->getModeratedEntity()->getRevisionId(),
-      $this->expected->getWorkflow(),
-      $this->expected->getOriginalState(),
-      $this->expected->getNewState(),
-      $this->expected->getModeratedEntity()->getEntityTypeId(),
-      $this->expected->getModeratedEntity()->language()->getId(),
-      $this->expected->getModeratedEntity()->getRevisionId(),
-    );
+    $this->assertSame([
+      // Event name, workflow, original state, new state, entity type,
+      // revision ID, langcode.
+      ['content_moderation.state_changed', 'editorial', FALSE, 'draft', 'node', 1, 'en'],
+      ['content_moderation.state_changed', 'editorial', 'draft', 'published', 'node', 2, 'en'],
+      ['content_moderation.state_changed', 'editorial', 'published', 'archived', 'node', 3, 'en'],
+      ['content_moderation.state_changed', 'editorial', NULL, 'published', 'node', 4, 'fr'],
+      ['content_moderation.state_changed', 'editorial', 'published', 'draft', 'node', 5, 'fr'],
+    ], $dispatched);
   }
 
 }
