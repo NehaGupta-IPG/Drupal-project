@@ -34,6 +34,10 @@ class StatementExecutionFailureEvent extends StatementExecutionEndEvent {
    *   The code of the exception that was thrown.
    * @param string $exceptionMessage
    *   The message of the exception that was thrown.
+   * @param string|null $transactionId
+   *   The current transaction ID if active.
+   * @param string|null $transactionName
+   *   The current transaction name if active.
    */
   public function __construct(
     int $statementObjectId,
@@ -46,8 +50,10 @@ class StatementExecutionFailureEvent extends StatementExecutionEndEvent {
     public readonly string $exceptionClass,
     public readonly int|string $exceptionCode,
     public readonly string $exceptionMessage,
+    ?string $transactionId = NULL,
+    ?string $transactionName = NULL,
   ) {
-    parent::__construct($statementObjectId, $key, $target, $queryString, $args, $caller, $startTime);
+    parent::__construct($statementObjectId, $key, $target, $queryString, $args, $caller, $startTime, $transactionId, $transactionName);
   }
 
 }

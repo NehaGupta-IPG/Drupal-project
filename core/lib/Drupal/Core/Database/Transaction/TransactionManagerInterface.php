@@ -20,6 +20,22 @@ interface TransactionManagerInterface {
   public function inTransaction(): bool;
 
   /**
+   * Gets the current transaction id.
+   *
+   * @return string|null
+   *   The current transaction id.
+   */
+  public function currentTransactionId(): ?string;
+
+  /**
+   * Gets the current transaction name.
+   *
+   * @return string|null
+   *   The current transaction name.
+   */
+  public function currentTransactionName(): ?string;
+
+  /**
    * Checks if a named Drupal transaction is active.
    *
    * @param string $name

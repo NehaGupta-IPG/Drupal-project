@@ -1,5 +1,9 @@
 services:
   _defaults:
+    autowire: true
     autoconfigure: true
   # A test subscriber for the database API events.
   Drupal\database_test\EventSubscriber\DatabaseEventSubscriber: ~
+  # An in-memory key-value store for testing.
+  database_test.memory.keyvalue:
+    class: Drupal\Core\KeyValueStore\KeyValueMemoryFactory

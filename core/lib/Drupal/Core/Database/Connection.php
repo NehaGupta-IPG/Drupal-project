@@ -1531,7 +1531,7 @@ abstract class Connection {
   /**
    * Enables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be enabled.
    *
    * @return static
@@ -1539,6 +1539,7 @@ abstract class Connection {
   public function enableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
       assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      assert(is_a($eventName, DatabaseEvent::class, TRUE), "Event class {$eventName} is not a valid database event class");
       $this->enabledEvents[$eventName] = TRUE;
     }
     return $this;
@@ -1547,7 +1548,7 @@ abstract class Connection {
   /**
    * Disables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be disabled.
    *
    * @return static
@@ -1555,6 +1556,7 @@ abstract class Connection {
   public function disableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
       assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      assert(is_a($eventName, DatabaseEvent::class, TRUE), "Event class {$eventName} is not a valid database event class");
       $this->enabledEvents[$eventName] = FALSE;
     }
     return $this;
