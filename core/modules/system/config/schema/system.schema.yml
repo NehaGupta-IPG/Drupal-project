@@ -435,7 +435,7 @@ block.settings.system_menu_block:*:
       label: 'Starting level'
       constraints:
         MenuLinkDepth:
-          min: 0
+          min: 1
     depth:
       type: integer
       label: 'Maximum number of levels'
@@ -443,7 +443,7 @@ block.settings.system_menu_block:*:
       constraints:
         MenuLinkDepth:
           baseLevel: '[%parent.level]'
-          min: 1
+          min: 0
     expand_all_items:
       type: boolean
       label: 'Expand all items'
