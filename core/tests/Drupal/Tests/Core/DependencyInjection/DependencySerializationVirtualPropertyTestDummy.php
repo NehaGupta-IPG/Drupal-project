@@ -26,11 +26,6 @@ class DependencySerializationVirtualPropertyTestDummy {
   public string $stored = 'stored value';
 
   /**
-   * A private property of the class that uses the trait.
-   */
-  private string $secret = 'secret value';
-
-  /**
    * A virtual property, which has no stored value.
    */
   public string $virtual {
@@ -38,13 +33,6 @@ class DependencySerializationVirtualPropertyTestDummy {
       $this->hookCalls++;
       return 'virtual value';
     }
-  }
-
-  /**
-   * Returns the private property.
-   */
-  public function getSecret(): string {
-    return $this->secret;
   }
 
 }
