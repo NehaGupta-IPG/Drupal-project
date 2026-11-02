@@ -2102,5 +2102,10 @@ services:
   Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManagerInterface: '@plugin.manager.design_token_value'
   Drupal\Core\Extension\ThemeSettingsProvider:
     autowire: true
+  icon.search:
+    class: Drupal\Core\Theme\Icon\IconSearch
+    arguments: ['@plugin.manager.icon_pack']
+  Drupal\Core\Theme\Icon\IconSearch: '@icon.search'
+  Drupal\Core\Theme\Icon\IconSearchInterface: '@icon.search'
   Drupal\Core\Extension\ModuleWeight:
     autowire: true
