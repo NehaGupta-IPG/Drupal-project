@@ -3092,12 +3092,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityUpdater.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/DraggableListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Entity\\\\DraggableListBuilder\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3696,12 +3690,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Transaction.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$count of method Drupal\\\\Core\\\\Datetime\\\\DateFormatter\\:\\:formatPlural\\(\\) expects int, float given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/DateFormatter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -5738,12 +5726,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
 	'identifier' => 'drupal.entityStorageDirectInjection',
 	'count' => 1,
@@ -6600,6 +6582,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/Plugin/Validation/Constraint/ExtensionExistsConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Constructor of class Drupal\\\\Core\\\\Extension\\\\Plugin\\\\Validation\\\\Constraint\\\\ExtensionNameConstraint has an unused parameter \\$pattern\\.$#',
+	'identifier' => 'constructor.unusedParameter',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Extension/Plugin/Validation/Constraint/ExtensionNameConstraint.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ThemeExtensionList\\:\\:fillInSubThemeData\\(\\) has no return type specified\\.$#',
@@ -8758,12 +8746,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:updateParentalStatus\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
 ];
@@ -11182,12 +11164,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/src/BlockForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/src/BlockListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block\\\\BlockListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -12256,12 +12232,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/CommentTypeForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/CommentTypeListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentTypeListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -13030,22 +13000,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/config_translation/src/ConfigNamesMapper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationBlockListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\config_translation\\\\Controller\\\\ConfigTranslationEntityListBuilder\\:\\:getOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationEntityListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/Controller/ConfigTranslationFieldListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\config_translation\\\\Form\\\\ConfigTranslationDeleteForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -15096,12 +15054,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Access/ViewModeAccessCheck.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field_ui/src/EntityDisplayModeListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\EntityDisplayModeListBuilder\\:\\:getOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -15654,12 +15606,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/Plugin/Field/FieldWidget/FileWidget.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$arguments of class Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup constructor expects array\\<string, bool\\|float\\|int\\|string\\|Stringable\\>, array\\<string, array\\> given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/src/Plugin/Field/FieldWidget/FileWidget.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\Plugin\\\\Validation\\\\Constraint\\\\FileExtensionSecureConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -16200,12 +16146,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/filter/src/FilterFormatInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/FilterFormatListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\FilterFormatListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
@@ -18038,12 +17978,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/language/src/HttpKernel/PathProcessorLanguage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/src/LanguageListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\LanguageListBuilder\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -20870,12 +20804,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_link_content/src/MenuLinkContentInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/src/MenuLinkListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_link_content\\\\MenuLinkListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -21466,12 +21394,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/destination/EntityContentComplete.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\destination\\\\EntityContentComplete\\:\\:rollback\\(\\) has no return type specified\\.$#',
@@ -23604,12 +23526,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeViewBuilder.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage_controller is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeViewsData.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:indexClear\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24560,12 +24476,6 @@ $ignoreErrors[] = [
 	'identifier' => 'return.missing',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/src/PathAliasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathFieldItemList\\:\\:computeValue\\(\\) has no return type specified\\.$#',
@@ -25604,12 +25514,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/src/Plugin/SearchPluginCollection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/src/Plugin/migrate/destination/EntitySearchPage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to method moduleExists\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\source\\\\DrupalSqlBase\\:
 in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
 replacement\\.$#',
@@ -25744,12 +25648,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/src/SearchPageInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/src/SearchPageListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\search\\\\SearchPageListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
@@ -26224,12 +26122,6 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/shortcut/src/Form/SwitchShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Plugin/migrate/destination/EntityShortcutSet.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Direct injection of entity storage via \\$shortcut_set_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
@@ -30915,12 +30807,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Plugin/migrate/destination/EntityUser.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/migrate/destination/EntityUserRole.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to method checkRequirements\\(\\) of deprecated class Drupal\\\\migrate_drupal\\\\Plugin\\\\migrate\\\\source\\\\DrupalSqlBase\\:
 in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
 replacement\\.$#',
@@ -31373,12 +31259,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/RoleForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/RoleListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\RoleListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -31431,12 +31311,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/UserFloodControl.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/UserListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\UserListBuilder\\:\\:getOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
@@ -39509,12 +39383,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/ViewFormBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
 	'identifier' => 'drupal.entityListBuilderMissingCacheabilityParameter',
 	'count' => 1,
@@ -40689,12 +40557,6 @@ $ignoreErrors[] = [
 	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceSwitcherForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces_ui\\\\WorkspaceListBuilder\\:\\:getDefaultOperations\\(\\) is missing the CacheableMetadata parameter added in Drupal 11\\.3\\. Update the signature to\\: getDefaultOperations\\(\\\\Drupal\\\\Core\\\\Entity\\\\EntityInterface \\$entity, \\?\\\\Drupal\\\\Core\\\\Cache\\\\CacheableMetadata \\$cacheability \\= NULL\\)\\.$#',
@@ -43589,78 +43451,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/claro/src/ClaroPreRender.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_oembed_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_media_library_add_form_upload_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_menu_link_content_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_menu_link_edit_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_node_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_node_preview_form_select_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_system_modules_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_system_theme_settings_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_user_admin_permissions_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_views_ui_add_handler_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/default_admin/src/Hook/FormHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Form alter hook "form_views_exposed_form_alter" implementation must have 2 or 3 parameters\\. Expected signature\\: method\\(&\\$form, \\\\Drupal\\\\Core\\\\Form\\\\FormStateInterface \\$form_state\\[, \\$form_id\\]\\)$#',
-	'identifier' => 'hookFormAlter.invalidParameterCount',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/olivero/src/Hook/OliveroHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\olivero\\\\OliveroPreRender\\:\\:textFormat\\(\\) has no return type specified\\.$#',
