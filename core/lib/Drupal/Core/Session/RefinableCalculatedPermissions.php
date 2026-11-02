@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Session;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 
 /**
@@ -56,7 +57,20 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
     foreach ($calculated_permissions->getItems() as $item) {
       $this->addItem($item);
     }
+
+    // If the cacheability metadata contains the 'user.permissions' cache context,
+    // remove it. This cache key invokes PermissionsHashGenerator::getCacheableMetadata(),
+    // which in turn invokes AccessPolicyProcessor::processAccessPolicies(), creating an
+    // infinite loop.
+    if (in_array('user.permissions', $calculated_permissions->getCacheContexts(), TRUE)) {
+      $cacheability = new CacheableMetadata();
+      $cacheability->setCacheContexts(array_diff($calculated_permissions->getCacheContexts(), ['user.permissions']));
+      $cacheability->setCacheTags($calculated_permissions->getCacheTags());
+      $cacheability->setCacheMaxAge($calculated_permissions->getCacheMaxAge());
+      $calculated_permissions->setCacheability($cacheability);
+    }
     $this->addCacheableDependency($calculated_permissions);
+
     return $this;
   }
 
