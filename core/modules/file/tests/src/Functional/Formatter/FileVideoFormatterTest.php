@@ -155,6 +155,14 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
     $assert_session->elementAttributeNotExists('css', 'video', 'height');
     $assert_session->elementAttributeNotExists('css', 'video', 'width');
 
+    // Null dimensions must also be valid when Drupal renders the formatter
+    // summary on the Manage display form.
+    $summaries = array_map(
+      static fn ($summary): string => (string) $summary,
+      $entityDisplay->getRenderer($fieldName)->settingsSummary(),
+    );
+    $this->assertNotContains('Size:  x  pixels', $summaries);
+
   }
 
 }
