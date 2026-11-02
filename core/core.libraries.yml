@@ -338,6 +338,7 @@ ckeditor5.autoformat:
     assets/vendor/ckeditor5/autoformat/autoformat.js: { minified: true }
   dependencies:
     - core/ckeditor5
+    - core/ckeditor5.translations
 
 ckeditor5.fullscreen:
   remote: https://github.com/ckeditor/ckeditor5
@@ -350,6 +351,7 @@ ckeditor5.fullscreen:
     assets/vendor/ckeditor5/fullscreen/fullscreen.js: { minified: true }
   dependencies:
     - core/ckeditor5
+    - core/ckeditor5.translations
 
 drupal:
   aggregate_target:
