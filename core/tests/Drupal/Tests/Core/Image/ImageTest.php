@@ -194,6 +194,26 @@ class ImageTest extends UnitTestCase {
   }
 
   /**
+   * Tests \Drupal\Core\Image\Image::getFileSize returns NULL when source is malformed.
+   */
+  public function testGetFileSizeReturnsNullForMalformedSource(): void {
+    $this->toolkit = $this->getToolkitMock();
+    $this->image = new Image($this->toolkit, 'malformed-source');
+    $this->assertNull($this->image->getFileSize());
+  }
+
+  /**
+   * Tests \Drupal\Core\Image\Image::getFileSize returns NULL when filesize() returns FALSE.
+   */
+  public function testGetFileSizeReturnsNullWhenFilesizeReturnsFalse(): void {
+    $this->toolkit = $this->getToolkitMock(['parseFile']);
+    // Force the toolkit to validate the image as correct, so filesize() is called.
+    $this->toolkit->method('parseFile')->willReturn(TRUE);
+    $this->image = new Image($this->toolkit, 'malformed-source');
+    $this->assertNull($this->image->getFileSize());
+  }
+
+  /**
    * Tests \Drupal\Core\Image\Image::getToolkit()->getType().
    */
   public function testGetType(): void {
