@@ -39,6 +39,7 @@ class FileThemeHooks {
           'file' => NULL,
           'description' => NULL,
           'attributes' => [],
+          'link_options' => [],
           'with_size' => TRUE,
         ],
         'initial preprocess' => static::class . ':preprocessFileLink',
@@ -85,13 +86,15 @@ class FileThemeHooks {
    *   - icon_directory: (optional) A path to a directory of icons to be used
    *     for files. Defaults to the value of the "icon.directory" variable.
    *   - description: A description to be displayed instead of the filename.
-   *   - attributes: An associative array of attributes to be placed in the a
-   *     tag.
+   *   - attributes: An associative array of attributes to be placed in the
+   *     wrapper element.
+   *   - link_options: An associative array of URL options to include in the
+   *     link, e.g. 'attributes' to be placed on the a tag.
    *   - with_size: A Boolean indicating if the file size should be displayed.
    */
   public function preprocessFileLink(array &$variables): void {
     $file = $variables['file'];
-    $options = [];
+    $options = $variables['link_options'] ?: [];
 
     $url = $this->fileUrlGenerator->generate($file->getFileUri());
 

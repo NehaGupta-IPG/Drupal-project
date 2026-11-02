@@ -9,6 +9,7 @@ use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Tests the default file formatter.
@@ -206,6 +207,24 @@ class FileEntityFormatterTest extends KernelTestBase {
     $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
     $this->assertStringContainsString('file--mime-application-octet-stream', $output);
     $this->assertStringContainsString('type="application/octet-stream"', $output);
+  }
+
+  /**
+   * Tests the file_link field formatter using link options.
+   */
+  public function testFormatterFileLinkWithLinkOptions(): void {
+    $file_link = [
+      '#theme' => 'file_link',
+      '#file' => $this->files[0],
+      '#link_options' => [
+        'attributes' => ['target' => '_blank'],
+      ],
+    ];
+
+    $crawler = new Crawler((string) \Drupal::service('renderer')->renderRoot($file_link));
+    $link = $crawler->filterXPath("//a");
+    self::assertCount(1, $link);
+    self::assertEquals('_blank', $link->attr('target'));
   }
 
 }
