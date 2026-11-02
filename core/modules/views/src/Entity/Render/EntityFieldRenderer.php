@@ -251,6 +251,7 @@ class EntityFieldRenderer extends RendererBase {
             $display->setComponent($field->definition['field_name'], [
               'type' => $field->options['type'],
               'settings' => $field->options['settings'],
+              'third_party_settings' => $field->options['third_party_settings'] ?? [],
             ]);
           }
           // Let the display build the render array for the entities.
