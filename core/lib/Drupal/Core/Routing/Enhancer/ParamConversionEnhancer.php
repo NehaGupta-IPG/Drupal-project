@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing\Enhancer;
 
+use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\EnhancerInterface;
@@ -10,7 +11,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -86,7 +86,7 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
     if ($exception instanceof ParamNotConvertedException) {
-      $event->setThrowable(new NotFoundHttpException($exception->getMessage(), $exception));
+      $event->setThrowable(new CacheableNotFoundHttpException($exception, $exception->getMessage(), $exception));
     }
   }
 

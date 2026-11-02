@@ -97,10 +97,8 @@ class AccessManager implements AccessManagerInterface {
       $result = AccessResult::forbidden()->addCacheTags(['config:core.extension']);
       return $return_as_object ? $result : $result->isAllowed();
     }
-    catch (ParamNotConvertedException) {
-      // Uncacheable because conversion of the parameter may not have been
-      // possible due to dynamic circumstances.
-      $result = AccessResult::forbidden()->setCacheMaxAge(0);
+    catch (ParamNotConvertedException $e) {
+      $result = AccessResult::forbidden()->addCacheableDependency($e);
       return $return_as_object ? $result : $result->isAllowed();
     }
   }

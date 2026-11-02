@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\ParamConverter;
 
+use Drupal\Core\Cache\CacheableMetadata;
+
 /**
  * Provides a trait to replace dynamic entity types in routes.
  */
@@ -26,7 +28,11 @@ trait DynamicEntityTypeParamConverterTrait {
   protected function getEntityTypeFromDefaults($definition, $name, array $defaults) {
     $type_part = strstr($definition['type'], ':');
     if (!$type_part) {
-      throw new ParamNotConvertedException(sprintf('The type definition "%s" is invalid. The expected format is "entity_revision:<entity_type_id>".', $definition['type']));
+      throw new ParamNotConvertedException(
+        sprintf('The type definition "%s" is invalid. The expected format is "entity_revision:<entity_type_id>".', $definition['type']),
+        // Can be cached permanently until routes are rebuilt.
+        cacheability: new CacheableMetadata(),
+      );
     }
     $entity_type_id = substr($type_part, 1);
 
@@ -34,7 +40,11 @@ trait DynamicEntityTypeParamConverterTrait {
     if (str_starts_with($entity_type_id, '{')) {
       $entity_type_slug = substr($entity_type_id, 1, -1);
       if (!isset($defaults[$entity_type_slug])) {
-        throw new ParamNotConvertedException(sprintf('The "%s" parameter was not converted because the "%s" parameter is missing.', $name, $entity_type_slug));
+        throw new ParamNotConvertedException(
+          sprintf('The "%s" parameter was not converted because the "%s" parameter is missing.', $name, $entity_type_slug),
+          // Can be cached permanently until routes are rebuilt.
+          cacheability: new CacheableMetadata(),
+        );
       }
       $entity_type_id = $defaults[$entity_type_slug];
     }
