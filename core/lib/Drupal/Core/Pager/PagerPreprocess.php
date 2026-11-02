@@ -41,6 +41,11 @@ class PagerPreprocess {
    *       append to the pager links.
    *     - #route_parameters: An associative array of the route parameters.
    *     - #quantity: The number of pages in the list.
+   *     - #modal_dialog_links: (optional) Set to FALSE to stop the pager links
+   *       from being turned into modal dialog links when the pager is rendered
+   *       inside a modal. Defaults to TRUE. A view that already handles its
+   *       pager links with the views AJAX JavaScript sets this to FALSE to
+   *       avoid conflicting with that handling.
    */
   public function preprocessPager(array &$variables): void {
     $element = $variables['pager']['#element'];
@@ -51,7 +56,14 @@ class PagerPreprocess {
 
     $link_attributes = [];
 
-    if ($this->requestStack->getCurrentRequest()?->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+    // Turn pager links into modal dialog links when the pager is rendered
+    // inside a modal, so paging reloads the modal instead of navigating away.
+    // A pager opts out by setting #modal_dialog_links to FALSE, for example an
+    // AJAX view whose links are already handled by the views AJAX JavaScript;
+    // adding the modal link attributes there would conflict and load the
+    // current page's (relative) URL into the dialog instead.
+    if (($variables['pager']['#modal_dialog_links'] ?? TRUE) !== FALSE
+      && $this->requestStack->getCurrentRequest()?->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
       $link_attributes = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
