@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Functional;
 
+use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -548,6 +549,25 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->assertSession()->pageTextContains('Log Message - French - Draft - Edit 2');
     $this->assertSession()->pageTextContains('Log Message - French - Published - Edit 3');
     $this->assertSession()->pageTextNotContains('Log Message - English');
+  }
+
+  /**
+   * Tests that the content language settings leave moderation_state alone.
+   *
+   * @see \Drupal\content_moderation\EntityTypeInfo::languageContentSettingsFormAfterBuild()
+   */
+  public function testModerationStateContentLanguageSettings(): void {
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer languages',
+      'administer content translation',
+    ]));
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->assertSession()->fieldNotExists('settings[node][article][fields][moderation_state]');
+
+    // Marking the bundle non-translatable would create a base field override
+    // for moderation_state, which breaks installing from existing config.
+    $this->submitForm(['settings[node][article][translatable]' => FALSE], 'Save configuration');
+    $this->assertNull(BaseFieldOverride::loadByName('node', 'article', 'moderation_state'));
   }
 
   /**
