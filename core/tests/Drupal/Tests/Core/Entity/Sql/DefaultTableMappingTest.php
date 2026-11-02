@@ -241,8 +241,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    * Computing the columns of a field can load entities, which suspends the
    * current Fiber. Another Fiber that asks for the same field in the meantime
    * must get the complete column names, not an empty array.
-   *
-   * @legacy-covers ::getColumnNames
    */
   public function testGetColumnNamesFromSuspendedFiber(): void {
     $definition = $this->createStub(TestBaseFieldDefinitionInterface::class);
