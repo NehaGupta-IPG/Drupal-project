@@ -136,7 +136,7 @@ class DisplayTest extends WebDriverTestBase {
     $element = $this->getSession()->getPage()->find('css', $selector);
     $element->find('css', '.contextual button')->press();
 
-    $contextual_container_id = 'entity.view.edit_form:view=test_display:location=page&name=test_display&display_id=page_1&langcode=en';
+    $contextual_container_id = 'entity.view.edit_form:view=test_display:location=page&name=test_display&display_id=page_1&langcode=en&admin_langcode=en';
     $contextual_container = $page->find('css', '[data-contextual-id="' . $contextual_container_id . '"]');
     $this->assertNotEmpty($contextual_container);
 

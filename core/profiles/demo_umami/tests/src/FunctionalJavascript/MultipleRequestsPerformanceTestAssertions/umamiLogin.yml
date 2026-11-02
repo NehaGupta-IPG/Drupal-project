@@ -1,5 +1,5 @@
 QueryCount: 15
-CacheGetCount: 97
+CacheGetCount: 99
 CacheGetCountByBin:
   config: 28
   bootstrap: 17
@@ -8,7 +8,7 @@ CacheGetCountByBin:
   entity: 4
   routes: 5
   dynamic_page_cache: 1
-  render: 5
+  render: 7
 CacheSetCount: 1
 CacheDeleteCount: 1
 CacheTagInvalidationCount: 0
@@ -43,11 +43,11 @@ CacheTagGroupedLookups:
   -
     - 'config:block_list'
   -
-    - 'config:filter.format.basic_html'
     - 'config:system.menu.footer'
   -
     - 'config:system.menu.account'
     - 'config:system.site'
+    - 'config:filter.format.basic_html'
     - 'block_content:2'
     - block_content_view
     - 'config:image.style.medium_8_7'
@@ -74,6 +74,7 @@ CacheTagGroupedLookups:
     - 'taxonomy_term:9'
     - taxonomy_term_list
   -
+    - 'config:language.types'
     - 'config:user.role.authenticated'
 ScriptCount: 3
 ScriptBytes: 13345

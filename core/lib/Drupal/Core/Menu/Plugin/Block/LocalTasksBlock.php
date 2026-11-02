@@ -12,6 +12,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\language\AdminLanguageRender;
 
 /**
  * Provides a "Tabs" block to display the local tasks.
@@ -83,6 +84,15 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       }
     }
 
+    // Switch to the user's preferred admin language before resolving local task
+    // titles. Unlike toolbar links, local task titles are cast to a plain
+    // string inside LocalTaskManager::getTasksBuild(), so the language must be
+    // active at call time rather than deferred to a #pre_render callback.
+    $originalLangcode = NULL;
+    if (\Drupal::moduleHandler()->moduleExists('language')) {
+      $originalLangcode = \Drupal::service(AdminLanguageRender::class)->switchToAdminLanguage();
+    }
+
     $tabs = [
       '#theme' => 'menu_local_tasks',
     ];
@@ -105,7 +115,13 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       ];
     }
 
+    // Restore the original language after resolving titles.
+    if ($originalLangcode !== NULL) {
+      \Drupal::service(AdminLanguageRender::class)->restoreAdminLanguage($originalLangcode);
+    }
+
     $build = [];
+    $cacheability->addCacheContexts(['user.admin_language']);
     $cacheability->applyTo($build);
     if (empty($tabs['#primary']) && empty($tabs['#secondary'])) {
       return $build;
