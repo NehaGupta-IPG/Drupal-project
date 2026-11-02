@@ -189,6 +189,10 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *
    * @param string $langcode
    *   A language code.
+   *
+   * @internal Use \Drupal\Core\Language\LanguageManagerInterface::setRenderOverrideLanguage() instead.
+   *
+   * @see \Drupal\Core\Language\LanguageManagerInterface::setRenderOverrideLanguage()
    */
   public function setDefaultLangcode($langcode) {
     $this->defaultLangcode = $langcode;

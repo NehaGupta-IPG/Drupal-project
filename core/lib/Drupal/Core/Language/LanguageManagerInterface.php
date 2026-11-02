@@ -198,6 +198,33 @@ interface LanguageManagerInterface {
   public function getConfigOverrideLanguage();
 
   /**
+   * Temporary enforces the render language.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   The language to use while rendering.
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return $this
+   */
+  public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static;
+
+  /**
+   * Returns a temporary enforced render language.
+   *
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return \Drupal\Core\Language\LanguageInterface|null
+   *   the current render override language.
+   */
+  public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface;
+
+  /**
    * Some common languages with their English and native names.
    *
    * Language codes are defined by the W3C language tags document for

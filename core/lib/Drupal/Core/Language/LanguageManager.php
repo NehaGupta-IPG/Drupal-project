@@ -396,6 +396,34 @@ class LanguageManager implements LanguageManagerInterface {
   }
 
   /**
+   * Temporary enforces the render language.
+   *
+   * This function is a noop since language switching during rendering is not
+   * supported unless the Language module is enabled.
+   *
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   The language to use while rendering.
+   * @param string $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return $this
+   *
+   * @see \Drupal\language\ConfigurableLanguageManager::setRenderOverrideLanguage()
+   */
+  public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface {
+    return NULL;
+  }
+
+  /**
    * Filters the full list of languages based on the value of the flag.
    *
    * The locked languages are removed by default.

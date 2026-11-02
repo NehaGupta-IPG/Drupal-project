@@ -6,6 +6,7 @@ use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Language\LanguageInterface;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -50,7 +51,8 @@ class LanguageServiceProvider extends ServiceProviderBase {
       ->addArgument(new Reference('module_handler'))
       ->addArgument(new Reference('language.config_factory_override'))
       ->addArgument(new Reference('request_stack'))
-      ->addArgument(new Reference('cache.bootstrap'));
+      ->addArgument(new Reference('cache.bootstrap'))
+      ->addArgument(new ServiceClosureArgument(new Reference('string_translation')));
     if ($default_language_values = $this->getDefaultLanguageValues()) {
       $container->setParameter('language.default_values', $default_language_values);
     }

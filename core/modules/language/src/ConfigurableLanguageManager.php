@@ -10,6 +10,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\FiberResumeType;
 use Drupal\language\Config\LanguageConfigFactoryOverrideInterface;
@@ -85,6 +86,20 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   protected $negotiatedMethods;
 
   /**
+   * An array of language objects keyed by language type.
+   *
+   * @var \Drupal\Core\Language\LanguageInterface[]
+   */
+  protected $renderOverrideLanguages;
+
+  /**
+   * The translation manager service closure.
+   *
+   * @var \Closure(): \Drupal\Core\StringTranslation\TranslationManager
+   */
+  protected \Closure $translationManagerClosure;
+
+  /**
    * Whether or not the language manager has been initialized.
    *
    * @var bool
@@ -120,13 +135,20 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *   The request stack object.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
+   * @param \Closure(): \Drupal\Core\StringTranslation\TranslationManager $translationManagerClosure
+   *   The translation manager service closure.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend, ?\Closure $translationManagerClosure = NULL) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
     $this->configFactoryOverride = $config_override;
     $this->requestStack = $request_stack;
+    if ($translationManagerClosure === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $translationManagerClosure argument is deprecated in drupal:11.5.0 and it will be required in drupal:14.0.0. See https://www.drupal.org/node/3626335', E_USER_DEPRECATED);
+      $translationManagerClosure = static fn() => \Drupal::service(TranslationInterface::class);
+    }
+    $this->translationManagerClosure = $translationManagerClosure;
   }
 
   /**
@@ -212,9 +234,17 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the negotiated language for the given type.
+   *
+   * @param string|null $type
+   *   (optional) The language type; e.g., the interface or the content
+   *   language. Defaults to
+   *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
+   *
+   * @return \Drupal\Core\Language\LanguageInterface
+   *   The negotiated language object for the given type of language.
    */
-  public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE) {
+  protected function getNegotiatedLanguage(?string $type = LanguageInterface::TYPE_INTERFACE): LanguageInterface {
     if (!isset($this->negotiatedLanguages[$type])) {
       // Ensure we have a valid value for this language type.
       $this->negotiatedLanguages[$type] = $this->getDefaultLanguage();
@@ -240,6 +270,13 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     }
 
     return $this->negotiatedLanguages[$type];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE) {
+    return $this->getRenderOverrideLanguage($type) ?? $this->getNegotiatedLanguage($type);
   }
 
   /**
@@ -512,6 +549,24 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   public function getLanguageConfigOverrideStorage($langcode) {
     return $this->configFactoryOverride->getStorage($langcode);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRenderOverrideLanguage(?LanguageInterface $language = NULL, $type = LanguageInterface::TYPE_INTERFACE): static {
+    $this->renderOverrideLanguages[$type] = $language;
+    if ($type === LanguageInterface::TYPE_INTERFACE) {
+      ($this->translationManagerClosure)()->setDefaultLangcode($language?->getId() ?? $this->getNegotiatedLanguage($type)->getId());
+    }
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRenderOverrideLanguage($type = LanguageInterface::TYPE_INTERFACE): ?LanguageInterface {
+    return $this->renderOverrideLanguages[$type] ?? NULL;
   }
 
   /**
