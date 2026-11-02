@@ -184,6 +184,43 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests serializing reference field items and lists.
+   *
+   * Their entity and target_id properties are virtual, so serializing them
+   * must not try to store those properties.
+   */
+  public function testEntityReferenceSerialization(): void {
+    $referenced_entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->referencedEntityType)
+      ->create(['type' => $this->bundle]);
+    $referenced_entity->save();
+
+    $storage = $this->container->get('entity_type.manager')->getStorage($this->entityType);
+
+    $entity = $storage->create(['type' => $this->bundle]);
+    $entity->{$this->fieldName}->target_id = $referenced_entity->id();
+    $entity->save();
+
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+    $entity = $storage->load($entity->id());
+    $items = $entity->get($this->fieldName);
+
+    set_error_handler(function (int $errno, string $errstr): never {
+      throw new \ErrorException($errstr, 0, $errno);
+    });
+    try {
+      $serialized_items = serialize($items);
+      $serialized_item = serialize($items->first());
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    $this->assertEquals($referenced_entity->id(), unserialize($serialized_items)->target_id);
+    $this->assertEquals($referenced_entity->id(), unserialize($serialized_item)->target_id);
+  }
+
+  /**
    * Tests reference field validation.
    */
   public function testEntityReferenceFieldValidation(): void {
