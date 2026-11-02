@@ -1297,4 +1297,22 @@ class MenuUiTest extends BrowserTestBase {
     $assert->linkExists('Login');
   }
 
+  /**
+   * Tests that links in the parent link selector list aren't truncated.
+   */
+  public function testMenuParentFormSelect() {
+    $this->drupalLogin($this->adminUser);
+
+    // Create a link in the tools menu which has a title greater than
+    // 30 characters.
+    $menu_link = $this->addMenuLink();
+    $link_title = $this->randomString(31);
+    $menu_link->set('title', $link_title);
+    $menu_link->save();
+
+    // Test that the menu link in the parent select list isn't truncated.
+    $this->drupalGet("admin/structure/menu/manage/tools/add");
+    $this->assertSession()->pageTextContains($link_title);
+  }
+
 }
