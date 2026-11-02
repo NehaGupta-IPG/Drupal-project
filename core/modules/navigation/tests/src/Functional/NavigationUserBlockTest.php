@@ -89,9 +89,13 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
       $links = $block->findAll('named', ['link', $link_label]);
       $this->assertCount(1, $links, sprintf('Found %s links with label %s.', count($links), $link_label));
     }
-    // The Edit profile link should link to the users edit profile page.
+    // The Edit profile link should link to the user's edit profile page.
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'Edit profile']);
-    $this->assertStringContainsString('/user/edit', $links[0]->getAttribute('href'));
+    $edit_url = Url::fromRoute(
+      'entity.user.edit_form',
+      ['user' => $this->normalUser->id()],
+    )->toString();
+    $this->assertSame($edit_url, $links[0]->getAttribute('href'));
 
     // Login as a different user, UI should update.
     $this->drupalLogin($this->adminUser);
@@ -99,9 +103,13 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     $rendered_user_name = $this->cssSelect('[aria-controls*="navigation-link--navigationuser-linksuserwrapper"] > .toolbar-button__label')[0]->getText();
     $this->assertEquals($this->adminUser->getDisplayName(), $rendered_user_name);
-    // The Edit profile link should link to the users edit profile page.
+    // The Edit profile link should link to the user's edit profile page.
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'Edit profile']);
-    $this->assertStringContainsString('/user/edit', $links[0]->getAttribute('href'));
+    $edit_url = Url::fromRoute(
+      'entity.user.edit_form',
+      ['user' => $this->adminUser->id()],
+    )->toString();
+    $this->assertSame($edit_url, $links[0]->getAttribute('href'));
   }
 
   /**
