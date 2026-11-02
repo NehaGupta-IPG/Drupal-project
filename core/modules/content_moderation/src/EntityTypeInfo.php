@@ -2,6 +2,7 @@
 
 namespace Drupal\content_moderation;
 
+use Drupal\content_moderation\Entity\Handler\CommentModerationHandler;
 use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\ContentEntityFormInterface;
@@ -80,6 +81,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    */
   protected $moderationHandlers = [
     'node' => NodeModerationHandler::class,
+    'comment' => CommentModerationHandler::class,
     'block_content' => BlockContentModerationHandler::class,
     'taxonomy_term' => TaxonomyTermModerationHandler::class,
   ];

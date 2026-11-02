@@ -134,6 +134,31 @@ class CommentTypeForm extends EntityForm {
       ];
     }
 
+    $form['additional_settings'] = [
+      '#type' => 'vertical_tabs',
+    ];
+
+    $form['workflow'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Publishing options'),
+      '#group' => 'additional_settings',
+    ];
+
+    $workflow_options = [
+      'revision' => $comment_type->shouldCreateNewRevision(),
+    ];
+    $keys = array_keys(array_filter($workflow_options));
+    $workflow_options = array_combine($keys, $keys);
+    $form['workflow']['options'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Default options'),
+      '#default_value' => $workflow_options,
+      '#options' => [
+        'revision' => $this->t('Create new revision'),
+      ],
+      '#description' => $this->t('Users with sufficient access rights will be able to override these options.'),
+    ];
+
     if ($this->moduleHandler->moduleExists('content_translation')) {
       $form['language'] = [
         '#type' => 'details',
@@ -187,6 +212,7 @@ class CommentTypeForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $comment_type = $this->entity;
+    $comment_type->setNewRevision($form_state->getValue(['options', 'revision']));
     $status = $comment_type->save();
 
     $edit_link = $this->entity->toLink($this->t('Edit'), 'edit-form')->toString();

@@ -54,6 +54,7 @@ use Drupal\user\Entity\EntityPermissionsRouteProvider;
     'label',
     'target_entity_type_id',
     'description',
+    'new_revision',
   ],
 )]
 class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface {
@@ -87,6 +88,13 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
   protected $target_entity_type_id;
 
   /**
+   * The default revision setting for a comment type.
+   *
+   * @var bool
+   */
+  protected $new_revision = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function getDescription() {
@@ -106,6 +114,20 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
    */
   public function getTargetEntityTypeId() {
     return $this->target_entity_type_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNewRevision($new_revision): void {
+    $this->new_revision = $new_revision;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldCreateNewRevision() {
+    return $this->new_revision;
   }
 
 }

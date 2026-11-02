@@ -5,3 +5,4 @@ id: comment
 label: 'Default comments'
 target_entity_type_id: node
 description: 'Allows commenting on content'
+new_revision: false

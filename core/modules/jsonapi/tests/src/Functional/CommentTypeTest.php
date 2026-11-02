@@ -98,6 +98,7 @@ class CommentTypeTest extends ConfigEntityResourceTestBase {
           'langcode' => 'en',
           'status' => TRUE,
           'target_entity_type_id' => 'node',
+          'new_revision' => FALSE,
           'drupal_internal__id' => 'camelids',
         ],
       ],
