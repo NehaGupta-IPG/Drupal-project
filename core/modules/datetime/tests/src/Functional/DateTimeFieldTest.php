@@ -7,11 +7,13 @@ namespace Drupal\Tests\datetime\Functional;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Form\FormState;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -680,8 +682,18 @@ class DateTimeFieldTest extends DateTestBase {
 
   /**
    * Tests default value functionality.
+   *
+   * @param string $type
+   *   The datetime type - 'date' or 'datetime'.
+   * @param string $relative_value
+   *   The relative date value to use as the default relative value.
    */
-  public function testDefaultValue(): void {
+  #[DataProvider('defaultValueProvider')]
+  public function testDefaultValue(string $type, string $relative_value): void {
+    $storage_format = match ($type) {
+      DateTimeItem::DATETIME_TYPE_DATE => DateTimeItemInterface::DATE_STORAGE_FORMAT,
+      DateTimeItem::DATETIME_TYPE_DATETIME => DateTimeItemInterface::DATETIME_STORAGE_FORMAT,
+    };
     // Create a test content type.
     $this->drupalCreateContentType(['type' => 'date_content']);
 
@@ -691,7 +703,7 @@ class DateTimeFieldTest extends DateTestBase {
       'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'datetime',
-      'settings' => ['datetime_type' => 'date'],
+      'settings' => ['datetime_type' => $type],
     ]);
     $field_storage->save();
 
@@ -701,8 +713,8 @@ class DateTimeFieldTest extends DateTestBase {
     ]);
     $field->save();
 
-    // Loop through defined timezones to test that date-only defaults work at
-    // the extremes.
+    // Loop through defined timezones to test that defaults work at the
+    // extremes.
     foreach (static::$timezones as $timezone) {
 
       $this->setSiteTimezone($timezone);
@@ -733,7 +745,7 @@ class DateTimeFieldTest extends DateTestBase {
       // Create a new node to check that datetime field default value is today.
       $new_node = Node::create(['type' => 'date_content']);
       $expected_date = new DrupalDateTime('now', date_default_timezone_get());
-      $this->assertEquals($expected_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT), $new_node->get($field_name)->offsetGet(0)->value);
+      $this->assertEquals($expected_date->format($storage_format), $new_node->get($field_name)->offsetGet(0)->value);
 
       // Set an invalid relative default_value to test validation.
       $field_edit = [
@@ -750,7 +762,7 @@ class DateTimeFieldTest extends DateTestBase {
       $field_edit = [
         'set_default_value' => '1',
         'default_value_input[default_date_type]' => 'relative',
-        'default_value_input[default_date]' => '+90 days',
+        'default_value_input[default_date]' => $relative_value,
       ];
       $this->drupalGet('admin/structure/types/manage/date_content/fields/node.date_content.' . $field_name);
       $this->submitForm($field_edit, 'Save settings');
@@ -759,21 +771,21 @@ class DateTimeFieldTest extends DateTestBase {
       $this->drupalGet('admin/structure/types/manage/date_content/fields/node.date_content.' . $field_name);
       $this->assertTrue($this->assertSession()->optionExists('edit-default-value-input-default-date-type', 'relative')->isSelected());
       // Check that the relative default value is displayed.
-      $this->assertSession()->fieldValueEquals('default_value_input[default_date]', '+90 days');
+      $this->assertSession()->fieldValueEquals('default_value_input[default_date]', $relative_value);
 
       // Check if default_date has been stored successfully.
       $config_entity = $this->config('field.field.node.date_content.' . $field_name)
         ->get();
-      $this->assertEquals(['default_date_type' => 'relative', 'default_date' => '+90 days'], $config_entity['default_value'][0], 'Default value has been stored successfully');
+      $this->assertEquals(['default_date_type' => 'relative', 'default_date' => $relative_value], $config_entity['default_value'][0], 'Default value has been stored successfully');
 
       // Clear field cache in order to avoid stale cache values.
       \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
 
-      // Create a new node to check that datetime field default value is +90
-      // days.
+      // Create a new node to check that datetime field default value is
+      // relative to the default timezone.
       $new_node = Node::create(['type' => 'date_content']);
-      $expected_date = new DrupalDateTime('+90 days', date_default_timezone_get());
-      $this->assertEquals($expected_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT), $new_node->get($field_name)->offsetGet(0)->value);
+      $expected_date = new DrupalDateTime($relative_value, date_default_timezone_get());
+      $this->assertEquals($expected_date->format($storage_format), $new_node->get($field_name)->offsetGet(0)->value);
 
       // Remove default value.
       $field_edit = [
@@ -802,6 +814,16 @@ class DateTimeFieldTest extends DateTestBase {
       $new_node = Node::create(['type' => 'date_content']);
       $this->assertNull($new_node->get($field_name)->value, 'Default value is not set');
     }
+  }
+
+  /**
+   * Provider for testDefaultValue().
+   */
+  public static function defaultValueProvider(): array {
+    return [
+      [DateTimeItem::DATETIME_TYPE_DATE, '+90 days'],
+      [DateTimeItem::DATETIME_TYPE_DATETIME, 'tomorrow 2pm'],
+    ];
   }
 
   /**
