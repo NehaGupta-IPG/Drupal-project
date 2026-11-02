@@ -23,9 +23,9 @@ class FormState implements FormStateInterface {
   /**
    * The complete form structure.
    *
-   * #process, #after_build, #element_validate, and other handlers being invoked
-   * on a form element may use this reference to access other information in the
-   * form the element is contained in.
+   * #process, #after_build, #element_validate, #element_submit and other
+   * handlers being invoked on a form element may use this reference to access
+   * other information in the form the element is contained in.
    *
    * @var array
    *

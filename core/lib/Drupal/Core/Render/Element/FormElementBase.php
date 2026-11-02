@@ -44,6 +44,9 @@ use Drupal\Core\Url;
  *   object, it will be filtered for XSS safety.
  * - #disabled: (bool) If TRUE, the element is shown but does not accept
  *   user input.
+ * - #element_submit: (array) Array of callables or function names, which
+ *   are called to submit the element. Arguments: $element, $form_state, $form.
+ *   The execution order is bottom to top in the form array.
  * - #element_validate: (array) Array of callables or function names, which
  *   are called to validate the input. Arguments: $element, $form_state, $form.
  * - #field_prefix: (string) Prefix to display before the HTML input element.

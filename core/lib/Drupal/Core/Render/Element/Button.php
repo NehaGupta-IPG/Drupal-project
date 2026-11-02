@@ -21,6 +21,9 @@ use Drupal\Core\Render\Element;
  * - #limit_validation_errors: An array of form element keys that will block
  *   form submission when validation for these elements or any child elements
  *   fails. Specify an empty array to suppress all form validation errors.
+ * - #limit_element_submit: An array of form element #array_parents arrays to
+ *   limit element level submitting to. FALSE or an empty array allows all
+ *   element submit handlers to run.
  * - #value: The text to be shown on the button.
  * - #submit_button: This has a default value of TRUE. If set to FALSE, the
  *   'type' attribute is set to 'button.'
@@ -50,6 +53,7 @@ class Button extends FormElementBase {
       '#submit_button' => TRUE,
       '#executes_submit_callback' => FALSE,
       '#limit_validation_errors' => FALSE,
+      '#limit_element_submit' => FALSE,
       '#process' => [
         [static::class, 'processButton'],
         [static::class, 'processAjaxForm'],

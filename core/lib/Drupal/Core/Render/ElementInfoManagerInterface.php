@@ -28,8 +28,11 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    *     and $complete_form.
    *   - #after_build: array of callables taking $element and $form_state.
    *   - #validate: array of callback functions taking $form and $form_state.
-   *   - #element_validate: array of callback functions taking $element and
-   *     $form_state.
+   *   - #element_submit: array of callables or function names, which are
+   *     called to submit the element. Arguments: $element, $form_state, $form.
+   *     The execution order is bottom to top in the form array.
+   *   - #element_validate: array of callback functions taking $element,
+   *     $form_state and the complete form.
    *   - #pre_render: array of callables taking $element.
    *   - #post_render: array of callables taking $children and $element.
    *   - #submit: array of callback functions taking $form and $form_state.

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Form;
 
 use Drupal\Core\EventSubscriber\RedirectResponseSubscriber;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
@@ -32,6 +33,9 @@ class FormSubmitter implements FormSubmitterInterface {
     }
 
     // Execute form submit handlers.
+    $triggering_element = $form_state->getTriggeringElement();
+    $limit_element_submit = isset($triggering_element['#limit_element_submit']) && $triggering_element['#limit_element_submit'] !== FALSE ? $triggering_element['#limit_element_submit'] : [];
+    $this->submitFormElement($form, $form_state, $limit_element_submit);
     $this->executeSubmitHandlers($form, $form_state);
 
     // If batches were set in the submit handlers, we process them now,
@@ -98,6 +102,58 @@ class FormSubmitter implements FormSubmitterInterface {
         $callable($form, $form_state);
       }
     }
+  }
+
+  /**
+   * Performs submission on form elements.
+   *
+   * @param array $elements
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $limit_element_submit
+   *   An array of form element #array_parents arrays to limit element level
+   *   submitting to.
+   */
+  protected function submitFormElement(array &$elements, FormStateInterface $form_state, array $limit_element_submit = []): void {
+    // Recurse through all children.
+    foreach (Element::children($elements) as $key) {
+      if (isset($elements[$key]) && is_array($elements[$key])) {
+        $this->submitFormElement($elements[$key], $form_state, $limit_element_submit);
+      }
+    }
+
+    // Call any element-specific submit handlers. These must act on the element
+    // #value data.
+    if (isset($elements['#element_submit']) && (empty($limit_element_submit) || $this->shouldElementBeSubmitted($elements, $limit_element_submit))) {
+      foreach ($elements['#element_submit'] as $callback) {
+        $complete_form = &$form_state->getCompleteForm();
+        $callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($callback));
+        $callable($elements, $form_state, $complete_form);
+      }
+    }
+  }
+
+  /**
+   * Determines whether an element's submit callbacks should run.
+   *
+   * @param array $element
+   *   The element itself.
+   * @param array $limit_element_submit
+   *   The array of parents which should be element submitted.
+   *
+   * @return bool
+   *   Whether the element belongs to one of the submitted subtrees.
+   */
+  protected function shouldElementBeSubmitted(array $element, array $limit_element_submit): bool {
+    $array_parents = $element['#array_parents'];
+    foreach ($limit_element_submit as $parents) {
+      // Compare complete keys so group_1 does not also submit group_10.
+      if (array_slice($array_parents, 0, count($parents)) === $parents) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**

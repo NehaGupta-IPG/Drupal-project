@@ -15,6 +15,13 @@ class Callbacks {
   use StringTranslationTrait;
 
   /**
+   * Reports which element-level submit handlers were invoked.
+   */
+  public function submitElement(array &$element, FormStateInterface $form_state): void {
+    \Drupal::messenger()->addStatus($this->t('@parents triggered', ['@parents' => implode(':', $element['#parents'])]));
+  }
+
+  /**
    * Form element validation handler for 'name' in form_test_validate_form().
    */
   public function validateName(&$element, FormStateInterface $form_state): void {
