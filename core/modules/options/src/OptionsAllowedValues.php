@@ -8,6 +8,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -23,6 +24,8 @@ class OptionsAllowedValues implements OptionsAllowedValuesInterface {
   public function __construct(
     #[Autowire(service: 'cache.memory')]
     protected CacheBackendInterface $cache,
+    #[Autowire(service: 'callable_resolver')]
+    protected CallableResolver $callableResolver,
   ) {}
 
   /**
@@ -47,7 +50,8 @@ class OptionsAllowedValues implements OptionsAllowedValuesInterface {
     // @see \Drupal\options_test\OptionsAllowedValues::dynamicValues()
     $cacheable = TRUE;
     if (!empty($callback) && is_callable($callback)) {
-      $allowedValues = $callback($definition, $entity, $cacheable);
+      $callable = $this->callableResolver->getCallableFromDefinition($callback);
+      $allowedValues = $callable($definition, $entity, $cacheable);
     }
     else {
       $allowedValues = $definition->getSetting('allowed_values') ?? [];

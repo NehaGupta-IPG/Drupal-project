@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\options_test\OptionsAllowedValues;
 use Drupal\Tests\field\Functional\FieldTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
@@ -810,6 +811,43 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->optionExists('card_1', 1);
     $this->assertSession()->optionNotExists('card_4', 0);
     $this->assertSession()->optionExists('card_4', 1);
+  }
+
+  /**
+   * Tests displaying the allowed values function.
+   */
+  public function testAllowedValuesFunctionDisplay(): void {
+    // Field storage with list of string values and allowed values function.
+    $field_storage_config = FieldStorageConfig::create([
+      'field_name' => 'string_allowed_values_function',
+      'entity_type' => 'entity_test',
+      'type' => 'list_string',
+      'cardinality' => 1,
+      'settings' => [
+        'allowed_values_function' => [OptionsAllowedValues::class, 'simpleValues'],
+      ],
+    ]);
+    $field_storage_config->save();
+
+    // Create an instance of the 'string value' field.
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage_config,
+      'bundle' => 'entity_test',
+      'required' => TRUE,
+    ]);
+    $field->save();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer entity_test fields',
+    ]));
+
+    $this->drupalGet('entity_test/structure/entity_test/fields/entity_test.entity_test.string_allowed_values_function');
+
+    $element = $this->getSession()->getPage()->find('css', '#edit-field-storage-subform-settings-allowed-values-function');
+    $this->assertNotNull($element);
+
+    $allowed_values_function = implode('::', [OptionsAllowedValues::class, 'simpleValues']);
+    $this->assertStringContainsString($allowed_values_function, $element->getHtml());
   }
 
 }
