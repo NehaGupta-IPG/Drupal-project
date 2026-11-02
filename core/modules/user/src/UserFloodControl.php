@@ -55,8 +55,8 @@ class UserFloodControl implements UserFloodControlInterface {
   /**
    * {@inheritdoc}
    */
-  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL) {
-    if ($this->flood->isAllowed($name, $threshold, $window, $identifier)) {
+  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL, bool $notify = TRUE) {
+    if ($this->flood->isAllowed($name, $threshold, $window, $identifier, $notify)) {
       return TRUE;
     }
     // Register flood control blocked login event.
@@ -64,7 +64,7 @@ class UserFloodControl implements UserFloodControlInterface {
     $event_map['user.failed_login_user'] = UserEvents::FLOOD_BLOCKED_USER;
     $event_map['user.http_login'] = UserEvents::FLOOD_BLOCKED_USER;
 
-    if (isset($event_map[$name])) {
+    if (isset($event_map[$name]) && $notify) {
       if (empty($identifier)) {
         $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
       }

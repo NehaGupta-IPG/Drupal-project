@@ -56,12 +56,15 @@ interface FloodInterface {
    * @param string $identifier
    *   (optional) Unique identifier of the current user. Defaults to the current
    *   user's IP address).
+   * @param bool $notify
+   *   (optional) Whether to log that flood control has been triggered. Defaults
+   *   to TRUE.
    *
    * @return bool
    *   TRUE if the user is allowed to proceed. FALSE if they have exceeded the
    *   threshold and should not be allowed to proceed.
    */
-  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL);
+  public function isAllowed($name, $threshold, $window = 3600, $identifier = NULL, bool $notify = TRUE);
 
   /**
    * Cleans up expired flood events.
