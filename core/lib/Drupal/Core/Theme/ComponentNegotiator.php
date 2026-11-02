@@ -3,7 +3,7 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
-use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 
 /**
  * Determines which component should be used.
@@ -15,7 +15,10 @@ class ComponentNegotiator {
   /**
    * {@inheritdoc}
    */
-  protected $deprecatedProperties = ['moduleExtensionList' => 'extension.list.module'];
+  protected $deprecatedProperties = [
+    'moduleExtensionList' => 'extension.list.module',
+    'themeManager' => 'theme.manager',
+  ];
 
   /**
    * Holds the component IDs from previous negotiations.
@@ -25,14 +28,18 @@ class ComponentNegotiator {
   protected array $cache = [];
 
   /**
-   * Constructs ComponentNegotiator objects.
-   *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
+   * The theme handler.
    */
+  protected ThemeHandlerInterface $themeHandler;
+
   public function __construct(
-    protected ThemeManagerInterface $themeManager,
+    ThemeHandlerInterface|ThemeManagerInterface $themeHandler,
   ) {
+    if ($themeHandler instanceof ThemeManagerInterface) {
+      @trigger_error('Passing the theme.manager service to ' . __METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Pass the theme_handler service instead. See https://www.drupal.org/node/3549491', E_USER_DEPRECATED);
+      $themeHandler = \Drupal::service('theme_handler');
+    }
+    $this->themeHandler = $themeHandler;
   }
 
   /**
@@ -93,13 +100,14 @@ class ComponentNegotiator {
    *   The plugin ID for the negotiated component, or NULL if none was found.
    */
   private function maybeNegotiateByTheme(array $candidates): ?string {
-    // Prepare the error message.
-    $theme_name = $this->themeManager->getActiveTheme()->getName();
-    // Let's do theme based negotiation.
-    $base_theme_names = array_map(
-      static fn(Extension $extension) => $extension->getName(),
-      $this->themeManager->getActiveTheme()->getBaseThemeExtensions()
-    );
+    $theme_name = $this->themeHandler->getDefault();
+    if (!$theme_name || !$this->themeHandler->themeExists($theme_name)) {
+      return NULL;
+    }
+    // Let's do theme based negotiation. The base themes are ordered from the
+    // root base theme to the direct parent, so reverse them to give priority
+    // to the closest ancestor. The property is only set for sub-themes.
+    $base_theme_names = array_reverse(array_keys($this->themeHandler->getTheme($theme_name)->base_themes ?? []));
     $considered_themes = [$theme_name, ...$base_theme_names];
     // Only consider components in the theme hierarchy tree.
     $candidates = array_filter(
@@ -150,7 +158,7 @@ class ComponentNegotiator {
     return sprintf(
       'component-negotiation::%s::%s',
       $component_id,
-      $this->themeManager->getActiveTheme()->getName()
+      $this->themeHandler->getDefault()
     );
   }
 
