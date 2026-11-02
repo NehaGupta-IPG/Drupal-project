@@ -7,6 +7,8 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\ValidReferenceConstraint;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
@@ -246,51 +248,28 @@ class EntityAutocomplete extends Textfield {
 
       // Check that the referenced entities are valid, if needed.
       if ($element['#validate_reference'] && !empty($value)) {
-        // Validate existing entities.
-        $ids = array_reduce($value, function ($return, $item) {
-          if (isset($item['target_id'])) {
-            $return[] = $item['target_id'];
-          }
-          return $return;
-        });
-
-        if ($ids) {
-          $valid_ids = $handler->validateReferenceableEntities($ids);
-          if ($invalid_ids = array_diff($ids, $valid_ids)) {
-            foreach ($invalid_ids as $invalid_id) {
-              $form_state->setError($element, t('The referenced entity (%type: %id) does not exist.', [
-                '%type' => $element['#target_type'],
-                '%id' => $invalid_id,
-              ]));
-            }
-          }
+        $definition = BaseFieldDefinition::create('entity_reference')->setSettings([
+          'target_type' => $element['#target_type'],
+          'handler' => $element['#selection_handler'],
+          'handler_settings' => $element['#selection_settings'],
+        ]);
+        $items = \Drupal::typedDataManager()->create($definition, $value);
+        $constraint = new ValidReferenceConstraint(
+          message: 'The referenced entity (%type: %id) does not exist.',
+          handler: $handler,
+          allowNewEntities: $autocreate,
+        );
+        $validator = \Drupal::service('validation.basic_recursive_validator_factory')->createValidator();
+        $errors = ['existing' => [], 'new' => []];
+        foreach ($validator->validate($items, $constraint) as $violation) {
+          $delta = (int) $violation->getPropertyPath();
+          $group = isset($value[$delta]['target_id']) ? 'existing' : 'new';
+          $errors[$group][] = $violation->getMessage();
         }
-
-        // Validate newly created entities.
-        $new_entities = array_reduce($value, function ($return, $item) {
-          if (isset($item['entity'])) {
-            $return[] = $item['entity'];
-          }
-          return $return;
-        });
-
-        if ($new_entities) {
-          if ($autocreate) {
-            $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
-            $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
-          }
-          else {
-            // If the selection handler does not support referencing newly
-            // created entities, all of them should be invalidated.
-            $invalid_new_entities = $new_entities;
-          }
-
-          foreach ($invalid_new_entities as $entity) {
-            /** @var \Drupal\Core\Entity\EntityInterface $entity */
-            $form_state->setError($element, t('This entity (%type: %label) cannot be referenced.', [
-              '%type' => $element['#target_type'],
-              '%label' => $entity->label(),
-            ]));
+        // Preserve this element's existing-first error order.
+        foreach ($errors as $messages) {
+          foreach ($messages as $message) {
+            $form_state->setError($element, $message);
           }
         }
       }

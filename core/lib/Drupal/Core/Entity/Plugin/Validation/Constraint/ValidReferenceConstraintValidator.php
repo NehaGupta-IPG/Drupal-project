@@ -94,12 +94,12 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
     $entity = !empty($value->getParent()) ? $value->getEntity() : NULL;
 
     /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler * */
-    $handler = $this->selectionManager->getSelectionHandler($value->getFieldDefinition(), $entity);
+    $handler = $constraint->handler ?? $this->selectionManager->getSelectionHandler($value->getFieldDefinition(), $entity);
     $target_type_id = $value->getFieldDefinition()->getSetting('target_type');
 
     // Add violations on deltas with a new entity that is not valid.
     if ($new_entities) {
-      if ($handler instanceof SelectionWithAutocreateInterface) {
+      if ($handler instanceof SelectionWithAutocreateInterface && $constraint->allowNewEntities) {
         $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
         $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
       }
@@ -134,7 +134,10 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
 
         // For accuracy of the error message, differentiate non-referenceable
         // and non-existent entities.
-        $existing_entities = $this->entityTypeManager->getStorage($target_type_id)->loadMultiple($invalid_target_ids);
+        // Equal messages need no existence lookup unless access checks need it.
+        $existing_entities = !$previously_referenced_ids && $constraint->message === $constraint->nonExistingMessage
+          ? []
+          : $this->entityTypeManager->getStorage($target_type_id)->loadMultiple($invalid_target_ids);
         foreach ($invalid_target_ids as $delta => $target_id) {
           // Check if any of the invalid existing references are simply not
           // accessible by the user, in which case they need to be excluded from
