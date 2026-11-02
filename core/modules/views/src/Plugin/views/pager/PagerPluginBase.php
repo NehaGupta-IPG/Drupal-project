@@ -25,7 +25,7 @@ use Drupal\views\Plugin\views\PluginBase;
 /**
  * Base class for views pager plugins.
  */
-abstract class PagerPluginBase extends PluginBase {
+abstract class PagerPluginBase extends PluginBase implements PagerPluginInterface {
 
   /**
    * The current page.

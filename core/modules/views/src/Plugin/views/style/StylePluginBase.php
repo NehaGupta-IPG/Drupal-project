@@ -37,7 +37,7 @@ use Drupal\views\ViewExecutable;
 /**
  * Base class for views style plugins.
  */
-abstract class StylePluginBase extends PluginBase {
+abstract class StylePluginBase extends PluginBase implements StylePluginInterface {
 
   /**
    * {@inheritdoc}
