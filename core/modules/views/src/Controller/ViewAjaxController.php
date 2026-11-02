@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
@@ -171,6 +172,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
         if (!empty($preview['#attached'])) {
           $response->setAttachments($preview['#attached']);
         }
+
+        $cacheableMetadata = $response->getCacheableMetadata();
+        $cacheableMetadata->addCacheTags($view->getCacheTags());
+        $cacheableMetadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($view->element));
+
+        // This controller uses various query arguments.
+        $cacheableMetadata->addCacheContexts(['url.query_args']);
 
         return $response;
       }
