@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\VariationCacheFactoryInterface;
@@ -46,6 +47,11 @@ class RenderCache implements RenderCacheInterface {
       if (!$this->isCacheableForCurrentHttpMethod($cache->tags)) {
         return FALSE;
       }
+
+      $cacheability = CacheableMetadata::createFromRenderArray($cache->data);
+      $cacheability->setCacheMaxAge(Cache::ttlFromExpire($cache->expire));
+      $cacheability->applyTo($cache->data);
+
       return $cache->data;
     }
     return FALSE;
@@ -75,6 +81,10 @@ class RenderCache implements RenderCacheInterface {
     foreach ($bin_map as $bin => $items) {
       foreach ($this->cacheFactory->get($bin)->getMultiple($items) as $item_key => $cache) {
         if ($this->isCacheableForCurrentHttpMethod($cache->tags)) {
+          $cacheability = CacheableMetadata::createFromRenderArray($cache->data);
+          $cacheability->setCacheMaxAge(Cache::ttlFromExpire($cache->expire));
+          $cacheability->applyTo($cache->data);
+
           $results[$item_key] = $cache->data;
         }
       }

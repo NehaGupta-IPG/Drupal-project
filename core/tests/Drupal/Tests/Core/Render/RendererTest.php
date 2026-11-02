@@ -988,6 +988,60 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Tests render cache max age correction.
+   *
+   * @param int $max_age
+   *   The initial max age of the element.
+   * @param int $delta
+   *   The delta to apply to the request time for this test.
+   * @param int|false $expected_ttl
+   *   The expected time-to-live.
+   * @param bool $multiple
+   *   TRUE to test ::getMultiple(), FALSE to test ::get().
+   *
+   * @legacy-covers \Drupal\Core\Render\RenderCache::get
+   * @legacy-covers \Drupal\Core\Render\RenderCache::getMultiple
+   */
+  #[DataProvider('providerTestRenderCacheMaxAgeCorrection')]
+  public function testRenderCacheMaxAgeCorrection(int $max_age, int $delta, int|false $expected_ttl, bool $multiple): void {
+    $this->setUpMemoryCache();
+
+    $element = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+        'max-age' => $max_age,
+      ],
+      '#markup' => '',
+    ];
+    $this->renderer->renderRoot($element);
+
+    $request = $this->requestStack->getCurrentRequest();
+    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
+
+    $cache = $multiple ? $this->renderCache->getMultiple([$element])[0] ?? FALSE : $this->renderCache->get($element);
+    $this->assertSame($expected_ttl, $cache !== FALSE ? $cache['#cache']['max-age'] : FALSE);
+  }
+
+  /**
+   * Data provider for ::testRenderCacheMaxAgeCorrection().
+   *
+   * @return array
+   *   The test case conditions.
+   */
+  public static function providerTestRenderCacheMaxAgeCorrection(): array {
+    return [
+      'Newly-inserted cache item, single' => [800, 0, 800, FALSE],
+      'Newly-inserted cache item, multiple' => [800, 0, 800, TRUE],
+      'Aged cache item, single' => [800, 500, 300, FALSE],
+      'Aged cache item, multiple' => [800, 500, 300, TRUE],
+      'Expiring cache item, single' => [800, 800, 0, FALSE],
+      'Expiring cache item, multiple' => [800, 800, 0, TRUE],
+      'Expired cache item, single' => [800, 801, FALSE, FALSE],
+      'Expired cache item, multiple' => [800, 801, FALSE, TRUE],
+    ];
+  }
+
+  /**
    * Tests that #cache_properties are properly handled.
    *
    * @param array $expected_results
