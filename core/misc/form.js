@@ -22,7 +22,7 @@
  * @event formFragmentLinkClickOrHashChange
  */
 
-(function ($, Drupal, debounce) {
+(function ($, window, Drupal, debounce) {
   /**
    * Retrieves the summary for the first element.
    *
@@ -141,6 +141,20 @@
         'form:not([method~="GET"])',
         onFormSubmit,
       );
+
+      // Binds a listener to clear stored form values from formSingleSubmit()
+      // when the page is loaded from back/forward cache. This allows the form
+      // submission button to be used again instead of remaining disabled.
+      // Checking persisted does not work with jQuery on().
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+          document
+            .querySelectorAll('form:not([method~="GET"])')
+            .forEach((form) =>
+              form.removeAttribute('data-drupal-form-submit-last'),
+            );
+        }
+      });
     },
   };
 
@@ -331,4 +345,4 @@
     'a[href*="#"]',
     debouncedHandleFragmentLinkClickOrHashChange,
   );
-})(jQuery, Drupal, Drupal.debounce);
+})(jQuery, window, Drupal, Drupal.debounce);
