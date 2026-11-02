@@ -176,11 +176,12 @@ abstract class AssetControllerBase extends FileDownloadController {
         }
       }
     };
+    $include_libraries = array_filter($include_libraries);
     $validate($include_libraries);
     $attached_assets->setLibraries($include_libraries);
 
     if ($request->query->has('exclude')) {
-      $exclude_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('exclude')));
+      $exclude_libraries = array_filter(explode(',', UrlHelper::uncompressQueryParameter($request->query->get('exclude'))));
       $validate($exclude_libraries);
       $attached_assets->setAlreadyLoadedLibraries($exclude_libraries);
     }
