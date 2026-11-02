@@ -502,6 +502,11 @@ services:
     calls:
       - [setValidationConstraintManager, ['@validation.constraint']]
   Drupal\Core\Config\TypedConfigManagerInterface: '@config.typed'
+  Drupal\Core\Conflict\ConflictResolver\ConflictResolverManagerInterface:
+    autowire: true
+    class: Drupal\Core\Conflict\ConflictResolver\ConflictResolverManager
+  Drupal\Core\Conflict\ConflictDiscovery\DefaultConflictDiscovery: ~
+  Drupal\Core\Conflict\ConflictResolution\MergeTheirsOnlyChanges: ~
   context.handler:
     class: Drupal\Core\Plugin\Context\ContextHandler
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'

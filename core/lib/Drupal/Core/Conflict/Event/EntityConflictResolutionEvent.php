@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Core\Conflict\Event;
+
+use Drupal\Core\Entity\EntityInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
+
+/**
+ * Defines an event to resolve entity conflicts.
+ */
+class EntityConflictResolutionEvent extends EntityConflictDiscoveryEvent {
+
+  public function __construct(
+    EntityInterface $oursEntity,
+    EntityInterface $theirsEntity,
+    EntityInterface $baseEntity,
+    protected EntityInterface $resultEntity,
+    array $conflicts,
+    ParameterBag $context = new ParameterBag(),
+  ) {
+    parent::__construct($oursEntity, $theirsEntity, $baseEntity, $context);
+    \assert($resultEntity->getEntityTypeId() === $oursEntity->getEntityTypeId());
+    \assert($resultEntity->id() === $oursEntity->id());
+    $this->conflicts = $conflicts;
+  }
+
+  /**
+   * Creates a conflict resolution event object from a conflict discovery event.
+   *
+   * @param \Drupal\Core\Conflict\Event\EntityConflictDiscoveryEvent $event
+   *   The conflict discovery event.
+   * @param \Drupal\Core\Entity\EntityInterface $result
+   *   The result entity, on which to apply the result.
+   *
+   * @return static
+   */
+  public static function createFromConflictDiscoveryEvent(EntityConflictDiscoveryEvent $event, EntityInterface $result): static {
+    return new static($event->oursEntity, $event->theirsEntity, $event->baseEntity, $result, $event->conflicts, $event->context);
+  }
+
+  /**
+   * Returns the result entity.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The result entity.
+   */
+  public function getResultEntity() : EntityInterface {
+    return $this->resultEntity;
+  }
+
+  /**
+   * Resolves a conflict by removing it from the list of unresolved conflicts.
+   *
+   * This method should be called when a conflict has been resolved or the
+   * property value on the resulting entity satisfies the merge strategy.
+   *
+   * @param string $property
+   *   The conflicting property.
+   */
+  public function resolveConflict(string $property): static {
+    unset($this->conflicts[$property]);
+    return $this;
+  }
+
+}
