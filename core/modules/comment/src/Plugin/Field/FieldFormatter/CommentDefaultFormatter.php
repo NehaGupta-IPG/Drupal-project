@@ -170,7 +170,6 @@ class CommentDefaultFormatter extends FormatterBase {
       $form_location = FormLocation::tryFrom($comment_settings['form_location']);
       if ($status == CommentingStatus::Open && $form_location == FormLocation::Below && $this->viewMode != 'print') {
         // Only show the add comment form if the user has permission.
-        $elements['#cache']['contexts'][] = 'user.roles';
         if ($this->currentUser->hasPermission('post comments')) {
           $output['comment_form'] = [
             '#lazy_builder' => [
