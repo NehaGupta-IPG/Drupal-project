@@ -348,6 +348,34 @@ class ExposedFormTest extends ViewTestBase {
   }
 
   /**
+   * Tests that exposed filter blocks work on unrouted requests with BigPipe.
+   *
+   * On 404 pages, getRouteName() returns NULL via NullRouteMatch. With BigPipe
+   * enabled, blocks are rendered in a context where the route is not set,
+   * causing str_starts_with() to receive NULL as its first argument.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3386085
+   */
+  public function testExposedBlockOnUnroutedRequestWithBigPipe(): void {
+    $this->container->get('module_installer')->install(['big_pipe']);
+
+    // Place the exposed filter block on all pages.
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-page_1');
+
+    // BigPipe only activates for authenticated users.
+    $this->drupalLogin($this->drupalCreateUser());
+
+    // Navigate to a non-existent URL (unrouted request / 404 page).
+    // Before the fix, this triggered a PHP 8.1+ deprecation:
+    // str_starts_with(): Passing null to parameter #1 ($haystack) of type string
+    $this->drupalGet('/this-path-does-not-exist');
+    $this->assertSession()->statusCodeEquals(404);
+    // Assert the exposed filter block is rendered on the 404 page.
+    $form_id = Html::cleanCssIdentifier('views-exposed-form-test-exposed-block-page-1');
+    $this->assertSession()->elementExists('css', "form#$form_id");
+  }
+
+  /**
    * Tests the input required exposed form type.
    */
   public function testExposedForm(): void {
