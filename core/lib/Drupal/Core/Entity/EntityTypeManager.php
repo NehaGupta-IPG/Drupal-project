@@ -89,7 +89,11 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     $this->setCacheBackend($cache, 'entity_type', ['entity_types']);
     $this->alterInfo('entity_type');
 
-    $this->discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, EntityType::class, 'Drupal\Core\Entity\Annotation\EntityType');
+    // @todo: make this a service.
+    $cache_file = \Drupal::service('cache.file_parsing');
+    $lock = \Drupal::service('lock');
+    $time = \Drupal::service('datetime.time');
+    $this->discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, EntityType::class, 'Drupal\Core\Entity\Annotation\EntityType', $cache_file, $lock, $time);
     $this->stringTranslation = $string_translation;
     $this->classResolver = $class_resolver;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
