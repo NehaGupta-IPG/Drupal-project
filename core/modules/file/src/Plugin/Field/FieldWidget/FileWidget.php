@@ -125,6 +125,10 @@ class FileWidget extends WidgetBase {
     $delta = 0;
     // Add an element for every existing item.
     foreach ($items as $item) {
+      // Fix duplicates in custom multi-steps forms.
+      if (empty($item->getValue())) {
+        continue;
+      }
       $element = [
         '#title' => $title,
         '#description' => $description,
