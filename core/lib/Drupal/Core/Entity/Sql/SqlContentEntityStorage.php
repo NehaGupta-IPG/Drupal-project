@@ -202,7 +202,6 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->entityTypeManager = $entity_type_manager;
     $this->entityType = $this->entityTypeManager->getActiveDefinition($entity_type->id());
     $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type->id());
-
     $this->initTableLayout();
   }
 
@@ -1960,6 +1959,11 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $storage_definition = $field_definition->getFieldStorageDefinition();
     $table_mapping = $this->getTableMapping();
     $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, $storage_definition->isDeleted());
+
+    if (!$this->database->schema()->tableExists($table_name)) {
+      \Drupal::logger($this->entityTypeId)->warning('Entity module tried to delete a non-existent %field_name field table.', ['%field_name' => $field_definition->getName()]);
+      return [];
+    }
 
     // Get the entities which we want to purge first.
     $entity_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative]);

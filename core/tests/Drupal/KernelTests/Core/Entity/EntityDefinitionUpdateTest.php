@@ -97,4 +97,35 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     }
   }
 
+  /**
+   * Tests purging a field with a broken state.
+   */
+  public function testBundleFieldPurgeWithBrokenState(): void {
+    /** @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('entity_test_update');
+    $schema_handler = $this->database->schema();
+
+    // Add the bundle field and run the update.
+    $this->addBundleField();
+    $this->applyEntityUpdates();
+
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    $table_mapping = $storage->getTableMapping();
+    $storage_definition = \Drupal::service('entity.last_installed_schema.repository')->getLastInstalledFieldStorageDefinitions('entity_test_update')['new_bundle_field'];
+
+    // Save an entity with the bundle field populated.
+    EntityTestHelper::createBundle('custom');
+    $entity = $storage->create(['type' => 'test_bundle', 'new_bundle_field' => 'foo']);
+    $entity->save();
+
+    // Remove the bundle field and apply updates.
+    $this->removeBundleField();
+    $this->applyEntityUpdates();
+
+    $dedicated_deleted_table_name = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
+
+    $this->assertTrue($schema_handler->dropTable($dedicated_deleted_table_name), 'Found and dropped the _deleted_ table.');
+    field_purge_batch(10);
+  }
+
 }
