@@ -30,6 +30,7 @@ enum ColumnType: string {
 
   // Other types.
   case Blob = 'blob';
+  case Generated = 'generated';
 
   /**
    * Checks if a default value is compatible with a column type.

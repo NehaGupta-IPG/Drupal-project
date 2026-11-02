@@ -12,6 +12,16 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 final class Column implements SchemaDefinitionInterface {
 
   /**
+   * The column data size.
+   *
+   * This is a hint about the largest value the column will store. See
+   * ColumnSize for allowed values.
+   *
+   * @see \Drupal\Core\Database\SchemaDefinition\ColumnSize
+   */
+  public readonly ColumnSize $size;
+
+  /**
    * Constructor.
    *
    * @param string $name
@@ -81,7 +91,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?ColumnType $type = NULL,
     public readonly ?string $description = NULL,
     public readonly ?bool $serialize = NULL,
-    public readonly ?ColumnSize $size = NULL,
+    ?ColumnSize $size = ColumnSize::Normal,
     public readonly ?bool $notNull = NULL,
     public readonly StringValue|IntValue|FloatValue|NullValue|null $default = NULL,
     public readonly ?int $length = NULL,
@@ -93,6 +103,8 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?GeneratedColumnExpression $generatedExpression = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
+    $this->size = $size ?? ColumnSize::Normal;
+    $this->validate();
   }
 
   /**
@@ -113,7 +125,7 @@ final class Column implements SchemaDefinitionInterface {
     ?bool $binary = NULL,
     ?array $dbSpecificExtra = NULL,
   ): self {
-    $instance = new self(
+    return new self(
       name: $name,
       type: $type,
       description: $description,
@@ -128,8 +140,6 @@ final class Column implements SchemaDefinitionInterface {
       binary: $binary,
       dbSpecificExtra: $dbSpecificExtra,
     );
-    $instance->validate();
-    return $instance;
   }
 
   /**
@@ -220,6 +230,13 @@ final class Column implements SchemaDefinitionInterface {
       throw new SchemaDefinitionException("Cannot set a null default for column '{$this->name}': notNull is true");
     }
 
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function normalizationProperty(): ?string {
+    return 'name';
   }
 
   /**
@@ -505,7 +522,7 @@ final class Column implements SchemaDefinitionInterface {
     ?bool $binary = NULL,
     ?array $dbSpecificExtra = NULL,
   ): self {
-    $column = new self(
+    return new self(
       type: $type,
       name: $name,
       description: $description,
@@ -519,8 +536,6 @@ final class Column implements SchemaDefinitionInterface {
       generatedExpression: $expression,
       dbSpecificExtra: $dbSpecificExtra,
     );
-    $column->validate();
-    return $column;
   }
 
 }
