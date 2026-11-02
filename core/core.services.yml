@@ -507,9 +507,7 @@ services:
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'
   context.repository:
     class: Drupal\Core\Plugin\Context\LazyContextRepository
-    arguments: ['@service_container']
-    tags:
-      - { name: service_id_collector, tag: context_provider }
+    autowire: true
   Drupal\Core\Plugin\Context\ContextRepositoryInterface: '@context.repository'
   Drupal\Component\DependencyInjection\ReverseContainer:
     arguments: [ '@service_container' ]

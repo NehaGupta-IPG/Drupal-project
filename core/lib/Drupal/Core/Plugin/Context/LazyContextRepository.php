@@ -2,27 +2,13 @@
 
 namespace Drupal\Core\Plugin\Context;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 
 /**
  * Provides a context repository which uses context provider services.
  */
 class LazyContextRepository implements ContextRepositoryInterface {
-
-  /**
-   * The set of available context providers service IDs.
-   *
-   * @var string[]
-   *   Context provider service IDs.
-   */
-  protected $contextProviderServiceIDs = [];
-
-  /**
-   * The service container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
 
   /**
    * The statically cached contexts.
@@ -34,15 +20,14 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * Constructs a LazyContextRepository object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The current service container.
-   * @param string[] $context_provider_service_ids
-   *   The set of the available context provider service IDs.
+   * @param \Symfony\Contracts\Service\ServiceCollectionInterface $contextProviders
+   *   A service locator containing the services tagged 'context_provider',
+   *   keyed by service ID.
    */
-  public function __construct(ContainerInterface $container, array $context_provider_service_ids) {
-    $this->container = $container;
-    $this->contextProviderServiceIDs = $context_provider_service_ids;
-  }
+  public function __construct(
+    #[AutowireLocator('context_provider')]
+    protected ServiceCollectionInterface $contextProviders,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -68,7 +53,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
     // Iterate over all missing context providers (services), gather the
     // runtime contexts and assign them as requested.
     foreach ($context_ids_by_service as $service_id => $unqualified_context_ids) {
-      $contexts_by_service = $this->container->get($service_id)->getRuntimeContexts($unqualified_context_ids);
+      $contexts_by_service = $this->contextProviders->get($service_id)->getRuntimeContexts($unqualified_context_ids);
 
       $wanted_contexts = array_intersect_key($contexts_by_service, array_flip($unqualified_context_ids));
       foreach ($wanted_contexts as $unqualified_context_id => $context) {
@@ -85,8 +70,8 @@ class LazyContextRepository implements ContextRepositoryInterface {
    */
   public function getAvailableContexts() {
     $contexts = [];
-    foreach ($this->contextProviderServiceIDs as $service_id) {
-      $contexts_by_service = $this->container->get($service_id)->getAvailableContexts();
+    foreach ($this->contextProviders as $service_id => $context_provider) {
+      $contexts_by_service = $context_provider->getAvailableContexts();
       foreach ($contexts_by_service as $unqualified_context_id => $context) {
         $context_id = '@' . $service_id . ':' . $unqualified_context_id;
         $contexts[$context_id] = $context;
