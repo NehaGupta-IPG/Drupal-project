@@ -491,6 +491,19 @@ class FilterKernelTest extends KernelTestBase {
       '<drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media>' => [
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
+      // Bug 3075527, links around drupalmedia tags were broken apart.
+      '<a href="https://example.com"><drupal-media data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></a>' => [
+        '<a href="https://example.com"><drupal-media data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></a>' => TRUE,
+        '<p><a href="https://example.com"></p>' => FALSE,
+        '<p></a></p>' => FALSE,
+      ],
+      "aaa\n<a href=\"https://example.com\">\n  <drupal-media data-entity-type=\"media\" data-entity-uuid=\"dbb16f97-cd11-4357-acde-cd09e19e312b\">\n  </drupal-media>\n</a>\nbbb" => [
+        "<a href=\"https://example.com\">\n  <drupal-media data-entity-type=\"media\" data-entity-uuid=\"dbb16f97-cd11-4357-acde-cd09e19e312b\">\n  </drupal-media>\n</a>" => TRUE,
+        '<p><a href="https://example.com">' => FALSE,
+        '<p></a></p>' => FALSE,
+        '<p>aaa' => TRUE,
+        "</a><p>bbb</p>" => TRUE,
+      ],
     ];
     // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     // cSpell:enable
