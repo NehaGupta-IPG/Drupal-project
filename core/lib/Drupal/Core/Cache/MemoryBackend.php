@@ -20,7 +20,7 @@ use Drupal\Component\Datetime\TimeInterface;
  *
  * @ingroup cache
  */
-class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterface {
+class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterface, CacheTimeInterface {
 
   /**
    * Array to store cache objects.
@@ -99,7 +99,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $prepared->data = unserialize($prepared->data);
 
     // Check expire time.
-    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->time->getRequestTime();
+    $prepared->valid = $prepared->expire == Cache::PERMANENT || $prepared->expire >= $this->getTime();
 
     if (!$allow_invalid && !$prepared->valid) {
       return FALSE;
@@ -119,7 +119,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
     $this->cache[$cid] = (object) [
       'cid' => $cid,
       'data' => serialize($data),
-      'created' => $this->time->getRequestTime(),
+      'created' => $this->getTime(),
       'expire' => $expire,
       'tags' => $tags,
     ];
@@ -160,7 +160,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function invalidate($cid) {
     if (isset($this->cache[$cid])) {
-      $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
+      $this->cache[$cid]->expire = 1;
     }
   }
 
@@ -170,7 +170,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateMultiple(array $cids) {
     $items = array_intersect_key($this->cache, array_flip($cids));
     foreach ($items as $cid => $item) {
-      $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
+      $this->invalidate($cid);
     }
   }
 
@@ -180,7 +180,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   public function invalidateTags(array $tags) {
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
-        $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
+        $this->invalidate($cid);
       }
     }
   }
@@ -189,9 +189,9 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    $requestTime = $this->time->getRequestTime();
-    $this->cache = array_filter($this->cache, function ($item) use ($requestTime) {
-      return $item->expire == Cache::PERMANENT || $item->expire >= $requestTime;
+    $time = $this->getTime();
+    $this->cache = array_filter($this->cache, function ($item) use ($time) {
+      return $item->expire == Cache::PERMANENT || $item->expire >= $time;
     });
   }
 
@@ -200,6 +200,13 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function removeBin() {
     $this->cache = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTime(): int {
+    return $this->time->getCurrentTime();
   }
 
   /**

@@ -418,7 +418,7 @@ class VariationCache implements VariationCacheInterface {
    */
   protected function maxAgeToExpire($max_age) {
     if ($max_age !== Cache::PERMANENT) {
-      return (int) $this->requestStack->getMainRequest()->server->get('REQUEST_TIME') + $max_age;
+      return $this->getTime() + $max_age;
     }
     return $max_age;
   }
@@ -478,6 +478,15 @@ class VariationCache implements VariationCacheInterface {
    */
   public function reset(): void {
     $this->redirectChainCache = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTime(): int {
+    return $this->cacheBackend instanceof CacheTimeInterface
+      ? $this->cacheBackend->getTime()
+      : (int) $this->requestStack->getMainRequest()->server->get('REQUEST_TIME');
   }
 
 }

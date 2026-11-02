@@ -26,7 +26,7 @@ class MemoryBackendTest extends UnitTestCase {
   public function testGarbageCollection(): void {
     $time = $this->createStub(TimeInterface::class);
     $time
-      ->method('getRequestTime')
+      ->method('getCurrentTime')
       ->willReturn(100);
     $backend = new MemoryBackend($time);
 

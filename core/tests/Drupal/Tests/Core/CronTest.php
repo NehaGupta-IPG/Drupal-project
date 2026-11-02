@@ -69,7 +69,9 @@ class CronTest extends UnitTestCase {
     parent::setUp();
 
     // Construct a state object used for testing logger assertions.
-    $time = $this->prophesize(TimeInterface::class)->reveal();
+    $time = $this->prophesize(TimeInterface::class);
+    $time->getCurrentTime()->willReturn(12345678);
+    $time = $time->reveal();
     $this->state = new State(new KeyValueMemoryFactory(), new MemoryBackend($time), new NullLockBackend());
 
     // Create a mock logger to set a flag in the resulting state.

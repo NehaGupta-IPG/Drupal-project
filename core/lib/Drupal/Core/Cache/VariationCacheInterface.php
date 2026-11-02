@@ -11,7 +11,7 @@ namespace Drupal\Core\Cache;
  *
  * @ingroup cache
  */
-interface VariationCacheInterface {
+interface VariationCacheInterface extends CacheTimeInterface {
 
   /**
    * Gets a cache entry based on cache keys.
