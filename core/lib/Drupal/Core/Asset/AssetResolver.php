@@ -5,6 +5,7 @@ namespace Drupal\Core\Asset;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Asset\Exception\InvalidLibraryException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -166,6 +167,9 @@ class AssetResolver implements AssetResolverInterface {
    */
   protected function filterLibrariesByType(array $libraries, string $asset_type): array {
     foreach ($libraries as $key => $library) {
+      if (!str_contains($library, '/')) {
+        throw new InvalidLibraryException(sprintf("Invalid library name '%s': missing a '/'", $library));
+      }
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (empty($definition[$asset_type])) {
@@ -254,6 +258,9 @@ class AssetResolver implements AssetResolverInterface {
     ];
 
     foreach ($libraries_to_load as $library) {
+      if (!str_contains($library, '/')) {
+        throw new InvalidLibraryException(sprintf("Invalid library name '%s': missing a '/'", $library));
+      }
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       foreach ($definition['css'] as $options) {
@@ -317,6 +324,9 @@ class AssetResolver implements AssetResolverInterface {
     $settings = [];
 
     foreach ($this->getLibrariesToLoad($assets, 'js') as $library) {
+      if (!str_contains($library, '/')) {
+        throw new InvalidLibraryException(sprintf("Invalid library name '%s': missing a '/'", $library));
+      }
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (isset($definition['drupalSettings'])) {
@@ -351,6 +361,9 @@ class AssetResolver implements AssetResolverInterface {
     // Collect all libraries that contain JS assets and are in the header.
     $header_js_libraries = [];
     foreach ($libraries_to_load as $key => $library) {
+      if (!str_contains($library, '/')) {
+        throw new InvalidLibraryException(sprintf("Invalid library name '%s': missing a '/'", $library));
+      }
       [$extension, $name] = explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (!empty($definition['header'])) {
@@ -390,6 +403,9 @@ class AssetResolver implements AssetResolverInterface {
       $header_js_libraries = $this->libraryDependencyResolver->getLibrariesWithDependencies($header_js_libraries);
 
       foreach ($libraries_to_load as $library) {
+        if (!str_contains($library, '/')) {
+          throw new InvalidLibraryException(sprintf("Invalid library name '%s': missing a '/'", $library));
+        }
         [$extension, $name] = explode('/', $library, 2);
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
