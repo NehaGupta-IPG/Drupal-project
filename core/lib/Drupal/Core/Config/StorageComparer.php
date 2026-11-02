@@ -100,6 +100,13 @@ class StorageComparer implements StorageComparerInterface {
   protected bool $writeMode = FALSE;
 
   /**
+   * Static cache for the collection names.
+   *
+   * @var array|null
+   */
+  protected ?array $cacheAllCollectionNames = NULL;
+
+  /**
    * Constructs the Configuration storage comparer.
    *
    * @param \Drupal\Core\Config\StorageInterface $source_storage
@@ -408,6 +415,7 @@ class StorageComparer implements StorageComparerInterface {
     $this->changelist = [StorageInterface::DEFAULT_COLLECTION => $this->getEmptyChangelist()];
     $this->sourceNames = $this->targetNames = [];
     // Reset the static configuration data caches.
+    $this->cacheAllCollectionNames = NULL;
     $this->sourceCacheStorage->deleteAll();
     $this->targetCacheStorage->deleteAll();
     return $this->createChangelist();
@@ -500,7 +508,10 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames($include_default = TRUE) {
-    $collections = array_unique(array_merge($this->sourceStorage->getAllCollectionNames(), $this->targetStorage->getAllCollectionNames()));
+    if ($this->cacheAllCollectionNames === NULL) {
+      $this->cacheAllCollectionNames = array_unique(array_merge($this->sourceStorage->getAllCollectionNames(), $this->targetStorage->getAllCollectionNames()));
+    }
+    $collections = $this->cacheAllCollectionNames;
     if ($include_default) {
       array_unshift($collections, StorageInterface::DEFAULT_COLLECTION);
     }

@@ -332,6 +332,26 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that collection names are cached until the comparer is reset.
+   */
+  public function testGetAllCollectionNamesCache(): void {
+    foreach ([$this->sourceStorage, $this->targetStorage] as $storage) {
+      $storage->method('listAll')->willReturn([]);
+      $storage->expects($this->exactly(2))
+        ->method('getAllCollectionNames')
+        ->willReturn([]);
+    }
+
+    // The second call is served from the cache.
+    $this->storageComparer->getAllCollectionNames();
+    $this->storageComparer->getAllCollectionNames();
+    // Resetting clears the cache, and rebuilding the changelist queries the
+    // storages again.
+    $this->storageComparer->reset();
+    $this->storageComparer->getAllCollectionNames();
+  }
+
+  /**
    * Generate random data in a config storage.
    *
    * @param \Drupal\Core\Config\StorageInterface $storage
