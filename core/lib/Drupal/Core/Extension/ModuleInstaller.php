@@ -913,19 +913,30 @@ class ModuleInstaller implements ModuleInstallerInterface {
     try {
       $class_name = install_get_fixed_class_name($extension, $directory_search);
       $install_task = $this->classResolver->getInstanceFromDefinition($class_name);
-      if ($install_task instanceof InstallInterface) {
-        $install_task->doInstall(...$args);
-        return NULL;
-      }
-      if ($install_task instanceof SchemaInterface) {
-        return $install_task->getSchema();
-      }
-      if ($install_task instanceof UninstallInterface) {
-        $install_task->doUninstall(...$args);
-        return NULL;
-      }
-      if ($install_task instanceof LastRemovedInterface) {
-        return $install_task->getLastRemoved();
+
+      switch ($hook) {
+        case 'install':
+          if ($install_task instanceof InstallInterface) {
+            $install_task->doInstall(...$args);
+            return NULL;
+          }
+          break;
+        case 'schema':
+          if ($install_task instanceof SchemaInterface) {
+            return $install_task->getSchema();
+          }
+          break;
+        case 'uninstall':
+          if ($install_task instanceof UninstallInterface) {
+            $install_task->doUninstall(...$args);
+            return NULL;
+          }
+          break;
+        case 'last_removed':
+          if ($install_task instanceof LastRemovedInterface) {
+            return $install_task->getLastRemoved();
+          }
+          break;
       }
     }
     catch (\InvalidArgumentException) {
