@@ -4,9 +4,11 @@ namespace Drupal\Core\Entity\Element;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
@@ -221,7 +223,12 @@ class EntityAutocomplete extends Textfield {
         $input_values = $element['#tags'] ? Tags::explode($element['#value']) : [$element['#value']];
 
         foreach ($input_values as $input) {
-          $match = static::extractEntityIdFromAutocompleteInput($input);
+          $match = static::extractEntityIdFromAutocompleteInput($input, $element['#target_type']);
+          // Handling the case when the entity label contains parentheses.
+          if (!empty($match)) {
+            $match = static::matchEntityByTitle($handler, $input, $element, $form_state, FALSE) ?? $match;
+          }
+
           if ($match === NULL) {
             // Try to get a match from the input string when the user didn't use
             // the autocomplete but filled in a value manually.
@@ -405,21 +412,70 @@ class EntityAutocomplete extends Textfield {
    *
    * @param string $input
    *   The input coming from the autocompletion result.
+   * @param string|null $target_type_id
+   *   The type of entity being autocompleted. Defaults to NULL, where it is
+   *   assumed that the target type uses integer IDs.
    *
    * @return mixed|null
    *   An entity ID or NULL if the input does not contain one.
    */
-  public static function extractEntityIdFromAutocompleteInput($input) {
-    $match = NULL;
-
+  public static function extractEntityIdFromAutocompleteInput($input, ?string $target_type_id = NULL) {
     // Take "label (entity id)', match the ID from inside the parentheses.
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
-    if (preg_match("/.+\s\(([^\)]+)\)/", $input, $matches)) {
-      $match = $matches[1];
-    }
+    $id_group = 2;
+    if (preg_match('/^("*).+ \\(([^)]+)\\)\\1$/', $input, $matches)) {
+      if ($target_type_id === NULL) {
+        return static::matchNumeric($matches[$id_group]) ? $matches[$id_group] : NULL;
+      }
 
-    return $match;
+      $target_type = \Drupal::entityTypeManager()->getDefinition($target_type_id);
+      if ($target_type instanceof ConfigEntityTypeInterface) {
+        // XXX: Config entities do not provide any means to typify their
+        // properties, so let us assume that config entity IDs are strings.
+        return static::matchString($matches[$id_group]) ? $matches[$id_group] : NULL;
+      }
+      if ($target_type->entityClassImplements(FieldableEntityInterface::class)) {
+        /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+        $field_manager = \Drupal::service('entity_field.manager');
+        $id_field_def = $field_manager->getFieldStorageDefinitions($target_type_id)[$target_type->getKey('id')];
+        $matcher = match($id_field_def->getType()) {
+          'string' => static::matchString(...),
+          default => static::matchNumeric(...),
+        };
+        return $matcher($matches[$id_group]) ? $matches[$id_group] : NULL;
+      }
+
+      // Fallback to base numeric check.
+      return static::matchNumeric($matches[$id_group]) ? $matches[$id_group] : NULL;
+    }
+  }
+
+  /**
+   * Helper; match an integer ID.
+   *
+   * @param string $value
+   *   The value to test.
+   *
+   * @return bool
+   *   TRUE if matched; otherwise, FALSE.
+   */
+  private static function matchNumeric(string $value) : bool {
+    // Check if string is an integer and does not start with a "0".
+    return ctype_digit($value) && !str_starts_with($value, "0");
+  }
+
+  /**
+   * Helper; match a string ID.
+   *
+   * @param string $value
+   *   The value to test.
+   *
+   * @return bool
+   *   TRUE if matched; otherwise, FALSE.
+   */
+  private static function matchString(string $value) : bool {
+    return $value !== "";
   }
 
 }
