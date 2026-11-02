@@ -115,7 +115,14 @@ class FieldPreprocess {
           'colspan' => 2,
           'class' => ['field-label'],
         ],
-        [],
+        [
+          'data' => [
+            '#type' => 'html_tag',
+            '#tag' => 'span',
+            '#value' => $this->t('Operations'),
+            '#attributes' => ['class' => ['visually-hidden']],
+          ],
+        ],
         $this->t('Order', [], ['context' => 'Sort order']),
       ];
       $rows = [];

@@ -285,6 +285,10 @@ class FormTest extends FieldTestBase {
     // Check if aria-describedby attribute is placed on multiple value widgets.
     $this->assertSession()->elementAttributeContains('xpath', '//table[@id="field-unlimited-values"]', 'aria-describedby', 'edit-field-unlimited--description');
 
+    // Check that the operations column header has accessible text.
+    $this->assertSession()->elementNotExists('xpath', '//table[@id="field-unlimited-values"]/thead//th[not(normalize-space())]');
+    $this->assertSession()->elementExists('xpath', '//table[@id="field-unlimited-values"]/thead//th/span[contains(@class, "visually-hidden") and text()="Operations"]');
+
     // Press 'add more' button -> 2 widgets.
     $this->submitForm([], 'Add another item');
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
