@@ -20,15 +20,42 @@
    */
   Drupal.behaviors.activeLinks = {
     attach(context) {
+      // JSON encode an object.
+      const jsonEncode = (object, stringify) => {
+        object = structuredClone(object);
+        const entries = Object.entries(object);
+
+        for (let i = 0; i < entries.length; i += 1) {
+          const [key, value] = entries[i];
+
+          if (typeof value === 'string') {
+            object[key] = value.replace(
+              /[\u007F-\uFFFF\u003c\u003e\u0022\u0027\u0026]/g,
+              (chr) => {
+                return '&u' + ('0000' + chr.charCodeAt(0).toString(16)).substr(-4);
+              }
+            );
+          }
+          else if (typeof value === 'object') {
+            object[key] = jsonEncode(value, false);
+          }
+        }
+
+        if (stringify === false) {
+          return object;
+        }
+
+        return JSON.stringify(object).replace('&u', '\\u');
+      };
+
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
-      const queryString = JSON.stringify(path.currentQuery);
-      const querySelector = queryString
-        ? `[data-drupal-link-query="${CSS.escape(queryString)}"]`
-        : ':not([data-drupal-link-query])';
       const originalSelectors = [
         `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
+      const querySelector = path.currentQuery
+        ? `[data-drupal-link-query="${CSS.escape(jsonEncode(path.currentQuery))}"]`
+        : ':not([data-drupal-link-query])';
       let selectors;
 
       // If this is the front page, we have to check for the <front> path as
