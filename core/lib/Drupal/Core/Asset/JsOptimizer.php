@@ -81,7 +81,7 @@ class JsOptimizer implements AssetOptimizerInterface {
    */
   public function clean($contents) {
     // Remove JS source and source mapping URLs or these may cause 404 errors.
-    $contents = preg_replace('/\/\/(#|@)\s(sourceURL|sourceMappingURL)=\s*(\S*?)\s*$/m', '', $contents);
+    $contents = preg_replace('~//[#@]\s(source(?:Mapping)?URL)=\s*(\S+)\s*~', '', $contents);
 
     return $contents;
   }

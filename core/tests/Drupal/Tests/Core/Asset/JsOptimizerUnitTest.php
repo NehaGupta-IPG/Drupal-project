@@ -78,6 +78,35 @@ class JsOptimizerUnitTest extends UnitTestCase {
   }
 
   /**
+   * Tests that the javascript may be cleaned without backtracking.
+   */
+  public function testCleanWithRecursionLimit() {
+    // Specify a hard backtracking limit.
+    ini_set('pcre.backtrack_limit', 100);
+    $backtrack_limit = (int) ini_get('pcre.backtrack_limit');
+    $this->assertEquals(100, $backtrack_limit);
+    $script = <<<JS
+(function($) { "use strict"; })
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,
+JS;
+    // Generate a source map URL that would exceed the backtrack limit.
+    $script .= str_repeat('x', $backtrack_limit);
+    // Add an empty space after the sourcemap, followed by other
+    // miscellaneous code.
+    $script .= <<<JS
+ // I appear after the sourcemap URL.
+(function($) { "use strict"; console.log('Hello'); })
+JS;
+    $expected_script = <<<JS
+(function($) { "use strict"; })
+// I appear after the sourcemap URL.
+(function($) { "use strict"; console.log('Hello'); })
+JS;
+
+    $this->assertEquals($expected_script, $this->optimizer->clean($script));
+  }
+
+  /**
    * Provides data for the JS asset optimize test.
    *
    * @see \Drupal\Core\Asset\JsOptimizer::optimize()
