@@ -190,6 +190,9 @@ class ImageFormatter extends ImageFormatterBase {
     // Check if the formatter involves a link.
     if ($image_link_setting == 'content') {
       $entity = $items->getEntity();
+      if ($langcode && $entity->hasTranslation($langcode)) {
+        $entity = $entity->getTranslation($langcode);
+      }
       if (!$entity->isNew()) {
         $url = $entity->toUrl();
       }

@@ -195,6 +195,9 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
     // Check if the formatter involves a link.
     if ($this->getSetting('image_link') == 'content') {
       $entity = $items->getEntity();
+      if ($langcode && $entity->hasTranslation($langcode)) {
+        $entity = $entity->getTranslation($langcode);
+      }
       if (!$entity->isNew()) {
         $url = $entity->toUrl();
       }
