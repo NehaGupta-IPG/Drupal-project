@@ -48,6 +48,8 @@ class ConfigImportCommand extends Command {
    *   The symfony style.
    * @param bool $yes
    *   The command option to skip the confirmation question.
+   * @param bool $diff
+   *   The command option to show the changes as a diff.
    *
    * @return int
    *   The command result.
@@ -56,6 +58,8 @@ class ConfigImportCommand extends Command {
     SymfonyStyle $io,
     #[Option(description: 'Answer the confirmation question with yes.', shortcut: 'y')]
     bool $yes = FALSE,
+    #[Option(description: 'Show the configuration changes as a diff.')]
+    bool $diff = FALSE,
   ): int {
 
     // Do the import storage transformation.
@@ -69,7 +73,12 @@ class ConfigImportCommand extends Command {
       return self::SUCCESS;
     }
 
-    $this->renderTable($comparer, $io);
+    if ($diff) {
+      $this->renderDiff($comparer, $io, 'sync', 'active');
+    }
+    else {
+      $this->renderTable($comparer, $io);
+    }
 
     if (!$yes && !$io->confirm((string) $this->t('Import the listed configuration changes?'))) {
       throw new UserAbortException('Cancelled');
