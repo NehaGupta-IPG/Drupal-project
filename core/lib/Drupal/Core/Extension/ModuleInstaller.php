@@ -9,6 +9,7 @@ use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -88,13 +89,17 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
     protected \Traversable $uninstallValidators,
     protected ModuleWeight $moduleWeight,
+    protected ClassResolverInterface $classResolver,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-
+    if ($this->classResolver === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $classResolver argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3633696', E_USER_DEPRECATED);
+      $this->classResolver = \Drupal::service('class_resolver');
+    }
   }
 
   /**
@@ -905,49 +910,31 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   function does not exist.
    */
   protected function invoke(Extension $extension, string $hook, string $directory_search = '', array $args = []): mixed {
-    if ($directory_search != '') {
+    try {
       $class_name = install_get_fixed_class_name($extension, $directory_search);
-      if (class_exists($class_name)) {
-        $install_class = \Drupal::classResolver($class_name);
-        switch ($hook) {
-          case 'install':
-            if (is_subclass_of($class_name, InstallInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\InstallInterface $install_class */
-              $install_class->doInstall(...$args);
-              return NULL;
-            }
-            break;
-
-          case 'schema':
-            if (is_subclass_of($class_name, SchemaInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\SchemaInterface $install_class */
-              return $install_class->getSchema();
-            }
-            break;
-
-          case 'uninstall':
-            /** @var \Drupal\Core\Extension\Install\UninstallInterface $install_class */
-            if (is_subclass_of($class_name, UninstallInterface::class)) {
-              $install_class->doUninstall(...$args);
-              return NULL;
-            }
-            break;
-
-          case 'update_last_removed':
-            if (is_subclass_of($class_name, LastRemovedInterface::class)) {
-              /** @var \Drupal\Core\Extension\Install\LastRemovedInterface $install_class */
-              return $install_class->getLastRemoved();
-            }
-            break;
-
-        }
+      $install_task = $this->classResolver->getInstanceFromDefinition($class_name);
+      if ($install_task instanceof InstallInterface) {
+        $install_task->doInstall(...$args);
+        return NULL;
+      }
+      if ($install_task instanceof SchemaInterface) {
+        return $install_task->getSchema();
+      }
+      if ($install_task instanceof UninstallInterface) {
+        $install_task->doUninstall(...$args);
+        return NULL;
+      }
+      if ($install_task instanceof LastRemovedInterface) {
+        return $install_task->getLastRemoved();
+      }
+    }
+    catch (\Exception $e) {
+      $function = $extension->getName() . '_' . $hook;
+      if (function_exists($function)) {
+        return $function(...$args);
       }
     }
 
-    $function = $extension->getName() . '_' . $hook;
-    if (function_exists($function)) {
-      return $function(...$args);
-    }
     return NULL;
   }
 
