@@ -75,4 +75,30 @@ class UriItemTest extends FieldKernelTestBase {
     $this->entityValidateAndSave($entity);
   }
 
+  /**
+   * Tests that the default value of a URI field is translatable.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3595275
+   */
+  public function testUriFieldDefaultValueIsTranslatable(): void {
+    $field_name = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'uri',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => $this->randomMachineName(),
+      'default_value' => [['value' => 'https://example.com']],
+    ])->save();
+
+    $typed_config = \Drupal::service('config.typed')
+      ->get("field.field.entity_test.entity_test.$field_name");
+    $value = $typed_config->get('default_value')->get(0)->get('value');
+    $this->assertTrue($value->getDataDefinition()['translatable']);
+  }
+
 }

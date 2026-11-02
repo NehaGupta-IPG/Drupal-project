@@ -121,6 +121,12 @@ text:
       match: false
       message: 'Text is not allowed to contain control characters, only visible characters.'
 
+# A URI that is translatable, for example to point to language-specific URLs.
+translatable_uri:
+  type: uri
+  label: 'URI'
+  translatable: true
+
 # A UUID.
 uuid:
   type: string
@@ -761,7 +767,7 @@ field.value.uri:
   label: 'Default value'
   mapping:
     value:
-      type: string
+      type: translatable_uri
       label: 'Value'
 
 # Schema for the configuration of the Created field type.
