@@ -2,12 +2,12 @@
 
 namespace Drupal\mysql\Plugin\views\query;
 
-use Drupal\views\Plugin\views\query\CastSqlInterface;
+use Drupal\views\Plugin\views\query\CastSql;
 
 /**
  * MySQL specific cast handling.
  */
-class MysqlCastSql implements CastSqlInterface {
+class MysqlCastSql extends CastSql {
 
   /**
    * {@inheritdoc}

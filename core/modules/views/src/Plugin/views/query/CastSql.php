@@ -14,4 +14,13 @@ class CastSql implements CastSqlInterface {
     return "CAST($field AS INTEGER)";
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getComparableOperands(array $left, array $right): array {
+    // Most engines convert the operands of a comparison themselves, so the
+    // column types do not have to be looked up.
+    return [$left['expression'], $right['expression']];
+  }
+
 }
