@@ -103,7 +103,7 @@ class ViewTestData {
         ],
         'status' => [
           'description' => "The status of this record",
-          'type' => 'int',
+          'type' => 'numeric',
           'unsigned' => TRUE,
           'not null' => TRUE,
           'default' => 0,
@@ -223,6 +223,8 @@ class ViewTestData {
       ],
       'filter' => [
         'id' => 'boolean',
+        'operator' => '=',
+        'value' => 'All',
       ],
       'sort' => [
         'id' => 'standard',
