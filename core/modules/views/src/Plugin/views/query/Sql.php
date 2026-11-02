@@ -1664,15 +1664,8 @@ class Sql extends QueryPluginBase {
     foreach ($revision_ids_by_type as $entity_type => $revision_ids) {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
       $entity_storage = $this->entityTypeManager->getStorage($entity_type);
-      $entities = [];
-
-      foreach ($revision_ids as $index => $revision_id_by_relationship) {
-        foreach ($revision_id_by_relationship as $revision => $revision_id) {
-          // Drupal core currently has no way to load multiple revisions.
-          $entity = $entity_storage->loadRevision($revision_id);
-          $entities[$revision_id] = $entity;
-        }
-      }
+      $flat_ids = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($revision_ids)), FALSE);
+      $entities = $entity_storage->loadMultipleRevisions(array_unique($flat_ids));
 
       $results = $this->assignEntitiesToResult($revision_ids, $entities, $results);
     }

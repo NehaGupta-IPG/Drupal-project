@@ -123,18 +123,17 @@ class NodeBulkUpdate {
     if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
       $context['sandbox']['max'] = count($nodes);
-      $context['sandbox']['nodes'] = $nodes;
+      // Process nodes by groups of 5.
+      $context['sandbox']['nodes'] = array_chunk($nodes, 5, TRUE);
     }
 
-    // Process nodes by groups of 5.
     $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $count = min(5, count($context['sandbox']['nodes']));
-    for ($i = 1; $i <= $count; $i++) {
-      // For each nid, load the node, reset the values, and save it.
-      $node = array_shift($context['sandbox']['nodes']);
-      if ($load) {
-        $node = $revisions ? $storage->loadRevision($node) : $storage->load($node);
-      }
+    $nodes = array_shift($context['sandbox']['nodes']);
+
+    if ($load) {
+      $nodes = $revisions ? $storage->loadMultipleRevisions($nodes) : $storage->loadMultiple($nodes);
+    }
+    foreach ($nodes as $node) {
       $node = static::processNode($node, $updates, $langcode);
 
       // Store result for post-processing in the finished callback.
@@ -146,7 +145,7 @@ class NodeBulkUpdate {
 
     // Inform the batch engine that we are not finished, and provide an
     // estimation of the completion level we reached.
-    if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    if (!empty($context['sandbox']['nodes']) && $context['sandbox']['progress'] != $context['sandbox']['max']) {
       $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
     }
   }

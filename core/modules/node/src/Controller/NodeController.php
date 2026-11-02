@@ -146,9 +146,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $rows = [];
     $current_revision_displayed = FALSE;
 
-    foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
+    foreach ($node_storage->loadMultipleRevisions($this->getRevisionIds($node, $node_storage)) as $vid => $revision) {
       /** @var \Drupal\node\NodeInterface $revision */
-      $revision = $node_storage->loadRevision($vid);
       $username = [
         '#theme' => 'username',
         '#account' => $revision->getRevisionUser(),

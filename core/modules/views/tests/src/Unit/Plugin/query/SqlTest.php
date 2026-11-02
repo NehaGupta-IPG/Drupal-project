@@ -18,6 +18,7 @@ use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -152,7 +153,7 @@ class SqlTest extends UnitTestCase {
    *
    * @param \Drupal\Core\Entity\EntityInterface[][] $entities_by_type
    *   Test entities keyed by entity type and entity ID.
-   * @param \Drupal\Core\Entity\EntityInterface[][] $entity_revisions_by_type
+   * @param array<string, array<int, \Drupal\Core\Entity\EntityInterface|null>> $entity_revisions_by_type
    *   Test entities keyed by entity type and revision ID.
    *
    * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityTypeManagerInterface>
@@ -238,9 +239,12 @@ class SqlTest extends UnitTestCase {
     }
 
     foreach ($entity_revisions_by_type as $entity_type_id => $entity_revisions) {
-      foreach ($entity_revisions as $revision_id => $revision) {
-        $entity_storages[$entity_type_id]->loadRevision($revision_id)->willReturn($revision);
-      }
+      $entity_storages[$entity_type_id]->loadMultipleRevisions(Argument::that(function ($ids) use ($entity_revisions) {
+        // The array keys of $ids does not matter but we cannot use an exact
+        // match because the keys are not guaranteed by the code in
+        // \Drupal\views\Plugin\views\query\Sql::loadEntities().
+        return array_keys($entity_revisions) === array_values($ids);
+      }))->willReturn(array_filter($entity_revisions));
     }
 
     $entity_type_manager->getStorage('first')->willReturn($entity_storages['first']);
@@ -471,6 +475,7 @@ class SqlTest extends UnitTestCase {
       'first' => [
         1 => $this->prophesize(EntityInterface::class)->reveal(),
         3 => $this->prophesize(EntityInterface::class)->reveal(),
+        99 => NULL,
       ],
     ];
     $entity_type_manager = $this->setupEntityTypes([], $entity_revisions);
@@ -491,12 +496,16 @@ class SqlTest extends UnitTestCase {
       'vid' => 3,
     ]);
 
+    // A deleted revision must leave the result row without an entity.
+    $result[] = new ResultRow(['vid' => 99]);
+
     $query->addField('entity_first__revision', 'vid', 'vid');
     $query->loadEntities($result);
 
     $this->assertSame($entity_revisions['first'][1], $result[0]->_entity);
     $this->assertSame($entity_revisions['first'][1], $result[1]->_entity);
     $this->assertSame($entity_revisions['first'][3], $result[2]->_entity);
+    $this->assertNull($result[3]->_entity);
   }
 
   /**
