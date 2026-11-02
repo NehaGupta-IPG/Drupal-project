@@ -234,9 +234,21 @@ class LanguageHooks {
       // the language type configuration.
       /** @var \Drupal\language\LanguageNegotiatorInterface $negotiator */
       $negotiator = \Drupal::service('language_negotiator');
-      $configurable = \Drupal::config('language.types')->get('configurable');
-      $negotiator->updateConfiguration($configurable);
-      $negotiator->purgeConfiguration();
+
+      // Load language.types config safely.
+      $config = \Drupal::config('language.types');
+
+      if (!$config->isNew()) {
+        $configurable = $config->get('configurable');
+
+        // Ensure $configurable is always an array.
+        if (!is_array($configurable)) {
+          $configurable = [];
+        }
+
+        $negotiator->updateConfiguration($configurable);
+        $negotiator->purgeConfiguration();
+      }
     }
     else {
       // In language_entity_base_field_info_alter() we are altering view/form
