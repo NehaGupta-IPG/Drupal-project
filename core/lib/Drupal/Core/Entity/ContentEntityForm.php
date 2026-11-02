@@ -100,14 +100,12 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    */
   public function form(array $form, FormStateInterface $form_state) {
 
-    if ($this->showRevisionUi()) {
-      // Advanced tab must be the first, because other fields rely on that.
-      if (!isset($form['advanced'])) {
-        $form['advanced'] = [
-          '#type' => 'vertical_tabs',
-          '#weight' => 99,
-        ];
-      }
+    // Advanced tab must be the first, because other fields rely on that.
+    if (!isset($form['advanced'])) {
+      $form['advanced'] = [
+        '#type' => 'vertical_tabs',
+        '#weight' => 99,
+      ];
     }
 
     $form = parent::form($form, $form_state);
