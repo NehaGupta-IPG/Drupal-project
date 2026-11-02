@@ -121,7 +121,10 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     // are no unclaimed items left.
     while (TRUE) {
       try {
-        $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+        // We only get the item ID here and get the data in a separate query
+        // because retrieving both in the same query is inefficient with large
+        // data.
+        $item = $this->connection->queryRange('SELECT [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
       }
       catch (\Exception $e) {
         $this->catchException($e);
@@ -147,7 +150,8 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
         ->condition('expire', 0);
       // If there are affected rows, this update succeeded.
       if ($update->execute()) {
-        $item->data = unserialize($item->data);
+        $data = $this->connection->query('SELECT [data] FROM {' . static::TABLE_NAME . '} q WHERE [item_id] = :item_id ', [':item_id' => $item->item_id])->fetchField();
+        $item->data = unserialize($data);
         return $item;
       }
     }
