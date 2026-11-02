@@ -6,6 +6,7 @@ use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
 use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -72,6 +73,9 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    */
   public function onKernelRequestAuthenticate(RequestEvent $event) {
     if ($event->isMainRequest()) {
+      // A reused kernel must not retain the account from a previous request,
+      // including when an authentication provider throws an exception.
+      $this->accountProxy->setAccount(new AnonymousUserSession());
       $request = $event->getRequest();
       if ($this->authenticationProvider->applies($request)) {
         $account = $this->authenticationProvider->authenticate($request);
