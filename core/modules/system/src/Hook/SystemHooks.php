@@ -220,6 +220,11 @@ class SystemHooks {
     ];
     if (!empty($current_query)) {
       ksort($current_query);
+      // @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. No core
+      // code reads drupalSettings.path.currentQuery any longer; it has no cache
+      // context of its own and can leak query string values into cached pages.
+      // Read the current query from window.location instead.
+      // @see https://www.drupal.org/node/3620505
       $path_settings['currentQuery'] = (object) $current_query;
     }
     // Only set core/drupalSettings values that haven't been set already.
