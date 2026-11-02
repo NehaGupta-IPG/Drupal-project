@@ -18,6 +18,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -49,6 +51,8 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     'taxonomy',
     'text',
     'user',
+    'content_moderation',
+    'workflows',
   ];
 
   /**
@@ -66,8 +70,10 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('content_moderation_state');
+    $this->installEntitySchema('workflow');
 
-    $this->installConfig(['comment', 'field', 'media', 'node', 'taxonomy', 'user', 'system']);
+    $this->installConfig(['comment', 'field', 'media', 'node', 'taxonomy', 'user', 'system', 'content_moderation']);
 
     // Create the anonymous and the admin users.
     $anonymous_user = User::create([
@@ -791,6 +797,292 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
       ],
     ];
     $this->assertReferenceable($selection_options, $referenceable_tests, 'Media handler (admin)');
+  }
+
+  /**
+   * Tests that unpublished nodes stay hidden without the right permission.
+   */
+  public function testNodeHandlerUnpublishedWithoutPermission(): void {
+    $selection_options = [
+      'target_type' => 'node',
+      'handler' => 'default',
+      'target_bundles' => NULL,
+      'include_unpublished_entities' => TRUE,
+    ];
+
+    $published = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+      'title' => 'Node published (<&>)',
+      'uid' => 1,
+    ]);
+    $published->save();
+    $unpublished = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'title' => 'Node unpublished (<&>)',
+      'uid' => 1,
+    ]);
+    $unpublished->save();
+    // Owned by the anonymous user, so that granting "view own unpublished
+    // content" to the anonymous role would expose it.
+    $unpublished_anonymous = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'title' => 'Node unpublished anonymous (<&>)',
+      'uid' => 0,
+    ]);
+    $unpublished_anonymous->save();
+
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $published->id() => Html::escape($published->label()),
+          ],
+        ],
+      ],
+    ];
+
+    // A user who may view content but no unpublished node only gets the
+    // published one, even though the field asks for unpublished entities.
+    $this->setCurrentUser($this->createUser(['access content']));
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+
+    // The "view own unpublished content" permission does not apply to
+    // anonymous users.
+    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), ['view own unpublished content']);
+    $this->setCurrentUser(User::getAnonymousUser());
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+  }
+
+  /**
+   * Tests the node-specific overrides of the entity handler.
+   */
+  public function testNodeHandlerWithUnpublishedContentAccessCheck(): void {
+    $selection_options = [
+      'target_type' => 'node',
+      'handler' => 'default',
+      'target_bundles' => NULL,
+      'include_unpublished_entities' => TRUE,
+    ];
+
+    // Build a set of test data.
+    // Titles contain HTML-special characters to test escaping.
+    $normal_user1 = $this->createUser([
+      'view own unpublished content',
+    ]);
+    $node_values = [
+      'published2' => [
+        'type' => 'article',
+        'status' => NodeInterface::PUBLISHED,
+        'title' => 'Node published2 (<&>)',
+        'uid' => 1,
+      ],
+      'unpublished' => [
+        'type' => 'article',
+        'status' => NodeInterface::NOT_PUBLISHED,
+        'title' => 'Node unpublished (<&>)',
+        'uid' => 1,
+      ],
+      'unpublished1' => [
+        'type' => 'article',
+        'status' => NodeInterface::NOT_PUBLISHED,
+        'title' => 'Node unpublished1 (<&>)',
+        'uid' => $normal_user1->id(),
+      ],
+      'unpublished2' => [
+        'type' => 'article',
+        'status' => NodeInterface::NOT_PUBLISHED,
+        'title' => 'Node unpublished-2 (<&>)',
+        'uid' => 0,
+      ],
+    ];
+
+    $nodes = [];
+    $node_labels = [];
+    foreach ($node_values as $key => $values) {
+      $node = Node::create($values);
+      $node->save();
+      $nodes[$key] = $node;
+      $node_labels[$key] = Html::escape($node->label());
+    }
+
+    // Test as a non-admin.
+    $this->setCurrentUser($normal_user1);
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['published2']->id() => $node_labels['published2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['published', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['published2']->id() => $node_labels['published2'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['published2', 'CONTAINS'],
+          ['Published2', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['published2']->id() => $node_labels['published2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['invalid node', 'CONTAINS'],
+        ],
+        'result' => [],
+      ],
+      [
+        'arguments' => [
+          ['Node unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+          ],
+        ],
+      ],
+    ];
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+
+    // Test as a non-admin user with "view any unpublished content" permission.
+    $user = $this->createUser([
+      'view any unpublished content',
+    ]);
+    $this->setCurrentUser($user);
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+            $nodes['published2']->id() => $node_labels['published2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['published', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['published2']->id() => $node_labels['published2'],
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['published2', 'CONTAINS'],
+          ['Published2', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['published2']->id() => $node_labels['published2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['invalid node', 'CONTAINS'],
+        ],
+        'result' => [],
+      ],
+      [
+        'arguments' => [
+          ['Node unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+          ],
+        ],
+      ],
+    ];
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+
+    // Test as an admin.
+    $content_admin = $this->createUser(['access content', 'bypass node access']);
+    $this->setCurrentUser($content_admin);
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['published2']->id() => $node_labels['published2'],
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+          ],
+        ],
+      ],
+      [
+        'arguments' => [
+          ['Node unpublished', 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $nodes['unpublished']->id() => $node_labels['unpublished'],
+            $nodes['unpublished1']->id() => $node_labels['unpublished1'],
+            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
+          ],
+        ],
+      ],
+    ];
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler (admin)');
   }
 
 }
