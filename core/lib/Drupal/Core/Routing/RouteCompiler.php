@@ -33,6 +33,11 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
 
     // The Drupal-specific compiled information.
     $stripped_path = static::getPathWithoutDefaults($route);
+    // Ensure that the route path is valid.
+    if (preg_match('/\{[^{}]+\}(?!\/).\{[^{}]+\}/', $stripped_path)) {
+      throw new \RuntimeException(sprintf('Invalid path %s.', $stripped_path));
+    }
+
     $fit = static::getFit($stripped_path);
     $pattern_outline = static::getPatternOutline($stripped_path);
     // We count the number of parts including any optional trailing parts. This
