@@ -30,6 +30,7 @@ trait CompositeFormElementTrait {
       $element['#theme_wrappers'][] = 'fieldset';
       $element['#attributes']['class'][] = 'fieldgroup';
       $element['#attributes']['class'][] = 'form-composite';
+      $element['#attached']['library'][] = 'core/drupal.fieldgroup';
     }
     return $element;
   }
