@@ -65,6 +65,13 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     $properties['options'] = MapDataDefinition::create()
       ->setLabel(new TranslatableMarkup('Options'));
 
+    $properties['is_external'] = DataDefinition::create('boolean')
+      ->setLabel(t('Is External'))
+      ->setDescription(t('Indicates if the link is external.'))
+      ->setComputed(TRUE)
+      ->setReadOnly(TRUE)
+      ->setClass('\Drupal\link\IsExternalComputed');
+
     return $properties;
   }
 
@@ -163,7 +170,13 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    * {@inheritdoc}
    */
   public function isExternal() {
-    return $this->getUrl()->isExternal();
+    try {
+      return $this->getUrl()->isExternal();
+    }
+    catch (\InvalidArgumentException) {
+      // There was an error building the Url object.
+      return FALSE;
+    }
   }
 
   /**
