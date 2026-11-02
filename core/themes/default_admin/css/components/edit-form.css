@@ -218,11 +218,6 @@
       padding-inline-start: 0;
     }
 
-    &::before {
-      inset-block-start: var(--admin-space-density-xl, var(--admin-space-xl));
-      inset-inline-start: 1.5rem;
-    }
-
     &:focus {
       outline-offset: calc(-1 * var(--outline-size, 0px));
     }
