@@ -508,4 +508,20 @@ class MenuLinksTest extends KernelTestBase {
     $this->assertStringNotContainsString('onmouseover=', $output);
   }
 
+  /**
+   * Tests that state variable change updates the value of base field's setting.
+   */
+  public function testMenuLinkContentMenuNameLength(): void {
+    $entityUpdateManager = \Drupal::entityDefinitionUpdateManager();
+    $entity_type = $entityUpdateManager->getEntityType('menu_link_content');
+    $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('menu_link_content');
+    $this->assertEquals(32, $field_storage_definitions['menu_name']->getSetting('max_length'));
+
+    // Update some other value.
+    \Drupal::state()->set('menu_link_content_menu_name_max_length', 42);
+    $entityUpdateManager->updateFieldableEntityType($entity_type, $field_storage_definitions);
+    $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('menu_link_content');
+    $this->assertEquals(42, $field_storage_definitions['menu_name']->getSetting('max_length'));
+  }
+
 }
