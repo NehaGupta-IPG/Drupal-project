@@ -83,7 +83,18 @@
             transition: false,
           }),
         ),
-      );
+      ).then(() => {
+        // The 'add_js' command runs before this one and already fired
+        // 'htmx:drupal:load', which bound behaviors (for example #ajax) to
+        // the old content. The swap above replaces that old content, so the
+        // new content has no bound behaviors yet. Re-fire 'htmx:drupal:load'
+        // on the swapped targets to bind behaviors to the new content.
+        // Already-bound content is unaffected: `once()` skips it.
+        // @see https://www.drupal.org/project/drupal/issues/3620565
+        htmx.findAll(selector).forEach((target) => {
+          htmx.trigger(target, 'htmx:drupal:load');
+        });
+      });
     },
 
     /**
