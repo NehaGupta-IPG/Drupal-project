@@ -166,6 +166,9 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         array_filter((array) $configuration['target_bundles'])
       );
 
+      // NULL allows references to any bundle; [] allows references to none.
+      // Do not convert an empty selection to NULL: deleting the last allowed
+      // bundle leaves [], which must not make all other bundles referenceable.
       $form['target_bundles'] = [
         '#type' => 'checkboxes',
         '#title' => $entity_type->getBundleLabel(),
@@ -194,12 +197,12 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ];
     }
     else {
+      // Bundleless entity types do not need a bundle restriction.
       $form['target_bundles'] = [
         '#type' => 'value',
-        '#value' => [],
+        '#value' => NULL,
       ];
     }
-    $form['target_bundles']['#element_validate'][] = [static::class, 'validateTargetBundles'];
 
     if ($entity_type->entityClassImplements(FieldableEntityInterface::class)) {
       $options = $entity_type->hasKey('bundle') ? $selected_bundles : $bundles;
@@ -311,8 +314,23 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
   /**
    * Validates a target_bundles element.
+   *
+   * Do not use this callback. Converting [] to NULL can unintentionally allow
+   * all bundles when an empty selection results from deleting the last allowed
+   * bundle. The existing behavior is retained only for backward compatibility.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. No direct
+   *   replacement is provided. Set the form value to NULL directly for
+   *   bundleless entity types. For entity types with bundles, custom forms that
+   *   allow removing the bundle restriction must provide an explicit choice to
+   *   allow all bundles and store NULL only for that choice. Preserve [] for an
+   *   empty selection, including when the last allowed bundle has been deleted,
+   *   or require the selection to be corrected.
+   *
+   * @see https://www.drupal.org/node/3061180
    */
   public static function validateTargetBundles($element, FormStateInterface $form_state, $form) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. No direct replacement is provided. Set the form value to NULL directly for bundleless entity types. For entity types with bundles, custom forms that allow removing the bundle restriction must provide an explicit choice to allow all bundles and store NULL only for that choice. Preserve [] for an empty selection, including when the last allowed bundle has been deleted, or require the selection to be corrected. See https://www.drupal.org/node/3061180', E_USER_DEPRECATED);
     // If no checkboxes were checked for 'target_bundles', store NULL ("all
     // bundles are referenceable") rather than empty array ("no bundle is
     // referenceable" - typically happens when all referenceable bundles have
