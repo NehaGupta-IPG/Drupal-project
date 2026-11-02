@@ -35,7 +35,7 @@ class ListIntegerItem extends ListItemBase {
       ->setLabel(new TranslatableMarkup('Integer value'))
       ->setRequired(TRUE);
 
-    return $properties;
+    return $properties + parent::propertyDefinitions($field_definition);
   }
 
   /**
