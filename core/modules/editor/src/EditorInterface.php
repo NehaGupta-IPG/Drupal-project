@@ -24,12 +24,10 @@ interface EditorInterface extends ConfigEntityInterface {
   /**
    * Returns the filter format this text editor is associated with.
    *
-   * This could be NULL if the associated filter format is still being created.
+   * @return \Drupal\filter\FilterFormatInterface
    *
-   * @see hasAssociatedFilterFormat()
-   *
-   * @return \Drupal\filter\FilterFormatInterface|null
-   *   The filter format this text editor is associated with.
+   * @throws \DomainException
+   *   Thrown if the text editor is called without an associated filter format.
    */
   public function getFilterFormat();
 

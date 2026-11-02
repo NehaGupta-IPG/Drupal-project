@@ -62,4 +62,30 @@ class EditorFilterIntegrationTest extends KernelTestBase {
     $this->assertNull(Editor::load($format->id()));
   }
 
+  /**
+   * Tests that ::getFilterFormat() throws domain exception if format not set.
+   */
+  public function testEmptyFilterFormat(): void {
+    $format = FilterFormat::create([
+      'format' => mb_strtolower($this->randomMachineName()),
+      'name' => $this->randomString(),
+    ]);
+    $format->save();
+    $editor = Editor::create(['editor' => 'unicorn']);
+    $editor->set('format', $format->id());
+    $format = $editor->getFilterFormat();
+    $this->assertInstanceOf(FilterFormat::class, $format);
+
+    // With an invalid format, getFilterFormat will return NULL.
+    $null_filter_editor = Editor::create(['editor' => 'unicorn', 'format' => 'invalid_format']);
+    $this->assertEmpty($null_filter_editor->getFilterFormat());
+
+    // Without an associated format, getFilterFormat will throw a domain
+    // exception.
+    $exception_editor = Editor::create(['editor' => 'unicorn']);
+    $this->expectException(\DomainException::class);
+    $this->expectExceptionMessage('You cannot call Drupal\editor\Entity\Editor::getFilterFormat on the editor "unicorn" since it does not have an assigned text format.');
+    $exception_editor->getFilterFormat();
+  }
+
 }
