@@ -121,8 +121,21 @@ class NumberItemTest extends FieldKernelTestBase {
       ->setSetting('max', 100);
 
     $entity->field_decimal->generateSampleItems();
-    $entity->field_integer->generateSampleItems();
     $entity->field_float->generateSampleItems();
+    $entity->field_integer->generateSampleItems();
+
+    // Confirm that the generated sample values are within range.
+    $this->entityValidateAndSave($entity);
+
+    // Test sample integer item generation without max value.
+    $entity = EntityTest::create();
+
+    $entity->field_integer
+      ->getFieldDefinition()
+      ->setSetting('min', 1000)
+      ->setSetting('max', '');
+
+    $entity->field_integer->generateSampleItems();
 
     // Confirm that the generated sample values are within range.
     $this->entityValidateAndSave($entity);

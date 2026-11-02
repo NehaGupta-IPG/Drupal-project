@@ -113,7 +113,7 @@ class IntegerItem extends NumericItemBase {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $min = $field_definition->getSetting('min') ?: 0;
-    $max = $field_definition->getSetting('max') ?: 999;
+    $max = $field_definition->getSetting('max') ?: $min + 999;
     $values['value'] = mt_rand($min, $max);
     return $values;
   }
