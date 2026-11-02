@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\PhpStorage;
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 
@@ -9,6 +10,24 @@ use Drupal\Core\StreamWrapper\PublicStream;
  * Creates a php storage object.
  */
 class PhpStorageFactory {
+
+  /**
+   * Placeholder value for the 'directory' configuration key.
+   *
+   * When used as a start of a directory in a storage configuration array, the
+   * factory replaces it with the return value of
+   * PhpStorageFactory::getTempDirectory(). This directs compiled PHP files to
+   * the web server's local temporary directory rather than the site's public
+   * files directory. This is important when the public files directory is on a
+   * shared NFS mount and PHP files are compiled in a race that can lead to an
+   * ever-growing number of stale files.
+   *
+   * The value matches the temporary:// scheme used by the File API.
+   *
+   * @see \Drupal\Core\PhpStorage\PhpStorageFactory::getTempDirectory()
+   * @see \Drupal\Core\StreamWrapper\TemporaryStream
+   */
+  protected const SYSTEM_TEMPORARY = 'temporary://';
 
   /**
    * Instantiates a storage for generated PHP code.
@@ -24,17 +43,26 @@ class PhpStorageFactory {
    *   The name for which the storage should be returned. Defaults to 'default'
    *   The name is also used as the storage bin if one is not specified in the
    *   configuration.
+   * @param array $configuration
+   *   Optional default configuration for the storage. Ignored if
+   *   $settings['php_storage'][$name] is set in settings.php (site
+   *   configuration always takes precedence). Recognized keys are the same as
+   *   for any PhpStorageInterface implementation: 'class', 'directory', 'bin',
+   *   and 'secret'.
+   * @param string|null $site_path
+   *   (optional) The site path to use for the storage directory. Defaults to
+   *   the site's public files directory. Only necessary if the factory is used
+   *   prior to the container being initialized.
    *
    * @return \Drupal\Component\PhpStorage\PhpStorageInterface
    *   An instantiated storage for the specified name.
    */
-  public static function get($name) {
-    $configuration = [];
+  public static function get($name, array $configuration = [], ?string $site_path = NULL) {
     $overrides = Settings::get('php_storage');
     if (isset($overrides[$name])) {
       $configuration = $overrides[$name];
     }
-    elseif (isset($overrides['default'])) {
+    elseif (empty($configuration) && isset($overrides['default'])) {
       $configuration = $overrides['default'];
     }
     // Make sure all the necessary configuration values are set.
@@ -45,10 +73,40 @@ class PhpStorageFactory {
     if (!isset($configuration['bin'])) {
       $configuration['bin'] = $name;
     }
+    if (isset($configuration['directory']) && str_starts_with($configuration['directory'], static::SYSTEM_TEMPORARY)) {
+      $temp_dir = static::getTempDirectory();
+      if ($temp_dir) {
+        $configuration['directory'] = rtrim($temp_dir . '/' . substr($configuration['directory'], strlen(static::SYSTEM_TEMPORARY)), '/');
+      }
+      else {
+        // Fallback to the public directory if the temporary directory cannot be
+        // written to.
+        unset($configuration['directory']);
+      }
+    }
     if (!isset($configuration['directory'])) {
-      $configuration['directory'] = PublicStream::basePath() . '/php';
+      $configuration['directory'] = PublicStream::basePath($site_path) . '/php';
     }
     return new $class($configuration);
+  }
+
+  /**
+   * Gets the temporary directory.
+   *
+   * @see \Drupal\Core\File\FileSystem::getTempDirectory()
+   *
+   * @return string|null
+   *   The temporary directory, or NULL if it cannot be determined.
+   */
+  protected static function getTempDirectory(): ?string {
+    // Use settings.
+    $temporary_directory = Settings::get('file_temp_path');
+    if (!empty($temporary_directory)) {
+      return $temporary_directory;
+    }
+
+    // Fallback to OS default.
+    return FileSystem::getOsTemporaryDirectory() ?: NULL;
   }
 
 }

@@ -21,6 +21,7 @@ use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\PhpUnitTestDiscovery;
 use Drupal\Core\Test\PhpUnitTestRunner;
 use Drupal\Core\Test\SimpletestTestRunResultsStorage;
+use Drupal\Core\Test\TestContainerStorage;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunnerKernel;
@@ -235,8 +236,24 @@ for ($i = 0; $i < Config::get('repeat'); $i++) {
   $tests_to_run = array_merge($tests_to_run, $test_list);
 }
 
+// Share compiled containers between the tests of this run, unless a directory
+// for them is set already. Set the variable to an empty string to turn sharing
+// off.
+// @see \Drupal\TestTools\Attribute\ShareContainer
+$container_directory = NULL;
+if (getenv(TestContainerStorage::ENVIRONMENT_VARIABLE) === FALSE) {
+  $container_directory = FileSystem::getOsTemporaryDirectory() . '/drupal-test-containers-' . bin2hex(random_bytes(8));
+  mkdir($container_directory, 0777);
+  putenv(TestContainerStorage::ENVIRONMENT_VARIABLE . '=' . $container_directory);
+}
+
 // Execute tests.
 $status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run);
+
+if ($container_directory !== NULL) {
+  \Drupal::service('file_system')->deleteRecursive($container_directory);
+  putenv(TestContainerStorage::ENVIRONMENT_VARIABLE);
+}
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();

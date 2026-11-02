@@ -13,13 +13,19 @@ use Drupal\Core\Routing\AttributeRouteDiscovery;
  */
 class KernelTestAttributeRouteDiscovery extends AttributeRouteDiscovery {
 
-  public function __construct(protected readonly string $kernelTestClass) {}
+  /**
+   * Constructs a KernelTestAttributeRouteDiscovery object.
+   *
+   * @param \Drupal\KernelTests\KernelTestBase $kernelTest
+   *   The kernel test.
+   */
+  public function __construct(protected readonly KernelTestBase $kernelTest) {}
 
   /**
    * {@inheritdoc}
    */
   protected function collectRoutes(): iterable {
-    $reflectionClass = $this->getReflectionClass($this->kernelTestClass);
+    $reflectionClass = $this->getReflectionClass($this->kernelTest::class);
     if ($reflectionClass !== NULL) {
       yield $this->createControllerRouteCollection($reflectionClass);
     }

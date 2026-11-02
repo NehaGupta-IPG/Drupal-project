@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
@@ -70,6 +72,44 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }
     parent::setParameter($name, $value);
+  }
+
+  /**
+   * Calls a function while some parameters are hidden.
+   *
+   * Container dumpers copy the value of each parameter into the code that uses
+   * it. When a parameter is hidden, they write code that reads the parameter
+   * at runtime instead, so its value can be set when the dumped container is
+   * loaded.
+   *
+   * @param list<string> $names
+   *   The names of the parameters to hide.
+   * @param callable $callback
+   *   The function to call. It receives this container builder.
+   *
+   * @return mixed
+   *   The return value of the function.
+   *
+   * @internal
+   *   Only for use by container storage.
+   *
+   * @see \Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass
+   */
+  public function withoutParameters(array $names, callable $callback): mixed {
+    assert($this->isCompiled(), 'Parameters can only be hidden on a compiled container builder.');
+    $parameter_bag = $this->parameterBag;
+    assert($parameter_bag instanceof ParameterBag);
+    $this->parameterBag = new FrozenParameterBag(
+      array_diff_key($parameter_bag->all(), array_flip($names)),
+      $parameter_bag->allDeprecated(),
+      $parameter_bag->allNonEmpty(),
+    );
+    try {
+      return $callback($this);
+    }
+    finally {
+      $this->parameterBag = $parameter_bag;
+    }
   }
 
   /**

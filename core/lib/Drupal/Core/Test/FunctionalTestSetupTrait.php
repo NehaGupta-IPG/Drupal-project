@@ -18,6 +18,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Site\SettingsEditor;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\SessionTestTrait;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
@@ -113,6 +114,18 @@ trait FunctionalTestSetupTrait {
       'value' => $this->apcuEnsureUniquePrefix,
       'required' => TRUE,
     ];
+    // Store the containers of the test site with those of the other tests.
+    // @see \Drupal\Core\Test\TestContainerStorage
+    if ($container_directory = $this->getContainerDirectory()) {
+      $settings['settings']['bootstrap_container_definition'] = (object) [
+        'value' => [
+          'services' => [
+            'container_storage' => TestContainerStorage::getServiceDefinition($container_directory),
+          ],
+        ],
+        'required' => TRUE,
+      ];
+    }
     // Disable fetching of advisories during tests to avoid outbound calls. This
     // cannot be set in ::initConfig() because it would not stop these calls
     // during install. Tests that need to have the security advisories
@@ -188,6 +201,18 @@ trait FunctionalTestSetupTrait {
     // bootstrap again. Hence, we have to reload the newly written custom
     // settings.php manually.
     Settings::initialize(DRUPAL_ROOT, $this->siteDirectory, $this->classLoader);
+  }
+
+  /**
+   * Returns the directory of containers shared between tests.
+   *
+   * @return string|null
+   *   The directory, or NULL if this test does not share its containers.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareContainer
+   */
+  protected function getContainerDirectory(): ?string {
+    return ShareContainer::isEnabledFor(static::class) ? TestContainerStorage::getDirectory() : NULL;
   }
 
   /**
@@ -430,7 +455,9 @@ trait FunctionalTestSetupTrait {
    *   The container.
    */
   protected function initKernel(Request $request) {
-    $this->kernel = DrupalKernel::createFromRequest($request, $this->classLoader, 'prod', TRUE);
+    // Share the containers of the site with other tests.
+    $kernel_class = $this->getContainerDirectory() ? TestDrupalKernel::class : DrupalKernel::class;
+    $this->kernel = $kernel_class::createFromRequest($request, $this->classLoader, 'prod', TRUE);
     $this->kernel->boot();
     // Add our request to the stack and route context.
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
@@ -616,6 +643,10 @@ trait FunctionalTestSetupTrait {
     ];
     if (isset($this->defaultTheme)) {
       $parameters['default_theme'] = $this->defaultTheme;
+    }
+    // Share the containers that the installer compiles with other tests.
+    if ($this->getContainerDirectory()) {
+      $parameters['kernel_class'] = TestInstallerKernel::class;
     }
 
     // If we only have one db driver available, we cannot set the driver.

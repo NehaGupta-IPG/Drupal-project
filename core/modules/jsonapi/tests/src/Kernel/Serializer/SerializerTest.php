@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Kernel\Serializer;
 
 use Drupal\Core\Render\Markup;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\jsonapi\Serializer\Serializer;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('jsonapi')]
 #[CoversClass(Serializer::class)]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer(FALSE)]
 class SerializerTest extends JsonapiKernelTestBase {
 
   /**

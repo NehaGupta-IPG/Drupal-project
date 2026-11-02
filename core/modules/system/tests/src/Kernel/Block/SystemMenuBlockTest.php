@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Block;
 
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\block\Entity\Block;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Render\Element;
@@ -33,6 +34,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 #[Group('Block')]
 #[RunTestsInSeparateProcesses]
+#[ShareContainer(FALSE)]
 class SystemMenuBlockTest extends KernelTestBase {
 
   /**

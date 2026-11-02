@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Bootstrap;
 
-use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Container base class which triggers an error.
  */
-class ErrorContainer extends Container {
+class ErrorContainer extends PhpContainer {
 
   /**
    * {@inheritdoc}

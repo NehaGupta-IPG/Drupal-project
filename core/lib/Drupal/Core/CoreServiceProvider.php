@@ -19,6 +19,7 @@ use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterServicesForDestructionPass;
+use Drupal\Core\DependencyInjection\Compiler\RuntimeParametersPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedKernelPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedSessionHandlerPass;
 use Drupal\Core\DependencyInjection\Compiler\StreamWrapperClassesPass;
@@ -106,6 +107,10 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterEventSubscribersPass(new RegisterListenersPass()), PassConfig::TYPE_AFTER_REMOVING);
     $container->addCompilerPass(new LoggerAwarePass(), PassConfig::TYPE_AFTER_REMOVING);
+    // Replace the resolved values of parameters that depend on the request
+    // with references, so that they can be set when the container is loaded.
+    // This must run after all other passes that add or change arguments.
+    $container->addCompilerPass(new RuntimeParametersPass(['app.root', 'site.path']), PassConfig::TYPE_AFTER_REMOVING, -1000);
 
     $container->addCompilerPass(new RegisterAccessChecksPass());
 

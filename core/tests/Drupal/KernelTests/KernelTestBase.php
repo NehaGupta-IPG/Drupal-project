@@ -6,6 +6,7 @@ namespace Drupal\KernelTests;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\FileCache\ApcuFileCacheBackend;
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Json;
@@ -16,10 +17,15 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\PhpContainer;
+use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
-use Drupal\Core\Test\KernelTestDrupalKernel;
+use Drupal\Core\Test\SharedContainerTestInterface;
+use Drupal\Core\Test\TestContainerStorage;
+use Drupal\Core\Test\TestDrupalKernel;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -32,6 +38,7 @@ use Drupal\Tests\DrupalTestCase;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\RandomGeneratorTrait;
+use Drupal\TestTools\Attribute\ShareContainer;
 use Drupal\TestTools\Attribute\ShareEnvironment;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\SchemaInspector;
@@ -47,6 +54,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -101,7 +109,7 @@ use Symfony\Component\Routing\Route;
  *
  * @ingroup testing
  */
-abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface {
+abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface, SharedContainerTestInterface {
 
   use AssertContentTrait;
   use RandomGeneratorTrait;
@@ -155,12 +163,21 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *
    * @todo Move into Config test base class.
    */
-  protected ?ConfigImporter $configImporter;
+  protected ?ConfigImporter $configImporter = NULL;
 
   /**
    * Environment variable carrying the shared prefix from parent to children.
    */
   private const string SHARED_DATABASE_PREFIX_ENV = 'DRUPAL_TEST_SHARED_DB_PREFIX';
+
+  /**
+   * The directory of shared containers that the test runner created.
+   *
+   * A test class that shares its environment shares its containers between
+   * its test methods. When the tests of the run do not share containers, the
+   * test class creates a directory for them of its own.
+   */
+  private static ?string $containerDirectory = NULL;
 
   /**
    * Name of the table recording the state of the shared database.
@@ -172,9 +189,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *
    * @var list<string>
    */
-  protected const array INFRASTRUCTURE_TABLES = [
-    'cache_container',
-  ];
+  protected const array INFRASTRUCTURE_TABLES = [];
 
   /**
    * The names of the tables that make up the shared environment.
@@ -296,6 +311,112 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
+   * Returns the directory of containers shared between tests.
+   *
+   * @return string|null
+   *   The directory, or NULL if this test does not share its containers.
+   *
+   * @see \Drupal\TestTools\Attribute\ShareContainer
+   */
+  protected function getContainerDirectory(): ?string {
+    // A test class that shares its environment shares its container between
+    // its test methods, even when it registers services.
+    if (!ShareContainer::isEnabledFor(static::class, !$this->registersServices() || static::sharesEnvironment())) {
+      return NULL;
+    }
+    // Shared containers are compiled to PHP code.
+    $container_base_class = Settings::get('container_base_class');
+    if ($container_base_class !== NULL && !is_a($container_base_class, PhpContainer::class, TRUE)) {
+      return NULL;
+    }
+    return TestContainerStorage::getDirectory();
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Tests with the same key add the same services in ::register(), so they can
+   * share a compiled container.
+   */
+  public function getContainerKey(): string {
+    $parts = [
+      $this->strictConfigSchema,
+      $this->getConfigSchemaExclusions(),
+      $this->isCoreTest(),
+      $this->usesSuperUserAccessPolicy ?? !$this->isCoreTest(),
+    ];
+    if ($this->getServiceId() === static::class) {
+      $parts[] = static::class;
+    }
+    return serialize($parts);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setContainer(ContainerInterface $container): void {
+    $this->container = $container;
+  }
+
+  /**
+   * Returns the ID of the service of this test in the container.
+   *
+   * A test class that registers services of its own, or implements hooks or
+   * routes, has a service named after the test class. Its container depends on
+   * the test class, so it is only shared with the same test class. Other test
+   * classes share a service ID, so that they can share the container.
+   *
+   * @return string
+   *   The service ID.
+   */
+  private function getServiceId(): string {
+    return $this->registersServices() || $this->implementsHooksOrRoutes() ? static::class : self::class;
+  }
+
+  /**
+   * Returns whether this test class registers or alters services.
+   *
+   * @return bool
+   *   TRUE if the test class overrides ::register(), or alters services.
+   */
+  private function registersServices(): bool {
+    $register = new \ReflectionMethod($this, 'register');
+    return $register->getDeclaringClass()->getName() !== self::class || $this instanceof ServiceModifierInterface;
+  }
+
+  /**
+   * Returns whether this test class implements hooks or routes.
+   *
+   * Hooks and route controllers are called on the service named after the
+   * test class.
+   *
+   * @return bool
+   *   TRUE if a method of the test class has a hook or route attribute.
+   *
+   * @see \Drupal\KernelTests\KernelTestCompilerPass
+   * @see \Drupal\KernelTests\KernelTestAttributeRouteDiscovery
+   */
+  private function implementsHooksOrRoutes(): bool {
+    foreach (new \ReflectionClass($this)->getMethods() as $method) {
+      if ($method->getAttributes(Hook::class, \ReflectionAttribute::IS_INSTANCEOF) || $method->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Returns whether this test is part of Drupal core.
+   *
+   * @return bool
+   *   TRUE if the test class file is in the core directory.
+   */
+  private function isCoreTest(): bool {
+    $test_file_name = (new \ReflectionClass($this))->getFileName();
+    return str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+  }
+
+  /**
    * Allocates one database prefix for the whole test class.
    */
   #[BeforeClass]
@@ -315,6 +436,14 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // class runs, so it has to be reserved against concurrent test runners.
     $test_database = new TestDatabase(NULL, create_lock: TRUE);
     putenv(self::SHARED_DATABASE_PREFIX_ENV . '=' . $test_database->getDatabasePrefix() . ':' . getmypid());
+
+    // Share the containers between the test methods, unless the tests of the
+    // run share them already or sharing is turned off.
+    if (getenv(TestContainerStorage::ENVIRONMENT_VARIABLE) === FALSE) {
+      self::$containerDirectory = FileSystem::getOsTemporaryDirectory() . '/drupal-test-containers-' . $test_database->getDatabasePrefix();
+      mkdir(self::$containerDirectory);
+      putenv(TestContainerStorage::ENVIRONMENT_VARIABLE . '=' . self::$containerDirectory);
+    }
   }
 
   /**
@@ -336,6 +465,13 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       return;
     }
     putenv(self::SHARED_DATABASE_PREFIX_ENV);
+
+    if (self::$containerDirectory !== NULL) {
+      array_map('unlink', glob(self::$containerDirectory . '/*'));
+      rmdir(self::$containerDirectory);
+      putenv(TestContainerStorage::ENVIRONMENT_VARIABLE);
+      self::$containerDirectory = NULL;
+    }
 
     // This runs in the test runner process, which has no bootstrapped Drupal,
     // so the connection has to be set up from scratch.
@@ -466,17 +602,25 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new KernelTestDrupalKernel('testing', $this->classLoader, static::sharesEnvironment());
+    $container_directory = $this->getContainerDirectory();
+    if ($container_directory) {
+      $this->setSetting('bootstrap_container_definition', [
+        'services' => [
+          'container_storage' => TestContainerStorage::getServiceDefinition($container_directory),
+        ],
+      ]);
+    }
+    // A test class that shares its environment checks that no tables are left
+    // behind. Compiling the container can create tables, through services that
+    // the container builder creates while compiling, so it stores and loads
+    // rebuilt containers instead of using the container builder.
+    $kernel = new TestDrupalKernel('testing', $this->classLoader, $container_directory && static::sharesEnvironment());
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
-    if (static::sharesEnvironment()) {
-      $kernel->setContainerNeedsRebuild(FALSE);
-      $kernel->setOverrideUseCache(TRUE);
-    }
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
     // which is required to initialize legacy global variables.
@@ -486,6 +630,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
 
     $this->container = $kernel->getContainer();
+    // A container loaded from storage does not have the test yet, because
+    // ::register() did not run.
+    $this->container->set($this->getServiceId(), $this);
     $this->keyValue = $this->container->get('keyvalue');
     $kernel->preHandle($request);
 
@@ -546,12 +693,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     $record = $this->loadSharedDatabaseState();
-    // For each method in the test, reset the kernel container cache suffix to
-    // 0. This ensures that the initial container state is the same for each
-    // method, while container rebuilds during tests will force a new cache key.
-    $kernel->resetCacheSuffix();
-    // Reset the container so it is always reloaded from the cache and any
-    // stateful services lose their state.
+    // Reset the container so that stateful services lose their state.
     // @todo revisit as part of https://www.drupal.org/node/2218651
     $kernel->resetContainer();
 
@@ -712,10 +854,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // Disable the super user access policy so that we are sure our tests check
     // for the right permissions.
     if (!isset($this->usesSuperUserAccessPolicy)) {
-      $test_file_name = (new \ReflectionClass($this))->getFileName();
       // @todo Decide in https://www.drupal.org/project/drupal/issues/3437926
       //   how to remove this fallback behavior.
-      $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+      $this->usesSuperUserAccessPolicy = !$this->isCoreTest();
     }
     $container->setParameter('security.enable_super_user', $this->usesSuperUserAccessPolicy);
 
@@ -723,9 +864,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $container->setParameter('language.default_values', Language::$defaultValues);
 
     // Determine whether the test is a core test.
-    $test_file_name = (new \ReflectionClass($this))->getFileName();
     // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
-    $is_core_test = str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+    $is_core_test = $this->isCoreTest();
 
     if ($this->strictConfigSchema) {
       $container
@@ -768,15 +908,20 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // built with up-to-date services.
     $this->configImporter = NULL;
 
-    // Allow kernel tests to register hooks.
-    $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
-    $container->set(static::class, $this);
+    // Allow kernel tests to register hooks and routes. They are called on the
+    // service named after the test class.
+    $service_id = $this->getServiceId();
+    $definition = $container->register($service_id, static::class)->setSynthetic(TRUE);
+    $container->set($service_id, $this);
+    if ($service_id !== self::class) {
+      $container->setAlias(self::class, $service_id);
+    }
     $container->addCompilerPass(new KernelTestCompilerPass($definition), priority: -100);
 
     // Allow kernel tests to register routes.
     $container
       ->register(KernelTestAttributeRouteDiscovery::class, KernelTestAttributeRouteDiscovery::class)
-      ->addArgument(static::class)
+      ->addArgument(new Reference(self::class))
       ->addTag('event_subscriber');
   }
 

@@ -36,20 +36,14 @@ class UpdateKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function initializeContainer() {
+    // Ensure the UpdateKernel's container is not dumped.
+    $this->allowDumping = FALSE;
+
     // Always force a container rebuild, in order to be able to override some
     // services, see \Drupal\Core\Update\UpdateServiceProvider.
     $this->containerNeedsRebuild = TRUE;
-    $container = parent::initializeContainer();
-    return $container;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function cacheDrupalContainer(array $container_definition) {
-    // Don't save this particular container to cache, so it does not leak into
-    // the main site at all.
-    return FALSE;
+    return parent::initializeContainer();
   }
 
   /**

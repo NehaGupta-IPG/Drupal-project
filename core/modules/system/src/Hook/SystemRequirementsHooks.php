@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
@@ -316,6 +317,7 @@ class SystemRequirementsHooks {
     }
 
     if ($phase == 'runtime') {
+      $container = \Drupal::getContainer();
       // Check to see if OPcache is installed.
       if (!OpCodeCache::isEnabled()) {
         $requirements['php_opcache'] = [
@@ -326,8 +328,42 @@ class SystemRequirementsHooks {
       }
       else {
         $requirements['php_opcache']['value'] = $this->t('Enabled');
+
+        // Check if the container file is cached in OPcache.
+        if ($container instanceof PhpContainer) {
+          $container_file = (new \ReflectionClass($container))->getFileName();
+          if ($container_file && opcache_is_script_cached($container_file)) {
+            $requirements['php_opcache_container'] = [
+              'value' => $this->t('Cached'),
+              'severity' => RequirementSeverity::OK,
+            ];
+          }
+          else {
+            $requirements['php_opcache_container'] = [
+              'value' => $this->t('Not cached'),
+              'severity' => RequirementSeverity::Warning,
+              'description' => $this->t(
+                'The service container PHP file is not cached by OPcache. This can happen if the <code>opcache.max_accelerated_files</code>, <code>opcache.max_file_size</code>, or <code>opcache.memory_consumption</code> settings in the php.ini are too low. Ensuring the container file can be cached by OPcache will improve performance. See the <a href=":drupal-php">system requirements</a> page for more information.',
+                [':drupal-php' => 'https://www.drupal.org/docs/system-requirements/php-requirements']
+              ),
+            ];
+          }
+          $requirements['php_opcache_container']['title'] = $this->t('PHP OPcode container');
+        }
       }
       $requirements['php_opcache']['title'] = $this->t('PHP OPcode caching');
+
+      if (is_a(Settings::get('container_base_class'), PhpContainer::class, TRUE) && !(is_a($container, PhpContainer::class, TRUE))) {
+        $requirements['php_compiled_container'] = [
+          'title' => $this->t('PHP compiled container'),
+          'value' => $this->t('Not written to disk'),
+          'severity' => RequirementSeverity::Error,
+          'description' => $this->t(
+            'The service container PHP file is not written to disk. Check file permissions and php_storage configuration. See the <a href=":drupal-php">system requirements</a> page for more information.',
+            [':drupal-php' => 'https://www.drupal.org/docs/system-requirements/php-requirements']
+          ),
+        ];
+      }
     }
 
     // Check to see if APCu is installed and configured correctly.
