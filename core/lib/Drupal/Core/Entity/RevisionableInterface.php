@@ -35,6 +35,27 @@ interface RevisionableInterface extends EntityInterface {
   public function isNewRevision();
 
   /**
+   * Creates a new revision starting off from the specified entity object.
+   *
+   * When dealing with a translatable entity, this will merge the default
+   * revision with the active translation of the passed entity.
+   *
+   * @param bool $default
+   *   (optional) Whether the new revision should be marked as default. Defaults
+   *   to TRUE.
+   * @param bool|null $keep_untranslatable_fields
+   *   (optional) Whether untranslatable field values should be kept or copied
+   *   from the default revision when generating a merged revision. Defaults to
+   *   TRUE if the provided entity is the default translation and untranslatable
+   *   fields should only affect the default translation, FALSE otherwise.
+   *
+   * @return static
+   *   A new entity revision object.
+   */
+  #[\NoDiscard]
+  public function createRevision($default = TRUE, $keep_untranslatable_fields = NULL);
+
+  /**
    * Enforces an entity to be saved as a new revision.
    *
    * @param bool $value
