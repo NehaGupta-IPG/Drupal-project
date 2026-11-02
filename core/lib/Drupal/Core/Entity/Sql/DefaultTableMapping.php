@@ -412,12 +412,16 @@ class DefaultTableMapping implements TableMappingInterface {
    */
   public function getColumnNames($field_name) {
     if (!isset($this->columnMapping[$field_name])) {
-      $this->columnMapping[$field_name] = [];
+      // Build the mapping in a local variable and store it only once it is
+      // complete. Computing the columns can load entities, which suspends the
+      // current Fiber, and another Fiber must not get a partial mapping.
+      $column_names = [];
       if (isset($this->fieldStorageDefinitions[$field_name]) && !$this->fieldStorageDefinitions[$field_name]->hasCustomStorage()) {
         foreach (array_keys($this->fieldStorageDefinitions[$field_name]->getColumns()) as $property_name) {
-          $this->columnMapping[$field_name][$property_name] = $this->getFieldColumnName($this->fieldStorageDefinitions[$field_name], $property_name);
+          $column_names[$property_name] = $this->getFieldColumnName($this->fieldStorageDefinitions[$field_name], $property_name);
         }
       }
+      $this->columnMapping[$field_name] = $column_names;
     }
     return $this->columnMapping[$field_name];
   }
