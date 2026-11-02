@@ -507,7 +507,7 @@ services:
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'
   context.repository:
     class: Drupal\Core\Plugin\Context\LazyContextRepository
-    arguments: ['@service_container']
+    arguments: ['@service_container', '@request_stack']
     tags:
       - { name: service_id_collector, tag: context_provider }
   Drupal\Core\Plugin\Context\ContextRepositoryInterface: '@context.repository'

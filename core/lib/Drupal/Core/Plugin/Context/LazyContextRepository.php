@@ -3,6 +3,7 @@
 namespace Drupal\Core\Plugin\Context;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a context repository which uses context provider services.
@@ -27,7 +28,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * The statically cached contexts.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @var \Drupal\Core\Plugin\Context\ContextInterface[][]
    */
   protected $contexts = [];
 
@@ -36,10 +37,16 @@ class LazyContextRepository implements ContextRepositoryInterface {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The current service container.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    * @param string[] $context_provider_service_ids
    *   The set of the available context provider service IDs.
    */
-  public function __construct(ContainerInterface $container, array $context_provider_service_ids) {
+  public function __construct(
+    ContainerInterface $container,
+    protected readonly RequestStack $requestStack,
+    array $context_provider_service_ids,
+  ) {
     $this->container = $container;
     $this->contextProviderServiceIDs = $context_provider_service_ids;
   }
@@ -49,13 +56,15 @@ class LazyContextRepository implements ContextRepositoryInterface {
    */
   public function getRuntimeContexts(array $context_ids) {
     $contexts = [];
+    $currentRequest = $this->requestStack->getCurrentRequest();
+    $requestCid = (string) $currentRequest;
 
     // Create a map of context providers (service IDs) to unqualified context
     // IDs.
     $context_ids_by_service = [];
     foreach ($context_ids as $id) {
-      if (isset($this->contexts[$id])) {
-        $contexts[$id] = $this->contexts[$id];
+      if (isset($this->contexts[$requestCid][$id])) {
+        $contexts[$id] = $this->contexts[$requestCid][$id];
         continue;
       }
       assert($id[0] === '@' && str_contains($id, ':'), 'You must provide the context IDs in the @{service_id}:{unqualified_context_id} format.');
@@ -73,7 +82,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
       $wanted_contexts = array_intersect_key($contexts_by_service, array_flip($unqualified_context_ids));
       foreach ($wanted_contexts as $unqualified_context_id => $context) {
         $context_id = '@' . $service_id . ':' . $unqualified_context_id;
-        $this->contexts[$context_id] = $contexts[$context_id] = $context;
+        $this->contexts[$requestCid][$context_id] = $contexts[$context_id] = $context;
       }
     }
 
