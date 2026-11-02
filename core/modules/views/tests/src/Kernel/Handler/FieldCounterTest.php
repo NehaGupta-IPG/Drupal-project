@@ -136,6 +136,8 @@ class FieldCounterTest extends ViewsKernelTestBase {
     $this->assertEquals('3', $counter);
 
     $view->destroy();
+    // Invalidate cache to fix issue:3456341
+    $view->storage->invalidateCaches();
 
     // Test using the counter start option.
     $counter_start = 1000000;

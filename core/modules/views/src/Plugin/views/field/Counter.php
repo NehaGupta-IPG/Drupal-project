@@ -57,6 +57,18 @@ class Counter extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
+  public function renderText($alter) {
+    $value = parent::renderText($alter);
+    if ($value == $this->getFieldTokenPlaceholder()) {
+      $row_key = $this->view->row_index;
+      return $this->getValue($this->view->result[$row_key]);
+    }
+    return $value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getValue(ResultRow $values, $field = NULL) {
     // Note:  1 is subtracted from the counter start value below because the
     // counter value is incremented by 1 at the end of this function.
