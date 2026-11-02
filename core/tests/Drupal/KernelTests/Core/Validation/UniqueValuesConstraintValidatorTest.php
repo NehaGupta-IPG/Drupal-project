@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator;
 use Drupal\entity_test\Entity\EntityTestUniqueConstraint;
 use Drupal\KernelTests\KernelTestBase;
@@ -335,6 +336,89 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
     $violations = $entity->validate();
     $this->assertCount(1, $violations);
     $this->assertEquals('field_test_text.0', $violations[0]->getPropertyPath());
+  }
+
+  /**
+   * Username validation with Unique field validations.
+   *
+   * Case sensitivity and accent normalization, checked in both directions:
+   * an accented value already saved when the unaccented value is
+   * validated, and an unaccented value already saved when the accented
+   * value is validated. The comparison must not depend on which value was
+   * saved first.
+   *
+   * The expected outcome depends on the database driver: MySQL/MariaDB's
+   * default collation is accent-insensitive, so the database itself
+   * considers "brulee" and "brûlée" duplicates and a pre-save violation
+   * must be raised to avoid an uncaught database exception on save.
+   * PostgreSQL and SQLite default to accent-sensitive collations, so the
+   * two values are genuinely distinct there and saving both must succeed
+   * without a violation.
+   */
+  public function testUsernameUniqueValidation(): void {
+    // Accented value saved first, unaccented value validated against it.
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'brûlée',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+    $this->assertCount(0, $violations);
+    $entity->save();
+
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'brulee',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+
+    if (in_array(Database::getConnection()->driver(), ['mysql', 'mysqli'])) {
+      $this->assertCount(1, $violations);
+    }
+    else {
+      $this->assertCount(0, $violations);
+      // Saving must never throw an uncaught database exception: on this
+      // driver the two values are genuinely distinct.
+      $entity->save();
+    }
+
+    // Unaccented value saved first, accented value validated against it.
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'cafe',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+    $this->assertCount(0, $violations);
+    $entity->save();
+
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'café',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+
+    if (in_array(Database::getConnection()->driver(), ['mysql', 'mysqli'])) {
+      $this->assertCount(1, $violations);
+    }
+    else {
+      $this->assertCount(0, $violations);
+      $entity->save();
+    }
   }
 
 }
