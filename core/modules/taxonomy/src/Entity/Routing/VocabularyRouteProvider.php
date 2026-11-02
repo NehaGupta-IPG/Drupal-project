@@ -14,9 +14,14 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
-
-    $collection = parent::getRoutes($entity_type);
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+    }
+    else {
+      $entity_type = $this->entityType;
+    }
+    $collection = parent::getRoutes();
 
     if ($reset_page_route = $this->getResetPageRoute($entity_type)) {
       $collection->add("entity.taxonomy_vocabulary.reset_form", $reset_page_route);

@@ -29,13 +29,23 @@ class EntityModerationRouteProvider implements EntityRouteProviderInterface, Ent
   protected $entityFieldManager;
 
   /**
-   * Constructs a new DefaultHtmlRouteProvider.
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
+   * Constructs a new EntityModerationRouteProvider.
    *
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
    */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, ?EntityTypeInterface $entity_type = NULL) {
     $this->entityFieldManager = $entity_field_manager;
+    $this->entityType = $entity_type;
   }
 
   /**
@@ -43,14 +53,21 @@ class EntityModerationRouteProvider implements EntityRouteProviderInterface, Ent
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $entity_type
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+    }
+    else {
+      $entity_type = $this->entityType;
+    }
     $collection = new RouteCollection();
 
     if ($moderation_route = $this->getLatestVersionRoute($entity_type)) {

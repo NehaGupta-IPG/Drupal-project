@@ -14,25 +14,46 @@ use Symfony\Component\Routing\RouteCollection;
 class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
 
   /**
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
+   * Constructs a new RevisionHtmlRouteProvider.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
+   */
+  public function __construct(?EntityTypeInterface $entity_type = NULL) {
+    $this->entityType = $entity_type;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+      $this->entityType = $entity_type;
+    }
     $collection = new RouteCollection();
-    $entityTypeId = $entity_type->id();
+    $entityTypeId = $this->entityType->id();
 
-    if ($version_history_route = $this->getVersionHistoryRoute($entity_type)) {
+    if ($version_history_route = $this->getVersionHistoryRoute($this->entityType)) {
       $collection->add("entity.$entityTypeId.version_history", $version_history_route);
     }
 
-    if ($revision_view_route = $this->getRevisionViewRoute($entity_type)) {
+    if ($revision_view_route = $this->getRevisionViewRoute($this->entityType)) {
       $collection->add("entity.$entityTypeId.revision", $revision_view_route);
     }
 
-    if ($revision_revert_route = $this->getRevisionRevertRoute($entity_type)) {
+    if ($revision_revert_route = $this->getRevisionRevertRoute($this->entityType)) {
       $collection->add("entity.$entityTypeId.revision_revert_form", $revision_revert_route);
     }
 
-    if ($revision_delete_route = $this->getRevisionDeleteRoute($entity_type)) {
+    if ($revision_delete_route = $this->getRevisionDeleteRoute($this->entityType)) {
       $collection->add("entity.$entityTypeId.revision_delete_form", $revision_delete_route);
     }
 

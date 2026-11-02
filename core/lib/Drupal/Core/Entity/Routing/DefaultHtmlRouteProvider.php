@@ -45,16 +45,26 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   protected $entityFieldManager;
 
   /**
+   * The entity type definition.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeInterface|null
+   */
+  protected ?EntityTypeInterface $entityType = NULL;
+
+  /**
    * Constructs a new DefaultHtmlRouteProvider.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityTypeInterface|null $entity_type
+   *   The entity type definition.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ?EntityTypeInterface $entity_type = NULL) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
+    $this->entityType = $entity_type;
   }
 
   /**
@@ -63,44 +73,49 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $entity_type
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRoutes(EntityTypeInterface $entity_type) {
+  public function getRoutes(?EntityTypeInterface $entity_type = NULL) {
+    if ($entity_type !== NULL) {
+      @trigger_error('Passing $entity_type to ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The entity type is passed on construction. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+      $this->entityType = $entity_type;
+    }
     $collection = new RouteCollection();
 
-    $entity_type_id = $entity_type->id();
+    $entity_type_id = $this->entityType->id();
 
-    if ($add_page_route = $this->getAddPageRoute($entity_type)) {
+    if ($add_page_route = $this->getAddPageRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.add_page", $add_page_route);
     }
 
-    if ($add_form_route = $this->getAddFormRoute($entity_type)) {
+    if ($add_form_route = $this->getAddFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.add_form", $add_form_route);
     }
 
-    if ($canonical_route = $this->getCanonicalRoute($entity_type)) {
+    if ($canonical_route = $this->getCanonicalRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.canonical", $canonical_route);
     }
 
-    if ($edit_route = $this->getEditFormRoute($entity_type)) {
+    if ($edit_route = $this->getEditFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.edit_form", $edit_route);
     }
 
-    if ($delete_route = $this->getDeleteFormRoute($entity_type)) {
+    if ($delete_route = $this->getDeleteFormRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.delete_form", $delete_route);
     }
 
-    if ($collection_route = $this->getCollectionRoute($entity_type)) {
+    if ($collection_route = $this->getCollectionRoute($this->entityType)) {
       $collection->add("entity.{$entity_type_id}.collection", $collection_route);
     }
 
-    if ($delete_multiple_route = $this->getDeleteMultipleFormRoute($entity_type)) {
-      $collection->add('entity.' . $entity_type->id() . '.delete_multiple_form', $delete_multiple_route);
+    if ($delete_multiple_route = $this->getDeleteMultipleFormRoute($this->entityType)) {
+      $collection->add("entity.{$entity_type_id}.delete_multiple_form", $delete_multiple_route);
     }
 
     return $collection;

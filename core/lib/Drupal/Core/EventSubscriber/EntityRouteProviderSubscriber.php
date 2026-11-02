@@ -44,7 +44,20 @@ class EntityRouteProviderSubscriber implements EventSubscriberInterface {
           // Allow to both return an array of routes or a route collection,
           // like route_callbacks in the routing.yml file.
 
-          $routes = $route_provider->getRoutes($entity_type);
+          // The entity type is now passed to the route provider on
+          // construction. Route providers that still declare a required
+          // $entity_type parameter on getRoutes() are not yet updated, so for
+          // backwards compatibility the entity type is passed to them
+          // explicitly.
+          // @todo Remove this BC layer in drupal:13.0.0.
+          $parameters = (new \ReflectionMethod($route_provider, 'getRoutes'))->getParameters();
+          if (isset($parameters[0]) && !$parameters[0]->isOptional()) {
+            @trigger_error('Implementing ' . get_class($route_provider) . '::getRoutes() with a required $entity_type parameter is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. The $entity_type parameter must be optional. See https://www.drupal.org/node/3593831', E_USER_DEPRECATED);
+            $routes = $route_provider->getRoutes($entity_type);
+          }
+          else {
+            $routes = $route_provider->getRoutes();
+          }
           if ($routes instanceof RouteCollection) {
             $routes = $routes->all();
           }
