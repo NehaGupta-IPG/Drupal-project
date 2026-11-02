@@ -93,6 +93,27 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Test a message with a NULL placeholder.
+   */
+  public function testNullPlaceholder(): void {
+    // Remove the watchdog entries added by the potential batch process.
+    $this->container->get('database')->truncate('watchdog')->execute();
+
+    $logger_factory = $this->container->get('logger.factory');
+    $logger_factory->get('test-views')->log(
+      RfcLogLevel::NOTICE,
+      'Message with NULL placeholder: @placeholder',
+      ['@placeholder' => NULL]
+    );
+
+    $view = Views::getView('test_dblog');
+    $this->executeView($view);
+    $view->initStyle();
+
+    $this->assertEquals('Message with NULL placeholder: NULL', $view->style_plugin->getField(0, 'message'));
+  }
+
+  /**
    * Tests the relationship with the users_field_data table.
    */
   public function testRelationship(): void {

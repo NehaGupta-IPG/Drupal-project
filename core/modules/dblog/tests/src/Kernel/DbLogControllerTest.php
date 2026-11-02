@@ -83,4 +83,19 @@ class DbLogControllerTest extends KernelTestBase {
     $this->assertEquals('Log data is corrupted and cannot be unserialized: Sample message with placeholder: @placeholder', $formatted);
   }
 
+  /**
+   * Tests NULL values for placeholders in log entries.
+   */
+  public function testDbLogNullPlaceholders(): void {
+    $dblog_controller = DbLogController::create($this->container);
+
+    $message = (object) [
+      'message' => 'Sample message with placeholder: @placeholder',
+      'variables' => serialize(['@placeholder' => NULL]),
+    ];
+
+    $formatted = $dblog_controller->formatMessage($message);
+    $this->assertEquals('Sample message with placeholder: NULL', $formatted);
+  }
+
 }
