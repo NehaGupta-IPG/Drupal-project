@@ -1174,7 +1174,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // processing consistent with submissions that include button data.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        $form_state->setTriggeringElement($buttons[0]);
+        $name = $form_state->getUserInput()['_triggering_element_name'] ?? '';
+        $named = $name === '' ? [] : array_filter($buttons, fn($b) => $b['#name'] == $name);
+        $form_state->setTriggeringElement(count($named) === 1 ? reset($named) : $buttons[0]);
       }
 
       $triggering_element = $form_state->getTriggeringElement();

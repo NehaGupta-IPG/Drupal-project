@@ -1120,6 +1120,52 @@ class FormBuilderTest extends FormTestBase {
     $this->assertSame('op', $triggeringElement['#name']);
   }
 
+  /**
+   * Tests Ajax fallback uses a unique triggering element name.
+   *
+   * Ajax submissions send _triggering_element_name and
+   * _triggering_element_value. If the value no longer matches the button, the
+   * triggering element is not identified and Form API falls back to the first
+   * button. That first button is often an unrelated control such as Media
+   * Library "Add media".
+   *
+   * When the submitted name uniquely matches a button, that button must be
+   * used instead of the first-button fallback.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3174361
+   */
+  public function testTriggeringElementFallbackWithUniqueName(): void {
+    $form_arg = 'Drupal\Tests\Core\Form\TestForm';
+
+    // Ajax extra data identifies the second button, but the value no longer
+    // matches so early detection fails.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput([
+      'form_id' => 'test_form',
+      '_triggering_element_name' => 'other_action',
+      '_triggering_element_value' => 'Changed label',
+    ]);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('other_action', $triggeringElement['#name']);
+    $this->assertSame('Other action', $triggeringElement['#value']);
+
+    // An unknown name still falls back to the first button.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput([
+      'form_id' => 'test_form',
+      '_triggering_element_name' => 'does_not_exist',
+      '_triggering_element_value' => 'Changed label',
+    ]);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('op', $triggeringElement['#name']);
+  }
+
 }
 
 /**
