@@ -140,6 +140,17 @@ class TokenReplaceTest extends ViewsKernelTestBase {
       $this->assertSame($expected_output, $output, sprintf('Token %s replaced correctly.', $token));
       $this->assertEquals($base_bubbleable_metadata, $bubbleable_metadata);
     }
+
+    // Ensure "[view:total-rows]" returns total data set size if the "More link"
+    // is enabled.
+    $view_more = Views::getView('test_tokens');
+    $view_more->setDisplay('page_5');
+    $this->executeView($view_more);
+    $base_bubbleable_metadata = BubbleableMetadata::createFromObject($view_more->storage);
+    $bubbleable_metadata = new BubbleableMetadata();
+    $output = $token_handler->replace('[view:total-rows]', ['view' => $view_more], [], $bubbleable_metadata);
+    $this->assertSame('5', $output, 'Token [view:total-rows] replaced correctly.');
+    $this->assertEquals($base_bubbleable_metadata, $bubbleable_metadata);
   }
 
   /**

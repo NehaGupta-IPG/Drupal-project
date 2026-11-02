@@ -139,3 +139,41 @@ display:
             value: "Total rows: [view:total-rows]"
             format: basic_html
           plugin_id: text
+  page_5:
+    display_plugin: page
+    id: page_5
+    display_title: Specific items page
+    position: 5
+    display_options:
+      defaults:
+        title: false
+        pager: false
+        header: false
+        use_more: false
+        use_more_always: false
+        use_more_text: false
+      pager:
+        type: some
+        options:
+          offset: 0
+          items_per_page: 3
+      title: 'Test token page with "Display a specified number of items" pager plugin and "More" link.'
+      path: test_tokens_display_specific_items
+      display_extenders: { }
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: false
+          tokenize: false
+          content:
+            value: "Total rows: [view:total-rows]"
+            format: basic_html
+          plugin_id: text
+      use_more: true
+      use_more_always: false
+      use_more_text: 'more'          

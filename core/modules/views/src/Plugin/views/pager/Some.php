@@ -95,7 +95,11 @@ class Some extends PagerPluginBase {
    * {@inheritdoc}
    */
   public function postExecute(&$result): void {
-    $this->total_items = count($result);
+    // If the "More link" is not enabled, the total_items should equal the
+    // number of query results.
+    if (!$this->view->getDisplay()->isMoreEnabled()) {
+      $this->total_items = count($result);
+    }
   }
 
 }
