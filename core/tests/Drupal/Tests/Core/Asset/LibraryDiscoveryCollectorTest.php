@@ -8,6 +8,7 @@ use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Core\Asset\LibraryDiscoveryParser;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests Drupal\Core\Asset\LibraryDiscoveryCollector.
@@ -51,6 +53,11 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    * The theme manager.
    */
   protected ThemeManagerInterface&Stub $themeManager;
+
+  /**
+   * The logger.
+   */
+  protected LoggerInterface&Stub $logger;
 
   /**
    * Test library data.
@@ -102,6 +109,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->libraryDiscoveryParser = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryParser')
       ->disableOriginalConstructor()
       ->getMock();
+    $this->logger = $this->createStub(LoggerInterface::class);
   }
 
   /**
@@ -118,7 +126,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme->expects($this->once())
       ->method('getName')
       ->willReturn('kitten_theme');
-    $this->libraryDiscoveryCollector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager);
+    $this->libraryDiscoveryCollector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager, $this->logger);
 
     $this->libraryDiscoveryParser->expects($this->once())
       ->method('buildByExtension')
@@ -127,6 +135,35 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
     $this->assertSame($this->libraryData, $this->libraryDiscoveryCollector->get('test'));
     $this->assertSame($this->libraryData, $this->libraryDiscoveryCollector->get('test'));
+  }
+
+  /**
+   * Tests that unknown extensions resolve to an empty library set.
+   */
+  public function testUnknownExtensionReturnsEmptyLibraries(): void {
+    $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
+    $this->themeManager->expects($this->once())
+      ->method('getActiveTheme')
+      ->willReturn($this->activeTheme);
+    $this->activeTheme->expects($this->once())
+      ->method('getName')
+      ->willReturn('kitten_theme');
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
+      ->method('warning')
+      ->with('Could not load libraries for unknown extension %extension.', ['%extension' => 'fakeLibrary']);
+    $this->libraryDiscoveryCollector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager, $logger);
+
+    $this->libraryDiscoveryParser->expects($this->once())
+      ->method('buildByExtension')
+      ->with('fakeLibrary')
+      ->willThrowException(new UnknownExtensionException('The theme fakeLibrary does not exist.'));
+
+    $this->assertSame([], $this->libraryDiscoveryCollector->getLibrariesByExtension('fakeLibrary'));
+    $this->assertFalse($this->libraryDiscoveryCollector->getLibraryByName('fakeLibrary', 'fakeLibrary'));
   }
 
   /**
@@ -145,7 +182,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme->expects($this->once())
       ->method('getName')
       ->willReturn('kitten_theme');
-    $this->libraryDiscoveryCollector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager);
+    $this->libraryDiscoveryCollector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager, $this->logger);
 
     $this->libraryDiscoveryParser->expects($this->once())
       ->method('buildByExtension')
@@ -212,7 +249,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
           ],
         ],
       ]);
-    $library_discovery_collector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager);
+    $library_discovery_collector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager, $this->logger);
     $libraries = $library_discovery_collector->get('test');
     $this->assertSame(['foo.css', 'baz.css'], array_keys($libraries['test_3']['css']['theme']));
   }
@@ -257,7 +294,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
           ],
         ],
       ]);
-    $library_discovery_collector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager);
+    $library_discovery_collector = new LibraryDiscoveryCollector($this->cache, $this->lock, $this->libraryDiscoveryParser, $this->themeManager, $this->logger);
     $library_discovery_collector->get('test');
   }
 
