@@ -81,4 +81,31 @@ class NodePreviewLinkTest extends WebDriverTestBase {
     $this->assertStringEndsWith('/foo', $this->getUrl());
   }
 
+  /**
+   * Tests leaving the preview when other document click handlers exist.
+   *
+   * Themes and modules may bind click handlers directly on the document. jQuery
+   * reuses the same event object for these, so the clicked link must still be
+   * followed rather than navigating to "undefined".
+   */
+  public function testLeavePreviewWithOtherDocumentClickHandler(): void {
+    $assertSession = $this->assertSession();
+    $cases = [
+      '/foo' => ['<a href="/foo">Normal link</a>', 'a[href="/foo"]'],
+      '/bar' => ['<a href="/bar"><span>Child element link</span></a>', 'a[href="/bar"] span'],
+    ];
+    foreach ($cases as $expected_path => [$body, $selector]) {
+      $this->drupalGet('node/add/test');
+      $this->submitForm([
+        'title[0][value]' => 'Test other click handler',
+        'body[0][value]' => $body,
+      ], 'Preview');
+      $this->getSession()->executeScript("jQuery(document).on('click', function () {});");
+      $assertSession->waitForElementVisible('css', $selector)->click();
+      $assertSession->waitForText('Leave preview?');
+      $this->click('button:contains("Leave preview")');
+      $this->assertTrue($this->getSession()->wait(5000, "window.location.pathname.endsWith('$expected_path')"));
+    }
+  }
+
 }
