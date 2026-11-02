@@ -1,0 +1,5 @@
+name: 'Region content test'
+type: theme
+description: 'Theme to test the rendering of blocks in a region template.'
+version: VERSION
+base theme: stark

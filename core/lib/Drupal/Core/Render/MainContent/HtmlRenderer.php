@@ -274,12 +274,21 @@ class HtmlRenderer implements MainContentRendererInterface {
       $page += $page_display->build();
     }
 
-    // $page is now fully built. Find all non-empty page regions, and add a
-    // theme wrapper function that allows them to be consistently themed.
+    // $page is now fully built. Find all non-empty page regions, and set a
+    // #theme property that allows them to be consistently themed.
     $regions = $this->themeManager->getActiveTheme()->getRegions();
     foreach ($regions as $region) {
       if (!empty($page[$region])) {
-        $page[$region]['#theme_wrappers'][] = 'region';
+        // On most pages, every $page[$region] is an array of block render
+        // arrays, keyed by block ID. However, in some rare cases (e.g.
+        // BatchController:batchPage) a render array with #type="page" is
+        // created manually and $page[$region] may already have a #type or
+        // #theme property. To avoid breaking this render array when we set the
+        // #theme="region" property, wrap it in an element "region_content".
+        if (isset($page[$region]['#type']) || isset($page[$region]['#theme'])) {
+          $page[$region] = ['region_content' => $page[$region]];
+        }
+        $page[$region]['#theme'] = 'region';
         $page[$region]['#region'] = $region;
       }
     }

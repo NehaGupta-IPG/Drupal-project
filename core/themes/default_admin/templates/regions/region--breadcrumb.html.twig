@@ -4,7 +4,10 @@
  * Theme override to display a breadcrumb region.
  *
  * Available variables:
- * - content: The content for this region, typically blocks.
+ * - content: The content for this region, typically blocks. Use {{ content }}
+ *   to print them all, or print a subset such as {{ content.page_title }}.
+ *   Use {{ content|without('page_title') }} to temporarily suppress the
+ *   printing of a given child element.
  * - attributes: HTML attributes for the region <div>.
  * - region: The name of the region variable as defined in the theme's
  *   .info.yml file.
