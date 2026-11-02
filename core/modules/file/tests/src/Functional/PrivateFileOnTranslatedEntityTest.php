@@ -6,6 +6,8 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -18,11 +20,17 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
 
   use ContentTranslationTestTrait;
+  use ContentModerationTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language', 'content_translation'];
+  protected static $modules = [
+    'language',
+    'content_translation',
+    'content_moderation',
+    'workflows',
+  ];
 
   /**
    * {@inheritdoc}
@@ -139,6 +147,49 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
 
     // Ensure the file attached to the translated node can be downloaded.
     $french_node = $default_language_node->getTranslation('fr');
+    $node_file = File::load($french_node->{$this->fieldName}->target_id);
+    $this->drupalGet($node_file->createFileUrl(FALSE));
+    $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
+   * Tests that the private file access works in a content moderation workflow.
+   */
+  public function testPrivateLanguageFileWithContentModeration(): void {
+    $workflow = $this->createEditorialWorkflow();
+    $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'page');
+    $workflow->save();
+
+    // Create a node in the default language.
+    $default_language_node = $this->drupalCreateNode([
+      'type' => 'page',
+      'moderation_state' => 'draft',
+      'status' => NodeInterface::NOT_PUBLISHED,
+    ]);
+    $default_language_node->save();
+    $node = Node::load($default_language_node->id());
+
+    $filename = \sprintf('%s.txt', $this->randomMachineName(5));
+    /** @var \Drupal\file\FileInterface $file */
+    $file = File::create([
+      'uri' => 'private://' . $filename,
+    ]);
+    // Create the file itself.
+    file_put_contents($file->getFileUri(), $this->randomMachineName(64));
+    $file->save();
+    $node->addTranslation(
+      'fr', [
+        'title' => $this->randomString(),
+        'moderation_state' => 'published',
+        'status' => NodeInterface::PUBLISHED,
+        $this->fieldName => [$file],
+      ]
+    );
+    $node->save();
+    $this->drupalLogout();
+
+    // Verify that the translation was created and visit the file page.
+    $french_node = $node->getTranslation('fr');
     $node_file = File::load($french_node->{$this->fieldName}->target_id);
     $this->drupalGet($node_file->createFileUrl(FALSE));
     $this->assertSession()->statusCodeEquals(200);
