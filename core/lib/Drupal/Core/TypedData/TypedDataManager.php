@@ -44,6 +44,11 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   protected $prototypes = [];
 
   /**
+   * Cache key parts for each unique root definition object.
+   */
+  protected ?\WeakMap $parts = NULL;
+
+  /**
    * The class resolver.
    *
    * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
@@ -162,22 +167,40 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     // creating a data object:
     // - for a similar root object (same data type and settings),
     // - at the same property path under that root object.
-    $root_definition = $object->getRoot()->getDataDefinition();
-    // If the root object is a list, we want to look at the data type and the
-    // settings of its item definition.
-    if ($root_definition instanceof ListDataDefinition) {
-      $root_definition = $root_definition->getItemDefinition();
+    // We also cache aspects of the cache key building when this occurs for
+    // identical objects and root objects.
+    if (!isset($this->parts)) {
+      $this->parts = new \WeakMap();
     }
+    if (isset($this->parts[$object])) {
+      $parts = $this->parts[$object];
+    }
+    else {
+      $root_definition = $object->getRoot()->getDataDefinition();
+      // If the root object is a list, we want to look at the data type and the
+      // settings of its item definition.
+      if ($root_definition instanceof ListDataDefinition) {
+        $root_definition = $root_definition->getItemDefinition();
+      }
 
-    // Root data type and settings.
-    $parts[] = $root_definition->getDataType();
-    if ($settings = $root_definition->getSettings()) {
-      // Include the settings serialized as JSON as part of the key. The JSON is
-      // a shorter string than the serialized form, so array access is faster.
-      $parts[] = json_encode($settings);
+      if (isset($this->parts[$root_definition])) {
+        $parts = $this->parts[$root_definition];
+      }
+      else {
+        // Root data type and settings.
+        $parts[] = $root_definition->getDataType();
+        if ($settings = $root_definition->getSettings()) {
+          // Include the settings serialized as JSON as part of the key. The
+          // JSON is a shorter string than the serialized form, so array access
+          // is faster.
+          $parts[] = json_encode($settings);
+        }
+        $this->parts[$root_definition] = $parts;
+      }
+      // Property path for the requested data object.
+      $parts[] = $object->getPropertyPath();
+      $this->parts[$object] = $parts;
     }
-    // Property path for the requested data object.
-    $parts[] = $object->getPropertyPath();
     // Only property instances of complex data types should be cached by the
     // property name, as they represent different properties. Properties of list
     // data types are the items of the list and the property name represents
@@ -292,6 +315,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   public function clearCachedDefinitions() {
     parent::clearCachedDefinitions();
     $this->prototypes = [];
+    $this->parts = new \WeakMap();
   }
 
   /**
