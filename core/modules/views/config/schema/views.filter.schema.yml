@@ -207,6 +207,9 @@ views.filter.date:
     type:
       type: string
       label: 'Type'
+    end_date_inclusive:
+      type: boolean
+      label: 'Include the whole end date'
 
 views.filter_value.in_operator:
   type: sequence

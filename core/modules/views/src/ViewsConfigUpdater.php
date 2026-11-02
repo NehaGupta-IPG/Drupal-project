@@ -176,4 +176,45 @@ class ViewsConfigUpdater {
     return FALSE;
   }
 
+  /**
+   * Checks for date filters missing the 'end_date_inclusive' option.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if any filter needs the update.
+   */
+  public function needsDateFilterEndDateInclusiveUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) {
+      return $this->processDateFilterEndDateInclusiveUpdate($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Adds the 'end_date_inclusive' option to date filters.
+   *
+   * The option is set to FALSE so that existing views keep excluding the end
+   * date of a range.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function processDateFilterEndDateInclusiveUpdate(array &$handler, string $handler_type): bool {
+    if (
+      $handler_type === 'filter' &&
+      in_array($handler['plugin_id'] ?? NULL, ['date', 'datetime'], TRUE) &&
+      !array_key_exists('end_date_inclusive', $handler)
+    ) {
+      $handler['end_date_inclusive'] = FALSE;
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
