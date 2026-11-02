@@ -192,7 +192,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     // object of the wrong class, or one carrying constraints that belong to
     // the other definition. Keying on the definition object also keeps the
     // cache honest when a definition is rebuilt on purpose, for example by
-    // \Drupal\field\Entity\FieldConfigBase::setPropertyConstraints() or by
+    // \Drupal\Core\Field\FieldConfigBase::setPropertyConstraints() or by
     // ListDataDefinition::__clone().
     //
     // The trade-off is that a caller building a fresh definition object per
