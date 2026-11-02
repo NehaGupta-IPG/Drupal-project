@@ -63,7 +63,7 @@ abstract class NumericFormatterBase extends FormatterBase {
     $settings = $this->getFieldSettings();
 
     foreach ($items as $delta => $item) {
-      $output = $this->numberFormat($item->value);
+      $output = ($item->value !== NULL) ? $this->numberFormat($item->value) : '';
 
       // Account for prefix and suffix.
       if ($this->getSetting('prefix_suffix')) {
