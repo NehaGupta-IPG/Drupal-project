@@ -143,15 +143,20 @@
   <!-- Settings for coverage reports. -->
   <source ignoreSuppressionOfDeprecations="true">
     <include>
-      <directory>./includes</directory>
+      <directory suffix=".inc">./includes</directory>
       <directory>./lib</directory>
       <directory>./modules</directory>
+      <directory suffix=".module">./modules</directory>
+      <directory suffix=".inc">./modules</directory>
       <directory>../modules</directory>
+      <directory>../composer</directory>
     </include>
     <exclude>
       <directory>./lib/Drupal/Component</directory>
       <directory>./modules/*/src/Tests</directory>
       <directory>./modules/*/tests</directory>
+      <directory suffix=".module">./modules/*/tests</directory>
+      <directory suffix=".inc">./modules/*/tests</directory>
       <directory>../modules/*/src/Tests</directory>
       <directory>../modules/*/tests</directory>
       <directory>../modules/*/*/src/Tests</directory>
