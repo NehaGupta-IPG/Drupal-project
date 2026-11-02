@@ -37,8 +37,6 @@ class LocaleTranslationDownloadTest extends LocaleUpdateBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $moduleHandler = $this->container->get('module_handler');
-    $moduleHandler->loadInclude('locale', 'inc', 'locale.batch');
     ConfigurableLanguage::createFromLangcode('de')->save();
 
     // Let the translations:// stream wrapper point to a virtual file system to

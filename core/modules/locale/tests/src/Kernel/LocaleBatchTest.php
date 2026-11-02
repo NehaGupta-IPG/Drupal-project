@@ -33,7 +33,6 @@ class LocaleBatchTest extends KernelTestBase {
   public function testBuildProjects(): void {
     $this->installConfig(['locale']);
     $this->installSchema('locale', ['locale_file']);
-    $this->container->get('module_handler')->loadInclude('locale', 'batch.inc');
 
     \Drupal::database()->insert('locale_file')
       ->fields([
@@ -57,7 +56,6 @@ class LocaleBatchTest extends KernelTestBase {
   public function testEnglishTranslationSkipsDefaultPattern(): void {
     $this->installConfig(['locale', 'language']);
     $this->installSchema('locale', ['locales_source', 'locales_target', 'locale_file']);
-    $this->container->get('module_handler')->loadInclude('locale', 'batch.inc');
 
     // Create source matching default drupal.org pattern.
     $source = new LocaleTranslationSource(
@@ -88,7 +86,6 @@ class LocaleBatchTest extends KernelTestBase {
   public function testNonEnglishLanguagesUnaffected(): void {
     $this->installConfig(['locale', 'language']);
     $this->installSchema('locale', ['locales_source', 'locales_target', 'locale_file']);
-    $this->container->get('module_handler')->loadInclude('locale', 'batch.inc');
 
     // Create source matching default drupal.org pattern.
     $source = new LocaleTranslationSource(

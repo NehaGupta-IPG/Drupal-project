@@ -195,7 +195,6 @@ class UpdateManager implements UpdateManagerInterface {
    * {@inheritdoc}
    */
   public function getAvailable(bool $refresh = FALSE): array {
-    \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.compare');
     $needs_refresh = FALSE;
 
     // Grab whatever data we currently have.

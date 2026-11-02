@@ -163,7 +163,6 @@ class ImportForm extends FormBase {
       'overwrite_options' => $form_state->getValue('overwrite_options'),
       'customized' => $form_state->getValue('customized') ? LocaleDefaultOptions::CUSTOMIZED : LocaleDefaultOptions::NOT_CUSTOMIZED,
     ]);
-    $this->moduleHandler->loadInclude('locale', 'bulk.inc');
     $file = LocaleFile::createFromPath($this->file->getFilename(), $this->file->getFileUri(), $options['langcode']);
     $batch = $this->localeImportBatch->buildBatch([$file->uri => $file], $options);
     batch_set($batch);

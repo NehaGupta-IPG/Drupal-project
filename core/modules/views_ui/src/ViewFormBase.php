@@ -25,9 +25,6 @@ abstract class ViewFormBase extends EntityForm {
    */
   public function init(FormStateInterface $form_state) {
     parent::init($form_state);
-
-    // @todo Remove the need for this.
-    $form_state->loadInclude('views_ui', 'inc', 'admin');
     $form_state->set('view', $this->entity);
   }
 

@@ -146,7 +146,7 @@ function views_ui_standard_display_dropdown(&$form, FormStateInterface $form_sta
  *
  * @see https://www.drupal.org/node/3566774
  */
-function views_ui_build_form_url(FormStateInterface $form_state) {
+function views_ui_build_form_url(FormStateInterface $form_state): Url {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no public replacement for this function. Form classes can use the \Drupal\views\ViewsFormHelperTrait trait and call the buildFormUrl() method. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
   return _views_ui_wrap_views_form_helper_traits()->buildFormUrlWrapper($form_state);
 }

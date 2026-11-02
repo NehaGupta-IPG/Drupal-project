@@ -32353,19 +32353,19 @@ $ignoreErrors[] = [
 	'message' => '#^Function views_ui_add_ajax_wrapper\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function views_ui_add_limited_validation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function views_ui_form_button_was_clicked\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/admin.inc',
+	'path' => __DIR__ . '/modules/views_ui/views_ui.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\Ajax\\\\SetFormCommand\\:\\:render\\(\\) has no return type specified\\.$#',
