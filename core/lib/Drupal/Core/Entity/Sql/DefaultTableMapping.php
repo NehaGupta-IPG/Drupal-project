@@ -455,13 +455,8 @@ class DefaultTableMapping implements TableMappingInterface {
    *   A list of field names to add the columns for.
    *
    * @return $this
-   *
-   * @internal
-   *
-   * @todo Make this method protected in drupal:9.0.0.
-   * @see https://www.drupal.org/node/3067336
    */
-  public function setFieldNames($table_name, array $field_names) {
+  protected function setFieldNames($table_name, array $field_names) {
     $this->fieldNames[$table_name] = $field_names;
     // Force the re-computation of the column list.
     unset($this->allColumns[$table_name]);
@@ -487,13 +482,8 @@ class DefaultTableMapping implements TableMappingInterface {
    *   The list of column names.
    *
    * @return $this
-   *
-   * @internal
-   *
-   * @todo Make this method protected in drupal:9.0.0.
-   * @see https://www.drupal.org/node/3067336
    */
-  public function setExtraColumns($table_name, array $column_names) {
+  protected function setExtraColumns($table_name, array $column_names) {
     $this->extraColumns[$table_name] = $column_names;
     // Force the re-computation of the column list.
     unset($this->allColumns[$table_name]);
