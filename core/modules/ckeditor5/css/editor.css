@@ -29,3 +29,21 @@
 .ck-toolbar__items .ck.ck-button.ck-on {
   border: 1px solid var(--ck-color-button-on-color);
 }
+
+[data-drupal-calibrate-width] [data-drupal-ckeditor5-cell] {
+  display: none;
+}
+
+[data-drupal-calibrate-width] td:not([data-drupal-ckeditor5-cell]) {
+  display: inline-block;
+}
+
+@media screen and (max-width: 90rem) {
+  .ck .ck-editor__top .ck.ck-toolbar.ck-toolbar_grouping > .ck-toolbar__items {
+    flex-wrap: wrap;
+  }
+}
+
+table.field-multiple-table td.has-multiple-fields-remove-button {
+  max-width: 0 !important;
+}

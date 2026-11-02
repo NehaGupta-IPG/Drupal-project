@@ -45,3 +45,7 @@
     margin-block-start: var(--admin-space-l);
   }
 }
+.layout-region--main,
+.layout-region--footer {
+  width: 100%;
+}
