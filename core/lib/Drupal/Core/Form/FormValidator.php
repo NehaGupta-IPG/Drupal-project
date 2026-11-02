@@ -204,6 +204,15 @@ class FormValidator implements FormValidatorInterface {
       }
     }
 
+    // The validation of required fields can be suppressed during AJAX requests
+    // when the form's triggering element opts in via
+    // #ajax['suppress_required_fields_validation']. The opt-in is read from the
+    // server-side form structure rather than a request parameter, so the
+    // suppression cannot be forced by a crafted request.
+    $request = $this->requestStack->getCurrentRequest();
+    $triggering_element = $form_state->getTriggeringElement();
+    $suppress_required_fields_validation = $request && $request->query->has(FormBuilderInterface::AJAX_FORM_REQUEST) && !empty($triggering_element['#ajax']['suppress_required_fields_validation']);
+
     // Validate the current input.
     if (!isset($elements['#validated']) || !$elements['#validated']) {
       // The following errors are always shown.
@@ -252,7 +261,7 @@ class FormValidator implements FormValidatorInterface {
       // #element_validate handlers changed any properties. If $is_empty_value
       // is defined, then above #required validation code ran, so the other
       // variables are also known to be defined and we can test them again.
-      if (isset($is_empty_value) && ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null)) {
+      if (!$suppress_required_fields_validation && isset($is_empty_value) && ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null)) {
         if (isset($elements['#required_error'])) {
           $form_state->setError($elements, $elements['#required_error']);
         }

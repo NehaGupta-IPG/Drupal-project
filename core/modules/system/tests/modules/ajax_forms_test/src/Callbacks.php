@@ -305,6 +305,14 @@ class Callbacks {
   }
 
   /**
+   * Ajax callback for the suppress_required_fields_validation button.
+   */
+  public static function suppressValidationCallback($form, FormStateInterface $form_state): array {
+    \Drupal::messenger()->addStatus("suppress_validation_callback invoked");
+    return ['#markup' => '<div id="suppress_validation_area">suppress_validation_callback at ' . date('c') . '</div>'];
+  }
+
+  /**
    * AJAX form callback: Selects for the ajax_forms_test_lazy_load_form() form.
    */
   public static function lazyLoadFormAjax($form, FormStateInterface $form_state): array {

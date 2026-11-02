@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormErrorHandlerInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormValidator;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -400,6 +402,195 @@ class FormValidatorTest extends UnitTestCase {
         '',
       ],
     ];
+  }
+
+  /**
+   * Tests required error is suppressed when the triggering element opts in.
+   *
+   * @legacy-covers ::doValidateForm
+   */
+  public function testRequiredErrorMessageSuppressedForAjax(): void {
+    $request_stack = new RequestStack();
+    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1');
+    $request_stack->push($request);
+
+    $form_validator = $this->getMockBuilder('Drupal\Core\Form\FormValidator')
+      ->setConstructorArgs([
+        $request_stack,
+        $this->getStringTranslationStub(),
+        $this->csrfToken,
+        $this->logger,
+        $this->formErrorHandler,
+        $this->callableResolver,
+      ])
+      ->onlyMethods(['executeValidateHandlers'])
+      ->getMock();
+    $form_validator->expects($this->once())
+      ->method('executeValidateHandlers');
+
+    $form = [];
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
+      ->onlyMethods(['setError'])
+      ->getMock();
+    // The triggering element opts in to required-field suppression in its
+    // server-side #ajax definition. #limit_validation_errors is set to FALSE
+    // (the button default) so the generic limit-validation suppression does not
+    // interfere, isolating the behavior under test.
+    $form_state->setTriggeringElement([
+      '#limit_validation_errors' => FALSE,
+      '#ajax' => ['suppress_required_fields_validation' => TRUE],
+    ]);
+    $form_state->expects($this->never())
+      ->method('setError');
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+  }
+
+  /**
+   * Tests that AJAX required-field suppression preserves custom validation.
+   */
+  public function testElementValidateWithRequiredValidationSuppressedForAjax(): void {
+    $request_stack = new RequestStack();
+    $request_stack->push(Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1'));
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturnArgument(0);
+    $form_validator = new FormValidator(
+      $request_stack,
+      $this->getStringTranslationStub(),
+      $this->csrfToken,
+      $this->logger,
+      $this->formErrorHandler,
+      $this->callableResolver,
+    );
+
+    $form['custom'] = [
+      '#type' => 'textfield',
+      '#title' => 'Custom',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['custom'],
+      '#element_validate' => [
+        static function (array &$element, FormStateInterface $form_state): void {
+          $form_state->setError($element, 'Custom validation failed.');
+        },
+      ],
+    ];
+    // Use a separate element so the custom error cannot hide a required error
+    // recorded for the same element.
+    $form['required'] = [
+      '#type' => 'textfield',
+      '#title' => 'Required',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['required'],
+    ];
+    $values = ['custom' => '', 'required' => ''];
+    $form_state = (new FormState())
+      ->setValues($values)
+      ->setTriggeringElement([
+        '#limit_validation_errors' => FALSE,
+        '#ajax' => ['suppress_required_fields_validation' => TRUE],
+      ]);
+
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+
+    $this->assertSame(['custom' => 'Custom validation failed.'], $form_state->getErrors());
+    $this->assertSame($values, $form_state->getValues());
+  }
+
+  /**
+   * Tests that an AJAX request alone cannot suppress required validation.
+   *
+   * The suppression is gated on the server-side #ajax opt-in of the triggering
+   * element, so a crafted AJAX request whose triggering element did not opt in
+   * must still raise the required error.
+   *
+   * @legacy-covers ::doValidateForm
+   */
+  public function testRequiredErrorMessageNotSuppressedForAjaxWithoutFlag(): void {
+    $request_stack = new RequestStack();
+    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1');
+    $request_stack->push($request);
+
+    $form_validator = $this->getMockBuilder('Drupal\Core\Form\FormValidator')
+      ->setConstructorArgs([
+        $request_stack,
+        $this->getStringTranslationStub(),
+        $this->csrfToken,
+        $this->logger,
+        $this->formErrorHandler,
+        $this->callableResolver,
+      ])
+      ->onlyMethods(['executeValidateHandlers'])
+      ->getMock();
+    $form_validator->expects($this->once())
+      ->method('executeValidateHandlers');
+
+    $form = [];
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
+      ->onlyMethods(['setError'])
+      ->getMock();
+    // The triggering element did not opt in to suppression, so the required
+    // error must still be set even though this is an AJAX request.
+    $form_state->setTriggeringElement([
+      '#limit_validation_errors' => FALSE,
+    ]);
+    $form_state->expects($this->once())
+      ->method('setError')
+      ->with($this->isArray(), 'Test field is required.');
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+  }
+
+  /**
+   * Tests that required-field suppression does not apply to non-AJAX requests.
+   */
+  public function testRequiredErrorMessageNotSuppressedForNonAjax(): void {
+    $request_stack = new RequestStack();
+    $request_stack->push(Request::create('/test'));
+    $form_validator = new FormValidator(
+      $request_stack,
+      $this->getStringTranslationStub(),
+      $this->csrfToken,
+      $this->logger,
+      $this->formErrorHandler,
+      $this->callableResolver,
+    );
+
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = (new FormState())
+      ->setTriggeringElement([
+        '#limit_validation_errors' => FALSE,
+        '#ajax' => ['suppress_required_fields_validation' => TRUE],
+      ]);
+
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+
+    $this->assertCount(1, $form_state->getErrors());
+    $this->assertSame('Test field is required.', (string) $form_state->getError($form['test']));
   }
 
   /**
