@@ -53,6 +53,14 @@ class PathAliasConstraintValidator extends ConstraintValidator implements Contai
       // Only add the violation if the current translation does not have the
       // same path alias.
       if ($original->hasTranslation($entity_langcode)) {
+        // Prevent errors if alias has not been initialized at all.
+        if (!isset($value->alias)) {
+          $value->alias = '';
+        }
+        // Fix alias if it is set in values but not in the alias property.
+        if (!$value->alias) {
+          $value->alias = $value->getValue()['alias'] ?? $value->alias;
+        }
         if ($value->alias != $original->getTranslation($entity_langcode)->path->alias) {
           $this->context->addViolation($constraint->message);
         }
