@@ -1,5 +1,5 @@
-QueryCount: 54
-CacheGetCount: 170
+QueryCount: 56
+CacheGetCount: 171
 CacheGetCountByBin:
   page: 1
   config: 40
@@ -9,9 +9,9 @@ CacheGetCountByBin:
   dynamic_page_cache: 1
   render: 23
   default: 2
-  entity: 16
+  entity: 17
   routes: 3
-CacheSetCount: 75
+CacheSetCount: 76
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 19
@@ -101,17 +101,17 @@ CacheTagGroupedLookups:
   -
     - 'media:17'
   -
+    - 'config:image.style.square_large'
+    - 'config:image.style.square_medium'
+    - 'config:image.style.square_small'
+    - 'config:responsive_image.styles.square'
+  -
     - 'config:image.style.scale_crop_7_3_large'
     - 'config:image.style.scale_crop_7_3_medium'
     - 'config:image.style.scale_crop_7_3_tiny'
     - 'config:image.style.scale_crop_7_3_wide'
     - 'config:responsive_image.styles.hero'
     - 'media:18'
-  -
-    - 'config:image.style.square_large'
-    - 'config:image.style.square_medium'
-    - 'config:image.style.square_small'
-    - 'config:responsive_image.styles.square'
   -
     - 'config:user.role.anonymous'
 ScriptCount: 3
