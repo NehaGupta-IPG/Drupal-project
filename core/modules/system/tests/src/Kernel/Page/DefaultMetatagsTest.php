@@ -37,7 +37,7 @@ class DefaultMetatagsTest extends KernelTestBase {
     $this->assertSession()->elementsCount('xpath', '//meta[@charset="utf-8"]', 1);
 
     // Ensure that the charset one is the first metatag.
-    $result = $this->getSession()->getPage()->findAll('xpath', '//meta');
+    $result = $this->getNodeElementsByXpath('//meta');
     $this->assertEquals('utf-8', (string) $result[0]->getAttribute('charset'));
 
     // Ensure that the icon is on the page.
