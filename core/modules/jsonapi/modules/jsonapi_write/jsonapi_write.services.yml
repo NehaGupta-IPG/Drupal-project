@@ -1,0 +1,20 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+  serializer.normalizer.unprocessable_entity_exception.jsonapi:
+    class: Drupal\jsonapi\Normalizer\UnprocessableHttpEntityExceptionNormalizer
+    tags:
+      # This must have a higher priority than the 'serializer.normalizer.http_exception.jsonapi' to take effect.
+      - { name: jsonapi_normalizer, priority: 1 }
+  serializer.normalizer.content_entity.jsonapi:
+    class: Drupal\jsonapi\Normalizer\ContentEntityDenormalizer
+    tags:
+      - { name: jsonapi_normalizer }
+  serializer.normalizer.config_entity.jsonapi:
+    class: Drupal\jsonapi\Normalizer\ConfigEntityDenormalizer
+    tags:
+      - { name: jsonapi_normalizer }
+  jsonapi.file_upload:
+    class: Drupal\jsonapi\Controller\FileUpload
+  Drupal\jsonapi\Controller\FileUpload: '@jsonapi.file_upload'

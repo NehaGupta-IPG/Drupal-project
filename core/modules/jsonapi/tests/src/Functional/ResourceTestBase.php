@@ -1385,7 +1385,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
@@ -2011,17 +2011,45 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
+   * Tests that write operations return 405 when JSON:API Write is not installed.
+   */
+  public function testWriteOperationsBlockedWithoutWriteModule(): void {
+    if (!$this->resourceType->isLocatable() || !$this->resourceType->isMutable()) {
+      $this->markTestSkipped('Resource type is not mutable or locatable.');
+    }
+    $base_path = $this->container->getParameter('jsonapi.base_path');
+    $resource_path = $base_path . $this->resourceType->getPath();
+    $request_options = [];
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
+
+    // POST on collection path.
+    $collection_url = Url::fromUri('base:' . $resource_path);
+    $response = $this->request('POST', $collection_url, $request_options);
+    $this->assertSame(405, $response->getStatusCode());
+    $this->assertContains('GET', explode(', ', $response->getHeaderLine('Allow')));
+
+    // PATCH and DELETE on individual path.
+    $individual_url = Url::fromUri('base:' . $resource_path . '/' . $this->entity->uuid());
+    $response = $this->request('PATCH', $individual_url, $request_options);
+    $this->assertSame(405, $response->getStatusCode());
+    $this->assertContains('GET', explode(', ', $response->getHeaderLine('Allow')));
+    $response = $this->request('DELETE', $individual_url, $request_options);
+    $this->assertSame(405, $response->getStatusCode());
+    $this->assertContains('GET', explode(', ', $response->getHeaderLine('Allow')));
+  }
+
+  /**
    * Tests POST/PATCH/DELETE for an individual resource.
    */
   public function testIndividual(): void {
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestDeleteIndividual();
   }
 
@@ -2054,18 +2082,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
-
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
-    if ($this->resourceType->isLocatable()) {
-      $this->assertSame(['GET'], $response->getHeader('Allow'));
-    }
-    else {
-      $this->assertSame([''], $response->getHeader('Allow'));
-    }
-
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
@@ -2287,13 +2303,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
-
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
-
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
@@ -2589,13 +2598,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
-
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('DELETE', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
-
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
@@ -3308,7 +3310,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // Ensures that PATCH and DELETE on individual resources with a
     // `resourceVersion` query parameter is not supported.

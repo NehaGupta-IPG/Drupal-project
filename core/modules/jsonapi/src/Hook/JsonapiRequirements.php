@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\jsonapi\Hook;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
 
 /**
  * Requirements for the JSON:API module.
@@ -19,7 +17,6 @@ class JsonapiRequirements {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly ConfigFactoryInterface $configFactory,
     protected readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
@@ -60,11 +57,10 @@ class JsonapiRequirements {
       'value' => $this->t('Read-only'),
       'severity' => RequirementSeverity::Info,
     ];
-    if (!$this->configFactory->get('jsonapi.settings')->get('read_only')) {
+    if ($this->moduleHandler->moduleExists('jsonapi_write')) {
       $requirements['jsonapi_read_only_mode']['value'] = $this->t('All (create, read, update, delete)');
-      $requirements['jsonapi_read_only_mode']['description'] = $this->t('It is recommended to <a href=":configure-url">configure</a> JSON:API to only accept all operations if the site requires it. <a href=":docs">Learn more about securing your site with JSON:API.</a>', [
+      $requirements['jsonapi_read_only_mode']['description'] = $this->t('It is recommended to uninstall the JSON:API Write module unless the site requires write operations. <a href=":docs">Learn more about securing your site with JSON:API.</a>', [
         ':docs' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/jsonapi-module/security-considerations',
-        ':configure-url' => Url::fromRoute('jsonapi.settings')->toString(),
       ]);
     }
     return $requirements;

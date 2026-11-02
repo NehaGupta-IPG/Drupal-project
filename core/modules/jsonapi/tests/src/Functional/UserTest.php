@@ -254,12 +254,7 @@ class UserTest extends ResourceTestBase {
     $normalization['data']['attributes']['mail'] = 'new-email@example.com';
     $request_options[RequestOptions::BODY] = Json::encode($normalization);
 
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
-
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // DX: 422 when changing email without providing the password.
     $response = $this->request('PATCH', $url, $request_options);
@@ -372,12 +367,7 @@ class UserTest extends ResourceTestBase {
     $normalization['data']['attributes']['mail'] = 'new-email@example.com';
     $request_options[RequestOptions::BODY] = Json::encode($normalization);
 
-    // DX: 405 when read-only mode is enabled.
-    $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
-    $this->assertSame(['GET'], $response->getHeader('Allow'));
-
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
 
     // Try changing user 1's email.
     $user1 = $original_normalization;
@@ -617,7 +607,7 @@ class UserTest extends ResourceTestBase {
    * Tests users with altered display names.
    */
   public function testResaveAccountName(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->setUpAuthorization('PATCH');
 
     $original_name = $this->entity->get('name')->value;
@@ -646,7 +636,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testDeleteRespectsUserCancelBlock(): void {
     $cancel_method = 'user_cancel_block';
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->config('user.settings')->set('cancel_method', $cancel_method)->save();
 
     $account = $this->createAnotherEntity($cancel_method);
@@ -676,7 +666,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testDeleteRespectsUserCancelBlockUnpublish(): void {
     $cancel_method = 'user_cancel_block_unpublish';
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->config('user.settings')->set('cancel_method', $cancel_method)->save();
 
     $account = $this->createAnotherEntity($cancel_method);
@@ -707,7 +697,7 @@ class UserTest extends ResourceTestBase {
   #[Group('jsonapi')]
   public function testDeleteRespectsUserCancelBlockUnpublishAndProcessesBatches(): void {
     $cancel_method = 'user_cancel_block_unpublish';
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->config('user.settings')->set('cancel_method', $cancel_method)->save();
 
     $account = $this->createAnotherEntity($cancel_method);
@@ -753,7 +743,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testDeleteRespectsUserCancelReassign(): void {
     $cancel_method = 'user_cancel_reassign';
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->config('user.settings')->set('cancel_method', $cancel_method)->save();
 
     $account = $this->createAnotherEntity($cancel_method);
@@ -784,7 +774,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testDeleteRespectsUserCancelDelete(): void {
     $cancel_method = 'user_cancel_delete';
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
+    $this->container->get('module_installer')->install(['jsonapi_write']);
     $this->config('user.settings')->set('cancel_method', $cancel_method)->save();
 
     $account = $this->createAnotherEntity($cancel_method);

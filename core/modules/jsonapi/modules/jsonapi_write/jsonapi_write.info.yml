@@ -1,0 +1,7 @@
+name: 'JSON:API Write'
+type: module
+description: 'Enables write (POST, PATCH, DELETE) operations for the JSON:API module.'
+package: Web services
+version: VERSION
+dependencies:
+  - drupal:jsonapi
