@@ -247,6 +247,7 @@ lrdd
 lstitle
 ltitle
 mainpage
+maint
 maryjane
 maximumred
 maxlifetime
@@ -268,7 +269,9 @@ mocktails
 moderatable
 modernizr
 mojito
+mset
 msgctxt
+mstatus
 multibuys
 multibyte
 multicardinality
