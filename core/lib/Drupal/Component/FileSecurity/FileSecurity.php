@@ -12,6 +12,11 @@ namespace Drupal\Component\FileSecurity;
 class FileSecurity {
 
   /**
+   * CSP-header value for image/svg+xml files.
+   */
+  public const string CSP_SVG_HEADER = "default-src 'none'; img-src data:; style-src 'unsafe-inline'";
+
+  /**
    * Writes an .htaccess file in the given directory, if it doesn't exist.
    *
    * @param string $directory
@@ -60,6 +65,7 @@ class FileSecurity {
    *   Apache htaccess directives to prevent execution of files in a location.
    */
   protected static function htaccessPreventExecution() {
+    $header = self::CSP_SVG_HEADER;
     return <<<EOF
 # Turn off all options we don't need.
 Options -Indexes -ExecCGI -Includes -MultiViews
@@ -74,6 +80,15 @@ SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
 # If we know how to do it safely, disable the PHP engine entirely.
 <IfModule mod_php.c>
   php_flag engine off
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch \.(?i:svgz?)$>
+    # Prevent script execution in SVG files.
+    Header set Content-Security-Policy "{$header}"
+  </FilesMatch>
+  # Also detect SVG MIME type
+  Header set Content-Security-Policy "{$header}" "expr=%{CONTENT_TYPE} == 'image/svg+xml'"
 </IfModule>
 EOF;
   }

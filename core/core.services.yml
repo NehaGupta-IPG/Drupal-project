@@ -1496,6 +1496,7 @@ services:
   finish_response_subscriber:
     class: Drupal\Core\EventSubscriber\FinishResponseSubscriber
     arguments: ['@language_manager', '@config.factory', '@page_cache_request_policy', '@page_cache_response_policy', '@cache_contexts_manager', '@datetime.time', '%http.response.debug_cacheability_headers%']
+  Drupal\Core\EventSubscriber\FileDownloadCspSubscriber: ~
   response_generator_subscriber:
     class: Drupal\Core\EventSubscriber\ResponseGeneratorSubscriber
   redirect_response_subscriber:

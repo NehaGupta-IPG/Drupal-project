@@ -61,6 +61,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringNotContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
+    $this->assertStringContainsString("Header set Content-Security-Policy \"default-src 'none'; img-src data:; style-src 'unsafe-inline'\"", $content);
     $this->assertFilePermissions($this->public . '/.htaccess', 0444);
 
     $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
@@ -74,6 +75,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
+    $this->assertStringContainsString("Header set Content-Security-Policy \"default-src 'none'; img-src data:; style-src 'unsafe-inline'\"", $content);
     $this->assertFilePermissions($private . '/.htaccess', 0444);
 
     $this->assertTrue($this->htaccessWriter->write($private));
@@ -87,6 +89,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
+    $this->assertStringContainsString("Header set Content-Security-Policy \"default-src 'none'; img-src data:; style-src 'unsafe-inline'\"", $content);
     $this->assertFilePermissions($stream . '/.htaccess', 0444);
 
     $this->assertTrue($this->htaccessWriter->write($stream));
