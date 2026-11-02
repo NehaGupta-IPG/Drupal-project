@@ -762,4 +762,31 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     return $dependent_ids;
   }
 
+  /**
+   * @covers ::getEntityTypeIdByName
+   */
+  public function testGetEntityTypeIdByName(): void {
+    /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
+    $config_manager = \Drupal::service('config.manager');
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('config_test');
+    $entity_1 = $storage->create(
+      [
+        'id' => 'entity_1',
+      ]
+    );
+    $entity_1->save();
+
+    // Test for config entity with type.
+    // Do a dry run using.
+    // \Drupal\Core\Config\ConfigManager::getEntityTypeIdByName().
+    $config_entities = $config_manager->getEntityTypeIdByName($entity_1->getConfigDependencyName());
+    $this->assertEquals('config_test', $config_entities, 'Entity type id is correct.');
+
+    // Test for simple config.
+    $this->assertNull($config_manager->getEntityTypeIdByName('system.site'), 'No entity type ID should be returned for system.site.');
+
+  }
+
 }
