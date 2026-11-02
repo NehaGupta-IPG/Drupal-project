@@ -134,4 +134,93 @@ class MenuLinkContentFormTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Custom Home');
   }
 
+  /**
+   * Tests that absolute URLs pointing at this site are saved as internal.
+   */
+  public function testReformatInternalLinkIfEnteredAsExternal(): void {
+    $base_url = rtrim($this->getAbsoluteUrl('/'), '/');
+
+    // Each case is the string entered in the link field, followed by the URI
+    // the menu link is expected to be saved with.
+    $cases = [
+      // An absolute URL for this site is rewritten as an internal URI.
+      [$base_url . '/user/login', 'internal:/user/login'],
+      // The query and the fragment are preserved.
+      [$base_url . '/user/login?foo=bar#baz', 'internal:/user/login?foo=bar#baz'],
+      // The site root is rewritten as the front page.
+      [$base_url, 'internal:/'],
+      // A host that merely starts with this site's host is left untouched.
+      [$base_url . '.example.com/user/login', $base_url . '.example.com/user/login'],
+      // Genuinely external URLs are left untouched.
+      ['https://www.example.com/user/login', 'https://www.example.com/user/login'],
+      // Schemes carrying no host are left untouched, and do not error.
+      ['mailto:test@example.com', 'mailto:test@example.com'],
+      ['tel:+15551234567', 'tel:+15551234567'],
+    ];
+
+    $this->assertLinksSavedAs($cases);
+  }
+
+  /**
+   * Tests that absolute URLs for a trusted host are saved as internal.
+   */
+  public function testReformatInternalLinkIfEnteredForATrustedHost(): void {
+    // A site can be served from more than one domain, in which case all of
+    // them are listed in the trusted host patterns. The host being browsed
+    // has to stay among them for the rest of the test to be served.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => [
+        '^' . preg_quote(\Drupal::request()->getHost()) . '$',
+        '^static\.example\.com$',
+      ],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // The other domain serves the same site, so it carries the same base path.
+    $base_path = rtrim(parse_url($this->getAbsoluteUrl('/'), PHP_URL_PATH), '/');
+    $trusted_base_url = 'http://static.example.com' . $base_path;
+
+    $this->assertLinksSavedAs([
+      // A URL for the other domain is rewritten as an internal URI, whether or
+      // not the site is being browsed on that domain.
+      [$trusted_base_url . '/user/login', 'internal:/user/login'],
+      [$trusted_base_url . '/user/login?foo=bar#baz', 'internal:/user/login?foo=bar#baz'],
+      // The scheme plays no part in the comparison.
+      ['https://static.example.com' . $base_path . '/user/login', 'internal:/user/login'],
+      // Hosts are matched case-insensitively.
+      ['http://STATIC.example.com' . $base_path . '/user/login', 'internal:/user/login'],
+      // The root of the other domain is rewritten as the front page.
+      [$trusted_base_url, 'internal:/'],
+      // A domain the site is not served from is left untouched, even when it
+      // is close to a trusted one.
+      ['http://untrusted.example.com/user/login', 'http://untrusted.example.com/user/login'],
+      ['http://static.example.com.evil.com/user/login', 'http://static.example.com.evil.com/user/login'],
+    ]);
+  }
+
+  /**
+   * Asserts that entered links are saved with the URI that is expected.
+   *
+   * @param array $cases
+   *   Each case is the string entered in the link field, followed by the URI
+   *   the menu link is expected to be saved with.
+   */
+  protected function assertLinksSavedAs(array $cases): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+    foreach ($cases as $delta => [$entered, $expected]) {
+      $title = 'Test link ' . $delta;
+      $this->drupalGet('admin/structure/menu/manage/admin/add');
+      $this->submitForm([
+        'title[0][value]' => $title,
+        'link[0][uri]' => $entered,
+      ], 'Save');
+
+      $links = $storage->loadByProperties(['title' => $title]);
+      $link = reset($links);
+      $this->assertNotFalse($link, "The menu link entered as '$entered' was saved.");
+      $this->assertSame($expected, $link->link->uri, "The link entered as '$entered' was saved with the expected URI.");
+    }
+  }
+
 }

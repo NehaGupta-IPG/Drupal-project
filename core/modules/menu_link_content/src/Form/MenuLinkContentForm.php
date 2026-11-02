@@ -3,12 +3,14 @@
 namespace Drupal\menu_link_content\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\system\MenuInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -114,8 +116,79 @@ class MenuLinkContentForm extends ContentEntityForm {
     $entity->menu_name->value = $menu_name;
     $entity->enabled->value = (!$form_state->isValueEmpty(['enabled', 'value']));
     $entity->expanded->value = (!$form_state->isValueEmpty(['expanded', 'value']));
+    $entity->link->uri = $this->reformatInternalLinkIfEnteredAsExternal($entity->link->uri);
 
     return $entity;
+  }
+
+  /**
+   * Reformat an internal link if it was entered as an external one.
+   *
+   * @param string $uri
+   *   The URI to possibly reformat.
+   *
+   * @return string
+   *   The possibly reformatted link.
+   */
+  protected function reformatInternalLinkIfEnteredAsExternal(string $uri): string {
+    // Schemes such as mailto: and tel: are external but carry no host to
+    // compare, and neither do the paths that are already internal.
+    $parts = UrlHelper::isExternal($uri) ? parse_url($uri) : FALSE;
+    if (!$parts || empty($parts['host']) || !$this->isLocalHost($parts['host'])) {
+      return $uri;
+    }
+
+    $base_path = $this->getRequest()->getBasePath();
+    $path = $parts['path'] ?? '';
+    // A URL pointing at the site root may be entered without its trailing
+    // slash, leaving no path for the base path to be matched against below.
+    if ($path === '' || $path === $base_path) {
+      $path .= '/';
+    }
+    // The trailing slash anchors the base path so that a partial match, such
+    // as /subdirectory against /subdir, is not mistaken for a local URL.
+    if (!str_starts_with($path, $base_path . '/')) {
+      return $uri;
+    }
+
+    // The entered URL points at this site, so drop the base path and keep the
+    // rest.
+    return 'internal:' . substr($path, strlen($base_path))
+      . (isset($parts['query']) ? '?' . $parts['query'] : '')
+      . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
+  }
+
+  /**
+   * Checks whether a host is one this site is served from.
+   *
+   * @param string $host
+   *   The host of the URI that was entered.
+   *
+   * @return bool
+   *   TRUE if the host is the one being browsed or a trusted host, FALSE if
+   *   not.
+   */
+  protected function isLocalHost(string $host): bool {
+    if (strcasecmp($host, $this->getRequest()->getHost()) === 0) {
+      return TRUE;
+    }
+
+    // A site can be served from several domains, all of which are listed in
+    // the trusted host patterns. A URL entered for any of them points at this
+    // site as much as one entered for the domain being browsed does. The
+    // patterns are wrapped the way Symfony wraps them when it validates the
+    // host of an incoming request, so that the same hosts match here.
+    $patterns = array_map(
+      static fn ($pattern) => sprintf('{%s}i', $pattern),
+      Settings::get('trusted_host_patterns', [])
+    );
+    foreach ($patterns as $pattern) {
+      if (preg_match($pattern, $host)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
   /**
