@@ -373,6 +373,14 @@ final class Settings implements ContainerInjectionInterface {
       '#default_value' => $account ? $this->get('show_description_toggle', $account) : $this->getDefault('show_description_toggle'),
     ];
 
+    // Sticky action buttons.
+    $form['sticky_action_buttons'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable sticky action buttons'),
+      '#description' => $this->t('Displays all actions of the form in the sticky header.'),
+      '#default_value' => $account ? $this->get('sticky_action_buttons', $account) : $this->getDefault('sticky_action_buttons'),
+    ];
+
     if (!$account) {
       foreach ($form as $key => $element) {
         $form[$key]['#after_build'][] = [__CLASS__, 'overriddenSettingByUser'];
