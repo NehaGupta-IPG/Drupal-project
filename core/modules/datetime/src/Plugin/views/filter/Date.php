@@ -58,6 +58,20 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   protected $requestStack;
 
   /**
+   * Mapping of granularity values to their corresponding date formats.
+   *
+   * @var array
+   */
+  protected $dateFormats = [
+    'second' => 'Y-m-d\TH:i:s',
+    'minute' => 'Y-m-d\TH:i',
+    'hour'   => 'Y-m-d\TH',
+    'day'    => 'Y-m-d',
+    'month'  => 'Y-m',
+    'year'   => 'Y',
+  ];
+
+  /**
    * Constructs a new Date handler.
    *
    * @param array $configuration
@@ -84,6 +98,61 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
       // as date-only.
       $this->calculateOffset = FALSE;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
+    parent::buildOptionsForm($form, $form_state);
+
+    $options = [];
+    // Only show granularity options for times if the field supports a time.
+    if ($this->fieldStorageDefinition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATETIME) {
+      $options = [
+        'second' => $this->t('Second'),
+        'minute' => $this->t('Minute'),
+        'hour'   => $this->t('Hour'),
+      ];
+    }
+    // All fields (datetime or date-only) will need these options.
+    $options['day'] = $this->t('Day');
+    $options['month'] = $this->t('Month');
+    $options['year'] = $this->t('Year');
+
+    $form['granularity'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Granularity'),
+      '#options' => $options,
+      '#description' => $this->t('The granularity is the smallest unit to use when determining whether two dates are the same; for example, if the granularity is "Year" then all dates in 1999, regardless of when they fall in 1999, will be considered the same date.'),
+      '#default_value' => $this->options['granularity'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+
+    $options['granularity'] = [
+      // The default depends on if the field is date-only or includes time.
+      'default' => $this->fieldStorageDefinition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATETIME ? 'second' : 'day',
+    ];
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query(): void {
+    // Set the date format based on granularity.
+    if (isset($this->dateFormats[$this->options['granularity']])) {
+      $this->dateFormat = $this->dateFormats[$this->options['granularity']];
+    }
+
+    parent::query();
   }
 
   /**
@@ -145,12 +214,20 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     // Although both 'min' and 'max' values are required, default empty 'min'
     // value as UNIX timestamp 0.
     $min = (!empty($this->value['min'])) ? $this->value['min'] : '@0';
+    $max = $this->value['max'];
+
+    // If year granularity is specified, then suffix with month and day to
+    // force DateTimePlus to treat the input as a proper date value.
+    if ($this->options['granularity'] == 'year') {
+      $min = preg_replace('/^(\d{4})$/', '$1-01-01', $min);
+      $max = preg_replace('/^(\d{4})$/', '$1-01-01', $max);
+    }
 
     // Convert to ISO format and format for query. UTC timezone is used since
     // dates are stored in UTC.
     $a = new DateTimePlus($min, new \DateTimeZone($timezone));
     $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
+    $b = new DateTimePlus($max, new \DateTimeZone($timezone));
     $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
 
     // This is safe because we are manually scrubbing the values.
@@ -166,10 +243,32 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     $timezone = $this->getTimezone();
     $origin_offset = $this->getOffset($this->value['value'], $timezone);
 
-    // Convert to ISO. UTC timezone is used since dates are stored in UTC.
-    $value = new DateTimePlus($this->value['value'], new \DateTimeZone($timezone));
-    $value = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($value->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+    // If year granularity is specified, then suffix with month and day to
+    // force DateTimePlus to treat the input as a proper date value.
+    $date_value = $this->value['value'];
+    if ($this->options['granularity'] === 'year') {
+      $date_value = preg_replace('/^(\d{4})$/', '$1-01-01', $date_value);
+      $this->calculateOffset = FALSE;
+    }
 
+    if ($this->options['granularity'] === 'month') {
+      $date_value = preg_replace('/^([0-1]?[0-9]?)$/', '0000-$1-01', $date_value);
+      $this->calculateOffset = FALSE;
+    }
+
+    // Does the value supplied by the filter need to have timezone offsets
+    // applied? If we've got a datetime field but are using day granularity, we
+    // want to convert the stored field values, but *not* the supplied filter
+    // value. That way, since dates are always stored in UTC, if that's not the
+    // same as the user's TZ or the default site-wide TZ, the query will find
+    // values that match whatever is being requested. If we also convert the
+    // filter value to UTC, we won't find date-only matches if the current time
+    // is a different date in UTC.
+    $value_needs_offset = $this->options['granularity'] === 'day' ? FALSE : $this->calculateOffset;
+
+    // Convert to ISO. UTC timezone is used since dates are stored in UTC.
+    $value = new DateTimePlus($date_value, new \DateTimeZone($timezone));
+    $value = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($value->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $timezone) . "'", TRUE, $value_needs_offset), $this->dateFormat, TRUE);
     // This is safe because we are manually scrubbing the value.
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
     $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");

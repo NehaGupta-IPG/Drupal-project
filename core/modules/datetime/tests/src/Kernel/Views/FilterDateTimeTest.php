@@ -57,7 +57,7 @@ class FilterDateTimeTest extends DateTimeHandlerTestBase {
       '2002-10-10T14:14:14',
       // The date storage timezone is used (this mimics the steps taken in the
       // widget: \Drupal\datetime\Plugin\Field\FieldWidget::messageFormValues().
-      \Drupal::service('date.formatter')->format(static::$date, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE),
+      \Drupal::service('date.formatter')->format(static::$date, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, static::$timezone),
     ];
     foreach ($dates as $date) {
       $node = Node::create([

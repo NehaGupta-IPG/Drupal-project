@@ -21,6 +21,10 @@ views.argument.datetime_year_month:
 
 views.filter.datetime:
   type: views.filter.date
+  mapping:
+    granularity:
+      type: string
+      label: 'Granularity'
 
 views.filter_value.datetime:
   type: views.filter_value.date
