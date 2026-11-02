@@ -1852,7 +1852,7 @@ services:
   Drupal\Core\Template\TwigEnvironment: '@twig'
   twig.extension:
     class: Drupal\Core\Template\TwigExtension
-    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator']
+    arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator', '@Drupal\Core\Render\RenderVisibilityResolver']
     tags:
       - { name: twig.extension, priority: 100 }
   Drupal\Core\Template\ComponentsTwigExtension:
@@ -1950,6 +1950,9 @@ services:
     class: Drupal\Core\Render\Renderer
     arguments: ['@callable_resolver', '@theme.manager', '@plugin.manager.element_info', '@render_placeholder_generator', '@render_cache', '@request_stack', '%renderer.config%']
   Drupal\Core\Render\RendererInterface: '@renderer'
+  Drupal\Core\Render\RenderVisibilityResolver:
+    class: Drupal\Core\Render\RenderVisibilityResolver
+    arguments: ['@callable_resolver']
   early_rendering_controller_wrapper_subscriber:
     class: Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber
     arguments: ['@http_kernel.controller.argument_resolver', '@renderer']

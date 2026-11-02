@@ -12,6 +12,7 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RenderVisibilityResolver;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -37,6 +38,7 @@ class ThemePreprocess {
     protected RouteMatchInterface $routeMatch,
     protected ThemeManagerInterface $themeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
+    protected RenderVisibilityResolver $visibilityResolver,
   ) {
   }
 
@@ -338,6 +340,19 @@ class ThemePreprocess {
     foreach ($this->themeManager->getActiveTheme()->getRegions() as $region) {
       if (!isset($variables['page'][$region])) {
         $variables['page'][$region] = [];
+      }
+    }
+
+    // Pre-compute region visibility by evaluating #access_callbacks.
+    // This allows Twig templates to use standard truthiness checks
+    // (e.g., {% if page.sidebar %}) without triggering full rendering
+    // of regions, preserving BigPipe and Dynamic Page Cache behavior.
+    foreach ($this->themeManager->getActiveTheme()->getRegions() as $region) {
+      if (!empty($variables['page'][$region]) && is_array($variables['page'][$region])) {
+        $result = $this->visibilityResolver->resolveAccess($variables['page'][$region]);
+        if ($result->isForbidden()) {
+          $variables['page'][$region]['#access'] = FALSE;
+        }
       }
     }
 

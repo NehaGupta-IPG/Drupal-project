@@ -11,6 +11,7 @@ use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderableInterface;
+use Drupal\Core\Render\RenderVisibilityResolver;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -71,6 +72,13 @@ class TwigExtension extends AbstractExtension {
   protected $fileUrlGenerator;
 
   /**
+   * The render visibility resolver.
+   *
+   * @var \Drupal\Core\Render\RenderVisibilityResolver
+   */
+  protected $visibilityResolver;
+
+  /**
    * Constructs \Drupal\Core\Template\TwigExtension.
    *
    * @param \Drupal\Core\Render\RendererInterface $renderer
@@ -83,13 +91,16 @@ class TwigExtension extends AbstractExtension {
    *   The date formatter.
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
+   * @param \Drupal\Core\Render\RenderVisibilityResolver $visibility_resolver
+   *   The render visibility resolver.
    */
-  public function __construct(RendererInterface $renderer, UrlGeneratorInterface $url_generator, ThemeManagerInterface $theme_manager, DateFormatterInterface $date_formatter, FileUrlGeneratorInterface $file_url_generator) {
+  public function __construct(RendererInterface $renderer, UrlGeneratorInterface $url_generator, ThemeManagerInterface $theme_manager, DateFormatterInterface $date_formatter, FileUrlGeneratorInterface $file_url_generator, RenderVisibilityResolver $visibility_resolver) {
     $this->renderer = $renderer;
     $this->urlGenerator = $url_generator;
     $this->themeManager = $theme_manager;
     $this->dateFormatter = $date_formatter;
     $this->fileUrlGenerator = $file_url_generator;
+    $this->visibilityResolver = $visibility_resolver;
   }
 
   /**
@@ -159,6 +170,10 @@ class TwigExtension extends AbstractExtension {
       new TwigFilter('format_date', [$this->dateFormatter, 'format']),
       // Add new theme hook suggestions directly from a Twig template.
       new TwigFilter('add_suggestion', [$this, 'suggestThemeHook']),
+      // Lightweight visibility check: evaluates #access_callback without
+      // triggering a full render. Returns TRUE if the element is accessible
+      // and has visible content.
+      new TwigFilter('render_access', [$this, 'renderAccess']),
     ];
   }
 
@@ -618,6 +633,33 @@ class TwigExtension extends AbstractExtension {
     }
     $arg['#printed'] = FALSE;
     return $this->renderer->render($arg);
+  }
+
+  /**
+   * Checks if a render array has accessible content without full rendering.
+   *
+   * Unlike the |render filter, this evaluates #access_callback without
+   * triggering a full render. This avoids breaking BigPipe and Dynamic
+   * Page Cache by not forcing deferred content to render prematurely.
+   *
+   * Usage in Twig:
+   * @code
+   *   {% if page.sidebar|render_access %}
+   *     <aside>{{ page.sidebar }}</aside>
+   *   {% endif %}
+   * @endcode
+   *
+   * @param mixed $arg
+   *   A render array, string, or other value.
+   *
+   * @return bool
+   *   TRUE if the element is accessible and has visible content.
+   */
+  public function renderAccess($arg): bool {
+    if (!is_array($arg) || empty($arg)) {
+      return !empty($arg);
+    }
+    return $this->visibilityResolver->isVisible($arg);
   }
 
   /**
