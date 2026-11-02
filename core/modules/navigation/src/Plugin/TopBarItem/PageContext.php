@@ -152,23 +152,24 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    */
   protected function getBadgeLabel(EntityInterface $entity): ?string {
     if ($entity instanceof ContentEntityInterface && $this->moderationInformation && $this->moderationInformation->isModeratedEntity($entity)) {
-      $state_label = $this->moderationInformation
+      $type_plugin = $this->moderationInformation
         ->getWorkflowForEntity($entity)
-        ->getTypePlugin()
+        ->getTypePlugin();
+      $state_label = $type_plugin
         ->getState($entity->get('moderation_state')->value)
         ->label();
-      if ($this->moderationInformation->hasPendingRevision($entity) && $entity->isDefaultRevision()) {
-        $active_revision = $this->entityRepository->getActive($entity->getEntityTypeId(), $entity->id());
+      if ($this->moderationInformation->hasPendingRevision($entity)) {
+        $other_revision = $entity->isDefaultRevision()
+          ? $this->entityRepository->getActive($entity->getEntityTypeId(), $entity->id())
+          : $this->entityRepository->getCanonical($entity->getEntityTypeId(), $entity->id());
 
-        $active_state_label = $this->moderationInformation
-          ->getWorkflowForEntity($entity)
-          ->getTypePlugin()
-          ->getState($active_revision->get('moderation_state')->value)
+        $other_state_label = $type_plugin
+          ->getState($other_revision->get('moderation_state')->value)
           ->label();
 
         $state_label = $this->t('@state_label (@active_state_label available)', [
           '@state_label' => $state_label,
-          '@active_state_label' => $active_state_label,
+          '@active_state_label' => $other_state_label,
         ]);
       }
       return (string) $state_label;

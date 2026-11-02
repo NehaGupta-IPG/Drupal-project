@@ -257,6 +257,55 @@ class PageContextTest extends UnitTestCase {
   }
 
   /**
+   * Tests the badge when viewing a pending revision of moderated content.
+   */
+  public function testBuildContentModerationViewingPendingRevision(): void {
+    // The viewed revision is the pending 'draft'; the default revision, exposed
+    // via the entity repository canonical lookup, is 'published'.
+    $entity = $this->prophesize(ContentEntityInterface::class);
+    $entity->get('moderation_state')->willReturn((object) ['value' => 'draft']);
+    $entity->isDefaultRevision()->willReturn(FALSE);
+    $entity->getEntityTypeId()->willReturn('node');
+    $entity->id()->willReturn('1');
+    $entity->label()->willReturn('Example Title');
+
+    $canonical = $this->prophesize(ContentEntityInterface::class);
+    $canonical->get('moderation_state')->willReturn((object) ['value' => 'published']);
+
+    // State objects and labels.
+    $draft_state = $this->prophesize(StateInterface::class);
+    $draft_state->label()->willReturn('Draft');
+    $published_state = $this->prophesize(StateInterface::class);
+    $published_state->label()->willReturn('Published');
+
+    $type = $this->prophesize(WorkflowTypeInterface::class);
+    $type->getState('draft')->willReturn($draft_state->reveal());
+    $type->getState('published')->willReturn($published_state->reveal());
+
+    $workflow = $this->prophesize(WorkflowInterface::class);
+    $workflow->getTypePlugin()->willReturn($type->reveal());
+
+    $moderation = $this->prophesize(ModerationInformationInterface::class);
+    $moderation->isModeratedEntity($entity->reveal())->willReturn(TRUE);
+    $moderation->getWorkflowForEntity($entity->reveal())->willReturn($workflow->reveal());
+    $moderation->hasPendingRevision($entity->reveal())->willReturn(TRUE);
+
+    $entity_repository = $this->prophesize(EntityRepositoryInterface::class);
+    $entity_repository->getCanonical('node', '1')->willReturn($canonical->reveal());
+
+    $route_helper = $this->prophesize(EntityRouteHelper::class);
+    $route_helper->getContentEntityFromRoute()->willReturn($entity->reveal());
+
+    $plugin = new PageContext([], 'page_context', [], $route_helper->reveal(), $entity_repository->reveal(), $moderation->reveal());
+    $build = $plugin->build();
+
+    $this->assertSame('Example Title', $build[0]['#slots']['content']);
+    $this->assertSame('navigation:badge', $build[1]['#component']);
+    $this->assertSame('Draft (Published available)', $build[1]['#slots']['label']);
+    $this->assertSame('info', $build[1]['#props']['status']);
+  }
+
+  /**
    * Tests the behavior of a plugin with no valid badge present.
    */
   public function testNoValidBadge(): void {

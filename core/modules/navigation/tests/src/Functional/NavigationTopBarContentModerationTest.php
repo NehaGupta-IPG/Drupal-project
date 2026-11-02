@@ -74,7 +74,7 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
     // Confirm that Edit option is featured  in Latest version page.
     $this->clickLink('Latest version');
     $this->assertSession()->elementNotContains('xpath', '//*[@id="top-bar-page-actions"]/ul', 'Edit');
-    $this->assertSession()->elementContains('css', '.toolbar-badge--info', 'Draft');
+    $this->assertSession()->elementContains('css', '.toolbar-badge--info', 'Draft (Published available)');
     $this->assertSession()->elementTextEquals('xpath', "//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/a[contains(@class, 'toolbar-button--icon--pencil')]", "Edit");
   }
 
