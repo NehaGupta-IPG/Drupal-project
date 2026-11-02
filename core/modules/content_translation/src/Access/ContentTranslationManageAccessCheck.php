@@ -101,8 +101,10 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
           $handler = $this->entityTypeManager->getHandler($entity->getEntityTypeId(), 'translation');
           $translations = $entity->getTranslationLanguages();
           $languages = $this->languageManager->getLanguages();
-          $source_language = $this->languageManager->getLanguage($source) ?: $entity->language();
-          $target_language = $this->languageManager->getLanguage($target) ?: $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT);
+          $source_language = $source !== NULL ? $this->languageManager->getLanguage($source) : NULL;
+          $source_language ??= $entity->language();
+          $target_language = $target !== NULL ? $this->languageManager->getLanguage($target) : NULL;
+          $target_language ??= $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT);
           $is_new_translation = ($source_language->getId() != $target_language->getId()
             && isset($languages[$source_language->getId()])
             && isset($languages[$target_language->getId()])
