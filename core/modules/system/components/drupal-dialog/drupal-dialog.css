@@ -1,0 +1,136 @@
+/* dialog.css — structural base, no theme */
+
+drupal-dialog {
+  display: contents;
+}
+
+dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--dialog-width, 880px), 95vw);
+  max-width: var(--dialog-max-width, 880px);
+  max-height: 90dvh;
+  padding: 0;
+  color: #333;
+  border: 1px solid #c5c5c5;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow:
+    0 8px 32px rgb(0, 0, 0, 0.28),
+    0 2px 8px rgb(0, 0, 0, 0.18);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog[open] {
+  position: fixed;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  inset: 0;
+}
+
+@media (max-width: 48em) {
+  dialog {
+    min-width: 92%;
+    max-width: 92%;
+  }
+}
+
+@media (forced-colors: active) {
+  dialog {
+    border: 1px solid transparent;
+  }
+}
+
+dialog::backdrop {
+  background: rgb(0, 0, 0, 0.45);
+}
+
+/* Titlebar */
+.dialog__titlebar {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0.75rem 3.5rem 0.75rem 1.25rem;
+  color: #fff;
+  border-radius: 4px 4px 0 0;
+  background: #232429;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.5;
+}
+.dialog__titlebar:empty {
+  display: none;
+}
+
+/* Close button */
+.dialog__titlebar-close {
+  position: absolute;
+  top: 50%;
+  inset-inline: auto 0.625rem;
+  overflow: hidden;
+  width: 1.875rem;
+  height: 1.875rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  text-indent: -624.9375rem;
+  color: inherit;
+  border: 1px solid transparent;
+  background-color: transparent;
+  appearance: none;
+
+  &:focus {
+    outline: solid 2px currentColor;
+    outline-offset: 2px;
+  }
+
+  /* The plus icon. */
+  &::before,
+  &::after {
+    position: absolute;
+    top: calc(50% - 1px);
+    left: 50%;
+    width: 50%;
+    height: 0;
+    content: "";
+    border-top: solid 2px currentColor;
+  }
+
+  &::before {
+    transform: translate(-50%, 50%) rotate(-45deg);
+  }
+
+  &::after {
+    transform: translate(-50%, 50%) rotate(45deg);
+  }
+}
+
+/* Sizing classes */
+.dialog--narrow {
+  --dialog-width: 500px;
+  --dialog-max-width: 500px;
+}
+
+.dialog--wide {
+  --dialog-width: 1100px;
+  --dialog-max-width: 1100px;
+}
+
+.dialog--x-wide {
+  --dialog-width: 95vw;
+  --dialog-max-width: 95vw;
+
+  min-height: min(75vh, var(--dialog-height-x-wide));
+}
+
+/* Content */
+.dialog-content {
+  overflow: auto;
+  flex: 1 1 auto;
+  padding: 1.25rem 1.5rem;
+  background: #fff;
+}

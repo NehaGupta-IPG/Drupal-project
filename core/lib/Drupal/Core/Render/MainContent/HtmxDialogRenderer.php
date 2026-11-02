@@ -1,0 +1,185 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Core\Render\MainContent;
+
+use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Controller\TitleResolverInterface;
+use Drupal\Core\Render\HtmlResponse;
+use Drupal\Core\Render\RenderCacheInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * Main content renderer for HTMX dialog requests.
+ *
+ * This renderer is invoked when:
+ * - The HTMX request adds the `_wrapper_format` query parameter with value
+ *   `drupal_htmx_dialog.*`.
+ * - The route has the `_htmx_route` option set to TRUE.
+ *
+ * Attachments in HTML responses are handled by
+ * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
+ * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
+ *
+ * @see \Drupal\Core\EventSubscriber\MainContentViewSubscriber
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
+ * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
+ * @see \Drupal\Core\Render\BareHtmlPageRenderer
+ * @see \Drupal\Core\Render\HtmlResponse
+ * @see \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+ * @see \Drupal\Core\PathProcessor\HtmxDialogPathProcessor
+ */
+class HtmxDialogRenderer implements MainContentRendererInterface {
+
+  /**
+   * The default swap strategy is to insert the dialog after the target element.
+   */
+  protected string $swapStrategy = 'afterend';
+
+  /**
+   * Constructs a new HtmxRenderer.
+   */
+  public function __construct(
+    protected TitleResolverInterface $titleResolver,
+    protected RendererInterface $renderer,
+    protected RenderCacheInterface $renderCache,
+    protected array $rendererConfig,
+  ) {
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * We only wrap the necessary content into a full HTML document to be
+   * processed by HTMX on the frontend.
+   */
+  public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
+    // Generate a target based on the route id.
+    $route_name = str_replace('.', '-dot-', $route_match->getRouteName());
+    $dialogId = Html::getId("drupal-dialog-$route_name");
+    $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
+    $dialog = $this->generateDialog($main_content, $dialogId, $title, $request);
+    // Prepare the page with placeholders for assets.
+    $token = Crypt::randomBytesBase64(55);
+    $html = [
+      '#type' => 'inline_template',
+      // Add a noindex meta tag to make sure this response will not be indexed.
+      '#template' => <<<HTMX_RESPONSE
+<!doctype html>
+<html>
+<head>
+<meta name="robots" content="noindex">
+<title>{{ title }}</title>
+<css-placeholder token="{{ placeholder_token }}">
+<js-placeholder token="{{ placeholder_token }}">
+<js-bottom-placeholder token="{{ placeholder_token }}">
+</head>
+<body>
+  <hx-partial hx-target="{{ dialog_target }}" hx-swap="delete"></hx-partial>
+  <hx-partial hx-target="[data-off-canvas-main-canvas]" hx-swap="{{ swap_strategy }}">
+    {{ dialog }}
+  </hx-partial>
+</body>
+</html>
+HTMX_RESPONSE,
+      '#context' => [
+        'title' => $title,
+        'dialog' => $dialog,
+        'dialog_target' => '#' . $dialogId,
+        'placeholder_token' => $token,
+        'swap_strategy' => $this->swapStrategy,
+      ],
+    ];
+    // Create placeholder strings for these keys.
+    // @see \Drupal\Core\Render\HtmlResponseSubscriber
+    $types = [
+      'styles' => 'css',
+      'scripts' => 'js',
+      'scripts_bottom' => 'js-bottom',
+    ];
+    foreach ($types as $type => $placeholder_name) {
+      $placeholder = '<' . $placeholder_name . '-placeholder token="' . $token . '">';
+      $html['#attached']['html_response_attachment_placeholders'][$type] = $placeholder;
+    }
+
+    // Render, but don't replace placeholders yet, because that happens later in
+    // the render pipeline. To not replace placeholders yet, we use
+    // RendererInterface::render() instead of RendererInterface::renderRoot().
+    // @see \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
+    $render_context = new RenderContext();
+    $this->renderer->executeInRenderContext($render_context, function () use (&$html) {
+      // RendererInterface::render() renders the $html render array and updates
+      // it in place. We don't care about the return value (which is just
+      // $html['#markup']), but about the resulting render array.
+      // @todo Simplify this when https://www.drupal.org/node/2495001 lands.
+      $this->renderer->render($html);
+    });
+    // RendererInterface::render() always causes bubbleable metadata to be
+    // stored in the render context, no need to check it conditionally.
+    $bubbleable_metadata = $render_context->pop();
+    $bubbleable_metadata->applyTo($html);
+    $content = $this->renderCache->getCacheableRenderArray($html);
+
+    // Also associate the required cache contexts.
+    // (Because we use ::render() above and not ::renderRoot(), we manually must
+    // ensure the HTML response varies by the required cache contexts.)
+    $content['#cache']['contexts'] = Cache::mergeContexts($content['#cache']['contexts'], $this->rendererConfig['required_cache_contexts']);
+
+    // Also associate the "rendered" cache tag. This allows us to invalidate the
+    // entire render cache, regardless of the cache bin.
+    $content['#cache']['tags'][] = 'rendered';
+
+    $response = new HtmlResponse($content, 200, [
+      'Content-Type' => 'text/html; charset=utf-8',
+      // Make sure bots do not show this response in search results.
+      'X-Robots-Tag' => 'noindex',
+    ]);
+
+    return $response;
+  }
+
+  /**
+   * Generate a dialog component based on the provided main content.
+   *
+   * Provides an overridable method for generating a dialog component.
+   * This allows child classes to set a different variant.
+   *
+   * @param array $main_content
+   *   The main content to be displayed within the dialog.
+   * @param string $dialogId
+   *   The unique identifier for the dialog.
+   * @param mixed $title
+   *   The title of the dialog.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request object.
+   *
+   * @return array
+   *   The generated dialog render array..
+   */
+  protected function generateDialog(array $main_content, string $dialogId, mixed $title, Request $request): array {
+    if ($request->query->has('class')) {
+      $dialogClasses = $request->query->get('class');
+      $dialogClasses = [$dialogClasses];
+    }
+    return [
+      '#type' => 'component',
+      '#component' => 'system:drupal-dialog',
+      '#variant' => 'default',
+      '#slots' => [
+        'content' => $main_content,
+      ],
+      '#props' => [
+        'id' => $dialogId,
+        'title' => $title,
+        'dialog_classes' => $dialogClasses ?? [],
+      ],
+    ];
+  }
+
+}

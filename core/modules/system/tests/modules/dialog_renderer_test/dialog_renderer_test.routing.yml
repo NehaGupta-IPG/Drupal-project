@@ -45,3 +45,19 @@ dialog_renderer_test.modal_form:
     _title: 'Modal Form'
   requirements:
     _access: 'TRUE'
+
+dialog_renderer_test.htmx_markup:
+  path: '/htmx-dialog-test-markup'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogTestController::testMarkup'
+    _title: 'Dialogs via htmx'
+  requirements:
+    _access: 'TRUE'
+
+dialog_renderer_test.dialog_content:
+  path: '/htmx-dialog-content'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogTestController::dialogContent'
+    _title: 'Thing 1'
+  requirements:
+    _access: 'TRUE'

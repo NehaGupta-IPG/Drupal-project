@@ -1,0 +1,63 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Drupal Dialog
+description: A web component wrapping a dialog element. Used by HtmxDialogRenderer but functionally independent.
+status: experimental
+group: Dialog
+
+variants:
+  default:
+    title: Default
+    description: A standard, non-modal dialog.
+  modal:
+    title: Modal
+    description: A blocking, or modal, dialog.
+  off-canvas:
+    title: Off-canvas
+    description: An interactive element that is inserted at the side, rather than above the document.
+
+props:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      title: ID attribute.
+      type: string
+    title:
+      title: Title
+      type: string
+      description: Label for the dialog title bar
+    position:
+      type: string
+      title: Dialog position
+      description: Only used by core for off-canvas, defaults to 'side'.
+      enum:
+        - top
+        - side
+      default: side
+    dialog_classes:
+      type: array
+      title: Extra classes for the dialog tag
+      items:
+        type: string
+      default: {}
+
+slots:
+  content:
+    title: Content
+    description: The content provided for the dialog
+
+libraryOverrides:
+  css:
+    component:
+      drupal-dialog.css: {}
+      off-canvas/reset.css: {}
+      off-canvas/ajax.css: {}
+      off-canvas/base.css: {}
+      off-canvas/form.css: {}
+      off-canvas/table.css: {}
+  js:
+    drupal-dialog.js: {}
+  dependencies:
+    - core/drupal.displace
