@@ -125,6 +125,25 @@ class ExceptionHandlingTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a non-scalar _wrapper_format does not escalate to a 500.
+   *
+   * The request has already failed with a BadRequestHttpException, and
+   * HttpExceptionSubscriberBase re-reads the same malformed array value while
+   * building the error response. That second read must not throw, so the
+   * response stays a clean 400 instead of becoming an unhandled 500.
+   */
+  public function testNonScalarWrapperFormat(): void {
+    $request = Request::create('/not-found', 'GET', ['_wrapper_format' => ['drupal_ajax']]);
+    $request->setFormat('html', ['text/html']);
+
+    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $kernel */
+    $kernel = \Drupal::getContainer()->get('http_kernel');
+    $response = $kernel->handle($request)->prepare($request);
+
+    $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+  }
+
+  /**
    * Tests that the exception response is executed in the original context.
    */
   public function testExceptionResponseGeneratedForOriginalRequest(): void {

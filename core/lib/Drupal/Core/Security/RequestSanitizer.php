@@ -3,6 +3,7 @@
 namespace Drupal\Core\Security;
 
 use Drupal\Component\Utility\UrlHelper;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -94,7 +95,13 @@ class RequestSanitizer {
     }
 
     if ($bag->has('destination')) {
-      $destination = $bag->get('destination');
+      // A non-scalar destination throws from InputBag::get(); return a 400.
+      try {
+        $destination = $bag->get('destination');
+      }
+      catch (BadRequestException $e) {
+        throw new BadRequestHttpException($e->getMessage(), $e);
+      }
       $destination_dangerous_keys = static::checkDestination($destination, $safe_keys);
       if (!empty($destination_dangerous_keys)) {
         // The destination is removed rather than sanitized because the URL
