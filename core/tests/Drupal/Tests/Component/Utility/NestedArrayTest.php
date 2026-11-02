@@ -293,4 +293,54 @@ class NestedArrayTest extends TestCase {
     return $data;
   }
 
+  /**
+   * @legacy-covers ::arrayWalkNested
+   */
+  public function testArrayWalkNested(): void {
+    $firstArray = [
+      'one' => 1,
+      'nest' => [
+        'two' => 2,
+        'three' => 3,
+        'nest' => [
+          'four' => 4,
+        ],
+      ],
+      'five' => 5,
+    ];
+    $secondArray = $firstArray;
+
+    // Applies a callback to each value of a nested array.
+    NestedArray::arrayWalkNested($firstArray, function (&$value, $parents) {
+      $value = $value . ' - ' . implode(':', $parents);
+    });
+
+    $this->assertEquals([
+      'one' => '1 - one',
+      'nest' => [
+        'two' => '2 - nest:two',
+        'three' => '3 - nest:three',
+        'nest' => [
+          'four' => '4 - nest:nest:four',
+        ],
+      ],
+      'five' => '5 - five',
+    ], $firstArray);
+
+    $output = [];
+
+    // Reads a nested array and applies the values to other array.
+    NestedArray::arrayWalkNested($secondArray, function ($value, $parents) use (&$output) {
+      $output[] = $value . ' - ' . implode(':', $parents);
+    });
+
+    $this->assertEquals([
+      '1 - one',
+      '2 - nest:two',
+      '3 - nest:three',
+      '4 - nest:nest:four',
+      '5 - five',
+    ], $output);
+  }
+
 }
