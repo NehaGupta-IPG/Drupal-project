@@ -85,4 +85,57 @@ final class RevisionVersionHistoryTranslatableTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists($firstRevision->getTranslation('es')->toUrl('revision-delete-form')->toString());
   }
 
+  /**
+   * Tests the version history page in a language with no translation.
+   */
+  public function testVersionHistoryUntranslatedInCurrentLanguage(): void {
+    $label = 'view all revisions,revert,delete revision';
+    $entity = EntityTestMulWithRevisionLog::create([
+      'name' => $label,
+      'type' => 'entity_test_mul_revlog',
+    ]);
+    $entity->save();
+
+    $entity->setNewRevision();
+    $entity->setName($label . ',2')
+      ->save();
+
+    $this->drupalGet($entity->toUrl('version-history', ['language' => ConfigurableLanguage::load('es')]));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 2);
+  }
+
+  /**
+   * Tests the version history page after a translation has been removed.
+   */
+  public function testVersionHistoryRemovedTranslation(): void {
+    $label = 'view all revisions,revert,delete revision';
+    $entity = EntityTestMulWithRevisionLog::create([
+      'name' => $label,
+      'type' => 'entity_test_mul_revlog',
+    ]);
+    $entity->addTranslation('es', ['name' => $label . ',es']);
+    $entity->save();
+    $firstRevisionId = $entity->getRevisionId();
+
+    $entity->setNewRevision();
+    $entity->removeTranslation('es');
+    $entity->setName($label . ',2')
+      ->save();
+    $secondRevisionId = $entity->getRevisionId();
+
+    $this->drupalGet($entity->toUrl('version-history', ['language' => ConfigurableLanguage::load('es')]));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 2);
+
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    // The revision that still has the translation is shown translated.
+    $firstRevision = $storage->loadRevision($firstRevisionId);
+    $this->assertSession()->linkByHrefExists($firstRevision->getTranslation('es')->toUrl('revision-revert-form')->toString());
+    // The revision without the translation falls back to its own language.
+    $secondRevision = $storage->loadRevision($secondRevisionId);
+    $this->assertFalse($secondRevision->hasTranslation('es'));
+  }
+
 }
