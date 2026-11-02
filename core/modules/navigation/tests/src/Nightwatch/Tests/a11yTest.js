@@ -2,11 +2,9 @@ const navigationTest = {
   '@tags': ['core', 'a11y', 'a11y:admin', 'navigation'],
 
   before(browser) {
-    browser
-      .drupalInstall({
-        installProfile: 'nightwatch_a11y_testing',
-      })
-      .drupalInstallModule('navigation', true);
+    browser.drupalInstall({
+      installProfile: 'nightwatch_a11y_testing',
+    });
   },
   after(browser) {
     browser.drupalUninstall();
