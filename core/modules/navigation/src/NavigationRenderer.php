@@ -79,6 +79,19 @@ final class NavigationRenderer {
    * @see hook_page_top()
    */
   public function buildNavigation(array &$page_top): void {
+    // Attach outside the #lazy_builder element. Extra properties on that
+    // element are not allowed, and assets attached only inside the callback
+    // can be delayed by BigPipe.
+    $page_top['navigation_anti_flicker'] = [
+      '#cache' => [
+        'contexts' => ['user.permissions'],
+      ],
+      '#attached' => [
+        'library' => [
+          'navigation/navigation.anti-flicker',
+        ],
+      ],
+    ];
     $page_top['navigation'] = [
       '#cache' => [
         'keys' => ['navigation', 'navigation'],
