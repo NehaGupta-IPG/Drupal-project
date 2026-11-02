@@ -636,23 +636,29 @@ END;
 
     $log_file = $this->getWorkspaceDirectory() . '/' . self::PROJECT_ROOT_RELATIVE . EventLogSubscriber::LOG_FILE_NAME;
     $max_wait = time() + $wait;
+    $log_data = [];
     do {
-      $this->assertFileIsReadable($log_file);
-      $log_data = file_get_contents($log_file);
-      $log_data = json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
+      // The log file is only created when the first event is logged. If the
+      // events happen in the background, that may not have happened yet, so
+      // keep waiting.
+      if (file_exists($log_file)) {
+        $log_data = file_get_contents($log_file);
+        $log_data = json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
 
-      // Filter out events logged by any other stage.
-      $log_data = array_filter($log_data, fn (array $event): bool => $event['stage'] === $expected_stage_class);
+        // Filter out events logged by any other stage.
+        $log_data = array_filter($log_data, fn (array $event): bool => $event['stage'] === $expected_stage_class);
 
-      // If we've logged at least the expected number of events, stop waiting.
-      // Break out of the loop and assert the expected events were logged.
-      if (count($log_data) >= count($expected_events)) {
-        break;
+        // If we've logged at least the expected number of events, stop waiting.
+        // Break out of the loop and assert the expected events were logged.
+        if (count($log_data) >= count($expected_events)) {
+          break;
+        }
       }
       // Wait a bit before checking again.
       sleep(5);
     } while ($max_wait > time());
 
+    $this->assertFileIsReadable($log_file);
     $this->assertSame($expected_events, array_column($log_data, 'event'), $message);
   }
 
