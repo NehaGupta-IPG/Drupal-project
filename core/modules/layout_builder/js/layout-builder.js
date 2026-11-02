@@ -4,7 +4,7 @@
  */
 
 (($, Drupal, Sortable) => {
-  const { ajax, behaviors, debounce, announce, formatPlural } = Drupal;
+  const { ajax, behaviors, debounce, announce } = Drupal;
 
   /*
    * Boolean that tracks if block listing is currently being filtered. Declared
@@ -78,7 +78,7 @@
             .hide();
 
           announce(
-            formatPlural(
+            Drupal.formatPlural(
               $categories.find('.js-layout-builder-block-link:visible').length,
               '1 block is available in the modified list.',
               '@count blocks are available in the modified list.',
