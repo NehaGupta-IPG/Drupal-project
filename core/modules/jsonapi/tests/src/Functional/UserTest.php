@@ -177,7 +177,7 @@ class UserTest extends ResourceTestBase {
    */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = parent::getExpectedCacheContexts($sparse_fieldset);
-    if ($sparse_fieldset === NULL || !empty(array_intersect(['mail', 'display_name'], $sparse_fieldset))) {
+    if ($sparse_fieldset === NULL || !empty(array_intersect(['roles', 'mail', 'display_name'], $sparse_fieldset))) {
       $cache_contexts = Cache::mergeContexts($cache_contexts, ['user']);
     }
     return $cache_contexts;
@@ -458,6 +458,51 @@ class UserTest extends ResourceTestBase {
     $doc = $this->getDocumentFromResponse($response);
     $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
     $this->assertArrayHasKey('mail', $doc['data'][2]['attributes']);
+  }
+
+  /**
+   * Tests that users can only see their own roles if they have permission.
+   */
+  public function testGetRolesRelationshipOnlyIfAllowed(): void {
+    $this->setUpAuthorization('GET');
+    $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['sort' => 'drupal_internal__uid']]);
+    $user_url = Url::fromRoute('jsonapi.user--user.individual', ['entity' => $this->account->uuid()]);
+    $request_options = [];
+    $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
+    $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
+
+    $user_url->setOption('query', ['include' => 'roles']);
+
+    // Check that the 'roles' relationship is not visible by default.
+    $response = $this->request('GET', $user_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayNotHasKey('roles', $doc['data']['relationships'] ?? [], "Own user--user.individual resource's 'roles' relationship is not visible.");
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayNotHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is not visible.");
+
+    // Now grant permission to view own roles.
+    $this->grantPermissionsToTestedRole(['view own roles']);
+
+    // Check that the 'roles' relationship is now visible.
+    $response = $this->request('GET', $user_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertArrayHasKey('relationships', $doc['data']);
+    $this->assertArrayHasKey('roles', $doc['data']['relationships'], "Own user--user.individual resource's 'roles' relationship is visible.");
+    // Also when looking at the collection.
+    $response = $this->request('GET', $collection_url, $request_options);
+    $doc = $this->getDocumentFromResponse($response);
+    $this->assertSame($this->account->uuid(), $doc['data']['2']['id']);
+    $this->assertArrayHasKey('relationships', $doc['data'][2]);
+    $this->assertArrayHasKey('roles', $doc['data'][2]['relationships'] ?? [], "Own user--user.collection resource's 'roles' relationship is visible.");
+    // The roles of other users stay hidden.
+    $other_users = array_filter($doc['data'], fn (array $resource) => $resource['id'] !== $this->account->uuid());
+    $this->assertNotEmpty($other_users);
+    foreach ($other_users as $resource) {
+      $this->assertArrayNotHasKey('roles', $resource['relationships'] ?? [], "Other user--user.collection resource's 'roles' relationship is not visible.");
+    }
   }
 
   /**
