@@ -292,6 +292,10 @@ class TermTest extends TaxonomyTestBase {
 
     // Create the term to edit.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
+
+    // Ensure the new updated title is taking for new term creation.
+    $this->assertSession()->pageTextNotContains('Add new term in ' . $this->vocabulary->label());
+
     $this->submitForm($edit, 'Save');
 
     // Ensure form redirected back to term add page.

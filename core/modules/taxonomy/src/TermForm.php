@@ -22,10 +22,22 @@ class TermForm extends ContentEntityForm {
     /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
     $taxonomy_storage = $this->entityTypeManager->getStorage('taxonomy_term');
     $vocabulary = $vocab_storage->load($term->bundle());
+    if ($term->isNew() && $vocabulary->label()) {
+      $form['#title'] = $this->t('<em>Add new term in</em> %parent', [
+        '%parent' => $vocabulary->label(),
+      ]);
+    }
 
     $parent = $this->getParentIds($term);
     $form_state->set(['taxonomy', 'parent'], $parent);
     $form_state->set(['taxonomy', 'vocabulary'], $vocabulary);
+
+    if (!$term->isNew()) {
+      $form['#title'] = $this->t('<em>Edit @title in </em> @type', [
+        '@type' => $vocabulary->getName() ?? '',
+        '@title' => $term->label(),
+      ]);
+    }
 
     $form['relations'] = [
       '#type' => 'details',
