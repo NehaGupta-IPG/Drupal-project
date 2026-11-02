@@ -8,6 +8,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
@@ -327,6 +330,13 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     }
     foreach ($empty_destinations as $field_name) {
       $entity->$field_name = NULL;
+    }
+
+    if (!empty($this->configuration['new_revision']) && $entity instanceof RevisionableInterface && $this->storage instanceof RevisionableStorageInterface) {
+      if ($entity instanceof RevisionLogInterface) {
+        $entity->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+      }
+      $entity = $this->storage->createRevision($entity, $this->configuration['default_revision'] ?? TRUE, $this->configuration['keep_untranslatable_fields'] ?? NULL);
     }
 
     $this->setRollbackAction($row->getIdMap(), $rollback_action);
