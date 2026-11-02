@@ -1152,6 +1152,7 @@ class ViewEditForm extends ViewFormBase {
     // Filters can now be grouped so we do a little bit extra:
     $groups = [];
     $grouping = FALSE;
+    $group_info = [];
     if ($type == 'filter') {
       $group_info = $executable->display_handler->getOption('filter_groups');
       // If there is only one group but it is using the "OR" filter, we still
@@ -1235,9 +1236,9 @@ class ViewEditForm extends ViewFormBase {
       if ($grouping) {
         $gid = $handler->options['group'];
 
-        // Show in default group if the group does not exist.
+        // Show in the first configured group if the group does not exist.
         if (empty($group_info['groups'][$gid])) {
-          $gid = 0;
+          $gid = array_key_first($group_info['groups']);
         }
         $groups[$gid][] = $id;
       }
