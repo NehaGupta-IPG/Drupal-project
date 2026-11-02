@@ -43,6 +43,23 @@ views.area.text_custom:
       type: boolean
       label: 'Use replacement tokens from the first row'
 
+views.area.link:
+  type: views_area
+  label: 'Link'
+  mapping:
+    path:
+      type: string
+      label: 'The URL or path to link to'
+    title:
+      type: label
+      label: 'The text of the link'
+    class:
+      type: string
+      label: 'CSS classes of the link'
+    tokenize:
+      type: boolean
+      label: 'Use replacement tokens from the first row'
+
 views.area.result:
   type: views_area
   label: 'Result'
