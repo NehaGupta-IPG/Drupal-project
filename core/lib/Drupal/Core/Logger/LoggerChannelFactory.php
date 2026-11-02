@@ -32,10 +32,13 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
    *   (optional) The request stack.
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   (optional) The current user.
+   * @param iterable<\Psr\Log\LoggerInterface> $containerLoggers
+   *   The logger services, sorted by descending priority.
    */
   public function __construct(
     protected RequestStack $requestStack,
     protected AccountInterface $currentUser,
+    protected iterable $containerLoggers = [],
   ) {
   }
 
@@ -43,6 +46,21 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
    * {@inheritdoc}
    */
   public function get($channel) {
+    if ($this->containerLoggers !== []) {
+      // Clear the iterator before resolving logger services, since their
+      // dependencies may request a channel themselves.
+      $loggers = $this->containerLoggers;
+      $this->containerLoggers = [];
+      foreach ($loggers as $logger) {
+        // The tagged iterator has already sorted the services by priority.
+        $this->loggers[0][] = $logger;
+      }
+      // Update channels requested while logger services were being resolved.
+      foreach ($this->channels as $instance) {
+        $instance->setLoggers($this->loggers);
+      }
+    }
+
     if (!isset($this->channels[$channel])) {
       $instance = new LoggerChannel($channel);
 
