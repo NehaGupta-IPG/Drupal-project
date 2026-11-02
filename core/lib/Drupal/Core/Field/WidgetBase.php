@@ -589,7 +589,31 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
             $delta_element = $element[$original_delta];
           }
           foreach ($delta_violations as $violation) {
+            $violation_element = $delta_element;
+            $property_path = $violation->getPropertyPath();
+            // Remove the delta from the property path.
+            if (is_numeric($property_path[0])) {
+              $property_path = substr($property_path, strpos($property_path, '.') + 1);
+            }
+
+            // If the violation is for a specific property, find the element
+            // that corresponds to it.
+            $property_path = explode('.', $property_path);
             $error_element = $this->errorElement($delta_element, $violation, $form, $form_state);
+            if ($property_path) {
+              $violation_element = NestedArray::getValue($delta_element, $property_path, $exists);
+              if (
+                $exists
+                && Element::isVisibleElement($violation_element)
+                // Some elements return the property as part of the
+                // ::errorElement method. Trying to descend into it would
+                // result in an property not found error.
+                && $violation_element !== $error_element
+              ) {
+                $error_element = $this->errorElement($violation_element, $violation, $form, $form_state);
+              }
+            }
+
             if ($error_element !== FALSE) {
               $form_state->setError($error_element, $violation->getMessage());
             }
