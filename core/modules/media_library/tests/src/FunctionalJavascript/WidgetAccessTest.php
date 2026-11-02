@@ -85,10 +85,10 @@ class WidgetAccessTest extends MediaLibraryTestBase {
     // Allow users with 'view media' permission to access the media library view
     // and controller. Since we are using the node entity type in the state
     // object, ensure the user also has permission to work with those.
-    $this->grantPermissions($role, [
+    $role->grantPermissions([
       'create basic_page content',
       'view media',
-    ]);
+    ])->save();
     $this->drupalGet('admin/content/media-widget', $url_options);
     $assert_session->elementExists('css', '.js-media-library-view');
     $this->drupalGet('admin/content/media-widget-table', $url_options);
@@ -110,9 +110,7 @@ class WidgetAccessTest extends MediaLibraryTestBase {
 
     // Assert users with the 'create media' permission can access the media add
     // form.
-    $this->grantPermissions($role, [
-      'create media',
-    ]);
+    $role->grantPermission('create media')->save();
     $this->drupalGet('media-library', $url_options);
     $assert_session->elementExists('css', '.js-media-library-view');
     $assert_session->fieldExists('Add files');

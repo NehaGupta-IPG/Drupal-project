@@ -60,10 +60,10 @@ class ContentTranslationEnableTest extends BrowserTestBase {
     $this->drupalGet('admin/reports/status');
     $this->assertSession()->elementTextEquals('css', "details.system-status-report__entry summary:contains('Entity/field definitions') + div", 'Up to date');
 
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), [
+    Role::load(Role::AUTHENTICATED_ID)->grantPermissions([
       'administer content translation',
       'administer languages',
-    ]);
+    ])->save();
     $this->drupalGet('admin/config/regional/content-language');
     // The node entity type should not be an option because it has no bundles.
     $this->assertSession()->responseNotContains('entity_types[node]');

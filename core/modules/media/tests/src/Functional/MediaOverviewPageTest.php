@@ -53,7 +53,7 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
     $this->drupalGet('/admin/content/media');
     $assert_session->statusCodeEquals(403);
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
-    $this->grantPermissions($role, ['access media overview']);
+    $role->grantPermission('access media overview')->save();
     $this->getSession()->reload();
     $assert_session->statusCodeEquals(200);
     $assert_session->titleEquals('Media | Drupal');
@@ -108,11 +108,11 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
 
     // Verify the view is now correctly populated. The non-admin user can only
     // view published media.
-    $this->grantPermissions($role, [
+    $role->grantPermissions([
       'view media',
       'update any media',
       'delete any media',
-    ]);
+    ])->save();
     $this->getSession()->reload();
     $row1 = $assert_session->elementExists('css', 'table tbody tr:nth-child(1)');
     $row2 = $assert_session->elementExists('css', 'table tbody tr:nth-child(2)');
@@ -283,7 +283,7 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
     $this->submitForm([], 'Save');
 
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
-    $this->grantPermissions($role, ['access media overview']);
+    $role->grantPermission('access media overview')->save();
     $this->drupalGet('/admin/content/media');
     $this->assertSession()->statusCodeEquals(200);
     // Assert we are using the user_name filter.

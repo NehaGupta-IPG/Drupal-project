@@ -91,7 +91,7 @@ class ModerationContentTranslationTest extends BrowserTestBase {
     $workflow = $this->createEditorialWorkflow();
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'article');
     $workflow->save();
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), ['use editorial transition publish']);
+    Role::load(Role::AUTHENTICATED_ID)->grantPermission('use editorial transition publish')->save();
 
     // Edit the English node.
     $this->drupalGet('node/' . $english_node->id() . '/edit');
