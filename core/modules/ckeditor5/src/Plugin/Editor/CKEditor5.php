@@ -577,15 +577,13 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $json = $form_state->getValue(['toolbar', 'items']);
-    $toolbar_items = Json::decode($json);
-
     // This basic validation must live in the form logic because it can only
     // occur in a form context.
-    if (!$toolbar_items) {
+    if (!json_validate($json)) {
       $form_state->setErrorByName('toolbar][items', $this->t('Invalid toolbar value.'));
       return;
     }
-
+    $toolbar_items = Json::decode($json);
     // Construct a Text Editor config entity with the submitted values for
     // validation. Do this on a clone: do not manipulate form state.
     $submitted_editor = clone $form_state->get('editor');
