@@ -9,9 +9,6 @@
 
 declare(strict_types=1);
 
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
-
 /**
  * Finds all valid extension directories recursively within a given directory.
  *
@@ -160,15 +157,3 @@ mb_language('uni');
 // and DST). This choice is made to prevent timezone related regressions and
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
-
-// Get deprecation override handling as early as possible, depending on the
-// extension configuration.
-try {
-  DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
-}
-catch (\AssertionError) {
-  // In case this script is executed outside of a PHPUnit test run, the
-  // configuration is not defined, so we cannot bootstrap the deprecation
-  // handler extension. In such case, do nothing.
-  // @see core/scripts/test-site.php for an example.
-}

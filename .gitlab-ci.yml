@@ -128,8 +128,8 @@ default:
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
       optional: true
-    - job: '🧹 PHP Static Analysis (phpstan)'
-      optional: true
+#    - job: '🧹 PHP Static Analysis (phpstan)'
+#      optional: true
     - job: '📦 Composer'
       optional: true
 
@@ -243,6 +243,7 @@ default:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
       - ./sites/default/files/simpletest/phpunit-*.xml
+      - ./sites/default/files/simpletest/otr
       - ./sites/simpletest/browser_output
       - '*.log'
 
@@ -983,7 +984,7 @@ default:
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ /var/cache/opcache-cli
   script:
     - export EXIT_CODE=0
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --debug-discovery --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
@@ -997,6 +998,7 @@ default:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
       - ./sites/default/files/simpletest/phpunit-*.xml
+      - ./sites/default/files/simpletest/otr
 
 '📋 PHPUnit Unit (Component)':
   # Jobs that produce metrics must run on performance test pipelines so MRs show
@@ -1036,7 +1038,7 @@ default:
     # file of its own located in the core/tests/Drupal/Tests/Component
     # directory.
     - export EXIT_CODE=0
-    - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --log-junit $_ARTIFACTS_DIR/junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
+    - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --log-junit $_ARTIFACTS_DIR/junit.xml --log-otr $_ARTIFACTS_DIR/otr.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100

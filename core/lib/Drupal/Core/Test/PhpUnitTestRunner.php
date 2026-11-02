@@ -4,6 +4,7 @@ namespace Drupal\Core\Test;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -51,10 +52,15 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
-    return new static(
+    $fileSystem = $container->get('file_system');
+    $filePath = 'public://simpletest';
+    $instance = new static(
       (string) $container->getParameter('app.root'),
-      (string) $container->get('file_system')->realpath('public://simpletest')
+      (string) $fileSystem->realpath($filePath),
     );
+    $filePath .= '/otr';
+    $fileSystem->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+    return $instance;
   }
 
   /**
@@ -188,6 +194,21 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
   }
 
   /**
+   * Returns the path to use for PHPUnit's --log-otr option.
+   *
+   * @param int $test_id
+   *   The current test ID.
+   *
+   * @return string
+   *   Path to the PHPUnit XML file to use for the current $test_id.
+   *
+   * @internal
+   */
+  private function otrLogFilePath(int $test_id): string {
+    return $this->workingDirectory . '/otr/test-' . $test_id . '.xml';
+  }
+
+  /**
    * Returns the command to run PHPUnit.
    *
    * @return string
@@ -274,6 +295,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--testdox',
       '--log-junit',
       $log_junit_file_path,
+      '--log-otr',
+      $this->otrLogFilePath($test_run->id()),
     ];
     if ($colors) {
       $command[] = '--colors=always';

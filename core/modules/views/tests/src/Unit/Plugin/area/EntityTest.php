@@ -126,11 +126,11 @@ class EntityTest extends UnitTestCase {
    */
   protected function setupEntityTypeManager(): void {
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->entityTypeManager
+    $this->entityTypeManager->expects($this->once())
       ->method('getStorage')
       ->with('entity_test')
       ->willReturn($this->entityStorage);
-    $this->entityTypeManager
+    $this->entityTypeManager->expects($this->once())
       ->method('getViewBuilder')
       ->with('entity_test')
       ->willReturn($this->entityViewBuilder);
@@ -145,7 +145,7 @@ class EntityTest extends UnitTestCase {
     $this->stylePlugin = $this->createMock(StylePluginBase::class);
 
     $this->display = $this->createMock(DisplayPluginBase::class);
-    $this->display
+    $this->display->expects($this->once())
       ->method('getPlugin')
       ->with('style')
       ->willReturn($this->stylePlugin);

@@ -7,7 +7,6 @@ namespace Drupal\Core\Test;
 use Drupal\Core\Test\Exception\MissingGroupException;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
-use PHPUnit\Framework\DataProviderTestSuite;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
@@ -124,7 +123,7 @@ class PhpUnitTestDiscovery {
       $container = \Drupal::getContainer();
       $containerObjectId = spl_object_id($container);
     }
-    $phpUnitTestSuite = (new TestSuiteBuilder())->build($phpUnitConfiguration);
+    $phpUnitTestSuite = (new TestSuiteBuilder(EventFacade::emitter()))->build($phpUnitConfiguration);
     if (isset($containerObjectId) && $containerObjectId !== spl_object_id(\Drupal::getContainer())) {
       $this->addWarning(
         ">>> The service container was changed during the test discovery <<<\n" .
@@ -328,29 +327,17 @@ class PhpUnitTestDiscovery {
   private function getTestClassInfo(Test $testClass, string $testSuite): array {
     $reflection = new \ReflectionClass($testClass->name());
 
-    // In PHPUnit 11+, we need to coalesce the groups from individual tests
-    // as they may not be available from the test class level (when tests are
-    // backed by data providers).
     $tmp = [];
-    foreach ($testClass as $test) {
-      if ($test instanceof DataProviderTestSuite) {
-        foreach ($test as $testWithData) {
-          if ($testWithData->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-            throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testWithData->valueObjectForEvents()->id()));
-          }
-          $tmp = array_merge($tmp, $testWithData->groups());
-        }
-      }
-      else {
-        if ($test->valueObjectForEvents()->metadata()->isGroup()->isEmpty()) {
-          throw new MissingGroupException(sprintf('Missing group metadata in test %s', $test->valueObjectForEvents()->id()));
-        }
-        $tmp = array_merge($tmp, $test->groups());
-      }
+    foreach ($testClass->tests() as $test) {
+      $tmp = array_merge($tmp, $this->getTestGroups($test));
     }
+
     $groups = array_filter(array_unique($tmp), function (string $value): bool {
-      return !str_starts_with($value, '__phpunit');
+      return $value !== 'default' && !str_starts_with($value, '__phpunit');
     });
+    if (empty($groups)) {
+      throw new MissingGroupException(sprintf('Missing group metadata in test %s', $testClass->name()));
+    }
 
     // Let PHPUnit API return the class coverage information.
     $test = $testClass;
@@ -367,14 +354,7 @@ class PhpUnitTestDiscovery {
     // Find the test cases count.
     $count = 0;
     foreach ($testClass->tests() as $testCase) {
-      if ($testCase instanceof TestCase) {
-        // If it's a straight test method, counts 1.
-        $count++;
-      }
-      else {
-        // It's a data provider test suite, count 1 per data set provided.
-        $count += count($testCase->tests());
-      }
+      $count += $this->getTestCaseCount($testCase);
     }
 
     return [
@@ -386,6 +366,55 @@ class PhpUnitTestDiscovery {
       'file' => $reflection->getFileName(),
       'tests_count' => $count,
     ];
+  }
+
+  /**
+   * Returns the test groups.
+   *
+   * In PHPUnit 13+, we need to recursively scan the test structure to find
+   * test cases, as there may be nested TestSuite collections.
+   *
+   * @param \PHPUnit\Framework\Test $test
+   *   The test.
+   * @param list<string> $groups
+   *   The test groups collected so far in recursion.
+   *
+   * @return list<string>
+   *   The test groups.
+   */
+  private function getTestGroups(Test $test, array $groups = []): array {
+    if ($test instanceof TestSuite) {
+      foreach ($test as $testItem) {
+        $groups = $this->getTestGroups($testItem, $groups);
+      }
+    }
+    else {
+      $groups = array_merge($groups, $test->groups());
+    }
+    return $groups;
+  }
+
+  /**
+   * Returns the count of test cases.
+   *
+   * @param \PHPUnit\Framework\Test $test
+   *   The test.
+   * @param int $count
+   *   The count collected so far in recursion.
+   *
+   * @return int
+   *   The count of test cases.
+   */
+  private function getTestCaseCount(Test $test, int $count = 0): int {
+    if ($test instanceof TestSuite) {
+      foreach ($test as $testItem) {
+        $count = $this->getTestCaseCount($testItem, $count);
+      }
+    }
+    else {
+      $count++;
+    }
+    return $count;
   }
 
   /**

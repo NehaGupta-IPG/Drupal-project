@@ -15,6 +15,7 @@ use Drupal\locale\Model\Overwrite;
 use Drupal\locale\Model\SourceType;
 use Drupal\locale\Model\TranslationUpdateMode;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Repeat;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore extraday lundi
@@ -133,9 +134,8 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: all existing translations.
    */
+  #[Repeat(3, 2)]
   public function testUpdateImportSourceRemote(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477');
     $config = $this->config('locale.settings');
 
     // Build the test environment.

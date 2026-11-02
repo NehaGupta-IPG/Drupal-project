@@ -144,13 +144,14 @@ class DiffOpOutputBuilderTest extends TestCase {
     $diff = $differ->diffToArray($from, $to);
     $diffOps = $diffOpBuilder->toOpsArray($diff);
     $this->assertCount(4, $diffOps);
-    $this->assertEquals($diffOps[0], new DiffOpAdd(['    - image.style.max_325x325']));
-    $this->assertEquals($diffOps[1], new DiffOpCopy(['    - image.style.max_650x650']));
-    $this->assertEquals($diffOps[2], new DiffOpChange(
-      ['    - image.style.max_325x325'],
-      ['_core:', '  default_config_hash: random_hash_string_here'],
-    ));
-    $this->assertEquals($diffOps[3], new DiffOpCopy(['fallback_image_style: max_325x325', '']));
+    $this->assertEquals(new DiffOpDelete(['    - image.style.max_650x650']), $diffOps[0]);
+    $this->assertEquals(new DiffOpCopy(['    - image.style.max_325x325']), $diffOps[1]);
+    $this->assertEquals(new DiffOpAdd([
+      '    - image.style.max_650x650',
+      '_core:',
+      '  default_config_hash: random_hash_string_here',
+    ]), $diffOps[2]);
+    $this->assertEquals(new DiffOpCopy(['fallback_image_style: max_325x325', '']), $diffOps[3]);
   }
 
 }
