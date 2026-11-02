@@ -48,6 +48,13 @@ class ComposerInspector implements LoggerAwareInterface {
   private array $packageLists = [];
 
   /**
+   * Cached results from calling composer config.
+   *
+   * Keyed by the 'key' and 'context' arguments to ::getConfig().
+   */
+  private array $configCache = [];
+
+  /**
    * A semantic version constraint for the supported version(s) of Composer.
    *
    * @see https://endoflife.date/composer
@@ -225,6 +232,10 @@ class ComposerInspector implements LoggerAwareInterface {
    * @see \Composer\Command\ConfigCommand::execute()
    */
   public function getConfig(string $key, string $context): ?string {
+    $this->invalidateCacheIfNeeded($context);
+    if (isset($this->configCache[$key]) && array_key_exists($context, $this->configCache[$key])) {
+      return $this->configCache[$key][$context];
+    }
     $this->validateExecutable();
 
     $command = ['config', $key];
@@ -243,13 +254,14 @@ class ComposerInspector implements LoggerAwareInterface {
     catch (RuntimeException $e) {
       // Assume any error from `composer config` is about an undefined key-value
       // pair which may have a known default value.
-      return match ($key) {
-        'extra' => '{}',
-        default => throw $e,
-      };
+      if ($key === 'extra') {
+        $this->configCache[$key][$context] = '{}';
+        return $this->configCache[$key][$context];
+      }
+      throw $e;
     }
     $output = $this->processCallback->getOutput();
-    return $output ? trim(implode('', $output)) : NULL;
+    return $this->configCache[$key][$context] = $output ? trim(implode('', $output)) : NULL;
   }
 
   /**
@@ -426,31 +438,44 @@ class ComposerInspector implements LoggerAwareInterface {
    * The following cached data may be invalidated:
    * - Installed package lists (see ::getInstalledPackageList()).
    *
-   * @param string $working_dir
-   *   A directory that contains a `composer.json` file, and optionally a
-   *   `composer.lock`. If either file has changed since the last time this
-   *   method was called, any cached data for the directory will be invalidated.
+   * @param string $context
+   *   The path of either the directory in which to run Composer, containing a
+   *   `composer.json` file or a specific configuration file (such as a
+   *    particular package's `composer.json`) from which to read specific
+   *    values.
    *
    * @return bool
    *   TRUE if the cached data was invalidated, otherwise FALSE.
    */
-  private function invalidateCacheIfNeeded(string $working_dir): bool {
+  private function invalidateCacheIfNeeded(string $context): bool {
     static $known_hashes = [];
 
     $invalidate = FALSE;
-    foreach (['composer.json', 'composer.lock'] as $filename) {
-      $known_hash = $known_hashes[$working_dir][$filename] ?? '';
-      // If the file doesn't exist, hash_file() will return FALSE.
-      $current_hash = @hash_file('xxh64', $working_dir . DIRECTORY_SEPARATOR . $filename);
-
-      if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
-        continue;
+    if (!is_dir($context)) {
+      // Use the same array structure as the directory path for consistency
+      // later in the method.
+      $known_hash = $known_hashes[$context][$context] ?? '';
+      $current_hash = @hash_file('xxh64', $context);
+      if (!$known_hash || !$current_hash || !hash_equals($known_hash, $current_hash)) {
+        $invalidate = TRUE;
       }
-      $known_hashes[$working_dir][$filename] = $current_hash;
-      $invalidate = TRUE;
+    }
+    else {
+      foreach (['composer.json', 'composer.lock'] as $filename) {
+        $known_hash = $known_hashes[$context][$filename] ?? '';
+        // If the file doesn't exist, hash_file() will return FALSE.
+        $current_hash = @hash_file('xxh64', $context . DIRECTORY_SEPARATOR . $filename);
+
+        if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
+          continue;
+        }
+        $known_hashes[$context][$filename] = $current_hash;
+        $invalidate = TRUE;
+      }
     }
     if ($invalidate) {
-      unset($this->packageLists[$working_dir]);
+      $this->configCache = [];
+      unset($this->packageLists[$context]);
     }
     return $invalidate;
   }
