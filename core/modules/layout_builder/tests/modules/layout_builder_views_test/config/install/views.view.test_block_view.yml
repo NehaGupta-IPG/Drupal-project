@@ -258,9 +258,11 @@ display:
       defaults:
         title: false
         use_ajax: false
+        disable_ajax_bookmarking: false
         filters: false
         filter_groups: false
       use_ajax: true
+      disable_ajax_bookmarking: false
       display_description: ''
       display_extenders: {  }
     cache_metadata:

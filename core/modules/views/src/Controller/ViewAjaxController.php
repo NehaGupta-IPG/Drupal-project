@@ -17,6 +17,7 @@ use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\views\Ajax\SetBrowserUrl;
 use Drupal\views\Ajax\ViewAjaxResponse;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutableFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -162,7 +163,12 @@ class ViewAjaxController implements ContainerInjectionInterface {
         $view->dom_id = $dom_id;
 
         $preview = $view->preview($display_id, $args);
-        if ($target_url) {
+        $bookmarkingDisabled = FALSE;
+        $display = $view->getDisplay();
+        if ($display instanceof DisplayPluginBase) {
+          $bookmarkingDisabled = $display->getOption('disable_ajax_bookmarking') ?? FALSE;
+        }
+        if ($target_url && $bookmarkingDisabled === FALSE) {
           $response->addCommand(new SetBrowserUrl($target_url->toString()));
         }
         $response->addCommand(new ReplaceCommand(".js-view-dom-id-$dom_id", $preview));

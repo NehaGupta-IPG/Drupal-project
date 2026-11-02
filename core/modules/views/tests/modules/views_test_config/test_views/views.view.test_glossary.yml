@@ -27,6 +27,7 @@ display:
           replica: false
           query_tags: {  }
       use_ajax: true
+      disable_ajax_bookmarking: false
       access:
         type: perm
         options:

@@ -867,6 +867,7 @@ display:
           query_tags: {  }
       css_class: ''
       use_ajax: false
+      disable_ajax_bookmarking: false
       group_by: false
       show_admin_links: true
       use_more: false

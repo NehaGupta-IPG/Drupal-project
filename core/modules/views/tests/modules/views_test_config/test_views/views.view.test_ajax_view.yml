@@ -48,6 +48,7 @@ display:
           table: views_test_data
           plugin_id: numeric
       use_ajax: true
+      disable_ajax_bookmarking: false
     display_plugin: default
     display_title: Default
     id: default
