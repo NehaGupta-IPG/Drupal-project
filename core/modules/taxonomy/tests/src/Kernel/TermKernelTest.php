@@ -49,6 +49,70 @@ class TermKernelTest extends KernelTestBase {
   }
 
   /**
+   * Tests setting description, keeps existing format.
+   */
+  public function testTermDescriptionFormat() {
+    $vocabulary = $this->createVocabulary();
+
+    // Function createTerm use 'plain_text' format by default.
+    $term = $this->createTerm($vocabulary);
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->setDescription($this->randomMachineName());
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->save();
+    $this->assertEquals('plain_text', $term->getFormat());
+
+    // Set format, then description.
+    $term = $this->createTerm($vocabulary);
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->setFormat('plain_text');
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->setDescription($this->randomMachineName());
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->save();
+    $this->assertEquals('plain_text', $term->getFormat());
+
+    // Set description, then format.
+    $term = $this->createTerm($vocabulary);
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->setDescription($this->randomMachineName());
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->setFormat('plain_text');
+    $this->assertEquals('plain_text', $term->getFormat());
+    $term->save();
+    $this->assertEquals('plain_text', $term->getFormat());
+
+    // Update description.
+    $term = $this->createTerm($vocabulary, [
+      'description' => [
+        'value' => $this->randomMachineName(),
+        'format' => 'full_html',
+      ],
+    ]);
+    $this->assertEquals('full_html', $term->getFormat());
+    $term->setDescription($this->randomMachineName());
+    $this->assertEquals('full_html', $term->getFormat());
+    $term->save();
+    $this->assertEquals('full_html', $term->getFormat());
+
+    // Description without format.
+    $term = Term::create([
+      'name' => $this->randomMachineName(),
+      'description' => [
+        'value' => $this->randomMachineName(),
+      ],
+      'vid' => $vocabulary->id(),
+    ]);
+    $this->assertNull($term->getFormat());
+    $term->save();
+    $this->assertNull($term->getFormat());
+    $term->setDescription($this->randomMachineName());
+    $this->assertNull($term->getFormat());
+    $term->save();
+    $this->assertNull($term->getFormat());
+  }
+
+  /**
    * Deleting a parent of a term with multiple parents does not delete the term.
    */
   public function testMultipleParentDelete(): void {
