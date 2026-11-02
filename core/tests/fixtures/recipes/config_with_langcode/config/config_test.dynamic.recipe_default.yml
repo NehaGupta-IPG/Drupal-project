@@ -1,0 +1,4 @@
+id: recipe_default
+label: 'Recipe default'
+weight: 0
+protected_property: Default

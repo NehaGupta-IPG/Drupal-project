@@ -604,9 +604,78 @@ class LocaleConfigManager {
   }
 
   /**
+   * Translates configuration data when the default langcode changes.
+   *
+   * @param string $name
+   *   The configuration name.
+   * @param array $data
+   *   The configuration data.
+   * @param string $langcode
+   *   The langcode the configuration data will be saved with.
+   * @param array $untranslated_keys
+   *   (optional) A nested array of the translatable key paths that hold
+   *   content in another language. These fall back to the English source
+   *   string when there is no translation.
+   *
+   * @return array
+   *   The translated configuration data.
+   */
+  public function getDataForDefaultLangcodeChange(string $name, array $data, string $langcode, array $untranslated_keys = []): array {
+    $translatable = $this->getTranslatableDefaultConfig($name);
+    if (empty($translatable)) {
+      return $data;
+    }
+    $source = $this->getSourceStrings($data, $translatable, $untranslated_keys);
+    $processed = $this->localeLanguages->isTranslatable($langcode) ? $this->processTranslatableData($name, $data, $translatable, $langcode) : [];
+    return NestedArray::mergeDeepArray([$data, $source, $processed], TRUE);
+  }
+
+  /**
+   * Gets the English source string for each key path present in $mask.
+   *
+   * @param array $active
+   *   The active configuration data.
+   * @param array $translatable
+   *   Translatable data array.
+   * @param array $mask
+   *   A nested array whose key paths select which entries of $translatable to
+   *   resolve to a source string.
+   *
+   * @return array
+   *   Nested array containing the untranslated source string for each key
+   *   path present in both $mask and $active. Empty if none are.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::extractUntranslatedKeys()
+   */
+  protected function getSourceStrings(array $active, array $translatable, array $mask) {
+    $source = [];
+    foreach ($mask as $key => $masked_value) {
+      if (!isset($active[$key]) || !isset($translatable[$key])) {
+        continue;
+      }
+      if (is_array($masked_value)) {
+        $value = $this->getSourceStrings($active[$key], $translatable[$key], $masked_value);
+        if (!empty($value)) {
+          $source[$key] = $value;
+        }
+      }
+      else {
+        $source[$key] = $translatable[$key]->getUntranslatedString();
+      }
+    }
+    return $source;
+  }
+
+  /**
    * Updates default configuration when new modules or themes are installed.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0.
+   *   There is no replacement.
+   *
+   * @see https://www.drupal.org/node/3623413
    */
   public function updateDefaultConfigLangcodes() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
     $this->isUpdatingFromLocale = TRUE;
     // Need to rewrite some default configuration language codes if the default
     // site language is not English.

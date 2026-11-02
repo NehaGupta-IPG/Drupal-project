@@ -1,0 +1,462 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\locale\Functional;
+
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\locale\LocaleConfigManager;
+use Drupal\locale\StringInterface;
+use Drupal\locale\TranslationString;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+// cspell:ignore chaine cadena
+/**
+ * Tests that changing the site default language retranslates configuration.
+ *
+ * @see \Drupal\language\DefaultLangcodeConfigUpdater
+ * @see \Drupal\locale\EventSubscriber\DefaultLangcodeConfigReconcileSubscriber
+ */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
+class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['language', 'locale', 'locale_test'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * The string storage used in this test.
+   *
+   * @var \Drupal\locale\StringStorageInterface
+   */
+  protected $stringStorage;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    // Ensure that batching in
+    // DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation() is
+    // tested.
+    $settings['settings']['entity_update_batch_size'] = (object) [
+      'value' => 1,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $this->stringStorage = $this->container->get('locale.storage');
+  }
+
+  /**
+   * Tests config is updated and retranslated on a default language change.
+   */
+  public function testDefaultLanguageChangeRetranslatesConfig(): void {
+    // locale_test.translation ships with langcode 'en' and English text.
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Seed a locale string translation the way importing a .po file would.
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+
+    // The default-langcode-change batch updates the configuration to the new
+    // default, then locale module's service decorator adds a step to that same
+    // batch which applies the real translated string - not just the langcode
+    // change.
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    // The seeded translation must still be exactly the one row it was
+    // before the switch, and still not customized.
+    $this->assertTranslation('locale_test.translation', 'French test', 'fr', FALSE);
+  }
+
+  /**
+   * Tests switching to a language with no translation creates no locale row.
+   *
+   * Updating untranslated shipped text to the new default must not be
+   * mistaken, anywhere in the process, for a deliberate translation of it, that
+   * would create a customized locale string.
+   */
+  public function testDefaultLanguageChangeToNonEnglishDoesNotCreateSpuriousTranslation(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'fr');
+  }
+
+  /**
+   * Tests switching back to English creates no locale row for English.
+   *
+   * English is not translatable by default - by design, locale module only
+   * deals with sources in English. None of this process may write an
+   * "English translation of English" row into locale storage, and the real
+   * French translation it passes on the way through must be left exactly as
+   * it was.
+   */
+  public function testDefaultLanguageChangeToEnglishDoesNotCreateEnglishTranslations(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'en'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'en');
+    $this->assertTranslation('locale_test.translation', 'French test', 'fr', FALSE);
+  }
+
+  /**
+   * Tests a round trip with English translatable creates no garbage row.
+   *
+   * With locale.settings:translate_english on, English stops being the one
+   * language none of this ever writes to - so this exercises the same
+   * update-then-save path
+   * testDefaultLanguageChangeToEnglishDoesNotCreateEnglishTranslations() found
+   * nothing to write for, this time with nothing stopping it from trying.
+   * Updating text back to English still must not be mistaken for a deliberate
+   * translation of it.
+   */
+  public function testDefaultLanguageChangeWithEnglishTranslatable(): void {
+    $this->config('locale.settings')->set('translate_english', TRUE)->save();
+
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'en'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'en');
+  }
+
+  /**
+   * Tests merging a pre-existing override creates no locale row.
+   *
+   * The override is written directly to storage so it never goes through
+   * locale's own onOverrideChange() and has no corresponding row in locale
+   * storage at all. Merging overrides into the active configuration is not a
+   * fresh translation and must not fabricate a locale row for content locale
+   * never had a hand in.
+   */
+  public function testDefaultLanguageChangeAbsorbingOverrideDoesNotCreateTranslation(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    // Write the override straight to storage, bypassing Config and the
+    // events a normal ->save() would fire - the same as it never having
+    // passed through locale module at all.
+    \Drupal::service('config.storage')
+      ->createCollection('language.fr')
+      ->write('locale_test.translation', ['test' => 'Override text']);
+    $this->assertNoTranslation('locale_test.translation', 'fr');
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('Override text', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'fr');
+  }
+
+  /**
+   * Tests moving the default language away and back preserves both languages.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
+   */
+  public function testDefaultLanguageRoundTripPreservesBothLanguages(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'en'], 'Save configuration');
+    $this->rebuildContainer();
+
+    // Back on English, the active configuration must show the original
+    // English text again - not the French text the first switch left
+    // behind - because the override that first switch created is merged back
+    // into the active configuration.
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+
+    // Moving off French in turn preserves the French translation the same
+    // way, so a future switch back to French would not lose it either.
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+    $french_override = $language_manager->getLanguageConfigOverride('fr', 'locale_test.translation');
+    $this->assertFalse($french_override->isNew());
+    $this->assertSame('French test', $french_override->get('test'));
+
+    // The round trip must not have left a second, duplicate row behind, nor
+    // touched the customized flag on the one row it started with.
+    $this->assertTranslation('locale_test.translation', 'French test', 'fr', FALSE);
+  }
+
+  /**
+   * Tests switching between two non-English defaults with no translation.
+   *
+   * Neither language here is English, and the new default has no
+   * translation at all - so DefaultLangcodeConfigUpdater finds no override
+   * to merge, and the active configuration is left holding the previous
+   * default's content, mislabelled with the new default's langcode. Locale
+   * module must correct that back to the English source rather than leaving
+   * it mislabelled.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
+   */
+  public function testDefaultLanguageChangeBetweenForeignLanguagesWithNoTranslation(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('fr', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    // Spanish has no translation at all for this string.
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'es'], 'Save configuration');
+    $this->rebuildContainer();
+
+    // The langcode is Spanish, matching the site's new default - but the
+    // content must be the English source, not the French text left behind
+    // by the previous default.
+    $this->assertSame('es', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'es');
+
+    // Moving off French still preserves the French translation as an
+    // override, the same as any other switch away from a translated
+    // default.
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+    $french_override = $language_manager->getLanguageConfigOverride('fr', 'locale_test.translation');
+    $this->assertFalse($french_override->isNew());
+    $this->assertSame('French test', $french_override->get('test'));
+  }
+
+  /**
+   * Tests a partial translation falls back to source per key, not per object.
+   *
+   * The override for the new default only covers one of several translatable
+   * keys, so DefaultLangcodeConfigUpdater merges that one key but leaves the
+   * others holding the previous default's content. Locale module must fall back
+   * to the English source for exactly those keys, without disturbing the one
+   * key that genuinely was translated.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::extractUntranslatedKeys()
+   */
+  public function testDefaultLanguageChangeWithPartialTranslationFallsBackPerKey(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('es')->save();
+
+    $config_name = 'locale_test.translation_multiple';
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation($config_name, 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation($config_name, 'fr', 'A string', '')
+      ->setString('Une chaine')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('fr', $this->config($config_name)->get('langcode'));
+    $this->assertSame('French test', $this->config($config_name)->get('test'));
+    $this->assertSame('Une chaine', $this->config($config_name)->get('test_multiple.string'));
+
+    // Create a Spanish override covering only test_multiple.string, written
+    // straight to storage bypassing Config and its events.
+    \Drupal::service('config.storage')
+      ->createCollection('language.es')
+      ->write($config_name, ['test_multiple' => ['string' => 'Una cadena']]);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'es'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $config = $this->config($config_name);
+    $this->assertSame('es', $config->get('langcode'));
+    // The one key that was translated is merged as-is.
+    $this->assertSame('Una cadena', $config->get('test_multiple.string'));
+    // Every other translatable key falls back to the English source, not the
+    // French text the previous default left behind.
+    $this->assertSame('English test', $config->get('test'));
+    $this->assertSame('Another string', $config->get('test_multiple.another_string'));
+    $this->assertSame('After a string', $config->get('test_after_multiple.string'));
+    $this->assertSame('After another string', $config->get('test_after_multiple.another_string'));
+  }
+
+  /**
+   * Tests switching to English with no English override.
+   */
+  public function testDefaultLanguageChangeToEnglishWithNoOverride(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    \Drupal::service(LocaleConfigManager::class)
+      ->getStringTranslation('locale_test.translation', 'fr', 'English test', '')
+      ->setString('French test')
+      ->setCustomized(FALSE)
+      ->save();
+
+    $admin_user = $this->drupalCreateUser(['administer languages']);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'fr'], 'Save configuration');
+    $this->rebuildContainer();
+    $this->assertSame('French test', $this->config('locale_test.translation')->get('test'));
+
+    // Remove the English override, as on a site installed in French.
+    \Drupal::service('config.storage')
+      ->createCollection('language.en')
+      ->delete('locale_test.translation');
+
+    $this->drupalGet('admin/config/regional/language');
+    $this->submitForm(['site_default_language' => 'en'], 'Save configuration');
+    $this->rebuildContainer();
+
+    $this->assertSame('en', $this->config('locale_test.translation')->get('langcode'));
+    $this->assertSame('English test', $this->config('locale_test.translation')->get('test'));
+    $this->assertNoTranslation('locale_test.translation', 'en');
+  }
+
+  /**
+   * Asserts no translation exists for a configuration object in a language.
+   *
+   * @param string $config_name
+   *   The configuration name.
+   * @param string $langcode
+   *   The language code.
+   */
+  protected function assertNoTranslation(string $config_name, string $langcode): void {
+    $strings = $this->stringStorage->getTranslations([
+      'type' => 'configuration',
+      'name' => $config_name,
+      'language' => $langcode,
+      'translated' => TRUE,
+    ]);
+    $this->assertSame([], $strings);
+  }
+
+  /**
+   * Asserts a translation exists for a configuration object and its status.
+   *
+   * @param string $config_name
+   *   The configuration name.
+   * @param string $translation
+   *   The expected translation.
+   * @param string $langcode
+   *   The language code.
+   * @param bool $customized
+   *   Whether the translation is expected to be marked customized.
+   */
+  protected function assertTranslation(string $config_name, string $translation, string $langcode, bool $customized): void {
+    $strings = $this->stringStorage->getTranslations([
+      'type' => 'configuration',
+      'name' => $config_name,
+      'language' => $langcode,
+      'translated' => TRUE,
+    ]);
+    $this->assertCount(1, $strings);
+    $string = reset($strings);
+    $this->assertInstanceOf(StringInterface::class, $string);
+    /** @var \Drupal\locale\TranslationString $string */
+    $this->assertSame($translation, $string->getString());
+    $this->assertInstanceOf(TranslationString::class, $string);
+    $this->assertEquals($customized, (bool) $string->customized);
+  }
+
+}

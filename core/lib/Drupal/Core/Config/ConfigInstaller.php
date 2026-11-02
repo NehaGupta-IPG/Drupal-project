@@ -397,6 +397,23 @@ class ConfigInstaller implements ConfigInstallerInterface {
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
             ],
           ] + $config_to_create[$name];
+
+          if ($this->typedConfig->hasConfigSchema($name)) {
+            // Building typed data here to check translatability is too
+            // expensive to do twice for every piece of configuration being
+            // installed. Resolve the langcode unconditionally instead,
+            // including for configuration with no translatable values at all.
+            // This is harmless: Config::save() will remove any langcodes added
+            // to untranslatable configuration. Extension-shipped configuration
+            // is assumed to be English unless it ships with its own explicit
+            // langcode.
+            if (!isset($config_to_create[$name]['langcode']) || $config_to_create[$name]['langcode'] === 'en') {
+              // The first time this point is reached, resolve the default
+              // langcode.
+              $default_langcode ??= $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
+              $config_to_create[$name]['langcode'] = $default_langcode;
+            }
+          }
         }
         $new_config->setData($config_to_create[$name]);
       }

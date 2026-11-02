@@ -10,11 +10,13 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that locale rewrites config langcodes after theme install.
+ * Tests that installing a theme updates its shipped English config.
  *
- * When a theme ships config with langcode 'en' and locale is enabled with a
- * non-English site default, locale's updateDefaultConfigLangcodes() batch
- * must rewrite those langcodes to the site default after install.
+ * When a theme ships config with langcode 'en' and the site's configuration
+ * default language is not English, ConfigInstaller must update that
+ * configuration to the site default while installing it.
+ *
+ * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
@@ -56,8 +58,8 @@ class LocaleThemeInstallTest extends BrowserTestBase {
    *
    * The locale_test_config_langcode test theme provides
    * core.date_format.locale_test_config_langcode_medium with langcode 'en'.
-   * With locale enabled and a non-English site default, that langcode should be
-   * rewritten to the site default after the install batch runs.
+   * With a non-English configuration default language, ConfigInstaller updates
+   * it to that default while installing the theme's configuration.
    */
   public function testThemeInstallRewritesConfigLangcode(): void {
     // Install locale_test_config_langcode via the Appearance UI.
@@ -69,7 +71,7 @@ class LocaleThemeInstallTest extends BrowserTestBase {
     $this->rebuildContainer();
 
     // core.date_format.locale_test_config_langcode_medium ships with langcode 'en'. Locale's
-    // updateDefaultConfigLangcodes() should have rewritten it to 'de'.
+    // ConfigInstaller has updated it to 'de'.
     $langcode = $this->config('core.date_format.locale_test_config_langcode_medium')->get('langcode');
     $this->assertSame('de', $langcode);
 

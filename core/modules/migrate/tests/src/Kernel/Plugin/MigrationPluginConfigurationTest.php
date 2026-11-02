@@ -27,6 +27,7 @@ class MigrationPluginConfigurationTest extends KernelTestBase {
     'migrate_drupal',
     // Test with a simple migration.
     'migrate_plugin_config_test',
+    'language',
     'locale',
   ];
 

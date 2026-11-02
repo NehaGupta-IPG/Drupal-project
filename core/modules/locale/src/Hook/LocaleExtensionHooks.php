@@ -60,7 +60,7 @@ class LocaleExtensionHooks {
       // Installing this component may have installed configuration from any
       // number of other components. Do this even if import is not enabled
       // because parsing new configuration may expose new source strings.
-      if ($batch = $this->localeConfigBatch->buildBatch([], [], [], TRUE)) {
+      if ($batch = $this->localeConfigBatch->buildBatch([], [], [])) {
         batch_set($batch);
       }
     }

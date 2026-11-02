@@ -1,0 +1,8 @@
+name: 'Config with langcode'
+type: 'Testing'
+install:
+  - config_test
+  - language
+config:
+  import:
+    config_test: '*'

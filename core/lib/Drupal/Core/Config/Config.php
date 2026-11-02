@@ -4,6 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Element;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -210,6 +212,9 @@ class Config extends StorableConfigBase {
     if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
       // Ensure that the schema wrapper has the latest data.
       $this->schemaWrapper = NULL;
+      if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+        $this->reconcileLangcodeWithTranslatability($this->getSchemaWrapper());
+      }
       $this->data = $this->castValue(NULL, $this->data);
       // Reclaim the memory used by the schema wrapper.
       $this->schemaWrapper = NULL;
@@ -233,6 +238,47 @@ class Config extends StorableConfigBase {
     $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
+  }
+
+  /**
+   * Keeps langcode in step with whether the configuration is translatable.
+   *
+   * Configuration can become translatable, or stop being translatable, as a
+   * side effect of an ordinary data change. For example, a plugin being swapped
+   * for one that does, or does not, have a translatable value. This adds a
+   * langcode when configuration becomes translatable and none is present yet,
+   * and removes it when configuration becomes untranslatable.
+   *
+   * This method never overwrites an existing langcode.
+   *
+   * @param \Drupal\Core\Config\Schema\Element $typed_config
+   *   The typed configuration wrapper for this configuration object.
+   */
+  protected function reconcileLangcodeWithTranslatability(Element $typed_config): void {
+    if (!$typed_config instanceof Mapping) {
+      // Translatable configuration is only supported for mappings. Both
+      // config_object and config_entity schema types are mappings.
+      return;
+    }
+
+    $required_langcode = $typed_config->getDataDefinition()['mapping']['langcode']['requiredKey'] ?? FALSE;
+    // This potentially loops through the config array again like call to
+    // StorableConfigBase::castValue() but this is mitigated by the fact that
+    // this only occurs for simple configuration. Configuration entities have a
+    // required langcode. Additionally, once
+    // \Drupal\Core\Config\Schema\ArrayElement::hasTranslatableElements() has
+    // found a translatable key it returns early.
+    if (!$required_langcode && !$typed_config->hasTranslatableElements()) {
+      unset($this->data['langcode']);
+      return;
+    }
+    if (array_key_exists('langcode', $this->data)) {
+      return;
+    }
+    $this->data['langcode'] = $this->eventDispatcher->dispatch(new ConfigLangcodeResolveEvent())->getLangcode();
+    // The underlying data has changed, so the schema wrapper needs to be
+    // updated.
+    $this->schemaWrapper = NULL;
   }
 
   /**
