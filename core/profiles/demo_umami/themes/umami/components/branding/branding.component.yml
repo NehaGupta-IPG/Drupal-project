@@ -23,8 +23,10 @@ props:
       title: Attributes
       description: Wrapper attributes.
     site_logo:
-      type: string
-      format: iri-reference
+      type:
+        - string
+        - array
+        - object
     url:
       type: string
       title: Branding url

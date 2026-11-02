@@ -171,11 +171,22 @@ INFO;
       $this->assertSession()->elementTextEquals('xpath', "{$xpath}[2]", $explicit_file);
       $this->assertSession()->elementTextEquals('xpath', "{$xpath}[3]", $local_file);
 
-      // Verify the actual 'src' attribute of the logo being output in a site
-      // branding block.
       $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
       $this->drupalGet('');
-      $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/img', 'src', $expected['src']);
+
+      $extension = pathinfo($expected['src'], PATHINFO_EXTENSION);
+      if ($extension === 'svg') {
+        // Verify the SVG is being output inline, and has dimension attributes.
+        $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/svg', 'height', '66');
+        $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/svg', 'width', '57');
+      }
+      else {
+        // Verify the actual 'src' attribute of the logo being output in a site
+        // branding block, and has width and height attributes.
+        $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/img', 'src', $expected['src']);
+        $this->assertSession()->elementAttributeExists('xpath', '//header//a[@rel="home"]/img', 'width');
+        $this->assertSession()->elementAttributeExists('xpath', '//header//a[@rel="home"]/img', 'height');
+      }
     }
     $unsupported_paths = [
       // Stream wrapper URI to non-existing file.
@@ -226,7 +237,17 @@ INFO;
 
       $uploaded_filename = 'public://' . $this->getSession()->getPage()->findField('logo_path')->getValue();
       $this->drupalGet('');
-      $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/img', 'src', $file_url_generator->generateString($uploaded_filename));
+
+      $extension = pathinfo($upload_uri, PATHINFO_EXTENSION);
+      if ($extension === 'svg') {
+        // Verify the SVG is being output inline.
+        $this->assertSession()->elementExists('xpath', '//header//a[@rel="home"]/svg');
+      }
+      else {
+        // Verify the actual 'src' attribute of the logo being output in a site
+        // branding block.
+        $this->assertSession()->elementAttributeContains('xpath', '//header//a[@rel="home"]/img', 'src', $file_url_generator->generateString($uploaded_filename));
+      }
 
       // Clear the logo or it will use previous value.
       $edit = [

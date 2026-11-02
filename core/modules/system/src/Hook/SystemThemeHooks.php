@@ -2,7 +2,9 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Theme\ThemeCommonElements;
+use Drupal\Core\Render\Element;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -11,6 +13,12 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for system.
  */
 class SystemThemeHooks {
+
+  public function __construct(
+    protected ?ThemeSettingsProvider $themeSettingsProvider = NULL,
+  ) {
+    $this->themeSettingsProvider = $themeSettingsProvider ?? \Drupal::service(ThemeSettingsProvider::class);
+  }
 
   /**
    * Implements hook_theme().
@@ -242,20 +250,16 @@ class SystemThemeHooks {
   public function preprocessBlock(&$variables): void {
     switch ($variables['base_plugin_id']) {
       case 'system_branding_block':
+        $content = $variables['content'];
         $variables['site_logo'] = '';
-        if ($variables['content']['site_logo']['#access'] && $variables['content']['site_logo']['#uri']) {
-          $variables['site_logo'] = $variables['content']['site_logo']['#uri'];
+        $variables['site_logo_element'] = '';
+        if (isset($content['site_logo']) && Element::isVisibleElement($content['site_logo'])) {
+          $variables['site_logo_element'] = $content['site_logo'];
+          $variables['site_logo'] = $this->themeSettingsProvider->getSetting('logo.url') ?? '';
         }
-        $variables['site_name'] = '';
-        if ($variables['content']['site_name']['#access'] && $variables['content']['site_name']['#markup']) {
-          $variables['site_name'] = $variables['content']['site_name']['#markup'];
-        }
-        $variables['site_slogan'] = '';
-        if ($variables['content']['site_slogan']['#access'] && $variables['content']['site_slogan']['#markup']) {
-          $variables['site_slogan'] = [
-            '#markup' => $variables['content']['site_slogan']['#markup'],
-          ];
-        }
+        $variables['deprecations']['site_logo'] = "'site_logo' is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Use 'site_logo_element' instead. See https://www.drupal.org/node/3626551";
+        $variables['site_name'] = (isset($content['site_name']) && Element::isVisibleElement($content['site_name']) && !empty($content['site_name']['#markup'])) ? $content['site_name']['#markup'] : '';
+        $variables['site_slogan'] = (isset($content['site_slogan']) && Element::isVisibleElement($content['site_slogan']) && !empty($content['site_slogan']['#markup'])) ? ['#markup' => $content['site_slogan']['#markup']] : '';
         break;
     }
   }
