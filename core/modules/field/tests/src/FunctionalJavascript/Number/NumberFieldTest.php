@@ -10,6 +10,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use function sprintf;
 
 /**
  * Tests the numeric field widget.
@@ -155,7 +156,8 @@ class NumberFieldTest extends WebDriverTestBase {
     // Check number_decimal and number_unformatted formatters behavior.
     $this->drupalGet('node/' . $node->id());
     $float_formatted = number_format($random_float, $scale, $decimal_separator, $thousand_separator);
-    $this->assertSession()->responseContains("$prefix$float_formatted$suffix");
+    $expected_output = sprintf('<span class="prefix">%s</span>%s<span class="suffix">%s</span>', $prefix, $float_formatted, $suffix);
+    $this->assertSession()->responseContains($expected_output);
     $this->assertSession()->responseContains((string) $random_integer);
 
     // Configure the number_decimal formatter.
