@@ -186,6 +186,7 @@ class UserPermissionsForm extends FormBase {
           '#markup' => $this->moduleExtensionList->getName($provider),
         ],
       ];
+      /** @var array $perm_item */
       foreach ($permissions as $perm => $perm_item) {
         // Fill in default values for the permission.
         $perm_item += [

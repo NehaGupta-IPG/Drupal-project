@@ -303,7 +303,9 @@ class UserLoginHttpTest extends BrowserTestBase {
 
     $user = $this->drupalCreateUser([]);
     $incorrect_user = clone $user;
-    $incorrect_user->passRaw .= 'incorrect';
+    /** @var string $pass_raw */
+    $pass_raw = $incorrect_user->passRaw;
+    $incorrect_user->passRaw = $pass_raw . 'incorrect';
 
     // Try 2 failed logins.
     for ($i = 0; $i < 2; $i++) {
@@ -378,7 +380,9 @@ class UserLoginHttpTest extends BrowserTestBase {
 
       $user1 = $this->drupalCreateUser([]);
       $incorrect_user1 = clone $user1;
-      $incorrect_user1->passRaw .= 'incorrect';
+      /** @var string $pass_raw */
+      $pass_raw = $incorrect_user1->passRaw;
+      $incorrect_user1->passRaw = $pass_raw . 'incorrect';
 
       $user2 = $this->drupalCreateUser([]);
 

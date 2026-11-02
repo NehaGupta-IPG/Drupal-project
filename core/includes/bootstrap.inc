@@ -197,7 +197,7 @@ function drupal_valid_test_ua($new_prefix = NULL) {
     }
     // The file properties add more entropy not easily accessible to others.
     $key = $private_key . filectime(__FILE__) . fileinode(__FILE__);
-    $time_diff = time() - $time;
+    $time_diff = time() - (int) $time;
     $test_hmac = Crypt::hmacBase64($check_string, $key);
     // Since we are making a local request a 600 second time window is allowed,
     // and the HMAC must match.

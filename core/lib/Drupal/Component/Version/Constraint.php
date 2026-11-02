@@ -103,7 +103,7 @@ class Constraint {
           }
           // Equivalence can be checked by adding two restrictions.
           if ($op == '=' || $op == '==') {
-            $this->constraintArray[] = ['op' => '<', 'version' => ($matches['major'] + 1) . '.x'];
+            $this->constraintArray[] = ['op' => '<', 'version' => (((int) $matches['major']) + 1) . '.x'];
             $op = '>=';
           }
         }

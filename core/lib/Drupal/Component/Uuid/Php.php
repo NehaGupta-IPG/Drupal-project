@@ -32,7 +32,7 @@ class Php implements UuidInterface {
 
     // Use characters 16-17 to generate 8-bit $clock_seq_hi_and_reserved.
     // The 2 most significant bits are set to one and zero respectively.
-    $clock_seq_hi_and_reserved = base_convert(substr($hex, 16, 2), 16, 10);
+    $clock_seq_hi_and_reserved = (int) base_convert(substr($hex, 16, 2), 16, 10);
     $clock_seq_hi_and_reserved &= 0b00111111;
     $clock_seq_hi_and_reserved |= 0b10000000;
 
