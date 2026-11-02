@@ -38,6 +38,14 @@ related:
   <dt>{% trans %}Configuration sync directory{% endtrans %}</dt>
   <dd>{% trans %}The configuration sync directory location is set in the site's <em>settings.php</em> file. When configuration is exported, the active configuration is exported and described in YAML files which are stored in the configuration sync directory. After the first export, the system compares the site's active configuration with the configuration data in the sync directory and will only export active configuration items that are different than their counterparts in the sync directory.{% endtrans %}</dd>
 </dl>
+<h2>{% trans %}Installing a new site from an existing config{% endtrans %}</h2>
+<p>{% trans %}You can create a new site from an existing site, if you want an identical configuration.{% endtrans %}</p>
+<dl>
+  <dt>{% trans %}Copy config files{% endtrans %}</dt>
+  <dd>{% trans %}Copy the files from the existing config directory into the new configuration directory{% endtrans %}</dd>
+  <dt>{% trans %}Import with drush{% endtrans %}</dt>
+  <dd>{% trans %}<code>drush site:install --existing-config</code> will install a new site, using the configuration from an existing config. This will overwrite anything in the database!{% endtrans %}</dd>
+</dl>
 <h2>{% trans %}Managing configuration overview{% endtrans %}</h2>
 <p>{% trans %}Configuration management tasks, such as exporting or importing configuration and synchronizing configuration, can be done either through the administrative UI provided by the core Configuration Manager module or a command-line interface (CLI) tool. Defining a configuration sync directory path other than the default value requires read/write access to the site's <em>settings.php</em> file.{% endtrans %}</p>
 <p>{% trans %}Most modules and themes also provide settings forms for updating the configuration they provide. See the related topics listed below for specific tasks.{% endtrans %}</p>
