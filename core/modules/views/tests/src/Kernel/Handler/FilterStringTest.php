@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Plugin\views\filter\StringFilter;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -1089,6 +1090,57 @@ class FilterStringTest extends ViewsKernelTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests that the word tokenizer does not generate empty or punctuation-only terms.
+   */
+  public function testFilterStringTokenizerEmpty(): void {
+    // Load the test view provided by Views.
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    // Add a string filter programmatically using the 'contains any word' operator.
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'name' => [
+        'id' => 'name',
+        'table' => 'views_test_data',
+        'field' => 'name',
+        'relationship' => 'none',
+        'operator' => 'word',
+        'exposed' => TRUE,
+        'expose' => [
+          'operator_id' => 'name_op',
+          'label' => 'Name contains any word',
+          'identifier' => 'name',
+        ],
+        'value' => '',
+        'group' => 1,
+      ],
+    ]);
+
+    // Provide exposed input containing punctuation adjacent to whitespace.
+    $input = 'Hello from me !';
+    $view->setExposedInput([
+      'name' => $input,
+    ]);
+    $view->execute();
+
+    /** @var \Drupal\views\Plugin\views\filter\StringFilter $handler */
+    $handler = $view->filter['name'];
+    var_dump($handler);
+    $this->assertInstanceOf(StringFilter::class, $handler);
+
+    // Extract the parsed words.
+    $tokens = is_array($handler->value) ? $handler->value : [$handler->value];
+
+    // Expected: ['Hello', 'from', 'me']
+    $this->assertNotContains('', $tokens, 'Tokenizer should not produce empty search terms.');
+    $this->assertNotContains(' ', $tokens, 'Tokenizer should not produce whitespace-only terms.');
+    $this->assertNotContains('!', $tokens, 'Tokenizer should not produce punctuation-only terms.');
+
+    // Ensure the number of tokens is correct.
+    $this->assertCount(3, $tokens, 'Tokenizer should produce exactly three valid words.');
   }
 
 }
