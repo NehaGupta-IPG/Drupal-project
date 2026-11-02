@@ -107,7 +107,7 @@ class MenuRouterTest extends BrowserTestBase {
   protected function doTestDescriptionMenuItems(): void {
     // Verify that the menu router item title is output as page title.
     $this->drupalGet('menu_callback_description');
-    $this->assertSession()->pageTextContains('Menu item description text');
+    $this->assertSession()->pageTextContains('Menu links description text');
   }
 
   /**
