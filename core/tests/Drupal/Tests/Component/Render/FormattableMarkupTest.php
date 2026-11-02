@@ -183,6 +183,7 @@ class FormattableMarkupTest extends TestCase {
     ini_set('zend.assertions', 1);
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessageMatches('/@first/');
+    // @phpstan-ignore argument.type (Tests intentional NULL placeholder values.)
     (string) new FormattableMarkup('@first and @second', ['@first' => NULL, '@second' => NULL]);
   }
 
@@ -193,6 +194,7 @@ class FormattableMarkupTest extends TestCase {
    */
   public function testMultipleNullPlaceholdersProductionFallback(): void {
     ini_set('zend.assertions', 0);
+    // @phpstan-ignore argument.type (Tests intentional NULL placeholder values.)
     $output = (string) new FormattableMarkup('@first and @second', ['@first' => NULL, '@second' => NULL]);
     ini_set('zend.assertions', 1);
     $this->assertEquals(' and ', $output);
