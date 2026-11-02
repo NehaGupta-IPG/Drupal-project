@@ -109,8 +109,14 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *
    * @return array
    *   An array suitable for \Drupal\Core\Render\RendererInterface::render().
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Entity\Controller\EntityRevisionViewController instead.
+   *
+   * @see https://www.drupal.org/node/3153559
    */
   public function revisionShow(NodeInterface $node_revision) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Entity\Controller\EntityRevisionViewController instead. See https://www.drupal.org/node/3153559', E_USER_DEPRECATED);
     $node_view_controller = new EntityViewController($this->entityTypeManager(), $this->renderer);
     $page = $node_view_controller->view($node_revision);
     unset($page['nodes'][$node_revision->id()]['#cache']);
@@ -125,8 +131,14 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *
    * @return array
    *   An array as expected by \Drupal\Core\Render\RendererInterface::render().
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Entity\Controller\VersionHistoryController instead.
+   *
+   * @see https://www.drupal.org/node/3153559
    */
   public function revisionOverview(NodeInterface $node) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Entity\Controller\VersionHistoryController instead. See https://www.drupal.org/node/3153559', E_USER_DEPRECATED);
     // Always use the latest revision in the current content language to
     // determine if this node has translations. This supports showing the
     // correct translation revisions for translations that only have.
@@ -207,7 +219,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       }
       else {
         $links = [];
-        if ($revision->access('revert revision')) {
+        if ($revision->access('revert')) {
           $links['revert'] = [
             'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
             'url' => $has_translations
@@ -216,7 +228,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
                 'node_revision' => $vid,
                 'langcode' => $langcode,
               ])
-              : Url::fromRoute('node.revision_revert_confirm', [
+              : Url::fromRoute('entity.node.revision_revert_form', [
                 'node' => $node->id(),
                 'node_revision' => $vid,
               ]),
@@ -226,7 +238,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         if ($revision->access('delete revision')) {
           $links['delete'] = [
             'title' => $this->t('Delete'),
-            'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
+            'url' => Url::fromRoute('entity.node.revision_delete_form', ['node' => $node->id(), 'node_revision' => $vid]),
           ];
         }
 
@@ -281,8 +293,14 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *
    * @return int[]
    *   Node revision IDs (in descending order).
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3153559
    */
   protected function getRevisionIds(NodeInterface $node, NodeStorageInterface $node_storage) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3153559', E_USER_DEPRECATED);
     $entityType = $node->getEntityType();
     $result = $node_storage->getQuery()
       ->accessCheck(TRUE)

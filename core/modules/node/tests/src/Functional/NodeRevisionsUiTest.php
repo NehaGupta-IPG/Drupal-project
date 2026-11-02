@@ -129,7 +129,14 @@ class NodeRevisionsUiTest extends NodeTestBase {
 
     // Assert the old revision message.
     $date = $this->container->get('date.formatter')->format($nodes[0]->revision_timestamp->value, 'short');
-    $url = new Url('entity.node.revision', ['node' => $nodes[0]->id(), 'node_revision' => $nodes[0]->getRevisionId()]);
+    $url = Url::fromRoute('entity.node.revision', [
+      'node' => $nodes[0]->id(),
+      'node_revision' => $nodes[0]->getRevisionId(),
+    ], [
+      'attributes' => [
+        'hreflang' => 'en',
+      ],
+    ]);
     $this->assertSession()->responseContains(Link::fromTextAndUrl($date, $url)->toString() . ' by ' . $editor);
 
     // Assert the current revision message.
@@ -219,7 +226,7 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $this->drupalGet($node->toUrl('version-history'));
     $assert = $this->assertSession();
     $assert->pageTextContains('translation change 49');
-    $assert->elementsCount('css', '.node-revision-table tbody tr', 50);
+    $assert->elementsCount('css', 'table tbody tr', 50);
     $assert->elementNotExists('css', '.pager');
 
     // Create another translation affecting revision.
@@ -235,31 +242,8 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $assert->elementExists('css', '.pager');
     $assert->elementNotExists('css', '.revision-current');
     $this->clickLink('Page 2');
-    $assert->elementsCount('css', '.node-revision-table tbody tr', 1);
+    $assert->elementsCount('css', 'table tbody tr', 1);
     $assert->elementExists('css', '.revision-current');
-  }
-
-  /**
-   * Checks the Revisions tab.
-   *
-   * Tests two 'Revisions' local tasks are not added by both Node and
-   * VersionHistoryLocalTasks.
-   *
-   * This can be removed after 'entity.node.version_history' local task is
-   * removed by https://www.drupal.org/project/drupal/issues/3153559.
-   *
-   * @legacy-covers \Drupal\node\Hook\NodeMenuHooks::localTasksAlter
-   */
-  public function testNodeDuplicateRevisionsTab(): void {
-    $this->drupalPlaceBlock('local_tasks_block');
-    $this->drupalLogin($this->editor);
-
-    $node = $this->drupalCreateNode();
-    $this->drupalGet($node->toUrl('edit-form'));
-
-    // There must be exactly one 'Revisions' local task.
-    $xpath = $this->assertSession()->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $node->toUrl('version-history')->toString()]);
-    $this->assertSession()->elementsCount('xpath', $xpath, 1);
   }
 
 }

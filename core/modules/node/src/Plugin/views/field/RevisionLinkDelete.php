@@ -23,7 +23,7 @@ class RevisionLinkDelete extends RevisionLink {
     if (!$node) {
       return NULL;
     }
-    return Url::fromRoute('node.revision_delete_confirm', [
+    return Url::fromRoute('entity.node.revision_delete_form', [
       'node' => $node->id(),
       'node_revision' => $node->getRevisionId(),
     ]);

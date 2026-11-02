@@ -228,14 +228,15 @@ class NodeRevisionsTest extends NodeTestBase {
     // Confirm user was redirected to revisions history page.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $remaining_revision_ids[0] . "/delete");
     $this->submitForm([], 'Delete');
-    $this->assertSession()->pageTextContains("Revisions for {$nodes[2]->label()}");
+    $this->assertSession()->addressEquals($nodes[2]->toUrl('version-history'));
     $this->assertSession()->pageTextNotContains($nodes[2]->body->value);
 
     // Confirm user was redirected to the node page.
     $this->drupalGet("node/" . $node->id() . "/revisions/" . $remaining_revision_ids[1] . "/delete");
     $this->submitForm([], 'Delete');
     $this->assertSession()->pageTextNotContains("Revisions for {$nodes[2]->label()}");
-    $this->assertSession()->pageTextContains($nodes[2]->body->value);
+    $this->assertSession()->addressEquals($nodes[2]->toUrl('version-history'));
+    $this->assertSession()->pageTextNotContains($nodes[2]->body->value);
 
     // Make a new revision and set it to not be default.
     // This will create a new revision that is not "front facing".
@@ -317,11 +318,6 @@ class NodeRevisionsTest extends NodeTestBase {
     $translation->revision_log = 'New revision message (DE)';
     $translation->setNewRevision();
     $translation->save();
-
-    // View the revision UI in 'IT', only the original node revision is shown.
-    $this->drupalGet("it/node/" . $node->id() . "/revisions");
-    $this->assertSession()->pageTextContains('Simple revision message (EN)');
-    $this->assertSession()->pageTextNotContains('New revision message (DE)');
 
     // View the revision UI in 'DE', only the translated node revision is shown.
     $this->drupalGet("de/node/" . $node->id() . "/revisions");
@@ -444,7 +440,7 @@ class NodeRevisionsTest extends NodeTestBase {
 
     // Now revert the entity revision to the initial one where the translation
     // didn't exist.
-    $revert_url = Url::fromRoute('node.revision_revert_confirm', [
+    $revert_url = Url::fromRoute('entity.node.revision_revert_form', [
       'node' => $node->id(),
       'node_revision' => $initial_revision_id,
     ]);
@@ -501,7 +497,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // Reverting the non-default revision should create a new revision and set
     // it as the default, meaning there should be 3 revisions displayed and no
     // Set as current revision link.
-    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 3);
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
     $this->assertSession()->linkNotExists('Set as current revision');
     $this->assertSession()->pageTextContains('Copy of the revision from');
     // The first row (the revision we just reverted to) should be displayed as
