@@ -18,10 +18,11 @@ class UserMailUnique extends UniqueFieldConstraint {
   public function __construct(
     bool $caseSensitive = FALSE,
     $message = 'The email address %value is already taken.',
+    public $bundle = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($caseSensitive, $message, $groups, $payload);
+    parent::__construct($caseSensitive, $message, $bundle, $groups, $payload);
   }
 
 }
