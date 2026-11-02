@@ -97,29 +97,17 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
     $handler = $this->selectionManager->getSelectionHandler($value->getFieldDefinition(), $entity);
     $target_type_id = $value->getFieldDefinition()->getSetting('target_type');
 
-    // Add violations on deltas with a new entity that is not valid.
-    if ($new_entities) {
-      if ($handler instanceof SelectionWithAutocreateInterface) {
-        $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
-        $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
-      }
-      else {
-        // If the selection handler does not support referencing newly created
-        // entities, all of them should be invalidated.
-        $invalid_new_entities = $new_entities;
-      }
+    // Handlers without autocreate support reject all new targets.
+    $invalid_new_entities = $new_entities;
+    $invalid_target_ids = [];
 
-      foreach ($invalid_new_entities as $delta => $entity) {
-        $this->context->buildViolation($constraint->invalidAutocreateMessage)
-          ->setParameter('%type', $target_type_id)
-          ->setParameter('%label', $entity->label())
-          ->atPath((string) $delta . '.entity')
-          ->setInvalidValue($entity)
-          ->addViolation();
-      }
+    // Check new targets in one batch.
+    if ($new_entities && $handler instanceof SelectionWithAutocreateInterface) {
+      $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
+      $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
     }
 
-    // Add violations on deltas with a target_id that is not valid.
+    // Check existing targets in one batch.
     if ($target_ids) {
       $valid_target_ids = $handler->validateReferenceableEntities($target_ids);
       if ($invalid_target_ids = array_diff($target_ids, $valid_target_ids)) {
@@ -135,22 +123,36 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
         // For accuracy of the error message, differentiate non-referenceable
         // and non-existent entities.
         $existing_entities = $this->entityTypeManager->getStorage($target_type_id)->loadMultiple($invalid_target_ids);
-        foreach ($invalid_target_ids as $delta => $target_id) {
-          // Check if any of the invalid existing references are simply not
-          // accessible by the user, in which case they need to be excluded from
-          // validation.
-          if (isset($previously_referenced_ids[$target_id]) && isset($existing_entities[$target_id]) && !$existing_entities[$target_id]->access('view')) {
-            continue;
-          }
+      }
+    }
 
-          $message = isset($existing_entities[$target_id]) ? $constraint->message : $constraint->nonExistingMessage;
-          $this->context->buildViolation($message)
-            ->setParameter('%type', $target_type_id)
-            ->setParameter('%id', $target_id)
-            ->atPath((string) $delta . '.target_id')
-            ->setInvalidValue($target_id)
-            ->addViolation();
+    // Report reference violations in the original field item order.
+    foreach ($value as $delta => $item) {
+      if (isset($invalid_new_entities[$delta])) {
+        $new_entity = $invalid_new_entities[$delta];
+        $this->context->buildViolation($constraint->invalidAutocreateMessage)
+          ->setParameter('%type', $target_type_id)
+          ->setParameter('%label', $new_entity->label())
+          ->atPath((string) $delta . '.entity')
+          ->setInvalidValue($new_entity)
+          ->addViolation();
+      }
+      elseif (isset($invalid_target_ids[$delta])) {
+        $target_id = $invalid_target_ids[$delta];
+        // Check if any of the invalid existing references are simply not
+        // accessible by the user, in which case they need to be excluded from
+        // validation.
+        if (isset($previously_referenced_ids[$target_id]) && isset($existing_entities[$target_id]) && !$existing_entities[$target_id]->access('view')) {
+          continue;
         }
+
+        $message = isset($existing_entities[$target_id]) ? $constraint->message : $constraint->nonExistingMessage;
+        $this->context->buildViolation($message)
+          ->setParameter('%type', $target_type_id)
+          ->setParameter('%id', $target_id)
+          ->atPath((string) $delta . '.target_id')
+          ->setInvalidValue($target_id)
+          ->addViolation();
       }
     }
   }

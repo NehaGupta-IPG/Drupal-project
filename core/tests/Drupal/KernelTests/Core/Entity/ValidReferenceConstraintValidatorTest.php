@@ -233,4 +233,25 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
   }
 
+  /**
+   * Keeps inaccessible existing references when another new item is rejected.
+   */
+  public function testRejectedNewEntityPreservesExistingReferences(): void {
+    $this->createEntityReferenceField(
+      'entity_test', 'entity_test', 'field_mixed', 'Mixed references', 'node',
+      'default', ['target_bundles' => ['article' => 'article']],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+    );
+    $hidden = Node::create(['type' => 'article', 'title' => 'Hidden', 'status' => NodeInterface::NOT_PUBLISHED]);
+    $hidden->save();
+    $host = EntityTest::create(['name' => 'Host', 'field_mixed' => ['target_id' => $hidden->id()]]);
+    $host->save();
+    $this->container->get('account_switcher')->switchTo($this->createUser(['access content']));
+    $this->assertFalse($hidden->access('view'));
+    $host->field_mixed->appendItem(['entity' => Node::create(['type' => 'page', 'title' => 'Rejected new target'])]);
+    $violations = $host->field_mixed->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame('1.entity', $violations[0]->getPropertyPath());
+  }
+
 }
