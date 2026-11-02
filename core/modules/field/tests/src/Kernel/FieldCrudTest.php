@@ -242,6 +242,14 @@ class FieldCrudTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that field configuration declares no data definition examples.
+   */
+  public function testDataDefinitionExamples(): void {
+    $field = FieldConfig::create($this->fieldDefinition);
+    $this->assertSame([], $field->getExamples());
+  }
+
+  /**
    * Tests reading back a field definition.
    */
   public function testReadField(): void {

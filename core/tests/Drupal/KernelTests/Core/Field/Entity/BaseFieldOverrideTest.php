@@ -121,6 +121,23 @@ class BaseFieldOverrideTest extends KernelTestBase {
   }
 
   /**
+   * Tests that data definition examples are inherited from the base field.
+   *
+   * @legacy-covers ::getExamples
+   */
+  public function testDataDefinitionExamples(): void {
+    $base_field = BaseFieldDefinition::create('string')
+      ->setName('Test Field')
+      ->setTargetEntityTypeId('entity_test');
+    $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field, 'test_bundle');
+    $this->assertSame([], $override->getExamples());
+
+    $base_field->setExamples(['foo', 'bar']);
+    $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field, 'test_bundle');
+    $this->assertSame(['foo', 'bar'], $override->getExamples());
+  }
+
+  /**
    * A default value callback which returns a primitive value.
    *
    * @return int

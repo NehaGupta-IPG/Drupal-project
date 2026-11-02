@@ -105,6 +105,44 @@ class TypedDataDefinitionTest extends KernelTestBase {
   }
 
   /**
+   * Tests that declared examples are metadata only.
+   */
+  public function testExamples(): void {
+    $definition = DataDefinition::create('string')->setExamples(['foo', 'bar']);
+
+    // Creating typed data does not use the declared examples.
+    $data = $this->typedDataManager->create($definition);
+    $this->assertNull($data->getValue());
+    $this->assertSame(['foo', 'bar'], $data->getDataDefinition()->getExamples());
+    $data->applyDefaultValue();
+    $this->assertNull($data->getValue());
+
+    // A value passed to ::create() is used as-is.
+    $data = $this->typedDataManager->create($definition, 'baz');
+    $this->assertSame('baz', $data->getValue());
+
+    // Declared examples do not influence validation: the violations are the
+    // same as for a definition without examples.
+    $definition = DataDefinition::create('string')->setRequired(TRUE);
+    $expected = (string) $this->typedDataManager->create($definition)->validate();
+    $definition->setExamples(['foo']);
+    $violations = $this->typedDataManager->create($definition)->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame($expected, (string) $violations);
+
+    // Examples of list items and map properties are not used either.
+    $list_definition = ListDataDefinition::create('string');
+    $list_definition->getItemDefinition()->setExamples(['foo']);
+    $list = $this->typedDataManager->create($list_definition);
+    $this->assertSame([], $list->getValue());
+
+    $map_definition = MapDataDefinition::create()
+      ->setPropertyDefinition('one', DataDefinition::create('string')->setExamples(['foo']));
+    $map = $this->typedDataManager->create($map_definition);
+    $this->assertNull($map->get('one')->getValue());
+  }
+
+  /**
    * Tests getString() throws exception when getType() is not implemented.
    */
   public function testNotImplementedGetType(): void {
