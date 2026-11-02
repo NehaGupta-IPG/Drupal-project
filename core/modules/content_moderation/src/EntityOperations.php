@@ -174,9 +174,14 @@ class EntityOperations implements ContainerInjectionInterface {
       $content_moderation_state = $storage->create([
         'content_entity_type_id' => $entity->getEntityTypeId(),
         'content_entity_id' => $entity->id(),
-        // Make sure that the moderation state entity has the same language code
-        // as the moderated entity.
-        'langcode' => $entity->language()->getId(),
+        // If the content_moderation_state is being created, the langcode and
+        // moderation_state values must come from the default translation.
+        // The langcode cannot be changed after creation, and the translation
+        // will still be created with its own values. If moderation_state
+        // doesn't exist for the default translation, the initial state will be
+        // used.
+        'langcode' => $entity->getUntranslated()->language()->getId(),
+        'moderation_state' => $entity->getUntranslated()->moderation_state->value ?: $workflow->getTypePlugin()->getInitialState()->id(),
       ]);
       $content_moderation_state->workflow->target_id = $workflow->id();
     }

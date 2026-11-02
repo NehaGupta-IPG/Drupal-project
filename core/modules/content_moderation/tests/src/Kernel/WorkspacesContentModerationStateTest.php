@@ -56,6 +56,8 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
     'testWorkflowNonConfigBundleDependencies',
     // This test does not assert anything that can be workspace-specific.
     'testGetCurrentUserId',
+    // This test does not assert anything that can be workspace-specific.
+    'testMultilingualNoModerationState',
   ];
 
   /**
