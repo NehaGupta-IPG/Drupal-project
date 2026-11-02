@@ -15,6 +15,13 @@ trait RoutePathGenerationTrait {
    * Placeholders without corresponding values in the parameters array
    * are removed from the resulting path.
    *
+   * A route may specify specific parameters to be excluded from this
+   * replacement of placeholders by specifying their names in the
+   * '_csrf_exclude_parameters' option. URLs that are used by the Drupal ajax
+   * framework will have 'nojs' transformed to 'ajax' by the framework, so might
+   * need to exclude that route parameter from the CSRF token calculation if
+   * that's also being used on the route.
+   *
    * @param \Symfony\Component\Routing\Route $route
    *   The route object containing the path with placeholders.
    * @param array $parameters
@@ -32,10 +39,19 @@ trait RoutePathGenerationTrait {
    *
    * @return string
    *   The generated path with all placeholders either replaced by their
-   *   corresponding values or removed if no matching parameter exists.
+   *   corresponding values or, removed if no matching parameter exists or
+   *   explicity specified to be excluded from replacement.
    */
   public function generateRoutePath(Route $route, array $parameters): string {
     $path = ltrim($route->getPath(), '/');
+
+    // Exclude parameters declared on the route to be excluded.
+    if ($route->hasOption('_csrf_exclude_parameters')) {
+      $exclude_parameters = $route->getOption('_csrf_exclude_parameters');
+      foreach ($exclude_parameters as $exclude_parameter) {
+        unset($parameters[$exclude_parameter]);
+      }
+    }
 
     // Replace path parameters with their corresponding values from the
     // parameters array.
