@@ -11,6 +11,8 @@ use Drupal\Core\Database\Statement\ResultBase;
 
 /**
  * Class for mysqli-provided results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class Result extends ResultBase {
 
@@ -21,20 +23,23 @@ class Result extends ResultBase {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
    *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   The fetch options.
    * @param \mysqli_result|false $mysqliResult
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
    *   Client database connection object.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected readonly \mysqli_result|false $mysqliResult,
     protected readonly \mysqli $mysqliConnection,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable && (bool) $mysqliResult);
   }
 
   /**
@@ -70,6 +75,8 @@ class Result extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
+    $this->fetchMode = $mode;
+    $this->fetchOptions = $fetchOptions;
     // There are no methods to set fetch mode in \mysqli_result.
     return TRUE;
   }
@@ -78,18 +85,25 @@ class Result extends ResultBase {
    * {@inheritdoc}
    */
   public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
+    if ($this->mysqliResult === FALSE) {
+      return FALSE;
+    }
+
     assert($this->mysqliResult instanceof \mysqli_result);
 
     $mysqli_row = $this->mysqliResult->fetch_assoc();
 
     if (!$mysqli_row) {
+      $this->markResultsetFetchingComplete();
       return FALSE;
     }
 
     // Stringify all non-NULL column values.
     $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
-    return $this->assocToFetchMode($row, $mode, $fetchOptions);
+    $row = $this->assocToFetchMode($row, $mode, $fetchOptions);
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
 }

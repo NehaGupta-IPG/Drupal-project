@@ -4,15 +4,12 @@ namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PdoResult;
-use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\StatementBase;
 
 /**
  * StatementInterface iterator implementation.
  */
 class StatementWrapperIterator extends StatementBase {
-
-  use PdoTrait;
 
   /**
    * Constructs a StatementWrapperIterator object.
@@ -46,25 +43,27 @@ class StatementWrapperIterator extends StatementBase {
   public function execute($args = [], $options = []) {
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
     try {
-      $return = $this->clientExecute($args, $options);
+      $return = $this->getClientStatement()->execute($args);
+
+      if (isset($options['fetch'])) {
+        if (is_string($options['fetch'])) {
+          $fetchMode = FetchAs::ClassObject;
+          $fetchOptions = ['class' => $options['fetch']];
+        }
+        else {
+          $fetchMode = $options['fetch'];
+        }
+      }
+
       $this->result = new PdoResult(
-        $this->fetchMode,
-        $this->fetchOptions,
+        $fetchMode ?? FetchAs::Object,
+        $fetchOptions ?? [],
         $this->getClientStatement(),
+        $return,
       );
-      $this->markResultsetIterable($return);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

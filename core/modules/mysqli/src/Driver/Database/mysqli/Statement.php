@@ -69,15 +69,6 @@ class Statement extends StatementBase {
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
     try {
@@ -99,16 +90,26 @@ class Statement extends StatementBase {
         $args = $tmp;
       }
 
+      if (isset($options['fetch'])) {
+        if (is_string($options['fetch'])) {
+          $fetchMode = FetchAs::ClassObject;
+          $fetchOptions = ['class' => $options['fetch']];
+        }
+        else {
+          $fetchMode = $options['fetch'];
+        }
+      }
+
       // In mysqli, the results of the statement execution are returned in a
       // different object than the statement itself.
       $return = $this->getClientStatement()->execute($args);
       $this->result = new Result(
-        $this->fetchMode,
-        $this->fetchOptions,
+        $fetchMode ?? FetchAs::Object,
+        $fetchOptions ?? [],
         $this->getClientStatement()->get_result(),
         $this->clientConnection,
+        $return,
       );
-      $this->markResultsetIterable($return);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);

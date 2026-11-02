@@ -98,8 +98,8 @@ trait FetchModeTrait {
   protected function assocToFetchMode(array $rowAssoc, FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
     return match ($mode) {
       FetchAs::Associative => $rowAssoc,
-      FetchAs::ClassObject => $this->assocToClass($rowAssoc, $fetchOptions['class'], $fetchOptions['constructor_args']),
-      FetchAs::Column => $this->assocToColumn($rowAssoc, array_keys($rowAssoc), $fetchOptions['column']),
+      FetchAs::ClassObject => $this->assocToClass($rowAssoc, $fetchOptions['class'] ?? \stdClass::class, $fetchOptions['constructor_args'] ?? []),
+      FetchAs::Column => $this->assocToColumn($rowAssoc, array_keys($rowAssoc), $fetchOptions['column'] ?? 0),
       FetchAs::List => $this->assocToNum($rowAssoc),
       FetchAs::Object => $this->assocToObj($rowAssoc),
     };

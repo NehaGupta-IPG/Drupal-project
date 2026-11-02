@@ -3,7 +3,6 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Statement\FetchAs;
-use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\PrefetchedResult;
 use Drupal\Core\Database\Statement\StatementBase;
 
@@ -22,8 +21,6 @@ use Drupal\Core\Database\Statement\StatementBase;
  * @see https://www.drupal.org/node/3575664
  */
 class StatementPrefetchIterator extends StatementBase {
-
-  use PdoTrait;
 
   /**
    * Constructs a StatementPrefetchIterator object.
@@ -61,39 +58,35 @@ class StatementPrefetchIterator extends StatementBase {
     // Prepare and execute the statement.
     try {
       $this->clientStatement = $this->getStatement($this->queryString, $args);
-      $return = $this->clientExecute($args, $options);
+      $return = $this->getClientStatement()->execute($args);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
-      // @phpstan-ignore unset.possiblyHookedProperty
-      unset($this->clientStatement);
+      $this->clientStatement = NULL;
       throw $e;
+    }
+
+    if (isset($options['fetch'])) {
+      if (is_string($options['fetch'])) {
+        $fetchMode = FetchAs::ClassObject;
+        $fetchOptions = ['class' => $options['fetch']];
+      }
+      else {
+        $fetchMode = $options['fetch'];
+      }
     }
 
     // Fetch all the data from the reply, in order to release any lock as soon
     // as possible. Then, destroy the client statement. See the documentation
     // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
     $this->result = new PrefetchedResult(
-      $this->fetchMode,
-      $this->fetchOptions,
-      $this->clientFetchAll(FetchAs::Associative),
-      $this->rowCountEnabled ? $this->clientRowCount() : NULL,
+      $fetchMode ?? FetchAs::Object,
+      $fetchOptions ?? [],
+      $this->getClientStatement()->fetchAll(\PDO::FETCH_ASSOC),
+      $this->rowCountEnabled ? $this->getClientStatement()->rowCount() : NULL,
+      $return,
     );
-    // @phpstan-ignore unset.possiblyHookedProperty
-    unset($this->clientStatement);
-    $this->markResultsetIterable($return);
-
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        // Default to an object. Note: db fields will be added to the object
-        // before the constructor is run. If you need to assign fields after
-        // the constructor is run. See https://www.drupal.org/node/315092.
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
+    $this->clientStatement = NULL;
 
     $this->dispatchStatementExecutionEndEvent($startEvent);
 

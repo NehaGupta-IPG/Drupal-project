@@ -8,6 +8,8 @@ use Drupal\Core\Database\FetchModeTrait;
 
 /**
  * Class for prefetched results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class PrefetchedResult extends ResultBase {
 
@@ -28,20 +30,23 @@ class PrefetchedResult extends ResultBase {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
    *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   The fetch options.
    * @param array $data
    *   The prefetched data, in FetchAs::Associative format.
    * @param int|null $rowCount
    *   The row count.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected array $data,
     public readonly ?int $rowCount,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable);
     $this->columnNames = isset($this->data[0]) ? array_keys($this->data[0]) : [];
     $this->currentRowIndex = -1;
   }
@@ -57,10 +62,8 @@ class PrefetchedResult extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
-    // We do not really need to do anything here, since calls to any of this
-    // class' methods require an explicit fetch mode to be passed in, and we
-    // have no longer an active client statement to which we may want to pass
-    // the default fetch mode. Just return TRUE.
+    $this->fetchMode = $mode;
+    $this->fetchOptions = $fetchOptions;
     return TRUE;
   }
 
@@ -71,11 +74,14 @@ class PrefetchedResult extends ResultBase {
     $this->currentRowIndex++;
     if (!isset($this->data[$this->currentRowIndex])) {
       $this->currentRowIndex = NULL;
+      $this->markResultsetFetchingComplete();
       return FALSE;
     }
     $rowAssoc = $this->data[$this->currentRowIndex];
     unset($this->data[$this->currentRowIndex]);
-    return $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
+    $row = $this->assocToFetchMode($rowAssoc, $mode, $fetchOptions);
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
   /**

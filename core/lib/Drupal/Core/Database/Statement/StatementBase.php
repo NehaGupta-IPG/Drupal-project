@@ -11,7 +11,6 @@ use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\FetchModeTrait;
 use Drupal\Core\Database\RowCountException;
 use Drupal\Core\Database\StatementInterface;
-use Drupal\Core\Database\StatementIteratorTrait;
 
 /**
  * StatementInterface base implementation.
@@ -34,7 +33,6 @@ use Drupal\Core\Database\StatementIteratorTrait;
 abstract class StatementBase implements \Iterator, StatementInterface {
 
   use FetchModeTrait;
-  use StatementIteratorTrait;
 
   /**
    * The client database Statement object.
@@ -50,6 +48,11 @@ abstract class StatementBase implements \Iterator, StatementInterface {
 
   /**
    * Holds the default fetch mode.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   ResultBase::setFetchMode() instead.
+   *
+   * @see https://www.drupal.org/node/3613105
    */
   protected FetchAs $fetchMode = FetchAs::Object;
 
@@ -57,6 +60,11 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * Holds fetch options.
    *
    * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   ResultBase::setFetchMode() instead.
+   *
+   * @see https://www.drupal.org/node/3613105
    */
   protected array $fetchOptions = [
     'class' => 'stdClass',
@@ -208,25 +216,24 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, string|int|null $a1 = NULL, array $a2 = []) {
-    $this->fetchMode = $mode;
+    $fetchOptions = NULL;
     switch ($mode) {
       case FetchAs::ClassObject:
-        $this->fetchOptions['class'] = $a1;
+        $fetchOptions['class'] = $a1;
         if ($a2) {
-          $this->fetchOptions['constructor_args'] = $a2;
+          $fetchOptions['constructor_args'] = $a2;
         }
         break;
 
       case FetchAs::Column:
-        $this->fetchOptions['column'] = $a1;
+        $fetchOptions['column'] = $a1;
         break;
 
     }
 
-    // If the result object is missing, just do with the properties setting.
     try {
       if ($this->result) {
-        return $this->result->setFetchMode($mode, $this->fetchOptions);
+        return $this->result->setFetchMode($mode, $fetchOptions ?? []);
       }
       return TRUE;
     }
@@ -239,35 +246,19 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetch(?FetchAs $mode = NULL) {
-    $row = $this->result->fetch($mode ?? $this->fetchMode, $this->fetchOptions);
-
-    if ($row === FALSE) {
-      $this->markResultsetFetchingComplete();
-      return FALSE;
-    }
-
-    $this->setResultsetCurrentRow($row);
-    return $row;
+    return $this->result->fetch($mode ?? $this->result->fetchMode, $this->result->fetchOptions);
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchObject(?string $className = NULL, array $constructorArguments = []) {
-    $row = $className === NULL ?
+    return $className === NULL ?
       $this->result->fetch(FetchAs::Object, []) :
       $this->result->fetch(FetchAs::ClassObject, [
         'class' => $className,
         'constructor_args' => $constructorArguments,
       ]);
-
-    if ($row === FALSE) {
-      $this->markResultsetFetchingComplete();
-      return FALSE;
-    }
-
-    $this->setResultsetCurrentRow($row);
-    return $row;
   }
 
   /**
@@ -281,34 +272,22 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchField(int $index = 0) {
-    $column = $this->result->fetch(FetchAs::Column, ['column' => $index]);
-
-    if ($column === FALSE) {
-      $this->markResultsetFetchingComplete();
-      return FALSE;
-    }
-
-    $this->setResultsetCurrentRow($column);
-    return $column;
+    return $this->result->fetch(FetchAs::Column, ['column' => $index]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchAll(?FetchAs $mode = NULL, ?int $columnIndex = NULL, ?array $constructorArguments = NULL) {
-    $fetchMode = $mode ?? $this->fetchMode;
+    $fetchOptions = NULL;
     if (isset($columnIndex)) {
-      $this->fetchOptions['column'] = $columnIndex;
+      $fetchOptions['column'] = $columnIndex;
     }
     if (isset($constructorArguments)) {
-      $this->fetchOptions['constructor_args'] = $constructorArguments;
+      $fetchOptions['constructor_args'] = $constructorArguments;
     }
 
-    $return = $this->result->fetchAll($fetchMode, $this->fetchOptions);
-
-    $this->markResultsetFetchingComplete();
-
-    return $return;
+    return $this->result->fetchAll($mode ?? $this->result->fetchMode, $fetchOptions ?? $this->result->fetchOptions);
   }
 
   /**
@@ -322,18 +301,14 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    * {@inheritdoc}
    */
   public function fetchAllAssoc(string $key, ?FetchAs $fetch = NULL) {
-    $result = $this->result->fetchAllAssoc($key, $fetch ?? $this->fetchMode, $this->fetchOptions);
-    $this->markResultsetFetchingComplete();
-    return $result;
+    return $this->result->fetchAllAssoc($key, $fetch ?? $this->result->fetchMode, $this->result->fetchOptions);
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchAllKeyed(int $keyIndex = 0, int $valueIndex = 1) {
-    $result = $this->result->fetchAllKeyed($keyIndex, $valueIndex);
-    $this->markResultsetFetchingComplete();
-    return $result;
+    return $this->result->fetchAllKeyed($keyIndex, $valueIndex);
   }
 
   /**
@@ -347,6 +322,69 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     else {
       throw new RowCountException();
     }
+  }
+
+  /**
+   * Returns the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.current.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function current(): mixed {
+    return $this->result->current();
+  }
+
+  /**
+   * Returns the key of the current element.
+   *
+   * @see https://www.php.net/manual/en/iterator.key.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function key(): mixed {
+    return $this->result->key();
+  }
+
+  /**
+   * Rewinds back to the first element of the Iterator.
+   *
+   * This is the first method called when starting a foreach loop. It will not
+   * be executed after foreach loops.
+   *
+   * @see https://www.php.net/manual/en/iterator.rewind.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function rewind(): void {
+    $this->result->rewind();
+  }
+
+  /**
+   * Moves the current position to the next element.
+   *
+   * This method is called after each foreach loop.
+   *
+   * @see https://www.php.net/manual/en/iterator.next.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function next(): void {
+    $this->result->next();
+  }
+
+  /**
+   * Checks if current position is valid.
+   *
+   * This method is called after ::rewind() and ::next() to check if the
+   * current position is valid.
+   *
+   * @see https://www.php.net/manual/en/iterator.valid.php
+   *
+   * @internal This method should not be called directly.
+   */
+  public function valid(): bool {
+    return $this->result->valid();
   }
 
 }

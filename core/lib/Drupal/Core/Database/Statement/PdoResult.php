@@ -6,6 +6,8 @@ namespace Drupal\Core\Database\Statement;
 
 /**
  * Class for PDO-provided results of a data query language (DQL) statement.
+ *
+ * @phpstan-import-type FetchOptions from \Drupal\Core\Database\Statement\ResultBase
  */
 class PdoResult extends ResultBase {
 
@@ -16,18 +18,21 @@ class PdoResult extends ResultBase {
    *
    * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
    *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
+   * @param FetchOptions $fetchOptions
    *   The fetch options.
    * @param \PDOStatement $clientStatement
    *   The PDO Statement object. PDO does not provide a separate object for
    *   results, se we need to fetch data from the Statement.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected readonly \PDOStatement $clientStatement,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable);
   }
 
   /**
@@ -53,6 +58,8 @@ class PdoResult extends ResultBase {
    * {@inheritdoc}
    */
   public function setFetchMode(FetchAs $mode, array $fetchOptions): bool {
+    $this->fetchMode = $mode;
+    $this->fetchOptions = $fetchOptions;
     return match ($mode) {
       FetchAs::ClassObject => $this->clientSetFetchMode($mode, $fetchOptions['class'], $fetchOptions['constructor_args'] ?? NULL),
       FetchAs::Column => $this->clientSetFetchMode($mode, $fetchOptions['column']),
@@ -67,14 +74,22 @@ class PdoResult extends ResultBase {
     if (!empty($fetchOptions)) {
       $this->setFetchMode($mode, $fetchOptions);
     }
-    return $this->clientFetch($mode);
+    $row = $this->clientFetch($mode);
+    // PostgreSql returns a \stdClass object with no content when fetching on
+    // a result from a DML statement.
+    if ($row === FALSE || ($mode === FetchAs::Object && empty((array) $row))) {
+      $this->markResultsetFetchingComplete();
+      return FALSE;
+    }
+    $this->setResultsetCurrentRow($row);
+    return $row;
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchAll(FetchAs $mode, array $fetchOptions): array {
-    return $this->clientFetchAll($mode, ...match ($mode) {
+    $result = $this->clientFetchAll($mode, ...match ($mode) {
       FetchAs::Column => [$fetchOptions['column'] ?? NULL],
       FetchAs::ClassObject => [
         $fetchOptions['class'] ?? NULL,
@@ -82,6 +97,8 @@ class PdoResult extends ResultBase {
       ],
       default => [],
     });
+    $this->markResultsetFetchingComplete();
+    return $result;
   }
 
 }
