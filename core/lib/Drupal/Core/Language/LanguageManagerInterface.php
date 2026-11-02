@@ -156,6 +156,9 @@ interface LanguageManagerInterface {
    *         The data key contains the source string.
    *   - data: A data structure that makes sense in the provided
    *     context, see above.
+   *   - first_candidate_only: (optional) TRUE when the caller only uses the
+   *     first usable candidate. Alter implementations may then skip expensive
+   *     checks on the candidates after it. Defaults to FALSE.
    *
    * @return array
    *   An array of language codes sorted by priority: first values should be
