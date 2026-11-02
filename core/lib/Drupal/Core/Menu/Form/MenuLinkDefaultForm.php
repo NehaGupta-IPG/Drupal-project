@@ -3,6 +3,7 @@
 namespace Drupal\Core\Menu\Form;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionInterface {
 
+  use DependencySerializationTrait;
   use StringTranslationTrait;
 
   /**
