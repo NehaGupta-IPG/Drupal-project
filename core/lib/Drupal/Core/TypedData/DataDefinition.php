@@ -187,6 +187,62 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   /**
    * {@inheritdoc}
    */
+  public function getDefault(): mixed {
+    return $this->definition['default'] ?? NULL;
+  }
+
+  /**
+   * Sets the default value.
+   *
+   * This only records metadata about the data; it does not change the value of
+   * any typed data object. As ::getDefault() returns NULL when no default
+   * value is declared, a declared NULL default value cannot be told apart
+   * from no declared default value by reading ::getDefault(). The definition
+   * array still records the declaration.
+   *
+   * @param mixed $value
+   *   The default value.
+   *
+   * @return static
+   *   The object itself for chaining.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinitionInterface::getDefault()
+   */
+  public function setDefault(mixed $value): static {
+    $this->definition['default'] = $value;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExamples(): array {
+    return $this->definition['examples'] ?? [];
+  }
+
+  /**
+   * Sets example values.
+   *
+   * This only records metadata about the data; it does not change the value of
+   * any typed data object. Pass an empty array to remove previously declared
+   * examples.
+   *
+   * @param array $examples
+   *   A list of example values.
+   *
+   * @return static
+   *   The object itself for chaining.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinitionInterface::getExamples()
+   */
+  public function setExamples(array $examples): static {
+    $this->definition['examples'] = $examples;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getClass() {
     if (isset($this->definition['class'])) {
       return $this->definition['class'];

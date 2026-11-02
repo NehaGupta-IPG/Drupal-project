@@ -242,6 +242,27 @@ class FieldCrudTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that field configuration declares no data definition default.
+   */
+  public function testDataDefinitionDefault(): void {
+    $field = FieldConfig::create($this->fieldDefinition);
+    $this->assertNull($field->getDefault());
+
+    // A field default value does not declare a data definition default.
+    $field = FieldConfig::create($this->fieldDefinition + ['default_value' => [['value' => 'foo']]]);
+    $this->assertSame([['value' => 'foo']], $field->getDefaultValueLiteral());
+    $this->assertNull($field->getDefault());
+  }
+
+  /**
+   * Tests that field configuration declares no data definition examples.
+   */
+  public function testDataDefinitionExamples(): void {
+    $field = FieldConfig::create($this->fieldDefinition);
+    $this->assertSame([], $field->getExamples());
+  }
+
+  /**
    * Tests reading back a field definition.
    */
   public function testReadField(): void {

@@ -117,6 +117,44 @@ interface DataDefinitionInterface {
   public function isRequired();
 
   /**
+   * Returns the declared default value.
+   *
+   * The default value is descriptive metadata only. The typed data system does
+   * not apply it when creating a typed data object, and it is not taken into
+   * account during validation. Consumers may use it, for example, to
+   * pre-populate a form element or to emit a JSON Schema "default" keyword.
+   *
+   * The default value should use the same format as accepted by
+   * \Drupal\Core\TypedData\TypedDataInterface::setValue() for the described
+   * data.
+   *
+   * @return mixed
+   *   The default value, or NULL if no default value was declared.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinition::setDefault()
+   */
+  public function getDefault(): mixed;
+
+  /**
+   * Returns example values.
+   *
+   * Examples are descriptive metadata only. The typed data system does not
+   * validate them and does not use them when creating a typed data object.
+   * Consumers may use them, for example, to document an API, to emit a JSON
+   * Schema "examples" keyword or to populate the placeholder of a form element.
+   *
+   * Each example should use the same format as accepted by
+   * \Drupal\Core\TypedData\TypedDataInterface::setValue() for the described
+   * data.
+   *
+   * @return array
+   *   A list of example values. An empty array if no examples were declared.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinition::setExamples()
+   */
+  public function getExamples(): array;
+
+  /**
    * Returns the class used for creating the typed data object.
    *
    * If not specified, the default class of the data type will be returned.

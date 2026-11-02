@@ -626,6 +626,24 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  public function getDefault(): mixed {
+    // Field configuration does not declare a data definition default value.
+    // The default value of a field is available via ::getDefaultValueLiteral()
+    // and ::getDefaultValue().
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExamples(): array {
+    // Field configuration does not declare data definition examples.
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isInternal() {
     // Respect the definition, otherwise default to TRUE for computed fields.
     if (isset($this->definition['internal'])) {

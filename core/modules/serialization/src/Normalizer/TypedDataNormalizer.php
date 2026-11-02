@@ -45,16 +45,18 @@ class TypedDataNormalizer extends NormalizerBase {
     $nullable = !$object->getDataDefinition()->isRequired();
     // Match the special-cased logic in ::normalize().
     if (is_object($value) && method_exists($value, '__toString')) {
-      return $nullable
+      $schema = $nullable
         ? ['oneOf' => ['string', 'null']]
         : ['type' => 'string'];
+      return $this->addDataDefinitionAnnotations($object, $schema);
     }
-    return $this->getJsonSchemaForMethod(
+    $schema = $this->getJsonSchemaForMethod(
       $object,
       'getValue',
       ['$comment' => static::generateNoSchemaAvailableMessage($object)],
       $nullable
     );
+    return $this->addDataDefinitionAnnotations($object, $schema);
   }
 
   /**
