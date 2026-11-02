@@ -1,0 +1,7 @@
+name: 'Link test widget'
+description: 'Provides a link widget that edits one link attribute.'
+type: module
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:link
