@@ -305,6 +305,7 @@ class Datetime extends DateElementBase {
         '#required' => $element['#required'],
         '#size' => 12,
         '#error_no_message' => TRUE,
+        '#step' => 1,
       ];
 
       // Allows custom callbacks to alter the element.
