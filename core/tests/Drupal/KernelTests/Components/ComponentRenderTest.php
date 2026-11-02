@@ -487,7 +487,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
   }
 
   /**
-   * Ensure that the slots allow a render array or a scalar when using the render element.
+   * Ensure that the slots allow valid input.
    */
   public function testRenderSlots(): void {
     $slots = [
@@ -495,6 +495,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       [
         '#plain_text' => 'This is the contents of the banner body.',
       ],
+      $this->t('This is the contents of the banner body.'),
     ];
     foreach ($slots as $slot) {
       $build = [
@@ -533,7 +534,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       ],
     ];
     $this->expectException(InvalidComponentDataException::class);
-    $this->expectExceptionMessageIs('Unable to render component "sdc_test:my-banner". A render array or a scalar is expected for the slot "banner_body" when using the render element with the "#slots" property');
+    $this->expectExceptionMessageIs('Unable to render component "sdc_test:my-banner". A scalar, render array, markup, or RenderableInterface is expected for the slot "banner_body" when using the render element with the "#slots" property');
     $this->renderComponentRenderArray($build);
   }
 
