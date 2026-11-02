@@ -141,6 +141,29 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   }
 
   /**
+   * Builds a page with ellipsis.
+   *
+   * @return array
+   *   A render array containing the table and pager elements.
+   */
+  public function ellipsis(): array {
+
+    // Build three tables with same query and different pagers.
+    $build['pager_table'] = $this->buildTestTable(0, 1);
+    $build['pager_pager'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['test-pager']],
+      'pager' => [
+        '#type' => 'pager',
+        '#element' => 0,
+        '#quantity' => 2,
+      ],
+    ];
+
+    return $build;
+  }
+
+  /**
    * Render API callback: Shows the pager cache context for type pager.
    *
    * This function is assigned as a #pre_render callback.
