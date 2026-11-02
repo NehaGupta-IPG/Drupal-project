@@ -118,8 +118,16 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     // always switch back to the original account after the return statement or
     // if an exception was thrown.
     try {
+      // For static cache, add the user ID and filter out user cache contexts
+      // as they are no longer needed. The user cache tag has to be added here
+      // so that changes to the user such as adding or removing a role
+      // invalidate the static cache, forcing any access policy checks after the
+      // change to rely on the latest state.
+      $static_cache_keys = array_merge($cache_keys, ['user:' . $account->id()]);
+      $static_initial_cacheability = clone $initial_cacheability;
+      $static_initial_cacheability->setCacheContexts($this->filterUserCacheContexts($initial_cacheability->getCacheContexts()));
       // Retrieve the permissions from the static cache if available.
-      if ($static_cache = $this->variationStatic->get($cache_keys, $initial_cacheability)) {
+      if ($static_cache = $this->variationStatic->get($static_cache_keys, $static_initial_cacheability)) {
         return $static_cache->data;
       }
 
@@ -133,7 +141,9 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         // conversion every time we call for the calculated permissions from a
         // warm static cache.
         $calculated_permissions = new CalculatedPermissions($calculated_permissions);
-        $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
+        $cacheability->setCacheContexts($this->filterUserCacheContexts($cacheability->getCacheContexts()));
+        $cacheability->addCacheTags(['user:' . $account->id()]);
+        $this->variationStatic->set($static_cache_keys, $calculated_permissions, $cacheability, $static_initial_cacheability);
         return $calculated_permissions;
       }
 
@@ -185,7 +195,9 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
       // conversion every time we call for the calculated permissions from a
       // warm static cache.
       $calculated_permissions = new CalculatedPermissions($calculated_permissions);
-      $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
+      $cacheability->setCacheContexts($this->filterUserCacheContexts($cacheability->getCacheContexts()));
+      $cacheability->addCacheTags(['user:' . $account->id()]);
+      $this->variationStatic->set($static_cache_keys, $calculated_permissions, $cacheability, $static_initial_cacheability);
 
       // Return the permissions as an immutable value object.
       return $calculated_permissions;
@@ -258,6 +270,19 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Filters out user cache contexts.
+   *
+   * @param array $contexts
+   *   Cache contexts to filter.
+   *
+   * @return array
+   *   The filtered cache contexts.
+   */
+  protected function filterUserCacheContexts(array $contexts): array {
+    return array_filter($contexts, fn(string $context) => !str_starts_with($context, 'user'));
   }
 
 }

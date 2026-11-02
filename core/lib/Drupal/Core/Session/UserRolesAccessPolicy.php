@@ -26,7 +26,11 @@ final class UserRolesAccessPolicy extends AccessPolicyBase implements CacheOptio
     foreach ($user_roles as $user_role) {
       $calculated_permissions
         ->addItem(new CalculatedPermissionsItem($user_role->getPermissions(), $user_role->isAdmin()))
-        ->addCacheableDependency($user_role);
+        ->addCacheTags($user_role->getCacheTags())
+        ->mergeCacheMaxAge($user_role->getCacheMaxAge())
+        // Filter out language cache contexts as they do not affect which
+        // permissions a role has.
+        ->addCacheContexts(array_filter($user_role->getCacheContexts(), fn(string $context) => !str_starts_with($context, 'languages:')));
     }
 
     return $calculated_permissions;

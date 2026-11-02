@@ -93,6 +93,7 @@ class WorkspaceAccessTest extends KernelTestBase {
     \Drupal::entityTypeManager()->getAccessControlHandler('workspace')->resetCache();
     $role = $this->createRole([$permission]);
     $user->addRole($role);
+    $user->save();
     $this->assertTrue($workspace->access($operation, $user));
   }
 

@@ -114,14 +114,14 @@ class FileUploadTest extends JsonapiKernelTestBase {
       'name' => 'editor',
       'mail' => 'editor@localhost',
       'status' => 1,
-      'uid' => 3,
+      'uid' => 4,
       'roles' => ['editor'],
     ]);
     $no_access_user = User::create([
       'name' => 'no access',
       'mail' => 'user@localhost',
       'status' => 1,
-      'uid' => 4,
+      'uid' => 5,
     ]);
 
     // Create an entity to test access against.
