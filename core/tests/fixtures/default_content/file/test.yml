@@ -1,0 +1,3 @@
+# Intentionally a string, so we can test that the default content finder
+# ignores scalars.
+A YAML file referenced by a file entity.

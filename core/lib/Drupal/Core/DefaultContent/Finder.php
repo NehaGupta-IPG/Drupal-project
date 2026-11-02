@@ -53,6 +53,10 @@ final class Finder {
         Json::getFileExtension() => Json::decode(...),
       })($file->getContents());
 
+      if (empty($decoded['_meta'])) {
+        continue;
+      }
+
       $decoded['_meta']['path'] = $file->getPathname();
       $uuid = $decoded['_meta']['uuid'] ?? throw new ImportException($decoded['_meta']['path'] . ' does not have a UUID.');
       $files[$uuid] = $decoded;
