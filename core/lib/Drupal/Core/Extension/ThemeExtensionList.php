@@ -111,7 +111,7 @@ class ThemeExtensionList extends ExtensionList {
     }
 
     // Build dependencies.
-    $themes = $this->moduleHandler->buildModuleDependencies($themes);
+    $themes = $this->buildModuleDependencies($themes);
 
     // After establishing the full list of available themes, fill in data for
     // sub-themes.

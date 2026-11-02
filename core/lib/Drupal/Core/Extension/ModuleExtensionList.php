@@ -167,7 +167,7 @@ class ModuleExtensionList extends ExtensionList {
       $module->status = (int) isset($installed_modules[$name]);
       $module->schema_version = UpdateHookRegistry::SCHEMA_UNINSTALLED;
     }
-    $extensions = $this->moduleHandler->buildModuleDependencies($extensions);
+    $extensions = $this->buildModuleDependencies($extensions);
 
     if ($this->installProfile && $extensions[$this->installProfile]) {
       $active_profile = $extensions[$this->installProfile];

@@ -195,6 +195,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function buildModuleDependencies(array $modules) {
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3017020', E_USER_DEPRECATED);
     foreach ($modules as $module) {
       $graph[$module->getName()]['edges'] = [];
       if (isset($module->info['dependencies']) && is_array($module->info['dependencies'])) {
