@@ -152,8 +152,8 @@ class Connection extends BaseMySqlConnection {
 
     try {
       // Create the database and set it as active.
-      $this->connection->query("CREATE DATABASE $database");
-      $this->connection->query("USE $database");
+      $this->getClientConnection()->query("CREATE DATABASE $database");
+      $this->getClientConnection()->query("USE $database");
     }
     catch (\Exception $e) {
       throw new DatabaseNotFoundException($e->getMessage());
@@ -164,14 +164,14 @@ class Connection extends BaseMySqlConnection {
    * {@inheritdoc}
    */
   public function quote($string, $parameter_type = \PDO::PARAM_STR) {
-    return "'" . $this->connection->escape_string((string) $string) . "'";
+    return "'" . $this->getClientConnection()->escape_string((string) $string) . "'";
   }
 
   /**
    * {@inheritdoc}
    */
   public function lastInsertId(?string $name = NULL): string {
-    return (string) $this->connection->insert_id;
+    return (string) $this->getClientConnection()->insert_id;
   }
 
   /**
@@ -186,6 +186,13 @@ class Connection extends BaseMySqlConnection {
    */
   protected function driverTransactionManager(): TransactionManagerInterface {
     return new TransactionManager($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDatabaseException(\Throwable $e): \Throwable|false {
+    return $e instanceof \mysqli_sql_exception ? $e : FALSE;
   }
 
 }

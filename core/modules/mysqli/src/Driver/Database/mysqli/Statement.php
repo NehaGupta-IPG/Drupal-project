@@ -25,6 +25,13 @@ class Statement extends StatementBase {
   protected array $paramsPositions;
 
   /**
+   * The converted query string.
+   *
+   * @var string
+   */
+  protected string $convertedQueryString;
+
+  /**
    * Constructs a Statement object.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -68,56 +75,51 @@ class Statement extends StatementBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($args = [], $options = []) {
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
-      }
-      else {
-        $this->setFetchMode($options['fetch']);
-      }
-    }
-
-    $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
-
-    try {
-      // Prepare the lower-level statement if it's not been prepared already.
-      if (!$this->hasClientStatement()) {
-        // Replace named placeholders with positional ones if needed.
-        $this->paramsPositions = array_flip(array_keys($args));
-        $converter = new NamedPlaceholderConverter();
-        $converter->parse($this->queryString, $args);
-        [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
-        $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
-      }
-      else {
-        // Transform the $args to positional.
-        $tmp = [];
-        foreach ($this->paramsPositions as $param => $pos) {
-          $tmp[$pos] = $args[$param];
-        }
-        $args = $tmp;
-      }
-
-      // In mysqli, the results of the statement execution are returned in a
-      // different object than the statement itself.
-      $return = $this->getClientStatement()->execute($args);
-      $this->result = new Result(
-        $this->fetchMode,
-        $this->fetchOptions,
-        $this->getClientStatement()->get_result(),
-        $this->clientConnection,
-      );
-      $this->markResultsetIterable($return);
-    }
-    catch (\Exception $e) {
-      $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
-      throw $e;
-    }
-
-    $this->dispatchStatementExecutionEndEvent($startEvent);
-
+  public function doExecute(?array $args = [], array $options = []): bool {
+    $return = $this->getClientStatement()->execute($args);
+    $this->result = new Result(
+      $this->fetchMode,
+      $this->fetchOptions,
+      $this->getClientStatement()->get_result(),
+      $this->clientConnection,
+    );
+    $this->markResultsetIterable($return);
     return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function convertArgs(array $args): array {
+    // Prepare the lower-level statement if it's not been prepared already.
+    if (!$this->hasClientStatement()) {
+      // Replace named placeholders with positional ones if needed.
+      $this->paramsPositions = array_flip(array_keys($args));
+      $converter = new NamedPlaceholderConverter();
+      $converter->parse($this->queryString, $args);
+      [$this->convertedQueryString, $args] = [
+        $converter->getConvertedSQL(),
+        $converter->getConvertedParameters(),
+      ];
+    }
+    else {
+      // Transform the $args to positional.
+      $tmp = [];
+      foreach ($this->paramsPositions as $param => $pos) {
+        $tmp[$pos] = $args[$param];
+      }
+      $args = $tmp;
+    }
+    return $args;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepare(array $options): void {
+    $this->clientStatement = $this->connection
+      ->getClientConnection()
+      ->prepare($this->convertedQueryString);
   }
 
 }

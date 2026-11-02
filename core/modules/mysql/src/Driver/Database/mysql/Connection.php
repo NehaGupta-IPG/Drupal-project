@@ -318,8 +318,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     try {
       // Create the database and set it as active.
-      $this->connection->exec("CREATE DATABASE $database");
-      $this->connection->exec("USE $database");
+      $this->getClientConnection()->exec("CREATE DATABASE $database");
+      $this->getClientConnection()->exec("USE $database");
     }
     catch (\Exception $e) {
       throw new DatabaseNotFoundException($e->getMessage());

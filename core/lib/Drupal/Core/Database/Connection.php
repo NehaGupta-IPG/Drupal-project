@@ -248,7 +248,88 @@ abstract class Connection {
    *   The client-level database connection, for example \PDO.
    */
   public function getClientConnection(): object {
+    if (!$this->connection) {
+      $this->connection = static::open($this->connectionOptions);
+    }
     return $this->connection;
+  }
+
+  /**
+   * Reconnect if necessary.
+   *
+   * @param \Throwable $e
+   *   The error thrown.
+   *
+   * @return bool
+   *   TRUE if reconnection was necessary.
+   *
+   * @internal
+   */
+  public function reconnectOnLostConnection(\Throwable $e): bool {
+    if ($this->transactionManager()->inTransaction() || !$this->detectLostConnection($e)) {
+      return FALSE;
+    }
+    $this->close();
+    // Getting connection will open the connection again.
+    $newConnection = Database::getConnection($this->target, $this->key);
+
+    // All the other references to this service instance will be retained, so
+    // hot-swap the new connection into this instance. PHP uses class based
+    // privacy so it's possible to read a protected property from the new
+    // instance and set it on this one. Java and C++ also uses class based
+    // privacy while Smalltalk, Ruby, Eiffel uses object based privacy where
+    // another instance of the same class cannot directly access private
+    // properties of an object.
+    $this->connection = $newConnection->connection;
+    return TRUE;
+  }
+
+  /**
+   * Close this connection.
+   */
+  public function close(): void {
+    Database::closeConnection($this->target, $this->key);
+  }
+
+  /**
+   * Close the native connection.
+   *
+   * @internal
+   */
+  public function closeClientConnection(): void {
+    // @phpstan-ignore method.deprecated
+    $this->commitAll();
+    $this->__destruct();
+  }
+
+  /**
+   * Detect whether an exception is a lost connection.
+   *
+   * @param \Throwable $e
+   *   The exception.
+   *
+   * @return bool
+   *   TRUE if this exception indicates a lost connection.
+   */
+  protected function detectLostConnection(\Throwable $e): bool {
+    if ($e = $this->getDatabaseException(ExceptionHandler::getRootException($e))) {
+      $message = $e->getMessage();
+      return array_any(LostConnectionDetector::STRINGS, static fn ($x): bool => str_contains($message, $x));
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get a database exception if there's one.
+   *
+   * @param \Throwable $e
+   *   An exception thrown during query execution.
+   *
+   * @return \Throwable|false
+   *   A database exception if one is found or FALSE.
+   */
+  protected function getDatabaseException(\Throwable $e): \Throwable|false {
+    return $e instanceof \PDOException ? $e : FALSE;
   }
 
   /**
@@ -434,16 +515,15 @@ abstract class Connection {
    * @throws \InvalidArgumentException
    *   If multiple statements are included in the string, and delimiters are
    *   not allowed in the query.
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws \Drupal\Core\Database\DatabaseException
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
-
     try {
       return new $this->statementWrapperClass(
         $this,
-        $this->connection,
+        $this->getClientConnection(),
         $this->preprocessStatement($query, $options),
         $options['pdo'] ?? [],
         $allow_row_count,
@@ -856,7 +936,7 @@ abstract class Connection {
    *   In case of failure.
    */
   public function lastInsertId(?string $name = NULL): string {
-    if (($last_insert_id = $this->connection->lastInsertId($name)) === FALSE) {
+    if (($last_insert_id = $this->getClientConnection()->lastInsertId($name)) === FALSE) {
       throw new DatabaseExceptionWrapper("Could not determine last insert id" . $name === NULL ? '' : " for sequence $name");
     }
     return $last_insert_id;
@@ -1205,7 +1285,7 @@ abstract class Connection {
    *   The version of the database server.
    */
   public function version() {
-    return $this->connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
+    return $this->getClientConnection()->getAttribute(\PDO::ATTR_SERVER_VERSION);
   }
 
   /**
@@ -1218,7 +1298,7 @@ abstract class Connection {
    *   The version of the database client.
    */
   public function clientVersion() {
-    return $this->connection->getAttribute(\PDO::ATTR_CLIENT_VERSION);
+    return $this->getClientConnection()->getAttribute(\PDO::ATTR_CLIENT_VERSION);
   }
 
   /**
@@ -1322,7 +1402,7 @@ abstract class Connection {
    * @see \PDO::quote()
    */
   public function quote($string, $parameter_type = \PDO::PARAM_STR) {
-    return $this->connection->quote($string, $parameter_type);
+    return $this->getClientConnection()->quote($string, $parameter_type);
   }
 
   /**

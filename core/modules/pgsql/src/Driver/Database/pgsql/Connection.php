@@ -330,7 +330,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $collate = setlocale(LC_COLLATE, 0);
     if ($ctype && $collate) {
       try {
-        $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='$ctype.UTF-8' LC_COLLATE='$collate.UTF-8'");
+        $this->getClientConnection()->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='$ctype.UTF-8' LC_COLLATE='$collate.UTF-8'");
         $db_created = TRUE;
       }
       catch (\Exception $e) {
@@ -342,7 +342,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // Otherwise fall back to creating the database using the 'en_US' locales.
     if (!$db_created) {
       try {
-        $this->connection->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='en_US.UTF-8' LC_COLLATE='en_US.UTF-8'");
+        $this->getClientConnection()->exec("CREATE DATABASE $database WITH TEMPLATE template0 ENCODING='UTF8' LC_CTYPE='en_US.UTF-8' LC_COLLATE='en_US.UTF-8'");
       }
       catch (\Exception $e) {
         // If the database can't be created with the 'en_US' locale either,
