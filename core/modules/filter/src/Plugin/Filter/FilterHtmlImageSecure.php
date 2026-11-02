@@ -77,6 +77,14 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
           // The image has the right path. Invalid images are handled below.
           continue;
         }
+
+        if (@pathinfo($local_image_path, PATHINFO_EXTENSION) === 'svg') {
+          // It's an SVG. Make sure it appears to be valid.
+          if (($xml = @simplexml_load_string(file_get_contents($local_image_path))) && strtolower($xml->getName()) === 'svg') {
+            // Appears to be valid. Erroneous images are dealt with below.
+            continue;
+          }
+        }
       }
       // Allow modules and themes to replace an invalid image with an error
       // indicator.

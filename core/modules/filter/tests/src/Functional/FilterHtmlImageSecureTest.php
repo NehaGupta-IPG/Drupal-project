@@ -91,6 +91,7 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $csrf_path = $public_files_path . '/' . implode('/', array_fill(0, substr_count($public_files_path, '/') + 1, '..'));
 
     $druplicon = 'core/misc/druplicon.png';
+    $svg_image = 'core/misc/logo/drupal-logo.svg';
     $red_x_image = base_path() . 'core/misc/icons/e32700/error.svg';
 
     // Put a test image in the files directory.
@@ -112,6 +113,9 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $images = [
       $http_base_url . '/' . $druplicon => base_path() . $druplicon,
       $https_base_url . '/' . $druplicon => base_path() . $druplicon,
+      // Test an SVG image.
+      $http_base_url . '/' . $svg_image => base_path() . $svg_image,
+      $https_base_url . '/' . $svg_image => base_path() . $svg_image,
       // Test a URL that includes a port.
       preg_replace($host_pattern, 'http://' . $host . ':', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
       preg_replace($host_pattern, 'http://' . $host . ':80', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
