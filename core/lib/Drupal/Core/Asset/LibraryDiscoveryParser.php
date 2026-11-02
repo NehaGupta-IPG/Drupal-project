@@ -22,6 +22,22 @@ use Drupal\Core\Plugin\Component;
  */
 class LibraryDiscoveryParser {
 
+  /**
+   * The list of asset paths / sources that have libraries-override applied.
+   */
+  protected array $overriddenLibraryPaths = [];
+
+  /**
+   * Used to retrieve original libraries-override keys from base theme paths.
+   *
+   * This is used to maintain backward compatibility with previous
+   * libraries-override behavior where overriding of already overridden paths
+   * required using the full Drupal-root-relative path of the last override.
+   *
+   * @todo Remove BC layer in Drupal 12.0.0 https://www.drupal.org/node/2852314.
+   */
+  protected array $originalLibraryPaths = [];
+
   public function __construct(
     protected string $appRoot,
     protected ModuleHandlerInterface $moduleHandler,
@@ -76,7 +92,7 @@ class LibraryDiscoveryParser {
     }
 
     $libraries = $this->parseLibraryInfo($extension, $path);
-    $libraries = $this->applyLibrariesOverride($libraries, $extension);
+    $libraries = $this->applyLibrariesOverride($libraries, $extension, $path);
 
     foreach ($libraries as $id => &$library) {
       if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
@@ -145,6 +161,14 @@ class LibraryDiscoveryParser {
         }
         foreach ($library[$type] as $source => $options) {
           unset($library[$type][$source]);
+          // Get the actual overridden path to $source in libraries-override.
+          $source = $this->getLatestOverridePath($source, $type, $id, $extension);
+          if (!$source) {
+            // If $source is false, it means that a libraries-override entry in
+            // the theme or base theme has specified that the library should be
+            // removed. Hence this entry should not be processed.
+            continue;
+          }
           // Allow to omit the options hashmap in YAML declarations.
           if (!is_array($options)) {
             $options = [];
@@ -449,17 +473,52 @@ class LibraryDiscoveryParser {
    *   The libraries definitions.
    * @param string $extension
    *   The extension in which these libraries are defined.
+   * @param string $extension_path
+   *   The extension path.
    *
    * @return array
    *   The modified libraries definitions.
    */
-  protected function applyLibrariesOverride($libraries, $extension) {
+  protected function applyLibrariesOverride($libraries, $extension, $extension_path) {
     $active_theme = $this->themeManager->getActiveTheme();
     // ActiveTheme::getLibrariesOverride() returns libraries-overrides for the
     // current theme as well as all its base themes.
     $all_libraries_overrides = $active_theme->getLibrariesOverride();
-    foreach ($all_libraries_overrides as $theme_path => $libraries_overrides) {
-      foreach ($libraries as $library_name => $library) {
+    if ($all_libraries_overrides) {
+      // Populate the original library paths if there are library overrides.
+      // It'll be used to check if the original path is being referenced in a
+      // libraries override.
+      // @todo Remove BC in Drupal 12.0.0 https://www.drupal.org/node/2852314.
+      foreach ($libraries as $library) {
+        foreach (['js', 'css'] as $type) {
+          if (!isset($library[$type]) || !is_array($library[$type])) {
+            continue;
+          }
+          $value = $library[$type];
+          if ($type === 'css') {
+            // Loop through the CSS categories.
+            foreach ($value as $library_entries) {
+              foreach (array_keys($library_entries) as $library_path) {
+                $resolved = $this->resolveThemeAssetPath($extension_path, $library_path);
+                if ($resolved !== $library_path) {
+                  $this->originalLibraryPaths[$resolved] = $library_path;
+                }
+              }
+            }
+          }
+          else {
+            foreach (array_keys($value) as $library_path) {
+              $resolved = $this->resolveThemeAssetPath($extension_path, $library_path);
+              if ($resolved !== $library_path) {
+                $this->originalLibraryPaths[$resolved] = $library_path;
+              }
+            }
+          }
+        }
+      }
+    }
+    foreach ($libraries as $library_name => $library) {
+      foreach ($all_libraries_overrides as $theme_path => $libraries_overrides) {
         $libraries_overrides = $this->applyLibrariesMovedOverrides($library, $library_name, $extension, $libraries_overrides, $active_theme);
 
         // Process libraries overrides.
@@ -487,23 +546,23 @@ class LibraryDiscoveryParser {
           elseif (is_array($override_definition)) {
             // An array definition implies an override for an asset within this
             // library.
-            foreach ($override_definition as $sub_key => $value) {
+            foreach ($override_definition as $type => $value) {
               // Throw an exception if the asset is not properly specified.
               if (!is_array($value)) {
-                throw new InvalidLibrariesOverrideSpecificationException(sprintf('Library asset %s is not correctly specified. It should be in the form "extension/library_name/sub_key/path/to/asset.js".', "$extension/$library_name/$sub_key"));
+                throw new InvalidLibrariesOverrideSpecificationException(sprintf('Library asset %s is not correctly specified. It should be in the form "extension/library_name/sub_key/path/to/asset.js".', "$extension/$library_name/$type"));
               }
-              if ($sub_key === 'drupalSettings') {
+              if ($type === 'drupalSettings') {
                 // drupalSettings may not be overridden.
-                throw new InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$sub_key"));
+                throw new InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$type"));
               }
-              elseif ($sub_key === 'css') {
+              elseif ($type === 'css') {
                 // SMACSS category should be incorporated into the asset name.
-                foreach ($value as $category => $overrides) {
-                  $this->setOverrideValue($libraries[$library_name], [$sub_key, $category], $overrides, $theme_path);
+                foreach ($value as $overrides) {
+                  $this->setOverrideValue($overrides, $type, $library_name, $extension, $theme_path);
                 }
               }
               else {
-                $this->setOverrideValue($libraries[$library_name], [$sub_key], $value, $theme_path);
+                $this->setOverrideValue($value, $type, $library_name, $extension, $theme_path);
               }
             }
           }
@@ -522,39 +581,42 @@ class LibraryDiscoveryParser {
   }
 
   /**
-   * Overrides the specified library asset.
+   * Stores the specified library-overrides for later implementation.
    *
-   * @param array $library
-   *   The containing library definition.
-   * @param array $sub_key
-   *   An array containing the sub-keys specifying the library asset, e.g.
-   *   ['js'] or ['css', 'component'].
    * @param array $overrides
    *   Specifies the overrides, this is an array where the key is the asset to
    *   be overridden while the value is overriding asset.
+   * @param string $type
+   *   The type of library asset, e.g. 'js' or 'css'.
+   * @param string $library_name
+   *   The name of the library being overridden.
+   * @param string $extension
+   *   The extension name.
    * @param string $theme_path
-   *   The theme or base theme.
+   *   The path to the theme defining the libraries-override.
    */
-  protected function setOverrideValue(array &$library, array $sub_key, array $overrides, $theme_path) {
+  protected function setOverrideValue(array $overrides, string $type, string $library_name, string $extension, string $theme_path): void {
     foreach ($overrides as $original => $replacement) {
-      // Get the attributes of the asset to be overridden. If the key does
-      // not exist, then throw an exception.
-      $key_exists = NULL;
-      $parents = array_merge($sub_key, [$original]);
-      // Save the attributes of the library asset to be overridden.
-      $attributes = NestedArray::getValue($library, $parents, $key_exists);
-      if ($key_exists) {
-        // Remove asset to be overridden.
-        NestedArray::unsetValue($library, $parents);
-        // No need to replace if FALSE is specified, since that is a removal.
-        if ($replacement) {
-          // Ensure the replacement path is relative to drupal root.
-          $replacement = $this->resolveThemeAssetPath($theme_path, $replacement);
-          $new_parents = array_merge($sub_key, [$replacement]);
-          // Replace with an override if specified.
-          NestedArray::setValue($library, $new_parents, $attributes);
-        }
+      // $original can either be the last overridden path or the original
+      // library definition path.
+
+      // For BC we check if $original still refers to base-theme overrides.
+      // @todo Remove BC in Drupal 12.0.0 https://www.drupal.org/node/2852314.
+      if (isset($this->originalLibraryPaths[$original])) {
+        // Here $original actually refers to an overridden path (maybe from a
+        // base theme), so get the actual original path by which the library
+        // asset was keyed.
+        @trigger_error(sprintf(
+          'Overriding a library asset using an overridden path as the key is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
+          $original
+        ), E_USER_DEPRECATED);
+        $original = $this->originalLibraryPaths[$original];
       }
+      if ($replacement) {
+        $this->originalLibraryPaths[$this->resolveThemeAssetPath($theme_path, $replacement)] = $original;
+      }
+
+      $this->setLatestOverridePath($this->resolveThemeAssetPath($theme_path, $replacement), $original, $type, $library_name, $extension);
     }
   }
 
@@ -563,14 +625,22 @@ class LibraryDiscoveryParser {
    *
    * @param string $theme_path
    *   The theme or base theme.
-   * @param string $overriding_asset
-   *   The overriding library asset.
+   * @param string|false $overriding_asset
+   *   The overriding library asset or false for asset removal.
    *
-   * @return string
-   *   A fully resolved theme asset path relative to the Drupal directory.
+   * @return string|false
+   *   A fully resolved theme asset path relative to the Drupal directory or
+   *   false if the asset is to be removed.
    */
   protected function resolveThemeAssetPath($theme_path, $overriding_asset) {
-    if ($overriding_asset[0] !== '/' && !$this->isValidUri($overriding_asset)) {
+    if ($overriding_asset === FALSE) {
+      return FALSE;
+    }
+    if (
+      isset($overriding_asset[0])
+      && $overriding_asset[0] !== '/'
+      && !$this->isValidUri($overriding_asset)
+    ) {
       // The destination is not an absolute path and it's not a URI (e.g.
       // public://generated_js/example.js or https://example.com/js/my_js.js),
       // so it's relative to the theme.
@@ -607,6 +677,47 @@ class LibraryDiscoveryParser {
     }
 
     return 0;
+  }
+
+  /**
+   * Gets the libraries-override path that applies to the library asset.
+   *
+   * @param string $original_path
+   *   The original library asset source path.
+   * @param string $type
+   *   The type of library asset, e.g. 'js' or 'css'.
+   * @param string $library_name
+   *   The library name or ID string.
+   * @param string $extension
+   *   The extension name.
+   *
+   * @return string|false
+   *   The full path to the effective libraries-override asset or $original_path
+   *   if the asset is not overridden. Returns false if the asset is to be
+   *   removed.
+   */
+  protected function getLatestOverridePath(string $original_path, string $type, string $library_name, string $extension): string|false {
+    $key = $extension . ':' . $library_name . ':' . $type . ':' . $original_path;
+    return $this->overriddenLibraryPaths[$key] ?? $original_path;
+  }
+
+  /**
+   * Sets the libraries-override path that applies to the library asset.
+   *
+   * @param string|false $new_path
+   *   The Drupal-root-relative path to the overriding library asset or false if
+   *   the asset is to be removed.
+   * @param string $original_path
+   *   The original library asset source path.
+   * @param string $type
+   *   The type of library asset, e.g. 'js' or 'css'.
+   * @param string $library_name
+   *   The library name or ID string.
+   * @param string $extension
+   *   The extension name.
+   */
+  protected function setLatestOverridePath(string|bool $new_path, string $original_path, string $type, string $library_name, string $extension): void {
+    $this->overriddenLibraryPaths[$extension . ':' . $library_name . ':' . $type . ':' . $original_path] = $new_path;
   }
 
 }

@@ -1,0 +1,11 @@
+name: 'Theme test legacy subtheme'
+type: theme
+description: 'Test theme which uses test_subtheme as the base theme.'
+version: VERSION
+base theme: test_subtheme
+
+libraries-override:
+  test_base_theme/global-styling:
+    css:
+      base:
+        /core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css: css/legacy-sub-theme-libraries-extend.css

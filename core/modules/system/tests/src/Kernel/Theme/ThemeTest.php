@@ -116,7 +116,11 @@ class ThemeTest extends KernelTestBase {
     // Check if ThemeHandlerInterface::listInfo() returns disabled themes.
     // Check for base theme and subtheme lists.
     $base_theme_list = ['test_base_theme' => 'Theme test base theme'];
-    $sub_theme_list = ['test_subsubtheme' => 'Theme test subsubtheme', 'test_subtheme' => 'Theme test subtheme'];
+    $sub_theme_list = [
+      'test_legacy_subtheme' => 'Theme test legacy subtheme',
+      'test_subsubtheme' => 'Theme test subsubtheme',
+      'test_subtheme' => 'Theme test subtheme',
+    ];
 
     $this->assertSame($sub_theme_list, $themes['test_base_theme']->sub_themes, 'Base theme\'s object includes list of subthemes.');
     $this->assertSame($base_theme_list, $themes['test_subtheme']->base_themes, 'Subtheme\'s object includes list of base themes.');
