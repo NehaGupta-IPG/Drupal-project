@@ -112,8 +112,10 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    * {@inheritdoc}
    */
   public function getFileContents(string $uri): string|bool {
-    $url = parse_url($uri);
-    if (isset($url['scheme']) || isset($url['host'])) {
+    $url = parse_url(str_replace('\\\\', '/', $uri));
+    // Get the realpath of the file, else fall back to the original uri.
+    $uri = realpath($url['path']) ?: $uri;
+    if ($uri !== FALSE && (isset($url['scheme']) || isset($url['host']))) {
       return FALSE;
     }
     if (!file_exists($uri)) {

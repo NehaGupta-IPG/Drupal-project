@@ -835,6 +835,14 @@ class IconFinderTest extends UnitTestCase {
         '//foo.com/bar.png',
         FALSE,
       ],
+      'valid windows file ' => [
+        str_replace('/', '\\\\', DRUPAL_ROOT) . '\\\\' . str_replace('/', '\\\\', self::TEST_ICONS_PATH) . '\\\\icons\\\\flat\\\\foo.svg',
+        TRUE,
+      ],
+      'windows path' => [
+        'C:\\foo.svg',
+        FALSE,
+      ],
     ];
   }
 
@@ -855,6 +863,8 @@ class IconFinderTest extends UnitTestCase {
     );
     if ($expected) {
       $result = $iconFinder->getFileContents($uri);
+      // Special case for Windows paths.
+      $uri = str_replace('\\\\', '/', $uri);
       $this->assertEquals(file_get_contents($uri), $result);
       return;
     }
