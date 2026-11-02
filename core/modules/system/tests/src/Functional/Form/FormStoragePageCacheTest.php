@@ -51,7 +51,7 @@ class FormStoragePageCacheTest extends BrowserTestBase {
     // @todo Add actual testing that the form build ID is not retained once
     // Firefox is included in automated testing in
     // https://www.drupal.org/project/drupal/issues/3462680.
-    $this->assertSame('off', $form_build_id_element->getAttribute('autocomplete'));
+    $this->assertNull($form_build_id_element->getAttribute('autocomplete'));
     return (string) $form_build_id_element->getAttribute('value');
   }
 

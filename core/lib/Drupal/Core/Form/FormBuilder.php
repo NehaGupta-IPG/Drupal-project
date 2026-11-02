@@ -764,11 +764,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // submitted form value appears literally, regardless of custom #tree
       // and #parents being set elsewhere.
       '#parents' => ['form_build_id'],
-      // Certain browsers such as Firefox retain form input data after reload.
-      // This can result in the form being in a strange state if the page is
-      // reloaded after an AJAX request. Setting the form build ID field's
-      // autocomplete off prevents the input from being retained.
-      '#attributes' => ['autocomplete' => 'off'],
     ];
 
     // Figure out if we need to update the form_build_id value, this is
