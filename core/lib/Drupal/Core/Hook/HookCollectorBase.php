@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Hook;
 
-use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -71,28 +70,6 @@ abstract class HookCollectorBase {
           ->setAutowired(TRUE);
       }
     }
-  }
-
-  /**
-   * Gets attribute instances from a class reflection.
-   *
-   * @param \ReflectionClass $reflection_class
-   *   The class reflection.
-   *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
-   *   Attribute instances keyed by method name.
-   */
-  protected static function getAttributeInstances(\ReflectionClass $reflection_class): array {
-    $attributes = [];
-    $reflections = $reflection_class->getMethods(\ReflectionMethod::IS_PUBLIC);
-    $reflections[] = $reflection_class;
-    foreach ($reflections as $reflection) {
-      if ($reflection_attributes = $reflection->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
-        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
-        $attributes[$method] = array_map(static fn (\ReflectionAttribute $reflection_attribute) => $reflection_attribute->newInstance(), $reflection_attributes);
-      }
-    }
-    return $attributes;
   }
 
 }

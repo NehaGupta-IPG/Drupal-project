@@ -8,7 +8,9 @@ use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
+use Drupal\Core\Discovery\AttributeScanner;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
@@ -254,7 +256,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
           $attributes = [];
           if (class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
-            $attributes = self::getAttributeInstances($reflectionClass);
+            $attributes = AttributeScanner::getAttributeInstances($reflectionClass, HookAttributeInterface::class);
             $hookFileCache->set($filename, ['class' => $class, 'attributes' => $attributes]);
           }
         }

@@ -8,6 +8,7 @@ use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
+use Drupal\Core\Discovery\AttributeScanner;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
@@ -364,7 +365,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
             $reflectionClass = new \ReflectionClass($class);
             $class_attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
             $class_attributes = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $class_attributes);
-            $attributes = self::getAttributeInstances($reflectionClass);
+            $attributes = AttributeScanner::getAttributeInstances($reflectionClass, HookAttributeInterface::class);
             $hook_file_cache->set($filename, [
               'class' => $class,
               'attributes' => $attributes,
