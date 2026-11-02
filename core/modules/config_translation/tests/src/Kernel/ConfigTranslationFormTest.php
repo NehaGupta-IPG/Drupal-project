@@ -24,14 +24,18 @@ class ConfigTranslationFormTest extends KernelTestBase {
   protected static $modules = [
     'config_translation',
     'config_translation_test',
+    'filter',
     'language',
     'locale',
+    'system',
+    'user',
   ];
 
   /**
    * Tests altering of the configuration translation forms.
    */
   public function testConfigTranslationFormAlter(): void {
+    $this->installConfig(['filter', 'system', 'user']);
     $this->installConfig(['config_translation_test']);
 
     $definitions = $this->container->get('plugin.manager.config_translation.mapper')->getDefinitions();
