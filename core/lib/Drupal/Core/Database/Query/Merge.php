@@ -199,6 +199,52 @@ class Merge extends Query implements ConditionInterface {
   }
 
   /**
+   * Sets a field to a value extracted from a JSON column.
+   *
+   * This is the JSON counterpart of expression(). It applies to the UPDATE
+   * query part only, and takes precedence over MergeQuery::updateFields(),
+   * MergeQuery::key() and MergeQuery::fields() in the same way expression()
+   * does.
+   *
+   * The extracted value is always cast to give it a consistent type across
+   * database backends.
+   *
+   * jsonCondition() skips rows whose value has another JSON type. An
+   * assignment cannot skip rows. Every updated row must hold a value of the
+   * cast type at the path, because MySQL rejects a numeric cast of a JSON
+   * string with error 1292 and PostgreSQL with SQLSTATE 22P02. Restrict the
+   * query with a jsonCondition() when the column holds mixed types.
+   *
+   * @param string $field
+   *   The field to set.
+   * @param string $json_field
+   *   The JSON column to extract the value from.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   a JSON string without its surrounding double quotes.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid or contains a wildcard, since a field can
+   *   only be set to a single value.
+   *
+   * @see \Drupal\Core\Database\Query\Merge::expression()
+   * @see \Drupal\Core\Database\Query\Update::jsonExpression()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
+   * @see https://dev.mysql.com/doc/mysql-errors/8.4/en/server-error-reference.html#error_er_truncated_wrong_value
+   * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
+   */
+  public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
+    $expression = $this->connection->jsonExpression($json_field, $jsonpath);
+    $this->expression($field, $expression->toCastSql($cast));
+    return $this;
+  }
+
+  /**
    * Adds a set of field->value pairs to be inserted.
    *
    * @param array $fields

@@ -372,6 +372,14 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function havingJsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->having->jsonCondition($field, $jsonpath, $value, $operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function forUpdate($set = TRUE) {
     if (isset($set)) {
       $this->forUpdate = $set;
@@ -613,6 +621,14 @@ class Select extends Query implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function addJsonExpression(string $field, string $jsonpath, ?string $alias = NULL, JsonCastType $cast = JsonCastType::Text): string {
+    $expression = $this->connection->jsonExpression($field, $jsonpath);
+    return $this->addExpression($expression->toCastSql($cast), $alias);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
     return $this->addJoin('INNER', $table, $alias, $condition, $arguments);
   }
@@ -673,6 +689,16 @@ class Select extends Query implements SelectInterface {
     // Only allow ASC and DESC, default to ASC.
     $direction = strtoupper($direction) == 'DESC' ? 'DESC' : 'ASC';
     $this->order[$field] = $direction;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): static {
+    $expression = $this->connection->jsonExpression($field, $jsonpath);
+    $alias = $this->addExpression($expression->toCastSql($cast));
+    $this->orderBy($alias, $direction);
     return $this;
   }
 

@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Database\InvalidQueryException;
+
 /**
  * General class for an abstracted INSERT query.
  *
@@ -45,6 +47,117 @@ abstract class Insert extends Query implements \Countable {
   public function from(SelectInterface $query) {
     $this->fromQuery = $query;
     return $this;
+  }
+
+  /**
+   * Adds a condition on a JSON column to the query the rows come from.
+   *
+   * An INSERT statement has no WHERE clause of its own, so this method only
+   * applies to a query that inserts the result of a SELECT query. Call from()
+   * before this method:
+   * @code
+   * $select = $connection->select('source', 's')
+   *   ->fields('s', ['id', 'data']);
+   * $connection->insert('target')
+   *   ->fields(['id', 'data'])
+   *   ->from($select)
+   *   ->jsonCondition('data', '$.status', 'active')
+   *   ->execute();
+   * @endcode
+   *
+   * @param string $field
+   *   The JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type selects the
+   *   JSON type it is compared against, see
+   *   ConditionInterface::jsonCondition().
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If no source SELECT query has been set with from().
+   *
+   * @see \Drupal\Core\Database\Query\Insert::from()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->validateFromQuery('condition');
+    $this->fromQuery->condition($this->connection->jsonCondition($field, $jsonpath, $value, $operator));
+    return $this;
+  }
+
+  /**
+   * Inserts a value extracted from a JSON column into a column.
+   *
+   * The value is taken from the rows the SELECT query returns, so this method
+   * only applies to a query that inserts the result of a SELECT query. Call
+   * from() before this method.
+   *
+   * The extracted value is always cast to give it a consistent type across
+   * database backends.
+   *
+   * The extracted value is added to the SELECT query as an expression, which
+   * comes after its regular fields. When calling fields() on this query, list
+   * the target column in that position.
+   *
+   * @param string $field
+   *   The column to insert the extracted value into.
+   * @param string $json_field
+   *   The JSON column to extract the value from.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   a JSON string without its surrounding double quotes.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If no source SELECT query has been set with from(), if the SELECT
+   *   query already has a field or an expression named after the target
+   *   column, or if the jsonpath is invalid or contains a wildcard, since a
+   *   column can only be set to a single value.
+   *
+   * @see \Drupal\Core\Database\Query\Insert::from()
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\Update::jsonExpression()
+   */
+  public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
+    $this->validateFromQuery('expression');
+    $fields = $this->fromQuery->getFields();
+    if (isset($fields[$field])) {
+      throw new InvalidQueryException(sprintf('The SELECT query the rows are inserted from already has a field named "%s".', $field));
+    }
+    $expressions = $this->fromQuery->getExpressions();
+    if (isset($expressions[$field])) {
+      throw new InvalidQueryException(sprintf('The SELECT query the rows are inserted from already has an expression named "%s".', $field));
+    }
+    $expression = $this->connection->jsonExpression($json_field, $jsonpath);
+    $this->fromQuery->addExpression($expression->toCastSql($cast), $field);
+    return $this;
+  }
+
+  /**
+   * Checks that the query inserts the result of a SELECT query.
+   *
+   * @param string $type
+   *   The kind of clause that requires the SELECT query, for the message of
+   *   the exception.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If from() has not been called.
+   */
+  protected function validateFromQuery(string $type): void {
+    if (empty($this->fromQuery)) {
+      throw new InvalidQueryException(sprintf('An INSERT query only takes a JSON %s when it inserts the result of a SELECT query. Call from() first.', $type));
+    }
   }
 
   /**

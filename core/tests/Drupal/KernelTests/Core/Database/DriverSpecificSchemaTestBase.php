@@ -1689,6 +1689,62 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($id + 1, $id_two);
   }
 
+  const JSON_TEST_VALUE = '{"key": "value1", "number": 0, "bool": true, "list": ["a","b","c"], "nested": {"key": "value2"}, "float": 5.5}';
+
+  const JSON_TEST_DATA = [
+    '$.key' => 'value1',
+    '$.nested.key' => 'value2',
+    '$.bool' => TRUE,
+    '$.number' => 0,
+    '$.list' => ['a', 'b', 'c'],
+    '$.list[1]' => 'b',
+    '$.float' => 5.5,
+  ];
+
+  /**
+   * Returns the table specification for JSON tests.
+   */
+  protected static function jsonTableSpecification(): array {
+    return [
+      'fields' => [
+        'id' => ['type' => 'serial', 'not null' => TRUE],
+        'test_field' => ['type' => 'json'],
+      ],
+      'primary key' => ['id'],
+    ];
+  }
+
+  /**
+   * Tests the JSON schema type and data round-trip.
+   */
+  public function testJsonSchema(): void {
+    $class = $this->connection->getDriverClass('JsonExpression');
+    if ($class === 'JsonExpression') {
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      $this->markTestSkipped('Driver does not provide JSON support.');
+    }
+
+    $spec = static::jsonTableSpecification();
+    $this->schema->createTable('test_json', $spec);
+    $this->assertTrue($this->schema->tableExists('test_json'));
+    $this->assertTrue($this->schema->fieldExists('test_json', 'test_field'));
+
+    $this->connection->insert('test_json')
+      ->fields([
+        'test_field' => self::JSON_TEST_VALUE,
+      ])
+      ->execute();
+
+    $this->doTestJsonRoundTrip();
+  }
+
+  /**
+   * Verifies that JSON data survives a store-and-retrieve cycle.
+   */
+  protected function doTestJsonRoundTrip(): void {
+    // Drivers should override this with driver-specific extraction assertions.
+  }
+
   /**
    * Tests creating a table with a generated column.
    */

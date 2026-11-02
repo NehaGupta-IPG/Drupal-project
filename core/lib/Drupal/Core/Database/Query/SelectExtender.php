@@ -112,6 +112,14 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->query->jsonCondition($field, $jsonpath, $value, $operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function &conditions() {
     return $this->query->conditions();
   }
@@ -211,6 +219,14 @@ class SelectExtender implements SelectInterface {
    */
   public function havingNotExists(SelectInterface $select) {
     $this->query->havingNotExists($select);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function havingJsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->query->havingJsonCondition($field, $jsonpath, $value, $operator);
     return $this;
   }
 
@@ -369,6 +385,13 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
+  public function addJsonExpression(string $field, string $jsonpath, ?string $alias = NULL, JsonCastType $cast = JsonCastType::Text): string {
+    return $this->query->addJsonExpression($field, $jsonpath, $alias, $cast);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
     return $this->query->join($table, $alias, $condition, $arguments);
   }
@@ -399,6 +422,14 @@ class SelectExtender implements SelectInterface {
    */
   public function orderBy($field, $direction = 'ASC') {
     $this->query->orderBy($field, $direction);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): static {
+    $this->query->jsonOrderBy($field, $jsonpath, $direction, $cast);
     return $this;
   }
 

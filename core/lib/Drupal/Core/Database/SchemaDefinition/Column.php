@@ -484,6 +484,38 @@ final class Column implements SchemaDefinitionInterface {
   }
 
   /**
+   * Returns a Column object for a JSON column.
+   *
+   * @param string $name
+   *   The column name.
+   * @param ?string $description
+   *   (optional) A string in non-markup plain text describing this field and
+   *   its purpose.
+   * @param ?bool $notNull
+   *   (optional) If TRUE, no NULL values will be allowed in this database
+   *   column. If FALSE, NULL values will be allowed. If NULL, it is not
+   *   specified. Defaults to NULL.
+   * @param NullValue|null $default
+   *   (optional) Pass a NullValue for an explicit DEFAULT NULL, or NULL for no
+   *   default. MySQL does not allow a literal default on a JSON column, see
+   *   ColumnType::isValidDefaultValue().
+   */
+  public static function json(
+    string $name,
+    ?string $description = NULL,
+    ?bool $notNull = NULL,
+    NullValue|null $default = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Json,
+      name: $name,
+      description: $description,
+      notNull: $notNull,
+      default: $default,
+    );
+  }
+
+  /**
    * Returns a Column object for a generated column.
    *
    * @see https://dev.mysql.com/doc/refman/9.7/en/create-table-generated-columns.html

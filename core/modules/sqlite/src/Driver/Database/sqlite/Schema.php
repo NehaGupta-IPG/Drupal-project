@@ -282,9 +282,6 @@ class Schema extends DatabaseSchema {
       'blob:big'        => 'BLOB',
       'blob:normal'     => 'BLOB',
 
-      // Only the SQLite driver has this field map to due to a fatal error
-      // error caused by this driver's schema on table introspection.
-      // @todo Add support to all drivers in https://drupal.org/i/3343634
       'json:normal'     => 'JSON',
     ];
     return $map;

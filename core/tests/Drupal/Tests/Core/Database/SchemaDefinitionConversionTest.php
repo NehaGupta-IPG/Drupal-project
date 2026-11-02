@@ -88,6 +88,11 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           'not null' => FALSE,
           'default' => NULL,
         ],
+        'data' => [
+          'description' => "The person's data",
+          'type' => 'json',
+          'not null' => FALSE,
+        ],
       ],
       'primary key' => ['id'],
       'unique keys' => [
@@ -163,6 +168,11 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           ],
           notNull: FALSE,
           default: new NullValue(),
+        ),
+        Column::json(
+          name: 'data',
+          description: "The person's data",
+          notNull: FALSE,
         ),
       ],
       primaryKey: new PrimaryKey(['id']),

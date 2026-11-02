@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Event\StatementEvent;
+use Drupal\Core\Database\Event\StatementExecutionEndEvent;
+use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\InvalidQueryException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -153,6 +156,75 @@ class QueryTest extends DatabaseTestBase {
       ':count' => 3,
     ])->fetchField();
     $this->assertEquals($count_expected, $count);
+  }
+
+  /**
+   * Tests that boolean arguments are normalized to integers.
+   *
+   * Clients bind parameters as strings, which turns TRUE into '1' and FALSE
+   * into ''. An integer column compared to '' does not match 0 on SQLite, and
+   * PostgreSQL rejects the comparison.
+   *
+   * @see \Drupal\Core\Database\Connection::query()
+   */
+  public function testBooleanSubstitution(): void {
+    $this->connection->insert('test')
+      ->fields(['name', 'age', 'job'])
+      ->values(['name' => 'Zero', 'age' => 0, 'job' => 'Boolean'])
+      ->values(['name' => 'One', 'age' => 1, 'job' => 'Boolean'])
+      ->execute();
+
+    $query = 'SELECT [name] FROM {test} WHERE [age] = :age AND [job] = :job';
+    $this->assertEquals('Zero', $this->connection->query($query, [':age' => FALSE, ':job' => 'Boolean'])->fetchField());
+    $this->assertEquals('One', $this->connection->query($query, [':age' => TRUE, ':job' => 'Boolean'])->fetchField());
+
+    // Arguments expanded from an array are normalized as well.
+    $names = $this->connection
+      ->query('SELECT [name] FROM {test} WHERE [age] IN ( :ages[] ) AND [job] = :job ORDER BY [age]', [
+        ':ages[]' => [FALSE, TRUE],
+        ':job' => 'Boolean',
+      ])
+      ->fetchCol();
+    $this->assertEquals(['Zero', 'One'], $names);
+
+    // The query builder passes its arguments through the same method.
+    $query = $this->connection->select('test', 't');
+    $query->addField('t', 'name');
+    $query->condition('t.age', FALSE);
+    $query->condition('t.job', 'Boolean');
+    $this->assertEquals(['Zero'], $query->execute()->fetchCol());
+  }
+
+  /**
+   * Tests that executing a query does not change the type of its arguments.
+   *
+   * \PDOStatement::execute() converts bound parameters to strings. When an
+   * argument is a PHP reference, that conversion happens in place, and is
+   * visible in every copy of the arguments array, including the readonly one
+   * held by the statement execution events.
+   *
+   * @see \Drupal\Core\Database\Connection::query()
+   */
+  public function testArgumentTypesInStatementEvents(): void {
+    $args = [];
+    $this->container->get('event_dispatcher')->addListener(
+      StatementExecutionEndEvent::class,
+      function (StatementExecutionEndEvent $event) use (&$args): void {
+        $args[] = $event->args;
+      },
+    );
+    $this->connection->enableEvents([
+      StatementExecutionStartEvent::class,
+      StatementExecutionEndEvent::class,
+    ]);
+
+    $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age AND [name] <> :name', [
+      ':age' => 25,
+      ':name' => 'Ringo',
+    ])->fetchCol();
+    $this->connection->disableEvents(StatementEvent::all());
+
+    $this->assertSame([[':age' => 25, ':name' => 'Ringo']], $args);
   }
 
   /**

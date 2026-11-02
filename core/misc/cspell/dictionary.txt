@@ -220,6 +220,7 @@ isam
 javascripts
 jessebeach
 jqueryui
+jsonpath
 justinrainbow
 keypresses
 kinberg

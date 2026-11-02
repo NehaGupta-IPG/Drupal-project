@@ -7,6 +7,9 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Query\JsonCastType;
+use Drupal\Core\Database\Query\JsonCondition;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\SelectExtender;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -628,6 +631,681 @@ class SelectTest extends DatabaseTestBase {
       ->fields('t')
       ->condition('age', [26, 27], $operator)
       ->execute();
+  }
+
+  /**
+   * Test JSON conditions with supported operators.
+   *
+   * This test appears simple at first glance but is particularly important when
+   * implementing JSON data types. Variable typing becomes far more sensitive
+   * when matching JSON documents vs. other data which is stored directly in SQL
+   * tables.
+   *
+   * The cases run in a loop instead of a data provider, so the class boots its
+   * isolated test process once for all of them.
+   */
+  public function testJsonCondition(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('j.test_field', $jsonpath, $value, $operator);
+      $ids = $query->execute()->fetchCol();
+      $this->assertEqualsCanonicalizing($expected_ids, $ids, "Case: $label");
+    }
+  }
+
+  /**
+   * Lists JSON conditions with invalid arguments.
+   *
+   * @return array[]
+   *   Test cases, each an array of a field, a jsonpath, a value and an
+   *   operator.
+   */
+  public static function providerJsonConditionOperatorValidation(): array {
+    return [
+      'unsupported operator' => ['field', '$.path', 'value', 'INVALID'],
+      'IN requires array' => ['field', '$.path', 'string', 'IN'],
+      'BETWEEN requires two' => ['field', '$.path', [1], 'BETWEEN'],
+      '= rejects array' => ['field', '$.path', ['a', 'b'], '='],
+      'CONTAINS rejects array' => ['field', '$.path', ['a', 'b'], 'CONTAINS'],
+      'IN rejects nested array' => ['field', '$.path', ['a', ['b']], 'IN'],
+      'BETWEEN rejects nested array' => ['field', '$.path', [[1], 2], 'BETWEEN'],
+      '= rejects NULL' => ['field', '$.path', NULL, '='],
+      'CONTAINS rejects NULL' => ['field', '$.path', NULL, 'CONTAINS'],
+      'IN rejects number then string' => ['field', '$.path', [1, 'a'], 'IN'],
+      'IN rejects string then number' => ['field', '$.path', ['a', 1], 'IN'],
+      'IN rejects boolean and string' => ['field', '$.path', [TRUE, 'a'], 'IN'],
+      'BETWEEN rejects mixed endpoints' => ['field', '$.path', [1, 'a'], 'BETWEEN'],
+      'IN rejects NULL first element' => ['field', '$.path', [NULL, 1], 'IN'],
+      'IN rejects NULL later element' => ['field', '$.path', [1, NULL], 'IN'],
+      'IN rejects object element' => ['field', '$.path', [new \stdClass()], 'IN'],
+    ];
+  }
+
+  /**
+   * Tests that JsonCondition validates its arguments.
+   */
+  public function testJsonConditionOperatorValidation(): void {
+    foreach (static::providerJsonConditionOperatorValidation() as $label => [$field, $path, $value, $operator]) {
+      try {
+        new JsonCondition($field, $path, $value, $operator);
+        $this->fail("Case: $label. Expected InvalidQueryException was not thrown.");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
+  }
+
+  /**
+   * Lists invalid jsonpath expressions.
+   *
+   * @return array[]
+   *   Test cases, each an array of a jsonpath.
+   */
+  public static function providerJsonExpressionPathValidation(): array {
+    return [
+      'no dollar prefix' => ['invalid'],
+      'single quote in path' => ["$.key' OR 1=1--"],
+      'semicolon in path' => ['$.key; DROP TABLE'],
+      'space in path' => ['$.key OR true'],
+      'parenthesis in path' => ['$.key)'],
+      'trailing newline' => ["$.key\n"],
+      'unsupported escape in quoted key' => ['$["a\nb"]'],
+      'multiple wildcards' => ['$.level1.*.level2.*.level3'],
+      'multiple element wildcards' => ['$.level1[*].level2[*].level3'],
+      'mixed wildcards' => ['$.level1[*].level2.*.level3'],
+    ];
+  }
+
+  /**
+   * Tests that JsonExpression rejects invalid jsonpath expressions.
+   */
+  public function testJsonExpressionPathValidation(): void {
+    foreach (static::providerJsonExpressionPathValidation() as $label => [$path]) {
+      try {
+        $this->connection->jsonExpression('test_field', $path);
+        $this->fail("Case: $label. Expected InvalidQueryException was not thrown.");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
+  }
+
+  /**
+   * Tests that a quoted key holding an escaped quote or backslash is accepted.
+   *
+   * The sample rows hold no keys with quotes or backslashes, so these paths
+   * are checked at construction only.
+   */
+  public function testJsonExpressionQuotedKeyEscapes(): void {
+    $this->assertInstanceOf(JsonExpression::class, $this->connection->jsonExpression('test_field', '$["a\"b"]'));
+    $this->assertInstanceOf(JsonExpression::class, $this->connection->jsonExpression('test_field', '$["a\\\\b"]'));
+  }
+
+  /**
+   * Lists operators that cannot expand a wildcard path.
+   *
+   * @return array[]
+   *   Test cases, each an array of an operator and a value to compare.
+   */
+  public static function providerJsonWildcardUnsupportedOperator(): array {
+    return [
+      'JSON_CONTAINS' => ['JSON_CONTAINS', ['enabled']],
+      'IS NULL' => ['IS NULL', NULL],
+      'IS NOT NULL' => ['IS NOT NULL', NULL],
+      'HAS KEY' => ['HAS KEY', NULL],
+    ];
+  }
+
+  /**
+   * Tests that operators which cannot expand a wildcard path reject one.
+   *
+   * A wildcard matches any number of values. The operators that test one
+   * extracted value expand it into a row set, and ask whether any matched
+   * value satisfies the test. The operators listed here read the document at
+   * the path itself, which a wildcard does not address.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition::WILDCARD_OPERATORS
+   */
+  public function testJsonWildcardUnsupportedOperator(): void {
+    foreach (static::providerJsonWildcardUnsupportedOperator() as $label => [$operator, $value]) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
+
+      try {
+        $query->execute();
+        $this->fail("Case: $label. Expected exception not thrown.");
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage(), "Case: $label");
+      }
+
+      // A failed compile can be retried, so executing the same query object
+      // again throws the same exception.
+      try {
+        $query->execute();
+        $this->fail("Case: $label. Expected exception not thrown on the second execution.");
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage(), "Case: $label, second execution");
+      }
+    }
+  }
+
+  /**
+   * Tests that a comparison operator expands a wildcard path.
+   *
+   * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonWildcardUnsupportedOperator()
+   */
+  public function testJsonWildcardSupportedOperator(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.deps.*.status', 'enabled');
+    $this->assertSame([10], array_map('intval', $query->execute()->fetchCol()));
+  }
+
+  /**
+   * Tests that the element wildcard is rejected by the same operators.
+   *
+   * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonWildcardUnsupportedOperator()
+   */
+  public function testJsonElementWildcardUnsupportedOperator(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.revs[*].uid', NULL, 'HAS KEY');
+
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('JSON operator HAS KEY does not support the wildcard');
+    $query->execute();
+  }
+
+  /**
+   * Tests that the JSON expression surfaces reject a wildcard path.
+   *
+   * A SELECT expression and a sort key hold one value, so there is nowhere to
+   * expand the wildcard into. Without this each backend degrades differently:
+   * PostgreSQL looks for a literal "*" key, SQLite raises an error, and MySQL
+   * returns the whole matched set.
+   *
+   * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()
+   */
+  public function testJsonWildcardUnsupportedExpression(): void {
+    $query = $this->connection->select('json', 'j');
+    try {
+      $query->addJsonExpression('test_field', '$.deps.*.status', 'st');
+      $this->fail('Expected exception for addJsonExpression().');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertStringContainsString('contains a wildcard, which is not supported when casting a value', $e->getMessage());
+    }
+
+    $query = $this->connection->select('json', 'j');
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('contains a wildcard');
+    $query->jsonOrderBy('test_field', '$.deps.*.status');
+  }
+
+  /**
+   * Tests combining JSON conditions with AND, OR, and regular conditions.
+   */
+  public function testJsonConditionCombined(): void {
+    // AND: number >= 5 AND boolean = true → row 1 only.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', 5, '>=');
+    $query->jsonCondition('test_field', '$.boolean', TRUE, '=');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    sort($ids);
+    $this->assertEquals([1], $ids);
+
+    // OR: key = "some text" OR number = 5 → rows 1, 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
+    $query->condition($or);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    sort($ids);
+    $this->assertEquals([1, 3], $ids);
+
+    // Mixed: jsonCondition AND regular condition.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', 10, '=');
+    $query->condition('j.id', 3);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests one JsonCondition instance used by more than one query.
+   *
+   * Each query numbers its placeholders from 0, so a condition object that is
+   * compiled against a second query has to take the placeholder names of that
+   * query. Keeping the names of the first compilation binds the values of one
+   * condition to the placeholders of another.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition::compile()
+   */
+  public function testJsonConditionReusedAcrossQueries(): void {
+    $condition = $this->connection->jsonCondition('test_field', '$.number', 5);
+
+    // The condition is the only one, so it takes placeholder 0.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition($condition);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+
+    // Here the condition on the regular column takes placeholder 0, so the
+    // JSON condition has to move to placeholder 1.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.id', 1);
+    $query->condition($condition);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+
+    // The same instance in two groups of one query. Both compile against the
+    // query, so the second use keeps its own placeholder.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->condition($condition);
+    $or->condition('j.id', 4);
+    $query->condition($or);
+    $query->condition('j.id', 1, '>=');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 4], $ids);
+
+    // A count query compiles the conditions of the query it clones.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.id', 1);
+    $query->condition($condition);
+    $this->assertSame('1', (string) $query->countQuery()->execute()->fetchField());
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+  }
+
+  /**
+   * Tests JSON conditions added to a condition group.
+   *
+   * @see \Drupal\Core\Database\Query\Condition::jsonCondition()
+   */
+  public function testJsonConditionInConditionGroup(): void {
+    // A group mixes JSON conditions with conditions on regular columns. Row 1
+    // holds 5 at $.number, row 4 is matched by its id.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->jsonCondition('test_field', '$.number', 5);
+    $or->condition('j.id', 4);
+    $query->condition($or);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 4], $ids);
+
+    // The method returns the group, so calls chain.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $group = $query->andConditionGroup();
+    $this->assertSame($group, $group->jsonCondition('test_field', '$.number', 5, '>='));
+    $query->condition($group->jsonCondition('test_field', '$.boolean', TRUE));
+    $this->assertEquals([1], array_map('intval', $query->execute()->fetchCol()));
+
+    // A group nested in another group keeps the JSON conditions grouped.
+    // Boolean true holds for rows 1 and 4, "some" is contained in $.key of
+    // rows 3 and 4, so the OR matches 1, 3 and 4. The id narrows that to 1
+    // and 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $and = $query->andConditionGroup();
+    $and->condition('j.id', [1, 2, 3], 'IN');
+    $nested = $and->orConditionGroup();
+    $nested->jsonCondition('test_field', '$.boolean', TRUE);
+    $nested->jsonCondition('test_field', '$.key', 'some', 'CONTAINS');
+    $query->condition($and->condition($nested));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 3], $ids);
+
+    // The placeholders a group generates do not collide with the ones of the
+    // query it is added to. BETWEEN binds two of them and matches rows 1, 2
+    // and 3; the id in the same group and the status outside it narrow that
+    // to row 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.status', 1);
+    $and = $query->andConditionGroup();
+    $and->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $and->condition('j.id', 3);
+    $query->condition($and);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests that a JSON condition in a group validates its arguments.
+   */
+  public function testJsonConditionInConditionGroupValidation(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->connection->condition('AND')
+      ->jsonCondition('test_field', '$.number', 'string', 'IN');
+  }
+
+  /**
+   * Tests JSON conditions in the HAVING clause.
+   *
+   * The queries group by the primary key, so every row forms a group of its
+   * own and the JSON column stays functionally dependent on the grouped
+   * column. HAVING then filters the same rows a WHERE would.
+   *
+   * @see \Drupal\Core\Database\Query\Select::havingJsonCondition()
+   */
+  public function testHavingJsonCondition(): void {
+    // Rows 2 and 3 both hold 10 at $.number.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // Unary operators take no value. Rows 3 and 4 hold $.key.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([3, 4], $ids);
+
+    // Two HAVING conditions are ANDed. Boolean false holds for row 2 only.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $query->havingJsonCondition('test_field', '$.number', 10, '=');
+    $query->havingJsonCondition('test_field', '$.boolean', FALSE, '=');
+    $this->assertEquals([2], array_map('intval', $query->execute()->fetchCol()));
+
+    // The placeholders of a HAVING condition collide neither with the ones of
+    // the WHERE conditions nor with the ones of the other HAVING parts.
+    // BETWEEN binds two placeholders and matches rows 1, 2 and 3; CONTAINS
+    // binds one and matches rows 3 and 4.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addExpression('COUNT(*)', 'total');
+    $query->condition('j.status', 1);
+    $query->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $query->having('COUNT(*) = :count', [':count' => 1]);
+    $query->havingJsonCondition('test_field', '$.key', 'some', 'CONTAINS');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests that a HAVING JSON condition validates its arguments.
+   */
+  public function testHavingJsonConditionValidation(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->connection->select('json', 'j')
+      ->havingJsonCondition('test_field', '$.number', [1], 'BETWEEN');
+  }
+
+  /**
+   * Tests JSON conditions on an extended query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectExtender::jsonCondition()
+   * @see \Drupal\Core\Database\Query\SelectExtender::havingJsonCondition()
+   */
+  public function testJsonConditionOnExtender(): void {
+    // The extender returns itself, so a chain does not drop the extender
+    // layer. Rows 1, 2 and 3 hold 5 or more at $.number.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame($query, $query->jsonCondition('test_field', '$.number', 5, '>='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 2, 3], $ids);
+
+    // An extender numbers placeholders with its own counter, so a JSON
+    // condition and a condition on a regular column must not collide.
+    // BETWEEN binds two placeholders and matches rows 1, 2 and 3; the id
+    // narrows that to 2 and 3.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $query->condition('j.id', [2, 3], 'IN');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // HAVING works the same way. The JSON column is grouped, so a HAVING
+    // clause may name it.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // One extender wrapping another passes both methods down to the query.
+    // The WHERE keeps rows 1, 2 and 3, the HAVING keeps 2 and 3.
+    $query = $this->connection->select('json', 'j')
+      ->extend(SelectExtender::class)
+      ->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
+    $this->assertSame($query, $query->jsonCondition('test_field', '$.number', 5, '>='));
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY'));
+    $this->assertEquals([3], array_map('intval', $query->execute()->fetchCol()));
+  }
+
+  /**
+   * Tests JSON expressions on an extended query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectExtender::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\SelectExtender::jsonOrderBy()
+   */
+  public function testJsonExpressionOnExtender(): void {
+    // The alias comes back from the wrapped query, so the extender returns a
+    // string here, not itself.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $alias = $query->addJsonExpression('test_field', '$.number', 'num', JsonCastType::Int);
+    $this->assertSame('num', $alias);
+    $query->condition('j.id', 1);
+    $this->assertEquals(5, $query->execute()->fetchObject()->num);
+
+    // Ordering returns the extender, so a chain does not drop the extender
+    // layer. The rows without the key sort first, then row 1 holds 5 at
+    // $.number, and rows 2 and 3 hold 10.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame($query, $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 0, 8));
+    $this->assertEquals(1, $ids[8]);
+    $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 9));
+
+    // One extender wrapping another passes both methods down to the query.
+    // Rows 3 and 4 hold $.key, and "some other text" sorts before "some text".
+    $query = $this->connection->select('json', 'j')
+      ->extend(SelectExtender::class)
+      ->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame('key_value', $query->addJsonExpression('test_field', '$.key', 'key_value'));
+    $this->assertSame($query, $query->jsonOrderBy('test_field', '$.key', 'ASC'));
+    $query->jsonCondition('test_field', '$.key', NULL, 'IS NOT NULL');
+    $values = [];
+    foreach ($query->execute() as $row) {
+      $values[(int) $row->id] = $row->key_value;
+    }
+    $this->assertSame([4 => 'some other text', 3 => 'some text'], $values);
+  }
+
+  /**
+   * Tests JSON ORDER BY with different types and directions.
+   */
+  public function testJsonOrderBy(): void {
+    // Integer ASC: rows with $.number: 1 (5), 2 (10), 3 (10). NULLs first.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    // Rows without $.number sort as NULL; their order is undefined.
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 0, 8));
+    $this->assertEquals(1, $ids[8]);
+    $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 9));
+
+    // Integer DESC: 10 before 5, NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'DESC', JsonCastType::Int);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertContains(2, array_slice($ids, 0, 2));
+    $this->assertContains(3, array_slice($ids, 0, 2));
+    $this->assertEquals(1, $ids[2]);
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 3));
+
+    // String ASC: rows with $.key: 3 ("some text"), 4 ("some other text").
+    // "some other text" < "some text", so 4 then 3. NULLs first.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.key', 'ASC');
+    $ids = $query->execute()->fetchCol();
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 0, 9));
+    $this->assertEquals(4, $ids[9]);
+    $this->assertEquals(3, $ids[10]);
+
+    // String DESC: "some text" > "some other text", so 3 then 4. NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.key', 'DESC');
+    $ids = $query->execute()->fetchCol();
+    $this->assertEquals(3, $ids[0]);
+    $this->assertEquals(4, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 2));
+
+    // Float ASC: row 5 (1.5) before row 8 (3.14). NULLs first.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.float', 'ASC', JsonCastType::Float);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10, 11], array_slice($ids, 0, 9));
+    $this->assertEquals(5, $ids[9]);
+    $this->assertEquals(8, $ids[10]);
+
+    // Float DESC: row 8 (3.14) before row 5 (1.5). NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.float', 'DESC', JsonCastType::Float);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals(8, $ids[0]);
+    $this->assertEquals(5, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10, 11], array_slice($ids, 2));
+
+    // Text ASC over numbers sorts lexicographically on every driver, so the
+    // "10" of rows 2 and 3 comes before the "5" of row 1. NULLs first.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Text);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 0, 8));
+    $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 8, 2));
+    $this->assertEquals(1, $ids[10]);
+  }
+
+  /**
+   * Tests adding a JSON extraction to the SELECT list.
+   */
+  public function testAddJsonExpression(): void {
+    // The default cast returns text without the quotes of the JSON string.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $alias = $query->addJsonExpression('test_field', '$.key', 'key_value');
+    $this->assertEquals('key_value', $alias);
+    $query->jsonCondition('test_field', '$.key', NULL, 'IS NOT NULL');
+    $values = [];
+    foreach ($query->execute() as $row) {
+      $values[(int) $row->id] = $row->key_value;
+    }
+    $this->assertEquals([3 => 'some text', 4 => 'some other text'], $values);
+
+    // An integer cast returns a number.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addJsonExpression('test_field', '$.number', 'number_value', JsonCastType::Int);
+    $query->condition('j.id', 1);
+    $this->assertEquals(5, $query->execute()->fetchObject()->number_value);
+
+    // The default text cast returns a JSON number as text on every driver.
+    $query = $this->connection->select('json', 'j');
+    $query->addJsonExpression('test_field', '$.number', 'number_text');
+    $query->condition('j.id', 1);
+    $this->assertSame('5', $query->execute()->fetchObject()->number_text);
+
+    // Text extraction preserves nulls, booleans, and long strings.
+    $query = $this->connection->select('json', 'j');
+    $query->addJsonExpression('test_field', '$.nulled', 'nulled');
+    $query->addJsonExpression('test_field', '$.flag_true', 'flag');
+    $query->addJsonExpression('test_field', '$.long_text', 'long_text');
+    $query->condition('j.id', 11);
+    $row = $query->execute()->fetchObject();
+    $this->assertNull($row->nulled);
+    $this->assertSame('true', $row->flag);
+    $this->assertSame(str_repeat('abcdefgh', 40), $row->long_text);
+
+    // The alias can be ordered by, and duplicate aliases are suffixed the same
+    // way as in addExpression().
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $first = $query->addJsonExpression('test_field', '$.number', 'num', JsonCastType::Int);
+    $second = $query->addJsonExpression('test_field', '$.float', 'num', JsonCastType::Float);
+    $this->assertEquals('num', $first);
+    $this->assertEquals('num_2', $second);
+    $query->condition('j.id', 5);
+    $row = $query->execute()->fetchObject();
+    $this->assertNull($row->num);
+    $this->assertEquals(1.5, $row->num_2);
+  }
+
+  /**
+   * Tests that an integer cast holds values wider than 32 bits.
+   *
+   * A JSON number can hold any 64-bit integer, so the integer cast has to be
+   * 64-bit on every driver.
+   */
+  public function testJsonIntCastIs64Bit(): void {
+    // Above the 2147483647 limit of a 32-bit signed integer.
+    $big = 4294967296;
+    $this->connection->insert('json')
+      ->fields([
+        'id' => 12,
+        'status' => 1,
+        'test_field' => '{"big": ' . $big . '}',
+      ])
+      ->execute();
+
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addJsonExpression('test_field', '$.big', 'big_value', JsonCastType::Int);
+    $query->condition('j.id', 12);
+    $this->assertEquals($big, $query->execute()->fetchObject()->big_value);
+
+    // The same cast is used for ordering. Row 12 has the only $.big value;
+    // rows without the key sort as NULL.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.big', 'DESC', JsonCastType::Int);
+    $this->assertEquals(12, (int) $query->execute()->fetchCol()[0]);
   }
 
 }

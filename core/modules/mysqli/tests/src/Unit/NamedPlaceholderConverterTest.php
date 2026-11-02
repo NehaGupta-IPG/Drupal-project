@@ -276,6 +276,38 @@ SQL,
       ['qux', 'git'],
     ];
 
+    yield 'Quotes inside literals escaped by a backslash' => [
+      <<<'SQL'
+SELECT * FROM foo
+ WHERE JSON_CONTAINS(bar, '{\"mountain\":\"\' OR 1=1--\"}', '$.associative')
+   AND baz = :a_param1
+   OR bar = '\':not_a_param1'
+   OR bar = "\":not_a_param2"
+   OR bar = :a_param2
+SQL,
+      [':a_param1' => 'qux', ':a_param2' => 'git'],
+      <<<'SQL'
+SELECT * FROM foo
+ WHERE JSON_CONTAINS(bar, '{\"mountain\":\"\' OR 1=1--\"}', '$.associative')
+   AND baz = ?
+   OR bar = '\':not_a_param1'
+   OR bar = "\":not_a_param2"
+   OR bar = ?
+SQL,
+      ['qux', 'git'],
+    ];
+
+    yield 'Literal ending in an escaped backslash' => [
+      <<<'SQL'
+SELECT * FROM foo WHERE bar = 'ends with a backslash\\' AND baz = :a_param
+SQL,
+      [':a_param' => 'qux'],
+      <<<'SQL'
+SELECT * FROM foo WHERE bar = 'ends with a backslash\\' AND baz = ?
+SQL,
+      ['qux'],
+    ];
+
     yield 'Combined single and double quotes' => [
       <<<'SQL'
 SELECT data.age AS age, data.id AS id, data.name AS name, data.id AS id
@@ -365,6 +397,48 @@ SELECT dummy as "dummy?"
    AND dummy = ?
 SQL,
       ['baz'],
+    ];
+
+    yield 'Double minus stops being a comment at the end of the line' => [
+      <<<'SQL'
+SELECT * FROM foo
+ WHERE bar = 1--2
+   AND baz = :a_param
+SQL,
+      [':a_param' => 'qux'],
+      <<<'SQL'
+SELECT * FROM foo
+ WHERE bar = 1--2
+   AND baz = ?
+SQL,
+      ['qux'],
+    ];
+
+    yield 'Placeholder after a double minus on the same line' => [
+      'SELECT * FROM foo WHERE bar = 1--2 AND baz = :a_param',
+      [':a_param' => 'qux'],
+      'SELECT * FROM foo WHERE bar = 1--2 AND baz = ?',
+      ['qux'],
+    ];
+
+    yield 'Comment with nothing between the dashes and the newline' => [
+      <<<'SQL'
+SELECT * FROM foo WHERE bar = 1 --
+   AND baz = :a_param
+SQL,
+      [':a_param' => 'qux'],
+      <<<'SQL'
+SELECT * FROM foo WHERE bar = 1 --
+   AND baz = ?
+SQL,
+      ['qux'],
+    ];
+
+    yield 'Statement ending with the dashes of a comment' => [
+      'SELECT * FROM foo WHERE bar = :a_param --',
+      [':a_param' => 'qux'],
+      'SELECT * FROM foo WHERE bar = ? --',
+      ['qux'],
     ];
 
     yield 'Escaped question' => [

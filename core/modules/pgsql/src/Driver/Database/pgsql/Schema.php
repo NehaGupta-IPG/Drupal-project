@@ -491,6 +491,8 @@ EOD;
       'serial:medium' => 'serial',
       'serial:big' => 'bigserial',
       'serial:normal' => 'serial',
+
+      'json:normal' => 'jsonb',
     ];
     return $map;
   }
@@ -844,7 +846,10 @@ EOD;
     if (!$this->tableExists($table)) {
       return FALSE;
     }
-    return $this->connection->query("SELECT array_position(i.indkey, a.attnum) AS position, a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE i.indrelid = '{" . $table . "}'::regclass AND i.indisprimary ORDER BY position")->fetchAllKeyed();
+    return $this->connection->query(
+      "SELECT array_position(i.indkey, a.attnum) AS position, a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE i.indrelid = :key::regclass AND i.indisprimary ORDER BY position",
+      [':key' => $this->connection->prefixTables('{' . $table . '}')]
+    )->fetchAllKeyed();
   }
 
   /**

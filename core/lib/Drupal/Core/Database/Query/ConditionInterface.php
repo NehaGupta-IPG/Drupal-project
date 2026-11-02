@@ -73,6 +73,61 @@ interface ConditionInterface {
   public function condition($field, $value = NULL, $operator = '=');
 
   /**
+   * Adds a condition on a value inside a JSON column.
+   *
+   * A condition group implements this method too, so a JSON condition can be
+   * mixed with regular conditions inside an AND or an OR group:
+   * @code
+   * $or = $query->orConditionGroup()
+   *   ->jsonCondition('data', '$.status', TRUE)
+   *   ->condition('uid', 1);
+   * $query->condition($or);
+   * // Match when any element of $.tags equals 'php'.
+   * $query->jsonCondition('data', '$.tags[*]', 'php');
+   * // Match a score between 10 and 20.
+   * $query->jsonCondition('data', '$.score', [10, 20], 'BETWEEN');
+   * @endcode
+   *
+   * @param string $field
+   *   The JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression, starting with '$'. Accepts dot notation
+   *   ($.key, $.nested.key), bracket notation with a quoted key
+   *   ($["any key"]), array indices ($[0]) and one wildcard segment
+   *   ($.tags[*], $.rows.*.uid).
+   * @param string|int|float|array|bool|null $value
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type selects the
+   *   JSON type it is compared against. Integers and floats compare against
+   *   JSON numbers, booleans against JSON booleans, and strings against JSON
+   *   strings. Comparison operators do not match values of another JSON type.
+   *   CONTAINS, STARTS_WITH, and ENDS_WITH search the text representation of
+   *   any JSON value. Request and form values arrive as strings. Cast them to
+   *   int, float or bool first, because a string only matches JSON strings.
+   * @param string $operator
+   *   The comparison operator, '=' by default. Supported: =, <>, !=, <, <=,
+   *   >, >=, IN, NOT IN, BETWEEN, NOT BETWEEN, CONTAINS, STARTS_WITH,
+   *   ENDS_WITH, JSON_CONTAINS, IS NULL, IS NOT NULL and HAS KEY. A path with
+   *   one wildcard matches when any selected value satisfies the operator.
+   *   Only the operators in JsonCondition::WILDCARD_OPERATORS accept a
+   *   wildcard. IS NULL matches both a missing path and JSON null. Use HAS KEY
+   *   to tell them apart.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value is not valid for it. The
+   *   jsonpath is validated when the query is compiled. That step also
+   *   rejects a wildcard path used with an operator outside
+   *   JsonCondition::WILDCARD_OPERATORS.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition
+   * @see \Drupal\Core\Database\Connection::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static;
+
+  /**
    * Adds an arbitrary WHERE clause to the query.
    *
    * @param string $snippet
