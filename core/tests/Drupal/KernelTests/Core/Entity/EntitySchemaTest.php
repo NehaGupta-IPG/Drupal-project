@@ -421,4 +421,17 @@ class EntitySchemaTest extends EntityKernelTestBase {
     $this->assertEquals($expected_revision_id_schema, $revision_id_schema);
   }
 
+  /**
+   * Test missing tables on uninstall.
+   *
+   * Manually drop one of the test entity type tables to simulate a scenario
+   * where a table was not created or an entity type is new.
+   */
+  public function testUninstall() {
+    $this->installModule('entity_test');
+    \Drupal::database()->schema()->dropTable('entity_test');
+    // Uninstall the entity_test module.
+    $this->container->get('module_installer')->uninstall(['entity_test']);
+  }
+
 }

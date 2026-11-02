@@ -40,12 +40,20 @@ class ContentUninstallValidator implements ModuleUninstallValidatorInterface {
     $entity_types = $this->entityTypeManager->getDefinitions();
     $reasons = [];
     foreach ($entity_types as $entity_type) {
-      if ($module == $entity_type->getProvider() && $entity_type instanceof ContentEntityTypeInterface && $this->entityTypeManager->getStorage($entity_type->id())->hasData()) {
-        $reasons[] = $this->t('There is content for the entity type: @entity_type. <a href=":url">Remove @entity_type_plural</a>.', [
-          '@entity_type' => $entity_type->getLabel(),
-          '@entity_type_plural' => $entity_type->getPluralLabel(),
-          ':url' => Url::fromRoute('system.prepare_modules_entity_uninstall', ['entity_type_id' => $entity_type->id()])->toString(),
-        ]);
+      try {
+        if ($module == $entity_type->getProvider() && $entity_type instanceof ContentEntityTypeInterface && $this->entityTypeManager->getStorage($entity_type->id())->hasData()) {
+          $reasons[] = $this->t('There is content for the entity type: @entity_type. <a href=":url">Remove @entity_type_plural</a>.', [
+            '@entity_type' => $entity_type->getLabel(),
+            '@entity_type_plural' => $entity_type->getPluralLabel(),
+            ':url' => Url::fromRoute('system.prepare_modules_entity_uninstall', ['entity_type_id' => $entity_type->id()])->toString(),
+          ]);
+        }
+      }
+      catch (\Throwable $th) {
+        // An exception here means that the table does not exist. That means
+        // there is no data. This exception is caught to allow to uninstall
+        // modules with incorrectly installed entity types.
+        return $reasons = [];
       }
     }
     return $reasons;
