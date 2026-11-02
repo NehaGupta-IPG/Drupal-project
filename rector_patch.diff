@@ -1,0 +1,13 @@
+diff --git a/rules/Php80/Rector/Class_/ClassPropertyAssignToConstructorPromotionRector.php b/rules/Php80/Rector/Class_/ClassPropertyAssignToConstructorPromotionRector.php
+index 5bfdde4..620faed 100644
+--- a/rules/Php80/Rector/Class_/ClassPropertyAssignToConstructorPromotionRector.php
++++ b/rules/Php80/Rector/Class_/ClassPropertyAssignToConstructorPromotionRector.php
+@@ -251,7 +251,7 @@ CODE_SAMPLE
+             // copy attributes of the old property
+             $param->attrGroups = array_merge($param->attrGroups, $property->attrGroups);
+             $this->processUnionType($property, $param);
+-            $this->propertyPromotionDocBlockMerger->mergePropertyAndParamDocBlocks($property, $param, $paramTagValueNode);
++//            $this->propertyPromotionDocBlockMerger->mergePropertyAndParamDocBlocks($property, $param, $paramTagValueNode);
+             // update variable to property fetch references
+             $this->traverseNodesWithCallable((array) $constructClassMethod->stmts, function (Node $node) use ($promotionCandidate, $propertyName) {
+                 if ($node instanceof Class_ || $node instanceof FunctionLike) {
