@@ -169,6 +169,11 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: cache.context }
+  cache_context.path_condition:
+    class: Drupal\Core\Cache\Context\PathConditionCacheContext
+    arguments: ['@path.matcher', '@request_stack']
+    tags:
+      - { name: cache.context }
   cache_context.url.query_args.pagers:
     class: Drupal\Core\Cache\Context\PagersCacheContext
     arguments: ['@pager.parameters']
