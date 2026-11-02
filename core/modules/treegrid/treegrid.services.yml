@@ -5,4 +5,5 @@ services:
 
   treegrid.csrf_token:
     class: Drupal\treegrid\TreegridCsrfToken
-    arguments: ['@csrf_token', '@current_user']
+    autowire: true
+  Drupal\treegrid\TreegridCsrfToken: '@treegrid.csrf_token'
