@@ -16,6 +16,3 @@ view all taxonomy revisions:
 
 view vocabulary labels:
   title: 'View vocabulary labels'
-
-permission_callbacks:
-  - Drupal\taxonomy\TaxonomyPermissions::permissions

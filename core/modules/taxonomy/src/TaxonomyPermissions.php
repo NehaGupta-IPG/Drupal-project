@@ -1,45 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\taxonomy;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\BundlePermissionHandlerTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\user\PermissionProviderInterface;
 
 /**
  * Provides dynamic permissions of the taxonomy module.
  *
  * @see taxonomy.permissions.yml
  */
-class TaxonomyPermissions implements ContainerInjectionInterface {
+class TaxonomyPermissions implements PermissionProviderInterface {
+
   use BundlePermissionHandlerTrait;
   use StringTranslationTrait;
 
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs a TaxonomyPermissions instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('entity_type.manager'));
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
   }
 
   /**
@@ -49,7 +31,15 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
    *   Permissions array.
    */
   public function permissions() {
-    return $this->generatePermissions(Vocabulary::loadMultiple(), [$this, 'buildPermissions']);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Call the getPermissions() method instead. See https://www.drupal.org/node/3421580', E_USER_DEPRECATED);
+    return $this->getPermissions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPermissions(): array {
+    return $this->generatePermissions($this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple(), $this->buildPermissions(...));
   }
 
   /**
@@ -61,7 +51,7 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
    * @return array
    *   An array of permission names and descriptions.
    */
-  protected function buildPermissions(VocabularyInterface $vocabulary) {
+  protected function buildPermissions(VocabularyInterface $vocabulary): array {
     $id = $vocabulary->id();
     $args = ['%vocabulary' => $vocabulary->label()];
 

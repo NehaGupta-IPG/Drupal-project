@@ -8,9 +8,10 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\CallableResolver;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
- * Provides the available permissions based on yml files.
+ * Provides the available permissions based on yml files and service providers.
  *
  * To define permissions you can use a $module.permissions.yml file. This file
  * defines machine names, human-readable names, restrict access (if required for
@@ -18,12 +19,18 @@ use Drupal\Core\Utility\CallableResolver;
  * machine names are the canonical way to refer to permissions for access
  * checking.
  *
- * If your module needs to define dynamic permissions you can use the
- * permission_callbacks key to declare a callable that will return an array of
- * permissions, keyed by machine name. Each item in the array can contain the
- * same keys as an entry in $module.permissions.yml.
+ * If your module needs to define dynamic permissions, declare a service
+ * implementing \Drupal\user\PermissionProviderInterface. Any such service is
+ * automatically discovered and its getPermissions() return value is merged
+ * with permissions declared in *.permissions.yml.
+ *
+ * (Deprecated) If your module needs to define dynamic permissions, you can
+ * also use the permission_callbacks key to declare a callable that will
+ * return an array of permissions, keyed by machine name. Each item in the
+ * array can contain the same keys as an entry in $module.permissions.yml.
  *
  * Here is an example from the core filter module (comments have been added):
+ *
  * @code
  * # The key is the permission machine name, and is required.
  * administer filters:
@@ -35,7 +42,7 @@ use Drupal\Core\Utility\CallableResolver;
  *   # be displayed on the Permissions page. Defaults to false.
  *   restrict access: false
  *
- * # An array of callables used to generate dynamic permissions.
+ * # (Deprecated) An array of callables used to generate dynamic permissions.
  * permission_callbacks:
  *   # The callable should return an associative array with one or more
  *   # permissions. Each permission array can use the same keys as the example
@@ -46,6 +53,7 @@ use Drupal\Core\Utility\CallableResolver;
  * @endcode
  *
  * @see \Drupal\user\PermissionHandlerInterface::getPermissions()
+ * @see \Drupal\user\PermissionProviderInterface
  * @see filter.permissions.yml
  * @see \Drupal\filter\FilterPermissions
  * @see user_api
@@ -55,13 +63,6 @@ class PermissionHandler implements PermissionHandlerInterface {
   use StringTranslationTrait;
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The YAML discovery class to find all .permissions.yml files.
    *
    * @var \Drupal\Core\Discovery\YamlDiscovery
@@ -69,30 +70,27 @@ class PermissionHandler implements PermissionHandlerInterface {
   protected $yamlDiscovery;
 
   /**
-   * The callable resolver.
-   *
-   * @var \Drupal\Core\Utility\CallableResolver
-   */
-  protected CallableResolver $callableResolver;
-
-  /**
    * Constructs a new PermissionHandler.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Utility\CallableResolver $callable_resolver
+   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
    * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
+   * @param iterable<\Drupal\user\PermissionProviderInterface> $permissionProviders
+   *   The set of services tagged with 'user.permission_provider'.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
-    $this->callableResolver = $callable_resolver;
-
-    // @todo It would be nice if you could pull all module directories from the
-    //   container.
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    TranslationInterface $string_translation,
+    protected CallableResolver $callableResolver,
+    protected ModuleExtensionList $moduleExtensionList,
+    #[AutowireIterator(tag: 'user.permission_provider')]
+    protected iterable $permissionProviders = [],
+  ) {
     $this->stringTranslation = $string_translation;
   }
 
@@ -114,6 +112,7 @@ class PermissionHandler implements PermissionHandlerInterface {
    */
   public function getPermissions() {
     $all_permissions = $this->buildPermissionsYaml();
+    $all_permissions += $this->buildPermissionsFromProviders();
 
     return $this->sortPermissions($all_permissions);
   }
@@ -135,6 +134,52 @@ class PermissionHandler implements PermissionHandlerInterface {
   }
 
   /**
+   * Builds permissions from services tagged 'user.permission_provider'.
+   *
+   * @return array[]
+   *   An array of permissions.
+   *
+   * @see \Drupal\user\PermissionHandlerInterface::getPermissions()
+   * @see \Drupal\user\PermissionProviderInterface
+   */
+  protected function buildPermissionsFromProviders(): array {
+    $all_permissions = [];
+    foreach ($this->permissionProviders as $permission_provider) {
+      $provider_module = $this->getProviderModule($permission_provider);
+      foreach ($permission_provider->getPermissions() as $name => $permission) {
+        if (!is_array($permission)) {
+          $permission = ['title' => $permission];
+        }
+        $permission += [
+          'description' => NULL,
+          'provider' => $provider_module,
+        ];
+        $all_permissions[$name] = $permission;
+      }
+    }
+    return $all_permissions;
+  }
+
+  /**
+   * Infers the providing module of a permission provider from its namespace.
+   *
+   * @param \Drupal\user\PermissionProviderInterface $permission_provider
+   *   The permission provider service.
+   *
+   * @return string|null
+   *   The module machine name, or NULL if it cannot be inferred.
+   *
+   * @see \Drupal\Core\Plugin\Discovery\AttributeClassDiscovery::getProviderFromNamespace()
+   */
+  protected function getProviderModule(PermissionProviderInterface $permission_provider): ?string {
+    preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $permission_provider::class, $matches);
+    if (isset($matches['provider'])) {
+      return mb_strtolower($matches['provider']);
+    }
+    return NULL;
+  }
+
+  /**
    * Builds all permissions provided by .permissions.yml files.
    *
    * @return array[]
@@ -152,6 +197,7 @@ class PermissionHandler implements PermissionHandlerInterface {
       // syntax, see \Drupal\Core\Utility\CallableResolver. These methods
       // should return an array of permissions in the same structure.
       if (isset($permissions['permission_callbacks'])) {
+        @trigger_error("The 'permission_callbacks' key in {$provider}.permissions.yml is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Declare a service implementing \\Drupal\\user\\PermissionProviderInterface instead. See https://www.drupal.org/node/3421580", E_USER_DEPRECATED);
         foreach ($permissions['permission_callbacks'] as $permission_callback) {
           $callback = $this->callableResolver->getCallableFromDefinition($permission_callback);
           if ($callback_permissions = call_user_func($callback)) {
