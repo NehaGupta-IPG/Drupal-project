@@ -191,54 +191,37 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       ];
       $row[] = $column;
 
-      if ($is_current_revision) {
-        $row[] = [
-          'data' => [
-            '#prefix' => '<em>',
-            '#markup' => $this->t('Current revision'),
-            '#suffix' => '</em>',
-          ],
-        ];
-
-        $rows[] = [
-          'data' => $row,
-          'class' => ['revision-current'],
+      $links = [];
+      if ($revision->access('revert revision')) {
+        $links['revert'] = [
+          'title' => $vid < $node->getRevisionId()
+            ? $this->t('Revert')
+            : $this->t('Set as current revision'),
+          'url' => $has_translations
+            ? Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode])
+            : Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
         ];
       }
-      else {
-        $links = [];
-        if ($revision->access('revert revision')) {
-          $links['revert'] = [
-            'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
-            'url' => $has_translations
-              ? Url::fromRoute('node.revision_revert_translation_confirm', [
-                'node' => $node->id(),
-                'node_revision' => $vid,
-                'langcode' => $langcode,
-              ])
-              : Url::fromRoute('node.revision_revert_confirm', [
-                'node' => $node->id(),
-                'node_revision' => $vid,
-              ]),
-          ];
-        }
 
-        if ($revision->access('delete revision')) {
-          $links['delete'] = [
-            'title' => $this->t('Delete'),
-            'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
-          ];
-        }
-
-        $row[] = [
-          'data' => [
-            '#type' => 'operations',
-            '#links' => $links,
-          ],
+      if ($revision->access('delete revision')) {
+        $links['delete'] = [
+          'title' => $this->t('Delete'),
+          'url' => Url::fromRoute('node.revision_delete_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
         ];
-
-        $rows[] = $row;
       }
+
+      $row[] = [
+        'data' => [
+          '#type' => 'operations',
+          '#links' => $links,
+          '#suffix' => $is_current_revision ? ' <em>' . $this->t('Current revision') . '</em>' : NULL,
+        ],
+      ];
+
+      $rows[] = [
+        'data' => $row,
+        'class' => $is_current_revision ? ['revision-current'] : [],
+      ];
     }
 
     $build['node_revisions_table'] = [

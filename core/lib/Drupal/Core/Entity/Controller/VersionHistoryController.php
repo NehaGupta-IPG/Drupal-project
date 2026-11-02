@@ -283,12 +283,6 @@ class VersionHistoryController extends ControllerBase {
     $row['revision']['data'] = $this->getRevisionDescription($revision);
     $row['operations']['data'] = [];
 
-    // Revision status.
-    if ($revision->isDefaultRevision()) {
-      $rowAttributes['class'][] = 'revision-current';
-      $row['operations']['data']['status']['#markup'] = $this->t('<em>Current revision</em>');
-    }
-
     // Operation links.
     $links = $this->getOperationLinks($revision);
     if (count($links) > 0) {
@@ -296,6 +290,12 @@ class VersionHistoryController extends ControllerBase {
         '#type' => 'operations',
         '#links' => $links,
       ];
+    }
+
+    // Revision status.
+    if ($revision->isDefaultRevision()) {
+      $rowAttributes['class'][] = 'revision-current';
+      $row['operations']['data']['status']['#markup'] = ' ' . $this->t('<em>Current revision</em>');
     }
 
     return ['data' => $row] + $rowAttributes;

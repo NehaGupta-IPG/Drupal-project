@@ -128,12 +128,12 @@ class RevisionRevertFormTest extends BrowserTestBase {
   }
 
   /**
-   * Ensures that forward revisions can be reverted.
+   * Ensures that forward revisions can not be reverted.
    *
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestForwardRevision(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('revert');
     $entity->isDefaultRevision(TRUE);
@@ -147,8 +147,8 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $entity->save();
 
     $this->drupalGet($entity->toUrl('revision-revert-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertTrue($entity->access('revert', $this->rootUser, FALSE));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($entity->access('revert', $this->rootUser, FALSE));
   }
 
   /**
