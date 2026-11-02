@@ -210,7 +210,7 @@ class TaxonomyHooks {
         if ($is_entity_reference_class && $field->getSetting('target_type') == 'taxonomy_term') {
           foreach ($node->getTranslationLanguages() as $language) {
             foreach ($node->getTranslation($language->getId())->$field_name as $item) {
-              if (!$item->isEmpty()) {
+              if (!$item->isEmpty() && is_numeric($item->target_id)) {
                 $tid_all[$item->target_id] = $item->target_id;
               }
             }
