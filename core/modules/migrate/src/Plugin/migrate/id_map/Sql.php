@@ -355,13 +355,8 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
 
       // Add destination identifiers to map table.
       // @todo How do we discover the destination schema?
-      $count = 1;
-      foreach ($this->migration->getDestinationPlugin()->getIds() as $id_definition) {
-        // Allow dest identifier fields to be NULL (for IGNORED/FAILED cases).
-        $map_key = 'destid' . $count++;
-        $fields[$map_key] = $this->getFieldSchema($id_definition);
-        $fields[$map_key]['not null'] = FALSE;
-      }
+      $destination_id_schema = $this->getDestinationIdFieldSchema();
+      $fields += $destination_id_schema;
       $fields['source_row_status'] = [
         'type' => 'int',
         'size' => 'tiny',
@@ -400,8 +395,9 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
       // table is successfully created or the chunk_size is less than zero. If
       // there are no source IDs the table is created.
       $chunk_size = count($source_id_schema);
+      $destination_indexes = $this->getDestinationIdIndexes($destination_id_schema);
       while ($chunk_size >= 0) {
-        $indexes = [];
+        $indexes = $destination_indexes;
         if ($chunk_size > 0) {
           foreach (array_chunk(array_keys($source_id_schema), $chunk_size) as $key => $index_columns) {
             $index_name = ($key === 0) ? 'source' : "source$key";
@@ -492,6 +488,62 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
           'length' => '64',
           'not null' => TRUE,
           'description' => 'Hash of source ids. Used as primary key',
+        ]);
+      }
+      $this->ensureDestinationIdIndexes($this->getDestinationIdFieldSchema());
+    }
+  }
+
+  /**
+   * Gets schema definitions for destination ID map fields.
+   *
+   * @return array
+   *   Destination map schema, keyed by destidN.
+   */
+  protected function getDestinationIdFieldSchema(): array {
+    $destination_id_schema = [];
+    $count = 1;
+    foreach ($this->migration->getDestinationPlugin()->getIds() as $id_definition) {
+      // Allow dest identifier fields to be NULL (for IGNORED/FAILED cases).
+      $map_key = 'destid' . $count++;
+      $destination_id_schema[$map_key] = $this->getFieldSchema($id_definition);
+      $destination_id_schema[$map_key]['not null'] = FALSE;
+    }
+    return $destination_id_schema;
+  }
+
+  /**
+   * Gets indexes for destination ID map fields.
+   *
+   * @param array $destination_id_schema
+   *   Destination map schema keyed by destidN.
+   *
+   * @return array
+   *   Destination index definitions.
+   */
+  protected function getDestinationIdIndexes(array $destination_id_schema): array {
+    if ($destination_id_schema === []) {
+      return [];
+    }
+    // Rollback deletes and destination lookups use all destination IDs.
+    return ['destination' => array_keys($destination_id_schema)];
+  }
+
+  /**
+   * Ensures destination ID indexes exist on pre-existing map tables.
+   *
+   * @param array $destination_id_schema
+   *   Destination map schema keyed by destidN.
+   */
+  protected function ensureDestinationIdIndexes(array $destination_id_schema): void {
+    $destination_indexes = $this->getDestinationIdIndexes($destination_id_schema);
+    if ($destination_indexes === [] || !$this->getDatabase()->schema()->tableExists($this->mapTableName)) {
+      return;
+    }
+    foreach ($destination_indexes as $index_name => $index_columns) {
+      if (!$this->getDatabase()->schema()->indexExists($this->mapTableName, $index_name)) {
+        $this->getDatabase()->schema()->addIndex($this->mapTableName, $index_name, $index_columns, [
+          'fields' => array_intersect_key($destination_id_schema, array_flip($index_columns)),
         ]);
       }
     }
