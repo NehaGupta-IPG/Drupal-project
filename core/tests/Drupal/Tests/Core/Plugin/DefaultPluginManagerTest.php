@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -272,6 +274,47 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $plugin_manager->setCacheBackend($cache_backend, $cid, ['tag']);
 
     $plugin_manager->clearCachedDefinitions();
+  }
+
+  /**
+   * Tests that tagged cache invalidation also drops the static definitions cache.
+   */
+  public function testStaticCacheClearedOnTagInvalidation(): void {
+    $cid = $this->randomMachineName();
+    $time = $this->createMock(TimeInterface::class);
+    $time->method('getRequestTime')->willReturn(1);
+    $cache_backend = new MemoryBackend($time);
+
+    $definitions = $this->expectedDefinitions;
+    $definitions['apple']['provider'] = 'core';
+    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, NULL, NULL, FruitInterface::class);
+    $plugin_manager->setCacheBackend($cache_backend, $cid, ['test_plugin_definitions']);
+
+    $this->assertEquals($definitions, $plugin_manager->getDefinitions());
+    $this->assertNotFalse($cache_backend->get($cid));
+
+    $pear = [
+      'id' => 'pear',
+      'label' => 'Pear',
+      'color' => 'green',
+      'class' => 'Drupal\plugin_test\Plugin\plugin_test\fruit\Apple',
+      'provider' => 'core',
+    ];
+    $discovery = new \ReflectionProperty($plugin_manager, 'discovery');
+    $discovery->getValue($plugin_manager)->setDefinition('pear', $pear);
+
+    $cache_backend->invalidateTags(['test_plugin_definitions']);
+
+    $this->assertArrayHasKey('pear', $plugin_manager->getDefinitions());
+    $this->assertTrue($plugin_manager->hasDefinition('pear'));
+
+    $apple = $definitions['apple'];
+    $apple['color'] = 'red';
+    $discovery->getValue($plugin_manager)->setDefinition('apple', $apple);
+
+    $cache_backend->invalidateTags(['test_plugin_definitions']);
+
+    $this->assertSame('red', $plugin_manager->getDefinitions()['apple']['color']);
   }
 
   /**

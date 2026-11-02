@@ -248,6 +248,15 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   and would actually be returned by the getDefinitions() method.
    */
   protected function getCachedDefinitions() {
+    if ($this->cacheTags) {
+      if ($cache = $this->cacheGet($this->cacheKey)) {
+        $this->definitions = $cache->data;
+      }
+      else {
+        $this->definitions = NULL;
+      }
+      return $this->definitions;
+    }
     if (!isset($this->definitions) && $cache = $this->cacheGet($this->cacheKey)) {
       $this->definitions = $cache->data;
     }
