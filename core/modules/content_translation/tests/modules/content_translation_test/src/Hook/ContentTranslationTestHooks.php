@@ -5,16 +5,33 @@ declare(strict_types=1);
 namespace Drupal\content_translation_test\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for content_translation_test.
  */
 class ContentTranslationTestHooks {
+
+  /**
+   * Implements hook_entity_bundle_field_info().
+   */
+  #[Hook('entity_bundle_field_info')]
+  public function entityBundleFieldInfo(EntityTypeInterface $entity_type, string $bundle): array {
+    if ($entity_type->id() === 'entity_test_mul' && $bundle === 'entity_test_mul') {
+      $fields['ct_test_bundle_field'] = BaseFieldDefinition::create('string')
+        ->setLabel('Bundle-only field')
+        ->setComputed(TRUE)
+        ->setTranslatable(TRUE);
+      return $fields;
+    }
+    return [];
+  }
 
   /**
    * Implements hook_entity_bundle_info_alter().
