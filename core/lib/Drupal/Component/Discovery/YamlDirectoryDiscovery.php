@@ -6,11 +6,18 @@ use Drupal\Component\FileSystem\RegexDirectoryIterator;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Messenger\MessengerTrait;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Discovers multiple YAML files in a set of directories.
  */
 class YamlDirectoryDiscovery implements DiscoverableInterface {
+
+  use MessengerTrait;
+  use LoggerChannelTrait;
+  use StringTranslationTrait;
 
   /**
    * Defines the key in the discovered data where the file path is stored.
@@ -80,6 +87,7 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
     // If there are files left that were not returned from the cache, load and
     // parse them now. This list was flipped above and is keyed by filename.
     if ($files) {
+      $duplicates = [];
       foreach ($files as $file => $provider) {
         // If a file is empty or its contents are commented out, return an empty
         // array instead of NULL for type consistency.
@@ -90,11 +98,18 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
           throw new DiscoveryException("The $file contains invalid YAML", 0, $e);
         }
         $data[static::FILE_KEY] = $file;
-        $all[$provider][$this->getIdentifier($file, $data)] = $data;
+        $componentid = $this->getIdentifier($file, $data);
+
+        if (isset($duplicates[$componentid])) {
+          $this->messenger()->addWarning($this->t('Duplicate component found: @componentid', ['@componentid' => $componentid]));
+          $this->getLogger('YamlDirectoryDiscovery')->warning('Duplicate component found: @componentid', ['@componentid' => $componentid]);
+        }
+        $duplicates[$componentid] = $componentid;
+
+        $all[$provider][$componentid] = $data;
         $file_cache->set($file, $data);
       }
     }
-
     return $all;
   }
 
