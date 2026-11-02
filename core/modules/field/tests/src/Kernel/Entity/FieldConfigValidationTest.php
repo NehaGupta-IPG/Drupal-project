@@ -205,6 +205,11 @@ class FieldConfigValidationTest extends ConfigEntityValidationTestBase {
     parent::resetEnvironment();
 
     $this->container->get('state')->delete(self::DISABLE_BROKEN_HANDLER_STATE);
+    // The test class shares its environment, so the module list must be left
+    // as it was.
+    if ($this->container->get('module_handler')->moduleExists('field_test')) {
+      $this->disableModules(['field_test']);
+    }
   }
 
 }
