@@ -131,6 +131,25 @@
         model.trigger('change:isFixed', model, model.get('isFixed'));
         model.trigger('change:activeTray', model, model.get('activeTray'));
 
+        // Do not carry an open tray into a later authenticated session.
+        $(toolbar).on('click', '[data-toolbar-logout]', () => {
+          localStorage.removeItem('Drupal.toolbar.activeTabID');
+
+          const storedToolbarState = sessionStorage.getItem(
+            'Drupal.toolbar.toolbarState',
+          );
+          if (storedToolbarState) {
+            const toolbarState = JSON.parse(storedToolbarState);
+            delete toolbarState.activeTray;
+            toolbarState.hasActiveTab = false;
+            toolbarState.activeTabId = null;
+            sessionStorage.setItem(
+              'Drupal.toolbar.toolbarState',
+              JSON.stringify(toolbarState),
+            );
+          }
+        });
+
         // Render collapsible menus.
         const menuModel = new Drupal.toolbar.MenuModel();
         Drupal.toolbar.models.menuModel = menuModel;

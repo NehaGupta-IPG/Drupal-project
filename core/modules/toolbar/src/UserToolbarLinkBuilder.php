@@ -56,6 +56,9 @@ class UserToolbarLinkBuilder implements TrustedCallbackInterface {
       'logout' => [
         'title' => $this->t('Log out'),
         'url' => Url::fromRoute('user.logout'),
+        'attributes' => [
+          'data-toolbar-logout' => 'true',
+        ],
       ],
     ];
     $build = [
