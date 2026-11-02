@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Template;
+namespace Drupal\Component\Utility\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
 
@@ -17,7 +17,7 @@ use Drupal\Component\Utility\Html;
  *  // Produces: <cat id="socks" style="background-color:white">.
  * @endcode
  *
- * @see \Drupal\Core\Template\Attribute
+ * @see \Drupal\Component\Utility\HtmlAttribute\Attribute
  */
 class AttributeString extends AttributeValueBase {
 
