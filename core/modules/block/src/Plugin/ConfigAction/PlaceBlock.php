@@ -63,7 +63,15 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
       // values are region names, so we know where to place this block. If the
       // target theme is not in the map, they should supply the name of a
       // fallback region. If all that fails, give up with an exception.
-      $value['region'] = $value['region'][$theme] ?? $value['default_region'] ?? throw new ConfigActionException("Cannot determine which region to place this block into, because no default region was provided.");
+      $value['region'] = $value['region'][$theme] ?? NULL;
+    }
+    // Ensure a string value for region, falling back to default_region.
+    $value['region'] ??= NULL;
+    if (!is_string($value['region']) && isset($value['default_region']) && is_string($value['default_region'])) {
+      $value['region'] = $value['default_region'];
+    }
+    if (!$value['region']) {
+      throw new ConfigActionException("Cannot determine which region to place this block into, because no default region was provided.");
     }
 
     // Allow the recipe author to position the block in the region without
