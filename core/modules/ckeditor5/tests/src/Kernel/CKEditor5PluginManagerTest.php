@@ -9,6 +9,7 @@ use Drupal\ckeditor5\Annotation\CKEditor5AspectsOfCKEditor5Plugin;
 use Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin;
 use Drupal\ckeditor5\HTMLRestrictions;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
+use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -197,6 +198,22 @@ YAML,
     }
 
     return $container;
+  }
+
+  /**
+   * Tests that discovery supplies the class omitted from a plugin definition.
+   */
+  public function testDefaultPluginClass(): void {
+    $container = $this->mockModuleInVfs('ckeditor5_default_class', <<<'YAML'
+ckeditor5_default_class_test:
+  ckeditor5:
+    plugins: {}
+  drupal:
+    label: Test plugin
+    elements: false
+YAML);
+    $definition = $container->get('plugin.manager.ckeditor5.plugin')->getDefinition('ckeditor5_default_class_test');
+    $this->assertSame(CKEditor5PluginDefault::class, $definition->getClass());
   }
 
   /**

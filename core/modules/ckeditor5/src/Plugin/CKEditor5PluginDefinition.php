@@ -171,14 +171,15 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
       }
     }
 
-    if (isset($definition['drupal']['class']) && !class_exists($definition['drupal']['class'])) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The CKEditor 5 "%s" provides a plugin class: "%s", but it does not exist.', $id, $definition['drupal']['class']));
+    $class = $definition['drupal']['class'] ?? '';
+    if (!class_exists($class)) {
+      throw new InvalidPluginDefinitionException($id, sprintf('The CKEditor 5 "%s" provides a plugin class: "%s", but it does not exist.', $id, $class));
     }
-    elseif (isset($definition['drupal']['class']) && !in_array(CKEditor5PluginInterface::class, class_implements($definition['drupal']['class']))) {
+    elseif (!is_subclass_of($class, CKEditor5PluginInterface::class)) {
       throw new InvalidPluginDefinitionException($id, sprintf('CKEditor 5 plugins must implement \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface. "%s" does not.', $id));
     }
-    elseif (in_array(CKEditor5PluginConfigurableInterface::class, class_implements($definition['drupal']['class'], TRUE))) {
-      $default_configuration = (new \ReflectionClass($definition['drupal']['class']))
+    elseif (is_subclass_of($class, CKEditor5PluginConfigurableInterface::class)) {
+      $default_configuration = (new \ReflectionClass($class))
         ->newInstanceWithoutConstructor()
         ->defaultConfiguration();
       if (!empty($default_configuration)) {
@@ -210,7 +211,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
           if (!is_array($required_configuration)) {
             return 'An array structure matching the required configuration for this plugin must be specified.';
           }
-          if (!in_array(CKEditor5PluginConfigurableInterface::class, class_implements($definition['drupal']['class'], TRUE))) {
+          if (!is_subclass_of($definition['drupal']['class'], CKEditor5PluginConfigurableInterface::class)) {
             return 'This condition type is only available for CKEditor 5 plugins implementing CKEditor5PluginConfigurableInterface.';
           }
           $error_message = $this->validateConfiguration($required_configuration);
