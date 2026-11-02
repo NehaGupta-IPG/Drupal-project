@@ -29,6 +29,7 @@
       "tests/fixtures/files/*",
       "tests/fixtures/phpunit_*.xml",
       "tests/Drupal/Tests/Component/Annotation/Doctrine/**",
+      "tests/Drupal/Tests/Component/Utility/fixtures/UnicodeTest.txt",
       "tests/PHPStan/vendor/**",
       "COPYRIGHT.txt",
       "MAINTAINERS.txt",
