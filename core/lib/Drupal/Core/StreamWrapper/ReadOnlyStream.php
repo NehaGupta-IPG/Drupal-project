@@ -6,11 +6,11 @@ namespace Drupal\Core\StreamWrapper;
  * Defines a read-only Drupal stream wrapper base class.
  *
  * This class provides a minimal-read only stream wrapper implementation.
- * Specifically, it only implements the writing classes and read classes where
+ * Specifically, it only implements the writing methods and read methods where
  * we need to restrict 'write-capable' arguments.
  *
  * Drupal\Core\StreamWrapper\ReadOnlyStream implementations need to implement
- * all the read-related classes.
+ * all the read-related methods.
  */
 abstract class ReadOnlyStream implements StreamWrapperInterface {
   /**
