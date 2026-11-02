@@ -119,6 +119,13 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
   }
 
   /**
+   * Query string to indicate the site default language.
+   *
+   * @see \Drupal\Core\Language\LanguageInterface::LANGCODE_DEFAULT
+   */
+  const LANGUAGE_SITE_DEFAULT = '***LANGUAGE_site_default***';
+
+  /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
@@ -137,6 +144,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       'sort' => [
         'field' => '_none',
         'direction' => 'ASC',
+        'language' => NULL,
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
@@ -486,7 +494,8 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
     // Add the sort option.
     if ($configuration['sort']['field'] !== '_none') {
-      $query->sort($configuration['sort']['field'], $configuration['sort']['direction']);
+      $langcode = isset($configuration['sort']['language']) ? $this->resolveLangcode($configuration['sort']['language']) : NULL;
+      $query->sort($configuration['sort']['field'], $configuration['sort']['direction'], $langcode);
     }
 
     return $query;
@@ -511,6 +520,51 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     // Restore the tags and metadata.
     $query->alterTags = $old_tags;
     $query->alterMetaData = $old_metadata;
+  }
+
+  /**
+   * Returns substitutions for languages.
+   *
+   * @return string[]
+   *   Substitutions
+   */
+  protected static function queryLanguageSubstitutions() {
+    $changes = [];
+    $manager = \Drupal::languageManager();
+
+    // Handle default language.
+    $default = $manager->getDefaultLanguage()->getId();
+    $changes[self::LANGUAGE_SITE_DEFAULT] = $default;
+
+    // Handle negotiated languages.
+    $types = $manager->getDefinedLanguageTypesInfo();
+    foreach ($types as $id => $type) {
+      if (isset($type['name'])) {
+        $changes['***LANGUAGE_' . $id . '***'] = $manager->getCurrentLanguage($id)->getId();
+      }
+    }
+
+    return $changes;
+  }
+
+  /**
+   * Resolve language code.
+   *
+   * @param string $language
+   *   Language.
+   *
+   * @return string
+   *   Language Code.
+   */
+  protected function resolveLangcode($language) {
+    if (strpos($language, '***LANGUAGE_') === 0) {
+      $substitutions = self::queryLanguageSubstitutions();
+      if (isset($substitutions[$language])) {
+        return $substitutions[$language];
+      }
+      return self::LANGUAGE_SITE_DEFAULT;
+    }
+    return $language;
   }
 
 }
