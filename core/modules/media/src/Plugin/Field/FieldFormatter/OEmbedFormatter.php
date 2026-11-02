@@ -211,6 +211,8 @@ class OEmbedFormatter extends FormatterBase {
             'height' => $resource->getHeight() ?: $max_height,
             'class' => ['media-oembed-content'],
             'loading' => $this->getSetting('loading')['attribute'],
+            'allowfullscreen' => 'true',
+            'allow' => 'fullscreen',
           ],
           '#attached' => [
             'library' => [

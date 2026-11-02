@@ -137,7 +137,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
 
     // Ensure the iframe exists and has the expected CSS class, and that its src
     // attribute contains a coherent URL with the query parameters we expect.
-    $iframe = $assert_session->elementExists('css', 'iframe.media-oembed-content');
+    $iframe = $assert_session->elementExists('css', 'iframe.media-oembed-content[allowfullscreen][allow="fullscreen"]');
     $iframe_url = parse_url($iframe->getAttribute('src'));
     $this->assertStringEndsWith('/media/oembed', $iframe_url['path']);
     $this->assertNotEmpty($iframe_url['query']);
