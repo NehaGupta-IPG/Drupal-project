@@ -87,7 +87,7 @@ class TestToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $this->logCall('settings', func_get_args());
+    $this->logCall('settings', []);
     $form['test_parameter'] = [
       '#type' => 'number',
       '#title' => $this->t('Test toolkit parameter'),
@@ -129,6 +129,7 @@ class TestToolkit extends ImageToolkitBase {
    */
   public function parseFile() {
     $this->logCall('parseFile', func_get_args());
+    // @phpstan-ignore method.deprecated
     $data = @getimagesize($this->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
       $this->setType($data[2]);

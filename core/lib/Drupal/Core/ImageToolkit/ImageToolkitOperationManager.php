@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Psr\Log\LoggerInterface;
@@ -36,6 +37,15 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    * The image toolkit manager.
    */
   protected readonly ImageToolkitManager $toolkitManager;
+
+  /**
+   * The map of active toolkit operation singleton instances.
+   *
+   * Keyed by image toolkit ID and by operation.
+   *
+   * @var array<string, array<string, ImageToolkitOperationInterface>>
+   */
+  protected array $activeToolkitOperations = [];
 
   /**
    * Constructs the ImageToolkitOperationManager object.
@@ -126,8 +136,6 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
     }
     else {
       // Pickup the first plugin found.
-      // @todo In https://www.drupal.org/node/2110591 we'll return here the UI
-      //   selected plugin or the first found if missed.
       $definition = reset($definitions);
       return $definition['id'];
     }
@@ -136,18 +144,47 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = [], ?ImageToolkitInterface $toolkit = NULL) {
-    $instance = parent::createInstance($plugin_id, $configuration);
-    $instance->setToolkit($toolkit);
+  public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
+    if (isset($this->activeToolkitOperations[$toolkit->getPluginId()][$operation])) {
+      return $this->activeToolkitOperations[$toolkit->getPluginId()][$operation];
+    }
+    $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
+    $instance = $this->createInstance($plugin_id, []);
+    if ($instance->getPluginDefinition()['needsToolkitInjection']) {
+      $instance->setToolkit($toolkit->getPluginDefinition()['isStateless'] ? clone $toolkit : $toolkit);
+    }
+    else {
+      $this->activeToolkitOperations[$toolkit->getPluginId()][$operation] = $instance;
+    }
     return $instance;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
-    $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
-    return $this->createInstance($plugin_id, [], $toolkit);
+  protected function findDefinitions(): array {
+    // BC layer, add a 'needsToolkitInjection' key to the definition if the
+    // toolkit operation can receive an ImageInterface argument and therefore
+    // work with stateless toolkits.
+    // @todo remove in drupal:43.0.0.
+    $definitions = parent::findDefinitions();
+    foreach ($definitions as &$plugin_definition) {
+      $plugin_definition['needsToolkitInjection'] = TRUE;
+      $reflectedExecute = new \ReflectionMethod($plugin_definition['class'], 'execute');
+      $parameters = $reflectedExecute->getParameters();
+      $rawType = $parameters[0]?->getType();
+      $types = match (get_class($rawType)) {
+        \ReflectionUnionType::class, \ReflectionIntersectionType::class => $rawType->getTypes(),
+        default => [$rawType],
+      };
+      foreach ($types as $type) {
+        if (is_a((string) $type, ImageInterface::class, TRUE)) {
+          $plugin_definition['needsToolkitInjection'] = FALSE;
+          break;
+        }
+      }
+    }
+    return $definitions;
   }
 
 }

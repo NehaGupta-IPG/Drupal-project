@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -43,7 +44,12 @@ class Scale extends Resize {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
     // Assure at least one dimension.
     if (empty($arguments['width']) && empty($arguments['height'])) {
       throw new \InvalidArgumentException("At least one dimension ('width' or 'height') must be provided to the image 'scale' operation");
@@ -54,7 +60,7 @@ class Scale extends Resize {
     // target dimensions is missing, that is the one that is calculated. If both
     // are specified then the dimension calculated is the one that would not be
     // calculated to be bigger than its target.
-    $aspect = $this->getToolkit()->getHeight() / $this->getToolkit()->getWidth();
+    $aspect = $image->getHeight() / $image->getWidth();
     if (($arguments['width'] && !$arguments['height']) || ($arguments['width'] && $arguments['height'] && $aspect < $arguments['height'] / $arguments['width'])) {
       $arguments['height'] = (int) round($arguments['width'] * $aspect);
     }
@@ -80,12 +86,18 @@ class Scale extends Resize {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments = []) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
     // Don't scale if we don't change the dimensions at all.
-    if ($arguments['width'] !== $this->getToolkit()->getWidth() || $arguments['height'] !== $this->getToolkit()->getHeight()) {
+    if ($arguments['width'] !== $image->getWidth() || $arguments['height'] !== $image->getHeight()) {
       // Don't upscale if the option isn't enabled.
-      if ($arguments['upscale'] || ($arguments['width'] <= $this->getToolkit()->getWidth() && $arguments['height'] <= $this->getToolkit()->getHeight())) {
-        return parent::execute($arguments);
+      if ($arguments['upscale'] || ($arguments['width'] <= $image->getWidth() && $arguments['height'] <= $image->getHeight())) {
+        return parent::execute($image, $arguments);
       }
     }
     return TRUE;

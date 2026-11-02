@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -34,7 +35,12 @@ class Resize extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+
     // Assure integers for all arguments.
     $arguments['width'] = (int) round($arguments['width']);
     $arguments['height'] = (int) round($arguments['height']);
@@ -53,23 +59,28 @@ class Resize extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments = []) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
     // Create a new image of the required dimensions, and copy and resize
     // the original image on it with resampling.
-    $original_image = $this->getToolkit()->getImage();
+    $original_gd_image = $image->getGdImageObject();
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
-      'extension' => image_type_to_extension($this->getToolkit()->getType(), FALSE),
-      'transparent_color' => $this->getToolkit()->getTransparentColor(),
+      'extension' => image_type_to_extension($image->getType(), FALSE),
+      'transparent_color' => $image->toolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
-    if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], imagesx($original_image), imagesy($original_image))) {
+    if ($image->apply('create_new', $data)) {
+      if (imagecopyresampled($image->getGdImageObject(), $original_gd_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], imagesx($original_gd_image), imagesy($original_gd_image))) {
         return TRUE;
       }
       // In case of failure, restore the original image.
-      $this->getToolkit()->setImage($original_image);
+      $image->setGdImageObject($original_gd_image);
     }
     return FALSE;
   }

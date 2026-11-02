@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitInterface;
+
 /**
  * Provides an interface for image objects.
  */
@@ -49,6 +51,16 @@ interface ImageInterface {
   public function getMimeType();
 
   /**
+   * Sets the source path of the image file.
+   *
+   * @param string $source
+   *   The source path of the image file.
+   *
+   * @return static
+   */
+  public function setSource(string $source): static;
+
+  /**
    * Retrieves the source path of the image file.
    *
    * @return string
@@ -62,8 +74,21 @@ interface ImageInterface {
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::toolkit() on stateless toolkits instead.
+   *
+   * @see https://www.drupal.org/node/3590417
    */
   public function getToolkit();
+
+  /**
+   * Returns the image toolkit singleton to be used for this image file.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The image toolkit.
+   */
+  public function toolkit(): ImageToolkitInterface;
 
   /**
    * Returns the ID of the image toolkit used for this image file.

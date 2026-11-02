@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -44,9 +45,15 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
-    $actualWidth = $this->getToolkit()->getWidth();
-    $actualHeight = $this->getToolkit()->getHeight();
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
+    $actualWidth = $image->getWidth();
+    $actualHeight = $image->getHeight();
 
     $scaleFactor = max($arguments['width'] / $actualWidth, $arguments['height'] / $actualHeight);
 
@@ -75,9 +82,15 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments = []) {
-    return $this->getToolkit()->apply('resize', $arguments['resize'])
-        && $this->getToolkit()->apply('crop', $arguments);
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
+    return $image->apply('resize', $arguments['resize'])
+        && $image->apply('crop', $arguments);
   }
 
 }

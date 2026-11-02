@@ -3,6 +3,7 @@
 namespace Drupal\Core\ImageToolkit;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,11 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
 
   /**
    * The image toolkit.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless
+   *   toolkits must not be injected to the toolkit operation.
+   *
+   * @see https://www.drupal.org/node/3590417
    */
   protected ImageToolkitInterface $toolkit;
 
@@ -54,6 +60,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if ($toolkit instanceof ImageToolkitInterface) {
       @trigger_error('The $toolkit argument of ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and the argument is removed from drupal:13.0.0. Use ::setToolkit() instead. See https://www.drupal.org/node/3562304', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $this->toolkit = $toolkit;
       $this->logger = $logger;
     }
@@ -66,6 +73,10 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * {@inheritdoc}
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    if (!$this->getPluginDefinition()['needsToolkitInjection']) {
+      throw new ImageToolkitException("No toolkit can be injected in image toolkit operation '{$this->getPluginId()}'");
+    }
     $this->toolkit = $toolkit;
   }
 
@@ -79,8 +90,17 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit in use.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless
+   *   toolkits must not be injected to the toolkit operation.
+   *
+   * @see https://www.drupal.org/node/3590417
    */
   protected function getToolkit() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless toolkits must not be injected to the toolkit operation. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    if (!$this->getPluginDefinition()['needsToolkitInjection']) {
+      throw new ImageToolkitException("No toolkit injected in image toolkit operation '{$this->getPluginId()}'");
+    }
     return $this->toolkit;
   }
 
@@ -185,10 +205,28 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
   /**
    * {@inheritdoc}
    */
-  final public function apply(array $arguments) {
+  final public function apply(/* ImageInterface $image, array */ $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      $image = NULL;
+    }
     $arguments = $this->prepareArguments($arguments);
-    $arguments = $this->validateArguments($arguments);
-    return $this->execute($arguments);
+    if ($this->getPluginDefinition()['needsToolkitInjection']) {
+      if ($image) {
+        // @phpstan-ignore property.deprecated
+        $this->toolkit->backfillImage = $image;
+      }
+      $arguments = $this->validateArguments($arguments);
+      return $this->execute($arguments);
+    }
+    // @phpstan-ignore arguments.count,argument.type
+    $arguments = $this->validateArguments($image, $arguments);
+    // @phpstan-ignore arguments.count,argument.type
+    return $this->execute($image, $arguments);
   }
 
   /**

@@ -3,6 +3,7 @@
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
 use Drupal\Component\Utility\Color;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -50,9 +51,15 @@ class CreateNew extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
     // Assure extension is supported.
-    if (!in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
+    if (!in_array($arguments['extension'], $image->toolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ('{$arguments['extension']}') specified for the image 'create_new' operation");
     }
 
@@ -79,12 +86,17 @@ class CreateNew extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    assert($arguments instanceof ImageInterface);
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
+
     // Get the image type.
-    $type = $this->getToolkit()->extensionToImageType($arguments['extension']);
+    $type = $image->toolkit()->extensionToImageType($arguments['extension']);
 
     // Create the image.
-    if (!$image = imagecreatetruecolor($arguments['width'], $arguments['height'])) {
+    if (!$gdImage = imagecreatetruecolor($arguments['width'], $arguments['height'])) {
       return FALSE;
     }
 
@@ -93,35 +105,35 @@ class CreateNew extends GDImageToolkitOperationBase {
       case IMAGETYPE_PNG:
       case IMAGETYPE_WEBP:
       case IMAGETYPE_AVIF:
-        imagealphablending($image, FALSE);
-        $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
-        imagefill($image, 0, 0, $transparency);
-        imagealphablending($image, TRUE);
-        imagesavealpha($image, TRUE);
+        imagealphablending($gdImage, FALSE);
+        $transparency = imagecolorallocatealpha($gdImage, 0, 0, 0, 127);
+        imagefill($gdImage, 0, 0, $transparency);
+        imagealphablending($gdImage, TRUE);
+        imagesavealpha($gdImage, TRUE);
         break;
 
       case IMAGETYPE_GIF:
         if (empty($arguments['transparent_color'])) {
           // No transparency color specified, fill white transparent.
-          $fill_color = imagecolorallocatealpha($image, 255, 255, 255, 127);
+          $fill_color = imagecolorallocatealpha($gdImage, 255, 255, 255, 127);
         }
         else {
           $fill_rgb = Color::hexToRgb($arguments['transparent_color']);
-          $fill_color = imagecolorallocatealpha($image, $fill_rgb['red'], $fill_rgb['green'], $fill_rgb['blue'], 127);
-          imagecolortransparent($image, $fill_color);
+          $fill_color = imagecolorallocatealpha($gdImage, $fill_rgb['red'], $fill_rgb['green'], $fill_rgb['blue'], 127);
+          imagecolortransparent($gdImage, $fill_color);
         }
-        imagefill($image, 0, 0, $fill_color);
+        imagefill($gdImage, 0, 0, $fill_color);
         break;
 
       case IMAGETYPE_JPEG:
-        imagefill($image, 0, 0, imagecolorallocate($image, 255, 255, 255));
+        imagefill($gdImage, 0, 0, imagecolorallocate($gdImage, 255, 255, 255));
         break;
 
     }
 
-    // Update the toolkit properties.
-    $this->getToolkit()->setType($type);
-    $this->getToolkit()->setImage($image);
+    // Update the image properties.
+    $image->setType($type);
+    $image->setGdImageObject($gdImage);
 
     return TRUE;
   }

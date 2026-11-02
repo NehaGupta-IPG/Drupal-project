@@ -23,6 +23,11 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
    *
    * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
    *   The image toolkit in use.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Stateless
+   *   toolkits must not be injected to the toolkit operation.
+   *
+   * @see https://www.drupal.org/node/3590417
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void;
 
@@ -38,6 +43,6 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
    * @throws \InvalidArgumentException
    *   If one or more of the arguments are not valid.
    */
-  public function apply(array $arguments);
+  public function apply(/* ImageInterface $image, array */ $arguments);
 
 }

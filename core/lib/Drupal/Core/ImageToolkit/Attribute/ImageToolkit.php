@@ -30,6 +30,7 @@ class ImageToolkit extends Plugin {
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $title,
+    public readonly ?string $imageClass = NULL,
     public readonly ?string $deriver = NULL,
   ) {}
 

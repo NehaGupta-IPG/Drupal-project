@@ -45,7 +45,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     // Color at top-right pixel should be fully transparent.
     $file = 'image-test-transparent-indexed.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
-    $gd_image = $image->getToolkit()->getImage();
+    $gd_image = $image->getGdImageObject();
     $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
     $color = array_values(imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "Image {$file} after load has full transparent color at corner 1.");
@@ -58,7 +58,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     // Create image.
     $image = $this->imageFactory->get();
     $image->createNew(50, 20, 'gif', NULL);
-    $gd_image = $image->getToolkit()->getImage();
+    $gd_image = $image->getGdImageObject();
     $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
     $color = array_values(imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "New GIF image with no transparent color set after creation has full transparent color at corner 1.");
@@ -66,7 +66,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $this->assertTrue($image->save($file_path), "New GIF image {$file} was saved.");
     // Reload image.
     $image_reloaded = $this->imageFactory->get($file_path);
-    $gd_image = $image_reloaded->getToolkit()->getImage();
+    $gd_image = $image_reloaded->getGdImageObject();
     $color_index = imagecolorat($gd_image, $image_reloaded->getWidth() - 1, 0);
     $color = array_values(imagecolorsforindex($gd_image, $color_index));
     // Check explicitly for alpha == 0 as the rest of the color has been
@@ -87,7 +87,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $file = 'image-test-transparent-out-of-range.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
     $this->assertTrue($image->isValid(), "Image '$file' after load should be valid, but it is not.");
-    $this->assertTrue(imageistruecolor($image->getToolkit()->getImage()), "Image '$file' after load should be a truecolor image, but it is not.");
+    $this->assertTrue(imageistruecolor($image->getGdImageObject()), "Image '$file' after load should be a truecolor image, but it is not.");
   }
 
 }

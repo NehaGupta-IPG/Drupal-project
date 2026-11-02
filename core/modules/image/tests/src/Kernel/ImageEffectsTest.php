@@ -10,12 +10,17 @@ use Drupal\image\Form\ImageEffectEditForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image effects.
+ *
+ * @todo in drupal:43.0.0, do not remove this test when removing the
+ *   #[IgnoreDeprecations] attribute. Rather, make the test toolkit stateless.
  */
 #[Group('image')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ImageEffectsTest extends KernelTestBase {
 

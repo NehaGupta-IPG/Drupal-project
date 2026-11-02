@@ -23,10 +23,8 @@ class Image implements ImageInterface {
 
   /**
    * An image toolkit object.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
    */
-  protected $toolkit;
+  protected ImageToolkitInterface $toolkit;
 
   /**
    * File size in bytes.
@@ -34,6 +32,19 @@ class Image implements ImageInterface {
    * @var int
    */
   protected $fileSize;
+
+  /**
+   * BC layer.
+   *
+   * @todo remove from drupal:43.0.0.
+   *
+   * @see https://www.drupal.org/node/3590417
+   */
+  public function __sleep(): array {
+    $ret = get_object_vars($this);
+    unset($ret['toolkit']);
+    return array_keys($ret);
+  }
 
   /**
    * Constructs a new Image object.
@@ -44,13 +55,18 @@ class Image implements ImageInterface {
    *   (optional) The path to an image file, or NULL to construct the object
    *   with no image source.
    */
-  public function __construct(ImageToolkitInterface $toolkit, $source = NULL) {
+  public function __construct(
+    ImageToolkitInterface $toolkit,
+    ?string $source = NULL,
+  ) {
     $this->toolkit = $toolkit;
+    $this->toolkit->backfillImage = $this;
     if ($source) {
       $this->source = $source;
-      $this->getToolkit()->setSource($this->source);
+      // @phpstan-ignore-next-line
+      $this->toolkit->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      if ($this->getToolkit()->parseFile()) {
+      if ($this->toolkit->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -60,21 +76,21 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    return $this->getToolkit()->isValid();
+    return $this->toolkit()->isValid($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHeight() {
-    return $this->getToolkit()->getHeight();
+    return $this->toolkit()->getHeight($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidth() {
-    return $this->getToolkit()->getWidth();
+    return $this->toolkit()->getWidth($this);
   }
 
   /**
@@ -88,7 +104,15 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    return $this->getToolkit()->getMimeType();
+    return $this->toolkit()->getMimeType($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSource(string $source): static {
+    $this->source = $source;
+    return $this;
   }
 
   /**
@@ -102,13 +126,28 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkitId() {
-    return $this->getToolkit()->getPluginId();
+    return $this->toolkit()->getPluginId();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getToolkit() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::toolkit() on stateless toolkits instead. See https://www.drupal.org/node/3590417', E_USER_DEPRECATED);
+    if ($this->toolkit->getPluginDefinition()['isStateless'] && !$this->toolkit()->isClone) {
+      // When accessing this method, stateless toolkits for BC should get a
+      // clone of the toolkit singleton, that would have the backfill image
+      // available.
+      $this->toolkit = clone $this->toolkit;
+      $this->toolkit->backfillImage = $this;
+    }
+    return $this->toolkit;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toolkit(): ImageToolkitInterface {
     return $this->toolkit;
   }
 
@@ -122,7 +161,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($destination)) {
+    if ($return = $this->toolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -139,7 +178,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    return $this->getToolkit()->apply($operation, $arguments);
+    return $this->toolkit()->apply($operation, $arguments, $this);
   }
 
   /**
