@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Form;
+namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\HttpKernelFormHelperTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,17 +15,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
-class ResponseTest extends BrowserTestBase {
+class ResponseTest extends KernelTestBase {
+
+  use HttpKernelFormHelperTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['form_test'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+  protected static $modules = ['form_test', 'system'];
 
   /**
    * Tests that enforced responses propagate through subscribers and middleware.
