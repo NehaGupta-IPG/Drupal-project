@@ -1,0 +1,5 @@
+name: Count test
+type: module
+description: Provides for testing of migrate row and message counts.
+package: Testing
+version: VERSION
