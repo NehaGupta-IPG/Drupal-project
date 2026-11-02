@@ -21,6 +21,11 @@ final class LocaleFile {
    * The directory the file is in.
    *
    * @var string
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
+   *     no replacement.
+   *
+   * @see https://www.drupal.org/node/3593802
    */
   public string $directory;
 
@@ -28,6 +33,11 @@ final class LocaleFile {
    * When the translation was last checked.
    *
    * @var string|null
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is
+   *    no replacement.
+   *
+   * @see https://www.drupal.org/node/3593802
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public int $last_checked;
