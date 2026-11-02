@@ -53,3 +53,11 @@ ajax_forms_test.dialog_form_link:
     _controller: '\Drupal\ajax_forms_test\Controller\DialogFormLink::makeDialogFormLink'
   requirements:
     _access: 'TRUE'
+
+ajax_forms_test.states_form:
+  path: '/ajax_forms_test_states_form'
+  defaults:
+    _title: 'Ajax Form with States API'
+    _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestStatesForm'
+  requirements:
+    _access: 'TRUE'
