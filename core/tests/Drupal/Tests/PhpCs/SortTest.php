@@ -49,10 +49,6 @@ class SortTest extends TestCase {
     $files = $xml_encoded['file'];
     $this->assertSorted($files);
 
-    $this->assertArrayHasKey('exclude-pattern', $xml_encoded);
-    $excluded_patterns = $xml_encoded['exclude-pattern'];
-    $this->assertSorted($excluded_patterns);
-
     $this->assertArrayHasKey('rule', $xml_encoded);
     $rules = $xml_encoded['rule'];
     $this->assertSorted($rules, '@ref');
@@ -64,6 +60,12 @@ class SortTest extends TestCase {
           return is_array($item) && array_key_exists('@name', $item);
         });
         $this->assertSorted($excluded, '@name');
+      }
+      if (array_key_exists('include-pattern', $item) && is_array($item['include-pattern'])) {
+        $this->assertSorted($item['include-pattern']);
+      }
+      if (array_key_exists('exclude-pattern', $item) && is_array($item['exclude-pattern'])) {
+        $this->assertSorted($item['exclude-pattern']);
       }
     }
   }
