@@ -433,7 +433,9 @@ class UserController extends ControllerBase {
     if ($this->currentUser()->isAuthenticated()) {
       $this->logoutFinalizer->finalizeLogout();
     }
-    return $this->redirect('<front>');
+    $response = $this->redirect('<front>');
+    $response->headers->set('Clear-Site-Data', 'cache');
+    return $response;
   }
 
   /**
