@@ -386,7 +386,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
     $function = $module . '_' . $hook;
-    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
+    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class, \ReflectionAttribute::IS_INSTANCEOF)) {
       return $function(... $args);
     }
 
