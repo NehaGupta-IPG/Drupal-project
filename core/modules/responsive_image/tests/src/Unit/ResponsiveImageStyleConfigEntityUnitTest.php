@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\responsive_image\Unit;
 
+use Drupal\breakpoint\BreakpointInterface;
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\File\MimeType\MimeTypeMapInterface;
+use Drupal\Core\Image\ImageFactory;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
+use Drupal\responsive_image\ResponsiveImageBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -418,6 +425,125 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
     $entity->setBreakpointGroup('test_group2');
     $this->assertEquals('test_group2', $entity->getBreakpointGroup());
     $this->assertFalse($entity->hasImageStyleMappings());
+  }
+
+  /**
+   * Tests that 'auto' is prepended to sizes when loading is lazy.
+   */
+  public function testAutoSizesWithLazyLoading(): void {
+    $builder = $this->createResponsiveImageBuilder();
+    $breakpoint = $this->createStub(BreakpointInterface::class);
+    $breakpoint->method('getMediaQuery')
+      ->willReturn('(min-width: 560px)');
+
+    $variables = [
+      'uri' => 'public://test.jpeg',
+      'width' => 360,
+      'height' => 240,
+      'attributes' => [
+        'loading' => 'lazy',
+      ],
+    ];
+    $multipliers = [
+      '1x' => [
+        'image_mapping_type' => 'sizes',
+        'image_mapping' => [
+          'sizes' => '(min-width: 700px) 700px, 100vw',
+          'sizes_image_styles' => ['medium'],
+        ],
+      ],
+    ];
+
+    $result = $builder->buildSourceAttributes($variables, $breakpoint, $multipliers);
+    $sizes_value = (string) $result->offsetGet('sizes');
+    $this->assertStringStartsWith('auto', $sizes_value, "Sizes attribute should start with 'auto' when loading is lazy.");
+  }
+
+  /**
+   * Tests that 'auto' is not prepended to sizes when loading is eager.
+   */
+  public function testNoAutoSizesWithEagerLoading(): void {
+    $builder = $this->createResponsiveImageBuilder();
+    $breakpoint = $this->createStub(BreakpointInterface::class);
+    $breakpoint->method('getMediaQuery')
+      ->willReturn('(min-width: 560px)');
+
+    $variables = [
+      'uri' => 'public://test.jpeg',
+      'width' => 360,
+      'height' => 240,
+      'attributes' => [
+        'loading' => 'eager',
+      ],
+    ];
+    $multipliers = [
+      '1x' => [
+        'image_mapping_type' => 'sizes',
+        'image_mapping' => [
+          'sizes' => '(min-width: 700px) 700px, 100vw',
+          'sizes_image_styles' => ['medium'],
+        ],
+      ],
+    ];
+
+    $result = $builder->buildSourceAttributes($variables, $breakpoint, $multipliers);
+    $sizes_value = (string) $result->offsetGet('sizes');
+    $this->assertStringStartsNotWith('auto', $sizes_value, "Sizes attribute should not start with 'auto' when loading is eager.");
+  }
+
+  /**
+   * Creates a ResponsiveImageBuilder with stubbed dependencies.
+   *
+   * @return \Drupal\responsive_image\ResponsiveImageBuilder
+   *   A responsive image builder instance.
+   */
+  protected function createResponsiveImageBuilder(): ResponsiveImageBuilder {
+    $image_style = $this->createStub(ImageStyle::class);
+    $image_style->method('transformDimensions')
+      ->willReturnCallback(function (&$dimensions) {
+        $dimensions['width'] = 220;
+        $dimensions['height'] = 220;
+      });
+    $image_style->method('getDerivativeExtension')
+      ->willReturn('jpeg');
+    $image_style->method('buildUrl')
+      ->willReturnCallback(function ($uri) {
+        return 'http://example.com/styles/medium/' . basename($uri);
+      });
+
+    $storage = $this->createStub(EntityStorageInterface::class);
+    $storage->method('load')
+      ->willReturn($image_style);
+
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_manager->method('getStorage')
+      ->willReturn($storage);
+
+    $entity_type_repository = $this->createStub(EntityTypeRepositoryInterface::class);
+    $entity_type_repository->method('getEntityTypeFromClass')
+      ->willReturn('image_style');
+
+    $container = new ContainerBuilder();
+    $container->set('entity_type.manager', $entity_type_manager);
+    $container->set('entity_type.repository', $entity_type_repository);
+    \Drupal::setContainer($container);
+
+    $mime_type_map = $this->createStub(MimeTypeMapInterface::class);
+    $mime_type_map->method('getMimeTypeForExtension')
+      ->willReturn('image/jpeg');
+
+    $file_url_generator = $this->createStub(FileUrlGeneratorInterface::class);
+    $file_url_generator->method('transformRelative')
+      ->willReturnCallback(function ($url) {
+        return $url;
+      });
+
+    return new ResponsiveImageBuilder(
+      $entity_type_manager,
+      $mime_type_map,
+      $this->createStub(ImageFactory::class),
+      $file_url_generator,
+    );
   }
 
 }

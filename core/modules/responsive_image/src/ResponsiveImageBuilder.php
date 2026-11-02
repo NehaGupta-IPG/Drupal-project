@@ -203,7 +203,7 @@ class ResponsiveImageBuilder {
             // Images within a srcset should be sorted from small to large,
             // since the first matching source will be used.
             $srcset[intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
-            $sizes = array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
+            $sizes = array_map('trim', array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes));
           }
           break;
 
@@ -234,8 +234,12 @@ class ResponsiveImageBuilder {
     if (count(array_unique($derivative_mime_types)) == 1) {
       $source_attributes->setAttribute('type', $derivative_mime_types[0]);
     }
+    $loading = $variables['attributes']['loading'] ?? NULL;
+    if (isset($loading) && $loading == 'lazy') {
+      array_unshift($sizes, 'auto');
+    }
     if (!empty($sizes)) {
-      $source_attributes->setAttribute('sizes', implode(',', array_unique($sizes)));
+      $source_attributes->setAttribute('sizes', implode(', ', array_unique($sizes)));
     }
     // The images used in a particular srcset attribute should all have the same
     // aspect ratio. The sizes attribute paired with the srcset attribute

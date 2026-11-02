@@ -316,8 +316,8 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
       $this->assertSession()->responseContains('media="(min-width: 0px)"');
       $this->assertSession()->responseContains('media="(min-width: 560px)"');
       // Assert the output of the 'sizes' attribute.
-      $this->assertSession()->responseContains('sizes="(min-width: 700px) 700px, 100vw"');
-      $this->assertSession()->responseMatches('/media="\(min-width: 560px\)".+?sizes="\(min-width: 700px\) 700px, 100vw"/');
+      $this->assertSession()->responseContains('sizes="auto, (min-width: 700px) 700px, 100vw"');
+      $this->assertSession()->responseMatches('/media="\(min-width: 560px\)".+?sizes="auto, \(min-width: 700px\) 700px, 100vw"/');
       // Assert the output of the 'srcset' attribute (small images first).
       $medium_style = ImageStyle::load('medium');
       $this->assertSession()->responseContains($this->fileUrlGenerator->transformRelative($medium_style->buildUrl($image_uri)) . ' 220w, ' . $this->fileUrlGenerator->transformRelative($large_style->buildUrl($image_uri)) . ' 360w');
