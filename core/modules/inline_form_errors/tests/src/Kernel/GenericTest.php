@@ -6,6 +6,7 @@ namespace Drupal\Tests\inline_form_errors\Kernel;
 
 use Drupal\Tests\system\Kernel\Module\GenericModuleTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -13,4 +14,5 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('inline_form_errors')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class GenericTest extends GenericModuleTestBase {}

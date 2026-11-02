@@ -263,7 +263,14 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
     $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
 
-    \Drupal::service('module_installer')->install(['inline_form_errors']);
+    $this->writeSettings([
+      'settings' => [
+        'enable_inline_error_handling' => (object) [
+          'value' => TRUE,
+          'required' => TRUE,
+        ],
+      ],
+    ]);
 
     $this->drupalGet('test_user_name');
     // Submit an invalid name, triggering validation errors.

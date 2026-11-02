@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,7 +41,8 @@ class FormErrorHandlerTest extends UnitTestCase {
     $container->set('messenger', $this->messenger);
     \Drupal::setContainer($container);
 
-    $this->formErrorHandler = new FormErrorHandler();
+    $renderer = $this->createStub(RendererInterface::class);
+    $this->formErrorHandler = new FormErrorHandler($renderer);
   }
 
   /**
