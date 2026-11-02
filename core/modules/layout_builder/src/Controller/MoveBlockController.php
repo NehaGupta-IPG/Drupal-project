@@ -2,10 +2,14 @@
 
 namespace Drupal\layout_builder\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines a controller to move a block.
@@ -25,13 +29,31 @@ class MoveBlockController implements ContainerInjectionInterface {
   protected $layoutTempstoreRepository;
 
   /**
+   * The request stack.
+   */
+  protected RequestStack $requestStack;
+
+  /**
+   * Token generator service.
+   *
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  protected $tokenGenerator;
+
+  /**
    * LayoutController constructor.
    *
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $token_generator
+   *   The CSRF token generator.
    */
-  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
+  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, RequestStack $request_stack, CsrfTokenGenerator $token_generator) {
     $this->layoutTempstoreRepository = $layout_tempstore_repository;
+    $this->requestStack = $request_stack;
+    $this->tokenGenerator = $token_generator;
   }
 
   /**
@@ -39,7 +61,9 @@ class MoveBlockController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('layout_builder.tempstore_repository')
+      $container->get('layout_builder.tempstore_repository'),
+      $container->get('request_stack'),
+      $container->get('csrf_token'),
     );
   }
 
@@ -63,6 +87,13 @@ class MoveBlockController implements ContainerInjectionInterface {
    *   An AJAX response.
    */
   public function build(SectionStorageInterface $section_storage, int $delta_from, int $delta_to, $region_to, $block_uuid, $preceding_block_uuid = NULL) {
+    $token = $this->requestStack->getCurrentRequest()->headers->get('X-CSRF-Token');
+    if ($token === NULL) {
+      throw new AccessDeniedHttpException('Missing X-CSRF-Token header');
+    }
+    if (!$this->tokenGenerator->validate($token, CsrfRequestHeaderAccessCheck::TOKEN_KEY)) {
+      throw new AccessDeniedHttpException('Invalid X-CSRF-Token header');
+    }
     $section = $section_storage->getSection($delta_from);
 
     $component = $section->getComponent($block_uuid);
