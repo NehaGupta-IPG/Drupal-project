@@ -2,16 +2,20 @@
 
 namespace Drupal\Core\Config\Development;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Psr\Log\LoggerInterface;
 
 /**
  * Listens to the config save event and warns about invalid schema.
  */
 class LenientConfigSchemaChecker extends ConfigSchemaChecker {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs the ConfigSchemaChecker object.
@@ -40,10 +44,15 @@ class LenientConfigSchemaChecker extends ConfigSchemaChecker {
       parent::onConfigSave($event);
     }
     catch (SchemaIncompleteException $exception) {
-      $message = sprintf('%s. These errors mean there is configuration that does not comply with its schema. This is not a fatal error, but it is recommended to fix these issues. For more information on configuration schemas, check out <a href="%s">the documentation</a>.', $exception->getMessage(), 'https://www.drupal.org/docs/drupal-apis/configuration-api/configuration-schemametadata');
+      $message = $this->t('@message. These errors mean there is configuration that does not comply with its schema. This is not a fatal error, but it is recommended to fix these issues. For more information on configuration schemas, check out <a href=":link">the documentation</a>.', [
+        // The exception message contains already escaped schema errors. Decode
+        // it so the placeholder does not escape it a second time.
+        '@message' => Html::decodeEntities($exception->getMessage()),
+        ':link' => 'https://www.drupal.org/docs/drupal-apis/configuration-api/configuration-schemametadata',
+      ]);
 
       $this->messenger->addWarning($message);
-      $this->logger->warning($message);
+      $this->logger->warning($message->getUntranslatedString(), $message->getArguments());
     }
   }
 
