@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\EntityReferenceMessageFormatter;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -9,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Plugin implementation of the 'entity_reference_autocomplete' widget.
@@ -133,6 +135,24 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
     }
 
     return ['target_id' => $element];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareViolations(ConstraintViolationListInterface $violations, array $element, array $original_deltas): ConstraintViolationListInterface {
+    $values = [];
+    $handles_multiple = $this->handlesMultipleValues();
+    foreach ($original_deltas as $delta => $original_delta) {
+      $input = $handles_multiple ? $element['target_id'] : $element[$original_delta]['target_id'];
+      $input_delta = !empty($input['#tags']) ? $original_delta : 0;
+      if (isset($input['#entity_reference_input_values'][$input_delta])) {
+        $values[$delta] = $input['#entity_reference_input_values'][$input_delta];
+      }
+    }
+
+    $entity_type_label = \Drupal::entityTypeManager()->getDefinition($this->getFieldSetting('target_type'))->getSingularLabel();
+    return EntityReferenceMessageFormatter::formatViolations($violations, $entity_type_label, $values);
   }
 
   /**

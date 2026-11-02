@@ -305,7 +305,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
       ]);
     $form_builder->submitForm($this, $form_state);
     $this->assertCount(1, $form_state->getErrors());
-    $this->assertEquals('There are no test entity entities matching "single - non-existent label".', $form_state->getErrors()['single']);
+    $this->assertSame('No test entity matching <em class="placeholder">single - non-existent label</em> can be referenced.', (string) $form_state->getErrors()['single']);
 
     // Test 'single' with an entity ID that doesn't exist.
     $form_state = (new FormState())
@@ -314,7 +314,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
       ]);
     $form_builder->submitForm($this, $form_state);
     $this->assertCount(1, $form_state->getErrors());
-    $this->assertEquals('The referenced entity (entity_test: 42) does not exist.', $form_state->getErrors()['single']);
+    $this->assertSame('No test entity matching <em class="placeholder">single - non-existent label (42)</em> can be referenced.', (string) $form_state->getErrors()['single']);
 
     // Do the same tests as above but on an element with '#validate_reference'
     // set to FALSE.
@@ -328,7 +328,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
     // The element without 'autocreate' support still has to emit a warning when
     // the input doesn't end with an entity ID enclosed in parentheses.
     $this->assertCount(1, $form_state->getErrors());
-    $this->assertEquals('There are no test entity entities matching "single - non-existent label".', $form_state->getErrors()['single_no_validate']);
+    $this->assertSame('No test entity matching <em class="placeholder">single - non-existent label</em> can be referenced.', (string) $form_state->getErrors()['single_no_validate']);
 
     $form_state = (new FormState())
       ->setValues([

@@ -261,7 +261,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $name = $this->randomMachineName();
     $this->submitForm(['uid' => $name], 'Apply');
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
-    $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
+    $this->assertSession()->pageTextContainsOnce(sprintf('No user matching %s can be referenced.', $name));
 
     \Drupal::service('module_installer')->install(['inline_form_errors']);
 
@@ -270,7 +270,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $name = $this->randomMachineName();
     $this->submitForm(['uid' => $name], 'Apply');
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
-    $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
+    $this->assertSession()->pageTextContainsOnce(sprintf('No user matching %s can be referenced.', $name));
   }
 
 }
