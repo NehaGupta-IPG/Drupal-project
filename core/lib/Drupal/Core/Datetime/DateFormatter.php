@@ -33,6 +33,13 @@ class DateFormatter implements DateFormatterInterface {
   protected $dateFormats = [];
 
   /**
+   * DateFormat Storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $dateFormatStorage;
+
+  /**
    * Contains the different date interval units.
    *
    * This array is keyed by strings representing the unit (e.g.
@@ -59,6 +66,7 @@ class DateFormatter implements DateFormatterInterface {
     protected RequestStack $requestStack,
   ) {
     $this->stringTranslation = $translation;
+    $this->dateFormatStorage = $this->entityTypeManager->getStorage('date_format');
   }
 
   /**
@@ -298,10 +306,15 @@ class DateFormatter implements DateFormatterInterface {
    *   non-custom formats, NULL otherwise.
    */
   protected function dateFormat($type, $langcode) {
+    if (isset($this->dateFormats[$type][$langcode])) {
+      if ($this->dateFormatStorage->load($type)->getPattern() !== $this->dateFormats[$type][$langcode]->getPattern()) {
+        $this->dateFormats[$type][$langcode] = NULL;
+      }
+    }
     if (!isset($this->dateFormats[$type][$langcode])) {
       $original_language = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $langcode]));
-      $this->dateFormats[$type][$langcode] = $this->entityTypeManager->getStorage('date_format')->load($type);
+      $this->dateFormats[$type][$langcode] = $this->dateFormatStorage->load($type);
       $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     return $this->dateFormats[$type][$langcode];

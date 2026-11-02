@@ -137,4 +137,38 @@ class DateFormatterTest extends KernelTestBase {
     $this->assertEquals('Sat, 02 Feb 2019 13:30:00 +0100', $formatter->format(1549110600, 'custom', 'r', 'Europe/Berlin'));
   }
 
+  /**
+   * Tests that changing a date format is reflected by DateFormatter.
+   */
+  public function testChangedDateFormat(): void {
+    $formatStorage = $this->container->get('entity_type.manager')->getStorage('date_format');
+    $date_format = $formatStorage->create([
+      'id' => 'new_format',
+      'label' => 'Probe',
+      'locked' => FALSE,
+      'pattern' => 'j M Y',
+    ]);
+    $date_format->save();
+
+    $formatter = $this->container->get('date.formatter');
+
+    $this->assertSame(
+      '1 Jan 1970',
+      $formatter->format(0, 'new_format', '', 'UTC')
+    );
+
+    $formatStorage->load('new_format')
+      ->setPattern('Y')
+      ->save();
+
+    $this->assertSame(
+      'Y',
+      $formatStorage->load('new_format')->getPattern()
+    );
+    $this->assertSame(
+      '1970',
+      $formatter->format(0, 'new_format', '', 'UTC')
+    );
+  }
+
 }
