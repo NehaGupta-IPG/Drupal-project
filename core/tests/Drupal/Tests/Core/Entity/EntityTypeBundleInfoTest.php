@@ -97,7 +97,8 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     $language = new Language(['id' => 'en']);
     $this->languageManager = $this->prophesize(LanguageManagerInterface::class);
     $this->languageManager->getCurrentLanguage()->willReturn($language);
-    $this->languageManager->getLanguages()->willReturn(['en' => (object) ['id' => 'en']]);
+    $this->languageManager->getConfigOverrideLanguage()->willReturn($language);
+    $this->languageManager->getLanguages()->willReturn(['en' => $language]);
 
     $this->typedDataManager = $this->prophesize(TypedDataManagerInterface::class);
 
@@ -232,13 +233,13 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     ]);
 
     $cacheBackend = $this->cacheBackend;
-    $this->cacheBackend->get('entity_bundle_info:en')->willReturn(FALSE);
-    $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, [
+    $this->cacheBackend->get('entity_bundle_info:en:en')->willReturn(FALSE);
+    $this->cacheBackend->set('entity_bundle_info:en:en', Argument::any(), Cache::PERMANENT, [
       'entity_types',
       'entity_bundles',
     ])
-      ->will(function () use ($cacheBackend): void {
-        $cacheBackend->get('entity_bundle_info:en')
+      ->will(function () use ($cacheBackend) {
+        $cacheBackend->get('entity_bundle_info:en:en')
           ->willReturn((object) ['data' => 'cached data'])
           ->shouldBeCalled();
       })
@@ -373,6 +374,85 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
       ],
       ['pear', []],
     ];
+  }
+
+  /**
+   * Tests per-language caching of the getAllBundleInfo() method.
+   *
+   * @legacy-covers ::getAllBundleInfo
+   */
+  public function testGetAllBundleInfoCachesPerInterfaceAndConfigLanguage(): void {
+    $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
+    $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
+
+    $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->getLabel()->willReturn('Apple');
+    $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
+
+    $this->setUpEntityTypeDefinitions([
+      'apple' => $apple,
+    ]);
+
+    $expected = [
+      'apple' => [
+        'apple' => [
+          'label' => 'Apple',
+        ],
+      ],
+    ];
+    $bundle_info = $this->entityTypeBundleInfo->getAllBundleInfo();
+    $this->assertSame($expected, $bundle_info);
+    $bundle_info = $this->entityTypeBundleInfo->getAllBundleInfo();
+    $this->assertSame($expected, $bundle_info);
+
+    // Add german language.
+    $language = new Language(['id' => 'de']);
+    $this->languageManager->getLanguages()->willReturn(['de' => $language]);
+
+    // Test that interface language cache context is respected.
+    $this->languageManager->getCurrentLanguage()->willReturn($language);
+
+    $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->getLabel()->willReturn('Apple (german interface language)');
+    $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
+
+    $this->setUpEntityTypeDefinitions([
+      'apple' => $apple,
+    ]);
+
+    $expected = [
+      'apple' => [
+        'apple' => [
+          'label' => 'Apple (german interface language)',
+        ],
+      ],
+    ];
+    $bundle_info = $this->entityTypeBundleInfo->getAllBundleInfo();
+    $this->assertSame($expected, $bundle_info);
+
+    // Test that  config language cache context is respected.
+    $this->languageManager->getConfigOverrideLanguage()->willReturn($language);
+
+    $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->getLabel()->willReturn('Apple (german config language)');
+    $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
+
+    $this->setUpEntityTypeDefinitions([
+      'apple' => $apple,
+    ]);
+
+    $expected = [
+      'apple' => [
+        'apple' => [
+          'label' => 'Apple (german config language)',
+        ],
+      ],
+    ];
+    $bundle_info = $this->entityTypeBundleInfo->getAllBundleInfo();
+    $this->assertSame($expected, $bundle_info);
   }
 
 }
