@@ -13,10 +13,11 @@
  * @see lazy_services
  */
 
-use Drupal\Core\Command\GenerateProxyClassApplication;
+use Drupal\Core\Command\GenerateProxyClassCommand;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\ProxyBuilder\ProxyBuilder;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\Console\Application;
 use Symfony\Component\HttpFoundation\Request;
 
 if (PHP_SAPI !== 'cli') {
@@ -34,5 +35,8 @@ return static function () {
   DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
 
   // Run the database dump command.
-  return new GenerateProxyClassApplication(new ProxyBuilder());
+  new Application()->addCommand(new GenerateProxyClassCommand(new ProxyBuilder()))
+    ->getApplication()
+    ->setDefaultCommand('generate-proxy-class', TRUE)
+    ->run();
 };
