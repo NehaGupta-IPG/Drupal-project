@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Recipe\RecipeRunner;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -230,7 +231,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
     }
     elseif (!empty($profile)) {
       // Creates a profile storage to search for overrides.
-      $profile_install_path = $this->extensionPathResolver->getPath('module', $profile) . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
+      $profile_install_path = $this->extensionPathResolver->getPath('profile', $profile) . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
       $profile_storage = new FileStorage($profile_install_path, StorageInterface::DEFAULT_COLLECTION);
     }
     else {
@@ -390,7 +391,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         // Add a hash to configuration created through the installer so it is
         // possible to know if the configuration was created by installing an
         // extension and to track which version of the default config was used.
-        if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION) {
+        if ((!$this->isSyncing() || RecipeRunner::isApplying()) && $collection == StorageInterface::DEFAULT_COLLECTION) {
           $config_to_create[$name] = [
             '_core' => [
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
@@ -764,7 +765,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
     $profile = $this->drupalGetProfile();
     $profile_storages = [];
     if ($profile && $profile != $installing_name) {
-      $profile_path = $this->extensionPathResolver->getPath('module', $profile);
+      $profile_path = $this->extensionPathResolver->getPath('profile', $profile);
       foreach ([InstallStorage::CONFIG_INSTALL_DIRECTORY, InstallStorage::CONFIG_OPTIONAL_DIRECTORY] as $directory) {
         if (is_dir($profile_path . '/' . $directory)) {
           $profile_storages[] = new FileStorage($profile_path . '/' . $directory, StorageInterface::DEFAULT_COLLECTION);

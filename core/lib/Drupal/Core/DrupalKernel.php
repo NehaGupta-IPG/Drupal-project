@@ -626,9 +626,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Set the allowed protocols.
     UrlHelper::setAllowedProtocols($this->container->getParameter('filter_protocols'));
 
-    // Override of Symfony's MIME type guesser singleton.
-    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
-
     $this->prepared = TRUE;
   }
 
@@ -1028,15 +1025,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-
+    $container_definition = $this->getContainerFromCacheIfCacheable();
     // If there is no cached container definition, build a new container from
     // scratch.
-    if (!isset($container_definition)) {
+    if ($container_definition === NULL) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
@@ -1114,6 +1106,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->containerNeedsDumping && !$this->cacheDrupalContainer($container_definition)) {
       $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
     }
+
+    // Override of Symfony's MIME type guesser singleton.
+    MimeTypeGuesser::registerWithSymfonyGuesser($this->container);
 
     return $this->container;
   }
@@ -1464,6 +1459,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
+
+    // Reset any existing container in order to avoid holding on to old object
+    // references, otherwise memory usage grows exponentially with each rebuild.
+    $this->container?->reset();
+
     return $container;
   }
 
@@ -1526,6 +1526,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($system = $this->getConfigStorage()->read('system.site')) {
       if ($default_language_values['id'] != $system['langcode']) {
         $default_language_values = ['id' => $system['langcode']];
+      }
+    }
+    else {
+      // If the system.site config doesn't exist, then we're in the installer,
+      // if langcode is set in install state parameters, then set that as the
+      // default language. This allows the default language to be correct on the
+      // container just before system module is installed.
+      // @todo move default language configuration to core from system module so
+      // that it can be set prior to system module install without workarounds.
+      // @see https://www.drupal.org/project/drupal/issues/3615365
+      if (isset($GLOBALS['install_state']['parameters']['langcode'])) {
+        $default_language_values['id'] = $GLOBALS['install_state']['parameters']['langcode'];
       }
     }
     $container->setParameter('language.default_values', $default_language_values);
@@ -1914,6 +1926,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getExtensions(): array|false {
     return $this->getConfigStorage()->read('core.extension');
+  }
+
+  /**
+   * Gets the cached container definition if the cache may be used.
+   *
+   * @return array|null
+   *   The cached container definition, or NULL if the cache must not be used
+   *   or holds no definition.
+   */
+  protected function getContainerFromCacheIfCacheable(): ?array {
+    // If the module list hasn't already been set in updateModules and we are
+    // not forcing a rebuild, then try and load the container from the cache.
+    if (!$this->moduleList && !$this->containerNeedsRebuild) {
+      return $this->getCachedContainerDefinition();
+    }
+    return NULL;
   }
 
 }

@@ -1,4 +1,7 @@
 
+.on-commit: &on-commit
+  if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "11.x"
+
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'

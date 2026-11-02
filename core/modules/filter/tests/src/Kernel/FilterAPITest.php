@@ -108,10 +108,10 @@ class FilterAPITest extends EntityKernelTestBase {
       $filtered_html_format->getHtmlRestrictions(),
       [
         'allowed' => [
-          'p' => FALSE,
-          'br' => FALSE,
-          'strong' => FALSE,
           'a' => ['href' => TRUE, 'hreflang' => TRUE],
+          'br' => FALSE,
+          'p' => FALSE,
+          'strong' => FALSE,
           '*' => ['style' => FALSE, 'on*' => FALSE, 'lang' => TRUE, 'dir' => ['ltr' => TRUE, 'rtl' => TRUE]],
         ],
       ],
@@ -200,9 +200,9 @@ class FilterAPITest extends EntityKernelTestBase {
       $very_restricted_html_format->getHtmlRestrictions(),
       [
         'allowed' => [
-          'p' => FALSE,
-          'br' => FALSE,
           'a' => ['href' => TRUE],
+          'br' => FALSE,
+          'p' => FALSE,
           '*' => ['style' => FALSE, 'on*' => FALSE, 'lang' => TRUE, 'dir' => ['ltr' => TRUE, 'rtl' => TRUE]],
         ],
       ],
@@ -478,7 +478,7 @@ class FilterAPITest extends EntityKernelTestBase {
    * deleted.
    *
    * @see \Drupal\filter\Entity\FilterFormat::onDependencyRemoval()
-   * @see filter_system_info_alter()
+   * @see \Drupal\filter\FilterUninstallValidator
    */
   public function testDependencyRemoval(): void {
     $this->installSchema('user', ['users_data']);

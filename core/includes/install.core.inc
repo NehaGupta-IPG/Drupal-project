@@ -5,6 +5,7 @@
  * API functions for installing Drupal.
  */
 
+use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
@@ -33,6 +34,8 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Install\TasksInterface;
 use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
@@ -171,6 +174,7 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
         $finish_url = $install_state['profile_info']['distribution']['install']['finish_url'];
       }
       install_goto($finish_url);
+      \Drupal::service('cache_prewarmer')->preWarmAllCaches();
     }
   }
 }
@@ -250,7 +254,7 @@ function install_state_defaults(): array {
     // An array of available installation profiles.
     'profiles' => [],
     // The name of the theme to use during installation.
-    'theme' => 'claro',
+    'theme' => InstallerKernel::INSTALL_THEME,
     // The server URL where the interface translation files can be downloaded.
     // Tokens in the pattern will be replaced by appropriate values for the
     // required translation file.
@@ -347,7 +351,6 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Ensure that procedural dependencies are loaded as early as possible,
   // since the error/exception handlers depend on them.
-  require_once __DIR__ . '/../modules/system/system.install';
   require_once __DIR__ . '/common.inc';
   require_once __DIR__ . '/install.inc';
   require_once __DIR__ . '/form.inc';
@@ -462,19 +465,6 @@ function install_begin_request($class_loader, &$install_state): void {
   $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
-
-  /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
-  $module_list = \Drupal::service('extension.list.module');
-  /** @var \Drupal\Core\Extension\ProfileExtensionList $profile_list */
-  $profile_list = \Drupal::service('extension.list.profile');
-
-  // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
-  foreach ($install_state['profiles'] as $name => $profile) {
-    // Profile path is set in both module and profile lists. See
-    // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
-    $profile_list->setPathname($name, $profile->getPathname());
-    $module_list->setPathname($name, $profile->getPathname());
-  }
 
   $profile = _install_select_profile($install_state);
   if ($profile !== NULL) {
@@ -879,11 +869,19 @@ function install_tasks($install_state): array {
       if (file_exists($profile_install_file)) {
         include_once \Drupal::root() . '/' . $profile_install_file;
       }
-      $function = $install_state['parameters']['profile'] . '_install_tasks';
-      if (function_exists($function)) {
-        $result = $function($install_state);
-        if (is_array($result)) {
-          $tasks += $result;
+      $profile_tasks = install_get_tasks($install_state['profiles'][$profile], $install_state);
+
+      if (!empty($profile_tasks)) {
+        $tasks += $profile_tasks;
+      }
+      else {
+        $function = $install_state['parameters']['profile'] . '_install_tasks';
+        if (function_exists($function)) {
+          @trigger_error('Procedural hook_install_tasks() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
+          $result = $function($install_state);
+          if (is_array($result)) {
+            $tasks += $result;
+          }
         }
       }
     }
@@ -903,9 +901,15 @@ function install_tasks($install_state): array {
   // Allow the installation profile to modify the full list of tasks.
   if (!empty($install_state['parameters']['profile'])) {
     $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
+    // Load the profile file if it exists so TasksInterface::alter can rely on
+    // functions in it.
+    $install_state['profiles'][$profile]->load();
+    $profile_tasks_altered = install_alter_tasks($install_state['profiles'][$profile], $tasks, $install_state);
+
+    if (!$profile_tasks_altered) {
       $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
       if (function_exists($function)) {
+        @trigger_error('Procedural hook_install_tasks_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
         $function($tasks, $install_state);
       }
     }
@@ -1119,7 +1123,6 @@ function install_verify_requirements(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_base_system(&$install_state): void {
-  // Install system.module.
   drupal_install_system($install_state);
 
   // Call HtaccessWriter::ensure() to ensure that all of Drupal's standard
@@ -1596,6 +1599,17 @@ function install_profile_modules(&$install_state) {
   install_core_entity_type_definitions();
 
   $modules = $install_state['profile_info']['install'];
+  $database_module = _install_get_database_module_name();
+  if ($database_module !== NULL) {
+    array_unshift($modules, $database_module);
+  }
+
+  // Extra module support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  $extra_modules = $install_state['extra_modules'] ?? [];
+  if ($extra_modules) {
+    $modules = array_merge($modules, $extra_modules);
+  }
   $files = \Drupal::service('extension.list.module')->getList();
 
   // Always install required modules first. Respect the dependencies between
@@ -1609,8 +1623,7 @@ function install_profile_modules(&$install_state) {
       $modules = array_merge($modules, array_keys($files[$module]->requires));
     }
   }
-  // The System module has already been installed by install_base_system().
-  $modules = array_diff(array_unique($modules), ['system']);
+
   foreach ($modules as $module) {
     if (!empty($files[$module]->info['required'])) {
       $required[$module] = $files[$module]->sort;
@@ -1622,13 +1635,23 @@ function install_profile_modules(&$install_state) {
   arsort($required);
   arsort($non_required);
 
+  $module_order = $required + $non_required;
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($module_order[$database_module])) {
+    $module_order = [$database_module => $module_order[$database_module]] + $module_order;
+  }
+
   $batch_builder = new BatchBuilder();
 
   // Put modules into groups of up to the maximum batch size, or until a module
   // states that it needs a container rebuild before and after install.
   $index = 0;
   $module_groups = [];
-  foreach (array_keys($required + $non_required) as $module) {
+  foreach (array_keys($module_order) as $module) {
     // If the container needs to be rebuilt, ensure this happens both before and
     // after the module is installed.
     $container_rebuild_required = !empty($files[$module]->info['container_rebuild_required']);
@@ -1651,7 +1674,7 @@ function install_profile_modules(&$install_state) {
     }
     $batch_builder->addOperation(
       '_install_module_batch',
-      [$module_group, $names],
+      [$module_group, $names, $install_state],
     );
   }
   $batch_builder
@@ -1697,6 +1720,12 @@ function install_core_entity_type_definitions(): void {
 function install_profile_themes(&$install_state): void {
   // Install the themes specified by the installation profile.
   $themes = $install_state['profile_info']['themes'];
+
+  // Default theme support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  if (isset($install_state['default_theme'])) {
+    $themes = array_unique(array_merge($themes, [$install_state['default_theme']]));
+  }
   \Drupal::service('theme_installer')->install($themes);
 
   // Ensure that the install profile's theme is used.
@@ -1720,7 +1749,15 @@ function install_install_profile(&$install_state): void {
   // any disparities that this creates.
   \Drupal::service('config.installer')->installOptionalConfig();
 
-  \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  if (empty($install_state['profile_info']['opt_out_install'])) {
+    \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  }
+
+  if (isset($install_state['default_theme'])) {
+    \Drupal::service('config.factory')->getEditable('system.theme')
+      ->set('default', $install_state['default_theme'])
+      ->save();
+  }
 
   // Ensure that the install profile's theme is used.
   // @see _drupal_maintenance_theme()
@@ -1840,22 +1877,23 @@ function install_finished(&$install_state): void {
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
     \Drupal::service(ModuleWeight::class)->set($profile, 1000);
+    // Build the router once after installing all modules.
+    // This would normally happen upon KernelEvents::TERMINATE, but since the
+    // installer does not use an HttpKernel, that event is never triggered.
+    // This is not necessary when the profile is uninstalled because
+    // uninstalling a module rebuilds the router anyway.
+    \Drupal::service('router.builder')->rebuild();
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
   }
-
-  // Build the router once after installing all modules.
-  // This would normally happen upon KernelEvents::TERMINATE, but since the
-  // installer does not use an HttpKernel, that event is never triggered.
-  \Drupal::service('router.builder')->rebuild();
 
   if ($install_state['interactive']) {
     // Load current user and perform final login tasks.
     // This has to be done after drupal_flush_all_caches()
     // to avoid session regeneration.
     $account = User::load(1);
-    user_login_finalize($account);
+    \Drupal::service(LoginFinalizer::class)->finalizeLogin($account);
   }
 
   // Record when this install ran.
@@ -1867,10 +1905,21 @@ function install_finished(&$install_state): void {
  *
  * Performs batch installation of modules.
  */
-function _install_module_batch(array $modules, array $module_names, array &$context): void {
+function _install_module_batch(array $modules, array $module_names, array $install_state, array &$context): void {
   \Drupal::service('module_installer')->install($modules, FALSE);
   $context['results'] = array_merge($context['results'], $modules);
   $context['message'] = \Drupal::translation()->formatPlural(count($module_names), 'Installed %module module.', 'Installed %module modules.', ['%module' => implode(', ', $module_names)]);
+
+  // If installing system module, set the langcode to the one chosen in the
+  // installer.
+  if (in_array('system', $modules)) {
+    if (isset($install_state['parameters']['langcode'])) {
+      \Drupal::configFactory()->getEditable('system.site')
+        ->set('langcode', (string) $install_state['parameters']['langcode'])
+        ->set('default_langcode', (string) $install_state['parameters']['langcode'])
+        ->save();
+    }
+  }
 }
 
 /**
@@ -2328,17 +2377,6 @@ function install_config_import_batch() {
 
   // Get the sync storage.
   $sync = \Drupal::service('config.storage.sync');
-  // Match up the site UUIDs, the install_base_system install task will have
-  // installed the system module and created a new UUID.
-  $system_site = $sync->read('system.site');
-  // When installing from configuration it is possible that system.site
-  // configuration is not present. If this occurs a ConfigImporterException will
-  // by thrown when $config_importer->initialize() is called below and the error
-  // will be reported to the user.
-  if ($system_site !== FALSE) {
-    \Drupal::configFactory()->getEditable('system.site')->set('uuid', $system_site['uuid'])->save();
-  }
-
   // Create the storage comparer and the config importer.
   $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
@@ -2524,7 +2562,7 @@ function _install_config_locale_overrides_process_batch(array $names, array $lan
  * @internal
  *   All installer code is internal.
  */
-function install_recipe_required_modules() {
+function install_recipe_required_modules(array $install_state) {
   // We need to manually trigger the installation of core-provided entity types,
   // as those will not be handled by the module installer.
   // @see install_profile_modules()
@@ -2542,15 +2580,22 @@ function install_recipe_required_modules() {
   // Always install required modules first.
   $required = [];
 
+  $database_module = _install_get_database_module_name();
+
   foreach ($files as $module => $extension) {
-    if (!empty($extension->info['required'])) {
+    if (!empty($extension->info['required']) || $module === $database_module) {
       $required[$module] = $extension->sort;
     }
   }
   arsort($required);
-
-  // The system module is already installed. See install_base_system().
-  unset($required['system']);
+  // The database driver module must be installed before any other module, so
+  // that it can override the hook_schema() implementations and the
+  // "backend_overridable" services of those modules. Sorting by weight above
+  // does not keep it in front, so move it back to the first position.
+  // @see _install_get_database_module_name()
+  if ($database_module !== NULL && isset($required[$database_module])) {
+    $required = [$database_module => $required[$database_module]] + $required;
+  }
 
   $modules = [];
   $names = [];
@@ -2559,7 +2604,7 @@ function install_recipe_required_modules() {
     $names[] = $files[$module]->info['name'];
   }
   $batch_builder->addOperation('_install_module_batch',
-    [$modules, $names]
+    [$modules, $names, $install_state]
   );
   return $batch_builder->toArray();
 }
@@ -2585,4 +2630,85 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
+}
+
+/**
+ * Gets the database driver module name.
+ *
+ * The database driver is provided by a module. That module must be
+ * installed before any other module, as it must be able to override any call
+ * to hook_schema() or any "backend_overridable" service. In edge cases, a
+ * driver module may extend from another driver module. In order for the
+ * extended classes to be autoloadable, the extending module should list the
+ * extended module in its dependencies.
+ *
+ * @return ?string
+ *   The database driver module or NULL if none is found.
+ */
+function _install_get_database_module_name(): ?string {
+  $connection = Database::getConnection();
+  $provider = $connection->getProvider();
+  $database_module = NULL;
+  if ($provider !== 'core') {
+    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
+    if (str_contains($autoload, 'src/Driver/Database/')) {
+      $database_module = $provider;
+    }
+  }
+  return $database_module;
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return array
+ *   The tasks.
+ *
+ * @internal
+ */
+function install_get_tasks(Extension $extension, array &$install_state): array {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $install_tasks = [];
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $install_tasks = $tasks_class->getTasks($install_state);
+  }
+  return $install_tasks;
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return bool
+ *   Whether tasks were altered.
+ *
+ * @internal
+ */
+function install_alter_tasks(Extension $extension, array &$tasks, array $install_state): bool {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $tasks_altered = FALSE;
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_altered = TRUE;
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $tasks_class->alter($tasks, $install_state);
+  }
+  return $tasks_altered;
 }

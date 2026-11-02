@@ -61,8 +61,7 @@ class FilterAutoP extends FilterBase {
       elseif (!$ignore) {
         // Skip if the next chunk starts with Twig theme debug.
         // @see twig_render_template()
-        if (isset($chunks[$i + 1]) && $chunks[$i + 1] === '<!-- THEME DEBUG -->') {
-          $chunk = rtrim($chunk, "\n");
+        if (isset($chunks[$i + 1]) && $chunks[$i + 1] === "<!--\n\nTHEME DEBUG -->") {
           $output .= $chunk;
           continue;
         }
@@ -71,10 +70,9 @@ class FilterAutoP extends FilterBase {
         // @see \Drupal\Core\Template\TwigThemeEngine::renderTemplate()
         if (isset($chunks[$i - 1])) {
           if (
-            str_starts_with($chunks[$i - 1], '<!-- BEGIN OUTPUT from ')
-            || str_starts_with($chunks[$i - 1], '<!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from ')
+            str_starts_with($chunks[$i - 1], "<!--\nBEGIN OUTPUT from ")
+            || str_starts_with($chunks[$i - 1], "<!--\n💡 BEGIN CUSTOM TEMPLATE OUTPUT from ")
           ) {
-            $chunk = ltrim($chunk, "\n");
             $output .= $chunk;
             continue;
           }
@@ -82,7 +80,7 @@ class FilterAutoP extends FilterBase {
 
         // Just to make things a little easier, pad the end.
         $chunk = preg_replace('|\n*$|', '', $chunk) . "\n\n";
-        $chunk = preg_replace('|<br />\s*<br />|', "\n\n", $chunk);
+        $chunk = preg_replace('|<br ?/?>\s*<br ?/?>|', "\n\n", $chunk);
         // Space things out a little.
         $chunk = preg_replace('!(<' . $block . '[^>]*>)!', "\n$1", $chunk);
         // Space things out a little.
@@ -102,9 +100,9 @@ class FilterAutoP extends FilterBase {
         $chunk = preg_replace('!<p>\s*(</?' . $block . '[^>]*>)!', "$1", $chunk);
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*</p>!', "$1", $chunk);
         // Make line breaks.
-        $chunk = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $chunk);
-        $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br />!', "$1", $chunk);
-        $chunk = preg_replace('!<br />(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $chunk);
+        $chunk = preg_replace('|(?<!<br>)\s*\n|', "<br>\n", $chunk);
+        $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br>!', "$1", $chunk);
+        $chunk = preg_replace('!<br>(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $chunk);
         $chunk = preg_replace('/&([^#])(?![A-Za-z0-9]{1,8};)/', '&amp;$1', $chunk);
       }
       $output .= $chunk;

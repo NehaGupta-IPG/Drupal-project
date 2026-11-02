@@ -26,7 +26,6 @@
 /**
  * Throbber.
  */
-
 .ajax-progress--throbber {
   position: relative;
   display: inline-flex;
@@ -42,16 +41,13 @@
  * Remove margin from ajax throbbers following buttons because buttons already
  * have a large margin set.
  */
-
 .js .action-link:not(.js-hide, .button--action) + .ajax-progress--throbber,
 .js .button:not(.js-hide, .button--action) + .ajax-progress--throbber {
   margin-inline-start: 0;
 }
-
 /**
  * Restore start margin for ajax throbbers inside a managed file widget.
  */
-
 .js .form-type--managed-file .button:not(.js-hide) + .ajax-progress--throbber,
 .js .file-operations-cell .button:not(.js-hide) + .ajax-progress--throbber {
   margin-inline-start: var(--ajax-progress-margin-horizontal); /* LTR */
@@ -61,7 +57,7 @@
   box-sizing: border-box;
   width: 1.125rem;
   height: 1.125rem;
-  animation: claro-throbber 0.75s linear infinite;
+  animation: throbber 0.75s linear infinite;
   border: 2px solid var(--admin-color-link);
   border-right: 2px dotted transparent;
   border-radius: 50%;
@@ -76,7 +72,6 @@
 /**
  * Full screen throbber.
  */
-
 .ajax-progress--fullscreen,
 .ui-dialog .ajax-progress--throbber {
   position: fixed;
@@ -92,7 +87,6 @@
   background: var(--admin-color-bg-raised);
   box-shadow: 0 0.25rem 0.625rem var(--jui-dropdown-shadow-color);
 }
-
 .ajax-progress__throbber--fullscreen,
 .ui-dialog .ajax-progress__throbber {
   position: absolute;
@@ -110,24 +104,10 @@
   display: none;
 }
 
-@keyframes claro-throbber {
+@keyframes throbber {
   0% {
     transform: rotateZ(0);
   }
-  100% {
-    transform: rotateZ(360deg);
-  }
-}
-
-/**
- * Default Admin throbber overrides.
- */
-
-@keyframes gin-throbber {
-  0% {
-    transform: rotateZ(0);
-  }
-
   100% {
     transform: rotateZ(360deg);
   }
@@ -145,7 +125,7 @@
   color: var(--admin-color-text);
 }
 
-[dir].gin--dark-mode .ajax-progress--fullscreen {
+[dir].dark-mode .ajax-progress--fullscreen {
   border-color: transparent;
   background-color: var(--admin-color-primary);
   box-shadow: 0 2px 6px 0 var(--admin-color-bg);
@@ -172,7 +152,7 @@
   background: var(--admin-color-bg);
   box-shadow: 0 2px 6px 0 rgb(34, 35, 48, 0.1);
 
-  .gin--dark-mode & {
+  .dark-mode & {
     border-color: transparent;
     background-color: var(--admin-color-primary);
     box-shadow: 0 2px 6px 0 var(--admin-color-bg);
@@ -184,7 +164,7 @@
     width: 1.125rem;
     height: 1.125rem;
     content: "";
-    animation: gin-throbber 0.75s linear infinite;
+    animation: throbber 0.75s linear infinite;
     border: 2px solid var(--admin-color-primary);
     border-inline-end: 2px dotted transparent;
     border-radius: 50%;
@@ -193,8 +173,8 @@
   }
 }
 
-.gin--dark-mode .ui-dialog .ajax-progress,
-.gin--dark-mode .media-library-item .ajax-progress.ajax-progress.ajax-progress {
+.dark-mode .ui-dialog .ajax-progress,
+.dark-mode .media-library-item .ajax-progress.ajax-progress.ajax-progress {
   border-color: var(--admin-color-bg);
   background-color: var(--admin-color-bg);
 }

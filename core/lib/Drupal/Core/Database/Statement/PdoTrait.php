@@ -82,17 +82,23 @@ trait PdoTrait {
   }
 
   /**
-   * Returns the client-level database statement object.
+   * Returns the client-level database PDO statement object.
    *
    * This method should normally be used only within database driver code.
    *
-   * @return object
-   *   The client-level database statement.
+   * @return \PDOStatement
+   *   The client-level database PDO statement.
    *
-   * @throws \RuntimeException
+   * @throws \LogicException
    *   If the client-level statement is not set.
    */
-  abstract public function getClientStatement(): object;
+  public function getClientStatement(): \PDOStatement {
+    if (isset($this->clientStatement)) {
+      assert($this->clientStatement instanceof \PDOStatement);
+      return $this->clientStatement;
+    }
+    throw new \LogicException('\\PDOStatement not initialized');
+  }
 
   /**
    * Sets the default fetch mode for the PDO statement.
@@ -157,7 +163,7 @@ trait PdoTrait {
    *   A result, formatted according to $mode, or FALSE on failure.
    */
   protected function clientFetch(?FetchAs $mode = NULL, ?int $cursorOrientation = NULL, ?int $cursorOffset = NULL): array|object|int|float|string|bool|NULL {
-    return match(func_num_args()) {
+    return match (func_num_args()) {
       0 => $this->getClientStatement()->fetch(),
       1 => $this->getClientStatement()->fetch($this->fetchAsToPdo($mode)),
       2 => $this->getClientStatement()->fetch($this->fetchAsToPdo($mode), $cursorOrientation),
