@@ -33,6 +33,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -77,13 +79,6 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @var \Drupal\Core\Language\LanguageManagerInterface|\Prophecy\Prophecy\ProphecyInterface
    */
   protected $languageManager;
-
-  /**
-   * The keyvalue factory.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\Prophecy\Prophecy\ProphecyInterface
-   */
-  protected $keyValueFactory;
 
   /**
    * The event dispatcher.
@@ -175,15 +170,44 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->languageManager->getCurrentLanguage()->willReturn($language);
     $this->languageManager->getLanguages()->willReturn(['en' => (object) ['id' => 'en']]);
 
-    $this->keyValueFactory = $this->prophesize(KeyValueFactoryInterface::class);
-
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
     $this->entityTypeRepository = $this->prophesize(EntityTypeRepositoryInterface::class);
     $this->entityTypeBundleInfo = $this->prophesize(EntityTypeBundleInfoInterface::class);
     $this->entityDisplayRepository = $this->prophesize(EntityDisplayRepositoryInterface::class);
     $this->entityLastInstalledSchemaRepository = $this->prophesize(EntityLastInstalledSchemaRepositoryInterface::class);
 
-    $this->entityFieldManager = new TestEntityFieldManager($this->entityTypeManager->reveal(), $this->entityTypeBundleInfo->reveal(), $this->entityDisplayRepository->reveal(), $this->typedDataManager->reveal(), $this->languageManager->reveal(), $this->keyValueFactory->reveal(), $this->moduleHandler->reveal(), $this->cacheBackend->reveal(), $this->entityLastInstalledSchemaRepository->reveal());
+    $this->entityFieldManager = new TestEntityFieldManager($this->entityTypeManager->reveal(), $this->entityTypeBundleInfo->reveal(), $this->entityDisplayRepository->reveal(), $this->typedDataManager->reveal(), $this->languageManager->reveal(), $this->moduleHandler->reveal(), $this->cacheBackend->reveal(), $this->entityLastInstalledSchemaRepository->reveal());
+  }
+
+  /**
+   * Tests constructor dependencies and the original signature deprecation.
+   */
+  #[TestWith([FALSE], 'current')]
+  #[TestWith([TRUE], 'original')]
+  #[IgnoreDeprecations]
+  public function testConstructor(bool $legacy): void {
+    if ($legacy) {
+      $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Entity\\EntityFieldManager::__construct() with the $key_value_factory argument is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3612113');
+    }
+    $key_value = $this->createStub(KeyValueFactoryInterface::class);
+    $dependencies = [
+      'entityTypeManager' => $this->entityTypeManager->reveal(),
+      'entityTypeBundleInfo' => $this->entityTypeBundleInfo->reveal(),
+      'entityDisplayRepository' => $this->entityDisplayRepository->reveal(),
+      'typedDataManager' => $this->typedDataManager->reveal(),
+      'languageManager' => $this->languageManager->reveal(),
+      'keyValueFactory' => $key_value,
+      'moduleHandler' => $this->moduleHandler->reveal(),
+      'cacheBackend' => $this->cacheBackend->reveal(),
+      'entityLastInstalledSchemaRepository' => $this->entityLastInstalledSchemaRepository->reveal(),
+    ];
+    if (!$legacy) {
+      unset($dependencies['keyValueFactory']);
+    }
+    $manager = new EntityFieldManager(...array_values($dependencies));
+    foreach ($dependencies as $property => $dependency) {
+      $this->assertSame($dependency, (new \ReflectionProperty($manager, $property))->getValue($manager));
+    }
   }
 
   /**

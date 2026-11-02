@@ -797,7 +797,7 @@ services:
   Drupal\Core\Entity\EntityDisplayRepositoryInterface: '@entity_display.repository'
   entity_field.manager:
     class: Drupal\Core\Entity\EntityFieldManager
-    arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_display.repository', '@typed_data_manager', '@language_manager', '@keyvalue', '@module_handler', '@cache.discovery', '@entity.last_installed_schema.repository']
+    arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_display.repository', '@typed_data_manager', '@language_manager', '@module_handler', '@cache.discovery', '@entity.last_installed_schema.repository']
   Drupal\Core\Entity\EntityFieldManagerInterface: '@entity_field.manager'
   entity_type.listener:
     class: Drupal\Core\Entity\EntityTypeListener
@@ -830,7 +830,7 @@ services:
   Drupal\Core\Field\FieldStorageDefinitionListenerInterface: '@field_storage_definition.listener'
   field_definition.listener:
     class: Drupal\Core\Field\FieldDefinitionListener
-    arguments: ['@entity_type.manager', '@entity_field.manager', '@keyvalue', '@cache.discovery']
+    arguments: ['@entity_type.manager', '@cache.discovery']
   Drupal\Core\Field\FieldDefinitionListenerInterface: '@field_definition.listener'
   Drupal\Core\Field\FieldPreprocess:
     class: Drupal\Core\Field\FieldPreprocess
