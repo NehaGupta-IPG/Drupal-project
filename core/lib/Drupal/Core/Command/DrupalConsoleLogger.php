@@ -27,6 +27,10 @@ class DrupalConsoleLogger extends AbstractLogger implements LoggerAwareInterface
    * {@inheritdoc}
    */
   public function log($level, $message, array $context = []): void {
+    if (!is_string($message) && !$message instanceof \Stringable) {
+      @trigger_error('Calling ' . __METHOD__ . '() with a $message that is not a string or \Stringable is deprecated in drupal:12.1.0 and is required from drupal:13.0.0. See https://www.drupal.org/node/3616478', E_USER_DEPRECATED);
+    }
+    $message = (string) $message;
     // Populate the message placeholders and then replace them in the message.
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
     $message = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
