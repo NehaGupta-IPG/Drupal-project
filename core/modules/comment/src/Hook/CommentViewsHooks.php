@@ -2,9 +2,12 @@
 
 namespace Drupal\comment\Hook;
 
+use Drupal\comment\CommentViewsConfigUpdater;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\views\ViewEntityInterface;
 
 /**
  * Hook implementations for comment.
@@ -12,6 +15,46 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class CommentViewsHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected readonly CommentViewsConfigUpdater $commentViewsConfigUpdater,
+  ) {
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for views.
+   *
+   * Converts numeric filters on comment field status columns in view
+   * configuration that was not updated by
+   * comment_post_update_views_status_filter().
+   */
+  #[Hook('view_presave')]
+  public function viewPresave(ViewEntityInterface $view): void {
+    $this->commentViewsConfigUpdater->processStatusFilters($view);
+  }
+
+  /**
+   * Implements hook_field_views_data().
+   *
+   * Filters on the status column of comment fields with the node_comment
+   * plugin, which offers the commenting status options, and displays it with
+   * the comment_status plugin, which renders the status label.
+   */
+  #[Hook('field_views_data')]
+  public function fieldViewsData(FieldStorageConfigInterface $field_storage): array {
+    $data = \Drupal::service('views.field_data_provider')->defaultFieldImplementation($field_storage);
+    if ($field_storage->getType() !== 'comment') {
+      return $data;
+    }
+    $key = $field_storage->getName() . '_status';
+    foreach ($data as $table_name => $table_data) {
+      if (isset($table_data[$key]['filter'])) {
+        $data[$table_name][$key]['filter']['id'] = 'node_comment';
+        $data[$table_name][$key]['field']['id'] = 'comment_status';
+      }
+    }
+    return $data;
+  }
 
   /**
    * Implements hook_views_data_alter().
