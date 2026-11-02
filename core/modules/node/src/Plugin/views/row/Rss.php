@@ -49,7 +49,7 @@ class Rss extends RssPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm_summary_options() {
+  public function buildOptionsForm_summary_options(): array {
     $options = parent::buildOptionsForm_summary_options();
     $options[$this::TITLE_VIEW_MODE] = $this->t('Title only');
     return $options;
@@ -95,6 +95,8 @@ class Rss extends RssPluginBase {
     if (empty($node)) {
       return;
     }
+
+    $node = $this->getEntityTranslationByRelationship($node, $row);
 
     $node->rss_namespaces = [];
     $node->rss_elements = [
