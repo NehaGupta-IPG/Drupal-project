@@ -1,0 +1,13 @@
+js_tabs_test.foo:
+  base_route: js_tabs_test
+  route_name: js_tabs_test
+  route_parameters:
+    argument: foo
+  title: Foo
+
+js_tabs_test.bar:
+  base_route: js_tabs_test
+  route_name: js_tabs_test
+  route_parameters:
+    argument: bar
+  title: Bar

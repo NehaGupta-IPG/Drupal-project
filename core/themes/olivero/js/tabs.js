@@ -22,7 +22,8 @@
      *   Whether the tabs trigger element is expanded.
      */
     function isTabsMobileLayout() {
-      return tabs.querySelector('.tabs__trigger').clientHeight > 0;
+      const tabsTrigger = tabs.querySelector('.tabs__trigger');
+      return tabsTrigger && tabsTrigger.clientHeight > 0;
     }
 
     /**
@@ -48,7 +49,7 @@
 
     tabs
       .querySelector('.tabs__trigger')
-      .addEventListener('click', handleTriggerClick);
+      ?.addEventListener('click', handleTriggerClick);
   }
 
   /**
