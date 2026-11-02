@@ -28,6 +28,17 @@ class LastTimestamp extends Date {
   /**
    * {@inheritdoc}
    */
+  public function query(): void {
+    $this->ensureMyTable();
+    // Add the field.
+    $params = $this->options['group_type'] != 'group' ? ['function' => $this->options['group_type']] : [];
+    $this->field_alias = $this->query->addField(NULL, "IF({$this->tableAlias}.comment_count > 0, {$this->tableAlias}.{$this->realField}, NULL)", $this->tableAlias . '_' . $this->field, $params);
+    $this->addAdditionalFields();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function render(ResultRow $values) {
     $comment_count = $this->getValue($values, 'comment_count');
     if (empty($this->options['empty_zero']) || $comment_count) {
