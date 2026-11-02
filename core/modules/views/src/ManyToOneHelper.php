@@ -5,6 +5,7 @@ namespace Drupal\views;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 
 /**
@@ -91,6 +92,10 @@ class ManyToOneHelper {
     // See if there's a chain between us and the base relationship. If so, we
     // need to create a new relationship to use.
     $relationship = $this->handler->relationship;
+    if ($relationship) {
+      $relationship = $this->handler->query->relationships[$relationship]['link'];
+    }
+    $base_relationship = $relationship;
 
     // Determine the primary table to seek.
     if (!isset($relationship, $this->handler->query->relationships[$relationship]['base'])) {
@@ -100,15 +105,18 @@ class ManyToOneHelper {
       $base_table = $this->handler->query->relationships[$relationship]['base'];
     }
 
+    if (!$join instanceof JoinPluginBase) {
+      return $this->handler->relationship;
+    }
     // Cycle through the joins. This isn't as error-safe as the normal
     // ensurePath logic. Perhaps it should be.
     $r_join = clone $join;
-    while ($r_join->leftTable != $base_table) {
+    while (isset($r_join->leftTable) && ($r_join->leftTable != $base_table)) {
       $r_join = HandlerBase::getTableJoin($r_join->leftTable, $base_table);
     }
     // If we found that there are tables in between, add the relationship.
     if ($r_join->table != $join->table) {
-      $relationship = $this->handler->query->addRelationship($this->handler->table . '_' . $r_join->table, $r_join, $r_join->table, $this->handler->relationship);
+      $relationship = $this->handler->query->addRelationship($this->handler->table . '_' . $r_join->table, $r_join, $r_join->table, $base_relationship);
     }
 
     // And now add our table, using the new relationship if one was used.
@@ -195,21 +203,23 @@ class ManyToOneHelper {
         }
         else {
           $join = $this->getJoin();
-          $join->type = 'LEFT';
-          if (!empty($this->handler->view->many_to_one_tables[$field])) {
-            foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
-              $join->extra = [
-                [
-                  'field' => $this->handler->realField,
-                  'operator' => '!=',
-                  'value' => $value,
-                  'numeric' => !empty($this->handler->definition['numeric']),
-                ],
-              ];
+          if (isset($join)) {
+            $join->type = 'LEFT';
+            if (!empty($this->handler->view->many_to_one_tables[$field])) {
+              foreach ($this->handler->view->many_to_one_tables[$field] as $value) {
+                $join->extra = [
+                  [
+                    'field' => $this->handler->realField,
+                    'operator' => '!=',
+                    'value' => $value,
+                    'numeric' => !empty($this->handler->definition['numeric']),
+                  ],
+                ];
+              }
             }
-          }
 
-          $this->handler->tableAlias = $this->addTable($join);
+            $this->handler->tableAlias = $this->addTable($join);
+          }
         }
 
         return $this->handler->tableAlias;
@@ -222,16 +232,18 @@ class ManyToOneHelper {
         $this->handler->tableAliases = [];
         foreach ($this->handler->value as $value) {
           $join = $this->getJoin();
-          if ($this->handler->operator == 'and') {
-            $join->type = 'INNER';
+          if (isset($join)) {
+            if ($this->handler->operator == 'and') {
+              $join->type = 'INNER';
+            }
+            $join->extra = [
+              [
+                'field' => $this->handler->realField,
+                'value' => $value,
+                'numeric' => !empty($this->handler->definition['numeric']),
+              ],
+            ];
           }
-          $join->extra = [
-            [
-              'field' => $this->handler->realField,
-              'value' => $value,
-              'numeric' => !empty($this->handler->definition['numeric']),
-            ],
-          ];
 
           // The table alias needs to be unique to this value across the
           // multiple times the filter or argument is called by the view.
@@ -254,18 +266,23 @@ class ManyToOneHelper {
       // the query phase to ensure that $table.$field IS NULL.
       else {
         $join = $this->getJoin();
-        $join->type = 'LEFT';
-        $join->extra = [];
-        $join->extraOperator = 'OR';
-        foreach ($this->handler->value as $value) {
-          $join->extra[] = [
-            'field' => $this->handler->realField,
-            'value' => $value,
-            'numeric' => !empty($this->handler->definition['numeric']),
-          ];
-        }
+        if (isset($join)) {
+          $join->type = 'LEFT';
+          $join->extra = [];
+          $join->extraOperator = 'OR';
+          foreach ($this->handler->value as $value) {
+            $join->extra[] = [
+              'field' => $this->handler->realField,
+              'value' => $value,
+              'numeric' => !empty($this->handler->definition['numeric']),
+            ];
+          }
 
-        $this->handler->tableAlias = $this->addTable($join);
+          $this->handler->tableAlias = $this->addTable($join);
+        }
+        else {
+          $this->handler->tableAlias = $this->handler->query->ensureTable($this->handler->table, $this->handler->relationship, $join);
+        }
       }
     }
     return $this->handler->tableAlias;
@@ -354,7 +371,7 @@ class ManyToOneHelper {
       $field = $this->handler->realField;
       $clause = $operator == 'or' ? $this->handler->query->getConnection()->condition('OR') : $this->handler->query->getConnection()->condition('AND');
       foreach ($this->handler->tableAliases as $value => $alias) {
-        $clause->condition("$alias.$field", $value);
+        $clause->condition((!empty($alias) ? $alias . '.' : '') . "$field", $value);
       }
 
       // Implode on either AND or OR.

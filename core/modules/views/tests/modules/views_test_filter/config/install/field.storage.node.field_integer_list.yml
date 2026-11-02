@@ -1,0 +1,50 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_integer_list
+field_name: field_integer_list
+entity_type: node
+type: list_integer
+settings:
+  allowed_values:
+    -
+      value: 0
+      label: 'Zero value'
+    -
+      value: 1
+      label: 'First value'
+    -
+      value: 2
+      label: 'Second value'
+    -
+      value: 3
+      label: 'Third value'
+    -
+      value: 4
+      label: 'Fourth value'
+    -
+      value: 5
+      label: 'Fifth value'
+    -
+      value: 6
+      label: 'Sixth value'
+    -
+      value: 7
+      label: 'Seventh value'
+    -
+      value: 8
+      label: 'Eighth value'
+    -
+      value: 9
+      label: 'Ninth value'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

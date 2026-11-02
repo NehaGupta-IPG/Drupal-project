@@ -688,12 +688,14 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     // Determine the primary table to seek.
     if (!isset($this->relationship) || empty($this->query->relationships[$this->relationship])) {
       $base_table = $this->view->storage->get('base_table');
+      $join = $this->getTableJoin($this->table, $base_table);
     }
     else {
-      $base_table = $this->query->relationships[$this->relationship]['base'];
+      $tableQueue = $this->query->getTableQueue();
+      $join = $tableQueue[$this->relationship]['join'];
+      $join = $this->getTableJoin($join->table, $join->leftTable);
     }
 
-    $join = $this->getTableJoin($this->table, $base_table);
     if ($join) {
       return clone $join;
     }

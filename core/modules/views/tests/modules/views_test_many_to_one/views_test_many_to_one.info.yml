@@ -1,0 +1,9 @@
+name: 'Views Test Many To One'
+type: module
+description: 'Provides views, content type and vocabulary for testing many to one relationship filters.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:node
+  - drupal:views
+  - drupal:taxonomy

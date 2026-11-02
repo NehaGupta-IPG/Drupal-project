@@ -28,4 +28,16 @@ class IndexTid extends ManyToOne {
     return $titles;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function summaryName($data): string {
+    $tid = $data->{$this->name_alias};
+    $term = $tid ? Term::load($tid) : NULL;
+    if ($term) {
+      return \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
+    }
+    return parent::summaryName($data);
+  }
+
 }
