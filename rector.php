@@ -9,9 +9,11 @@ return Rector\Config\RectorConfig::configure()
   ->withBootstrapFiles([
      'vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
   ])
-  >ruleWithConfiguration(ClassPropertyAssignToConstructorPromotionRector::class, [
-    ClassPropertyAssignToConstructorPromotionRector::INLINE_PUBLIC => TRUE,
-  ])
+  >withConfiguredRule(
+    ClassPropertyAssignToConstructorPromotionRector::class, [
+      ClassPropertyAssignToConstructorPromotionRector::INLINE_PUBLIC => TRUE,
+    ]
+  )
   ->withPaths([
     'composer',
     'core',
