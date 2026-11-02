@@ -197,8 +197,9 @@ class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
   public function testListItemConstraintsDropped(): void {
     // List A: unconstrained string items.
     $list_a = ListDataDefinition::create('string');
+    // Creating the list with a value populates the prototype cache for its
+    // items.
     $la = $this->typedDataManager->create($list_a, ['anything']);
-    // Access an item to populate the prototype cache without constraints.
     $this->assertInstanceOf(ListInterface::class, $la);
     $this->assertCount(1, $la);
     $this->assertInstanceOf(StringData::class, $la->get(0));
