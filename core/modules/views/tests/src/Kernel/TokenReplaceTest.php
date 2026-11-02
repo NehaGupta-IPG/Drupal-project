@@ -129,7 +129,7 @@ class TokenReplaceTest extends ViewsKernelTestBase {
       '[view:url]' => $view->getUrl(NULL, 'page_4')
         ->setAbsolute(TRUE)
         ->toString(),
-      '[view:total-rows]' => '3',
+      '[view:total-rows]' => '5',
     ];
 
     $base_bubbleable_metadata = BubbleableMetadata::createFromObject($view->storage);
