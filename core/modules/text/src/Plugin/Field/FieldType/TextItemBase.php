@@ -79,7 +79,8 @@ abstract class TextItemBase extends FieldItemBase {
       ->setLabel(t('Text'))
       ->setRequired(TRUE);
 
-    $properties['format'] = DataDefinition::create('filter_format')
+    $filter_format_type = \Drupal::moduleHandler()->moduleExists('filter') ? 'filter_format' : 'string';
+    $properties['format'] = DataDefinition::create($filter_format_type)
       ->setLabel(t('Text format'))
       ->setSetting('allowed_formats', $field_definition->getSetting('allowed_formats'));
 
@@ -116,7 +117,16 @@ abstract class TextItemBase extends FieldItemBase {
    */
   public function isEmpty() {
     $value = $this->get('value')->getValue();
-    return $value === NULL || $value === '';
+    // If there's a text value, it's not empty.
+    if ($value !== NULL && $value !== '') {
+      return FALSE;
+    }
+    // If a format is explicitly set, consider it not empty.
+    $format = $this->get('format')->getValue();
+    if ($format !== NULL && $format !== '') {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
