@@ -93,7 +93,6 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
     // Create a "Llama" taxonomy term.
     $term = Term::create(['vid' => $vocabulary->id()])
       ->setName('Llama')
-      ->setDescription("It is a little known fact that llamas cannot count higher than seven.")
       ->setChangedTime(123456789)
       ->set('path', '/llama');
     $term->save();
@@ -188,13 +187,6 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       'name' => [
         ['value' => 'Llama'],
       ],
-      'description' => [
-        [
-          'value' => 'It is a little known fact that llamas cannot count higher than seven.',
-          'format' => NULL,
-          'processed' => "<p>It is a little known fact that llamas cannot count higher than seven.</p>\n",
-        ],
-      ],
       'parent' => $expected_parent_normalization,
       'weight' => [
         ['value' => 0],
@@ -257,12 +249,6 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       'name' => [
         [
           'value' => 'Drama llama',
-        ],
-      ],
-      'description' => [
-        [
-          'value' => 'Drama llamas are the coolest camelids.',
-          'format' => NULL,
         ],
       ],
     ];

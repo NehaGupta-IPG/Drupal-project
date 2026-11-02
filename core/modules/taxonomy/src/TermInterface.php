@@ -13,42 +13,6 @@ use Drupal\Core\Entity\RevisionLogInterface;
 interface TermInterface extends ContentEntityInterface, EntityChangedInterface, EntityPublishedInterface, RevisionLogInterface {
 
   /**
-   * Gets the term description.
-   *
-   * @return string
-   *   The term description.
-   */
-  public function getDescription();
-
-  /**
-   * Sets the term description.
-   *
-   * @param string $description
-   *   The term description.
-   *
-   * @return $this
-   */
-  public function setDescription($description);
-
-  /**
-   * Gets the text format name for the term description.
-   *
-   * @return string
-   *   The text format name.
-   */
-  public function getFormat();
-
-  /**
-   * Sets the text format name for the term description.
-   *
-   * @param string $format
-   *   The text format name.
-   *
-   * @return $this
-   */
-  public function setFormat($format);
-
-  /**
    * Gets the term name.
    *
    * @return string

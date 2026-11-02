@@ -190,22 +190,6 @@ class Term extends EditorialContentEntityBase implements TermInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
-      ->setTranslatable(TRUE)
-      ->setRevisionable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'text_default',
-        'weight' => 0,
-      ])
-      ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('form', [
-        'type' => 'text_textfield',
-        'weight' => 0,
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('The weight of this term in relation to other terms.'))
@@ -234,36 +218,6 @@ class Term extends EditorialContentEntityBase implements TermInterface {
     $fields['parent'] = clone $base_field_definitions['parent'];
     $fields['parent']->setSetting('handler_settings', ['target_bundles' => [$bundle => $bundle]]);
     return $fields;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDescription() {
-    return $this->get('description')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setDescription($description) {
-    $this->set('description', $description);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormat() {
-    return $this->get('description')->format;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setFormat($format) {
-    $this->get('description')->format = $format;
-    return $this;
   }
 
   /**

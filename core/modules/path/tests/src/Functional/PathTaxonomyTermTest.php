@@ -53,10 +53,8 @@ class PathTaxonomyTermTest extends PathTestBase {
   public function testTermAlias(): void {
     // Create a term in the default 'Tags' vocabulary with URL alias.
     $vocabulary = Vocabulary::load('tags');
-    $description = $this->randomMachineName();
     $edit = [
       'name[0][value]' => $this->randomMachineName(),
-      'description[0][value]' => $description,
       'path[0][alias]' => '/' . $this->randomMachineName(),
     ];
     $this->drupalGet('admin/structure/taxonomy/manage/' . $vocabulary->id() . '/add');
@@ -70,7 +68,7 @@ class PathTaxonomyTermTest extends PathTestBase {
 
     // Confirm that the alias works.
     $this->drupalGet($edit['path[0][alias]']);
-    $this->assertSession()->pageTextContains($description);
+    $this->assertSession()->pageTextContains($edit['name[0][value]']);
 
     // Confirm the 'canonical' and 'shortlink' URLs.
     $this->assertSession()->elementExists('xpath', "//link[contains(@rel, 'canonical') and contains(@href, '" . $edit['path[0][alias]'] . "')]");
@@ -84,11 +82,11 @@ class PathTaxonomyTermTest extends PathTestBase {
 
     // Confirm that the changed alias works.
     $this->drupalGet(trim($edit2['path[0][alias]'], '/'));
-    $this->assertSession()->pageTextContains($description);
+    $this->assertSession()->pageTextContains($edit['name[0][value]']);
 
     // Confirm that the old alias no longer works.
     $this->drupalGet(trim($edit['path[0][alias]'], '/'));
-    $this->assertSession()->pageTextNotContains($description);
+    $this->assertSession()->pageTextNotContains($edit['name[0][value]']);
     $this->assertSession()->statusCodeEquals(404);
 
     // Remove the term's URL alias.
@@ -99,7 +97,7 @@ class PathTaxonomyTermTest extends PathTestBase {
 
     // Confirm that the alias no longer works.
     $this->drupalGet(trim($edit2['path[0][alias]'], '/'));
-    $this->assertSession()->pageTextNotContains($description);
+    $this->assertSession()->pageTextNotContains($edit['name[0][value]']);
     $this->assertSession()->statusCodeEquals(404);
   }
 

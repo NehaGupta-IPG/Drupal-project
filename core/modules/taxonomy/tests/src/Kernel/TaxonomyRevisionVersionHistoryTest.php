@@ -73,7 +73,6 @@ class TaxonomyRevisionVersionHistoryTest extends KernelTestBase {
     ]);
 
     $entity
-      ->setDescription('Description 1')
       ->setRevisionCreationTime((new \DateTimeImmutable('1st June 2020 7am'))->getTimestamp())
       ->setRevisionLogMessage('first revision log')
       ->setRevisionUser($this->drupalCreateUser(name: 'first author'))
@@ -81,7 +80,6 @@ class TaxonomyRevisionVersionHistoryTest extends KernelTestBase {
     $entity->save();
 
     $entity
-      ->setDescription('Description 2')
       ->setRevisionCreationTime((new \DateTimeImmutable('2nd June 2020 8am'))->getTimestamp())
       ->setRevisionLogMessage('second revision log')
       ->setRevisionUser($this->drupalCreateUser(name: 'second author'))
@@ -89,7 +87,6 @@ class TaxonomyRevisionVersionHistoryTest extends KernelTestBase {
     $entity->save();
 
     $entity
-      ->setDescription('Description 3')
       ->setRevisionCreationTime((new \DateTimeImmutable('3rd June 2020 9am'))->getTimestamp())
       ->setRevisionLogMessage('third revision log')
       ->setRevisionUser($this->drupalCreateUser(name: 'third author'))

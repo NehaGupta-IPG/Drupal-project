@@ -15,8 +15,6 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\taxonomy\Entity\Term;
-use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -1187,65 +1185,6 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     $this->assertCount(0, $result, 'Case sensitive, exact match.');
 
-  }
-
-  /**
-   * Tests base fields with multiple columns.
-   */
-  public function testBaseFieldMultipleColumns(): void {
-    $this->enableModules(['taxonomy']);
-    $this->installEntitySchema('taxonomy_term');
-
-    Vocabulary::create(['vid' => 'tags']);
-
-    $term1 = Term::create([
-      'name' => $this->randomMachineName(),
-      'vid' => 'tags',
-      'description' => [
-        'value' => 'description1',
-        'format' => 'format1',
-      ],
-    ]);
-    $term1->save();
-
-    $term2 = Term::create([
-      'name' => $this->randomMachineName(),
-      'vid' => 'tags',
-      'description' => [
-        'value' => 'description2',
-        'format' => 'format2',
-      ],
-    ]);
-    $term2->save();
-
-    // Test that the properties can be queried directly.
-    $ids = $this->container->get('entity_type.manager')
-      ->getStorage('taxonomy_term')
-      ->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('description.value', 'description1')
-      ->execute();
-    $this->assertCount(1, $ids);
-    $this->assertEquals($term1->id(), reset($ids));
-
-    $ids = $this->container->get('entity_type.manager')
-      ->getStorage('taxonomy_term')
-      ->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('description.format', 'format1')
-      ->execute();
-    $this->assertCount(1, $ids);
-    $this->assertEquals($term1->id(), reset($ids));
-
-    // Test that the main property is queried if no property is specified.
-    $ids = $this->container->get('entity_type.manager')
-      ->getStorage('taxonomy_term')
-      ->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('description', 'description1')
-      ->execute();
-    $this->assertCount(1, $ids);
-    $this->assertEquals($term1->id(), reset($ids));
   }
 
   /**
