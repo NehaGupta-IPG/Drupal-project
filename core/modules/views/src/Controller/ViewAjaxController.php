@@ -42,6 +42,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
     'view_base_path',
     'ajax_page_state',
     '_drupal_ajax',
+    'selector',
     FormBuilderInterface::AJAX_FORM_REQUEST,
     MainContentViewSubscriber::WRAPPER_FORMAT,
   ];

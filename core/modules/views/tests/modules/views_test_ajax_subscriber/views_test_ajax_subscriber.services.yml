@@ -1,0 +1,6 @@
+services:
+  views_test_ajax_subscriber.event_subscriber:
+    class: Drupal\views_test_ajax_subscriber\EventSubscriber\ViewsTestAjaxSubscriberEvent
+    arguments: []
+    tags:
+      - { name: event_subscriber }
