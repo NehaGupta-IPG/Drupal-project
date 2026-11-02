@@ -9,6 +9,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['file_test'];
+  protected static $modules = ['file_test', 'locale'];
 
   /**
    * A stream wrapper scheme to register for the test.
@@ -138,6 +139,52 @@ class StreamWrapperTest extends FileTestBase {
 
     // Cleanup.
     unlink($filename);
+  }
+
+  /**
+   * Checks if a directory gets autocreated on file upload.
+   *
+   * @dataProvider providerAutocreateDirectory
+   */
+  public function testAutocreateDirectory($callable) {
+    $directory = Settings::get('file_public_path') . '/' . $this->randomMachineName();
+    $this->config('locale.settings')
+      ->set('translation.path', $directory)
+      ->save();
+
+    $this->assertDirectoryDoesNotExist($directory);
+    $callable();
+    $this->assertDirectoryExists($directory);
+  }
+
+  public static function providerAutocreateDirectory() {
+    $data = [];
+    $data[] = [
+      function () {
+        realpath('translations://');
+      },
+    ];
+    $data[] = [
+      function () {
+        fopen('translations://' . Random::machineName(), 'w');
+      },
+    ];
+    $data[] = [
+      function () {
+        mkdir('translations://' . Random::machineName());
+      },
+    ];
+    $data[] = [
+      function () {
+        stat('translations://');
+      },
+    ];
+    $data[] = [
+      function () {
+        opendir('translations://');
+      },
+    ];
+    return $data;
   }
 
   /**
