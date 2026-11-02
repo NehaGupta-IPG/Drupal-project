@@ -85,6 +85,11 @@ class Section implements ThirdPartySettingsInterface {
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
     $regions = [];
     foreach ($this->getComponents() as $component) {
+      // Components without a region, such as those added to a blank section,
+      // cannot be placed in the layout.
+      if ($component->getRegion() === NULL) {
+        continue;
+      }
       if ($output = $component->toRenderArray($contexts, $in_preview)) {
         $regions[$component->getRegion()][$component->getUuid()] = $output;
       }

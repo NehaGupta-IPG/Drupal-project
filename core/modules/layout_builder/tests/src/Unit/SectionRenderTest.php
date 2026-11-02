@@ -243,6 +243,25 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
+   * Tests to render array with a component that has no region.
+   */
+  public function testToRenderArrayNullRegion(): void {
+    $this->blockManager->createInstance(Argument::cetera())->shouldNotBeCalled();
+
+    $section = [
+      SectionComponent::fromArray([
+        'uuid' => 'some_uuid',
+        'region' => NULL,
+        'configuration' => ['id' => 'block_plugin_id'],
+        'additional' => [],
+        'weight' => 0,
+      ]),
+    ];
+    $result = (new Section('layout_onecol', [], $section))->toRenderArray();
+    $this->assertSame([], $result);
+  }
+
+  /**
    * Tests context aware block.
    *
    * @legacy-covers ::toRenderArray
