@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Drupal\newsroom\ReviewPolicy: ~
+  Drupal\newsroom\Render\ArticleViewBuilder: ~
+  Drupal\newsroom\Repository\ArticleRepository: ~
+  Drupal\newsroom\Repository\ArticleRepositoryInterface: '@Drupal\newsroom\Repository\ArticleRepository'
