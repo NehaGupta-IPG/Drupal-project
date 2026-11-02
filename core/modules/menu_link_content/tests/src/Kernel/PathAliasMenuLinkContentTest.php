@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\path_alias\Entity\PathAlias;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -90,6 +91,17 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
     $path_alias = $this->createPathAlias('/test-page', '/my-blog');
     $this->assertNotNull($path_alias->id());
     $this->assertFalse($menu_link_manager->hasDefinition($plugin_id));
+  }
+
+  /**
+   * Tests deleting a path alias whose alias value is NULL.
+   */
+  public function testNullPathAliasDelete(): void {
+    $path_alias = $this->createPathAlias('/test-page', '/my-blog');
+    $path_alias->set('alias', NULL);
+    $path_alias->delete();
+
+    $this->assertNull(PathAlias::load($path_alias->id()));
   }
 
 }
