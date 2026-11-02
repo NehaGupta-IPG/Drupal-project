@@ -67,6 +67,7 @@ class FileAudioFormatterTest extends FileMediaFormatterTestBase {
 
     $assert_session = $this->assertSession();
     $assert_session->elementsCount('css', 'audio[controls="controls"]', $tag_count);
+    $assert_session->elementExists('css', 'audio[preload="metadata"]');
     $assert_session->elementExists('css', "audio > source[src='$file1_url'][type='audio/mpeg']");
     $assert_session->elementExists('css', "audio > source[src='$file2_url'][type='audio/mpeg']");
   }

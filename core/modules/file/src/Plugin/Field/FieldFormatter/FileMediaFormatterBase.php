@@ -33,6 +33,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
       'controls' => TRUE,
       'autoplay' => FALSE,
       'loop' => FALSE,
+      'preload' => 'metadata',
       'multiple_file_display_type' => 'tags',
     ] + parent::defaultSettings();
   }
@@ -56,6 +57,18 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
         '#title' => $this->t('Loop'),
         '#type' => 'checkbox',
         '#default_value' => $this->getSetting('loop'),
+      ],
+      'preload' => [
+        '#type' => 'radios',
+        '#title' => $this->t('Preload attribute'),
+        '#options' => [
+          'none' => $this->t("None: The media file should not be preloaded."),
+          'auto' => $this->t('Auto: The whole media file can be downloaded, even if the user is not expected to use it.'),
+          'metadata' => $this->t('Metadata: Only media metadata should be fetched.'),
+        ],
+        '#description' => $this->t('Regardless of the attribute value, the browser decides what to do since this is only a hint.'),
+        '#default_value' => $this->getSetting('preload'),
+        '#required' => TRUE,
       ],
       'multiple_file_display_type' => [
         '#title' => $this->t('Display of multiple files'),
@@ -97,6 +110,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
     $summary[] = $this->t('Playback controls: %controls', ['%controls' => $this->getSetting('controls') ? $this->t('visible') : $this->t('hidden')]);
     $summary[] = $this->t('Autoplay: %autoplay', ['%autoplay' => $this->getSetting('autoplay') ? $this->t('yes') : $this->t('no')]);
     $summary[] = $this->t('Loop: %loop', ['%loop' => $this->getSetting('loop') ? $this->t('yes') : $this->t('no')]);
+    $summary[] = $this->t('Preload: %preload', ['%preload' => $this->getSetting('preload')]);
     switch ($this->getSetting('multiple_file_display_type')) {
       case 'tags':
         $summary[] = $this->t('Multiple file display: Multiple HTML tags');
@@ -151,6 +165,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
    */
   protected function prepareAttributes(array $additional_attributes = []) {
     $attributes = new Attribute();
+    $attributes->setAttribute('preload', $this->getSetting('preload'));
     foreach (array_merge(['controls', 'autoplay', 'loop'], $additional_attributes) as $attribute) {
       if ($this->getSetting($attribute)) {
         $attributes->setAttribute($attribute, $attribute);

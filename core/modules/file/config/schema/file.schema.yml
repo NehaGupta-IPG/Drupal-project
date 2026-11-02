@@ -107,6 +107,10 @@ file.formatter.media:
     loop:
       type: boolean
       label: 'Loop'
+    preload:
+      type: string
+      label: 'Preload'
+      requiredKey: false
     # @see \Drupal\file\Plugin\Field\FieldFormatter\FileMediaFormatterBase::settingsForm
     multiple_file_display_type:
       type: string

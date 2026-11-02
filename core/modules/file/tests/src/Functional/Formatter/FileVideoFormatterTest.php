@@ -73,6 +73,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
 
     $assert_session = $this->assertSession();
     $assert_session->elementsCount('css', 'video[controls="controls"]', $tag_count);
+    $assert_session->elementExists('css', 'video[preload="metadata"]');
     $assert_session->elementExists('css', "video > source[src='$file1_url'][type='video/mp4']");
     $assert_session->elementExists('css', "video > source[src='$file2_url'][type='video/mp4']");
   }
