@@ -1,0 +1,5 @@
+name: 'EventListener test'
+type: module
+description: 'Support module for event listener testing.'
+package: Testing
+version: VERSION
