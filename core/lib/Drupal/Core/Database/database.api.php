@@ -592,6 +592,9 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  *
  * Only procedural implementations are supported for this hook.
  *
+ * For OOP replacements see Drupal\Core\Extension\Install\SchemaInterface.
+ * This hook will not run if an OOP implementation is present.
+ *
  * A Drupal schema definition is a structure of value objects representing one
  * or more tables and their related keys and indexes. A schema is defined by
  * hook_schema() which must live in your module's .install file.

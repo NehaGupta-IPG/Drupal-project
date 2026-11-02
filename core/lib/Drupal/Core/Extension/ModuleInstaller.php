@@ -9,11 +9,16 @@ use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\Install\InstallInterface;
+use Drupal\Core\Extension\Install\LastRemovedInterface;
+use Drupal\Core\Extension\Install\SchemaInterface;
+use Drupal\Core\Extension\Install\UninstallInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
@@ -84,13 +89,17 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
     protected \Traversable $uninstallValidators,
     protected ModuleWeight $moduleWeight,
+    protected ClassResolverInterface $classResolver,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-
+    if ($this->classResolver === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $classResolver argument is deprecated in drupal:12.1.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3633696', E_USER_DEPRECATED);
+      $this->classResolver = \Drupal::service('class_resolver');
+    }
   }
 
   /**
@@ -351,7 +360,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $this->moduleHandler->invokeAll('module_preinstall', [$module, $sync_status]);
 
       // Now install the module's schema if necessary.
-      $this->installSchema($module);
+      $this->installSchema($module_filenames[$module]);
     }
 
     // Clear plugin manager caches.
@@ -438,7 +447,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
       // hook_update_last_removed().
-      if ($last_removed = $this->invoke($module, 'update_last_removed')) {
+      if ($last_removed = $this->invoke($module_filenames[$module], 'update_last_removed', 'Install/LastRemoved')) {
         $version = max($version, $last_removed);
       }
       $this->updateRegistry->setInstalledVersion($module, $version);
@@ -471,7 +480,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallEntities);
 
       // Allow the module to perform install tasks.
-      $this->invoke($module, 'install', [$sync_status]);
+      $this->invoke($module_filenames[$module], 'install', 'Install/Installer', [$sync_status]);
 
       // Record the fact that it was installed.
       \Drupal::logger('system')->info('%module module installed.', ['%module' => $module]);
@@ -580,6 +589,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     }
 
     $sync_status = \Drupal::service('config.installer')->isSyncing();
+    $module_filenames = $this->moduleHandler->getModuleList();
 
     // Only process modules that are enabled. A module is only enabled if it is
     // configured as enabled. Custom or overridden module handlers might contain
@@ -605,7 +615,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       // Uninstall the module.
       $this->moduleHandler->loadInclude($module, 'install');
-      $this->invoke($module, 'uninstall', [$sync_status]);
+      if (!isset($module_filenames[$module])) {
+        $module_path = \Drupal::service('extension.list.module')
+          ->getPath($module);
+        $pathname = "$module_path/$module.info.yml";
+        $filename = file_exists($module_path . "/$module.module") ? "$module.module" : NULL;
+        $module_filenames[$module] = new Extension($this->root, 'module', $pathname, $filename);
+      }
+      $this->invoke($module_filenames[$module], 'uninstall', 'Install/Uninstaller', [$sync_status]);
 
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
@@ -638,7 +655,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
 
       // Remove the schema.
-      $this->uninstallSchema($module);
+      $this->uninstallSchema($module_filenames[$module]);
 
       // Remove the module's entry from the config. Don't check schema when
       // uninstalling a module since we are only clearing a key.
@@ -655,7 +672,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild
       // below.
-      $module_filenames = $this->moduleHandler->getModuleList();
       unset($module_filenames[$module]);
       $this->moduleHandler->setModuleList($module_filenames);
 
@@ -815,22 +831,23 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * Creates all tables defined in a module's hook_schema().
    *
-   * @param string $module
-   *   The module for which the tables will be created.
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The extension for which the tables will be created.
    *
    * @internal
    */
-  protected function installSchema(string $module): void {
-    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
+  protected function installSchema(Extension $extension): void {
+    $extensionName = $extension->getName();
+    $schemaDefinition = $this->invoke($extension, 'schema', 'Install/Schema') ?? [];
     $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
       assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
-      assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
+      assert($schemaDefinition->name === $extensionName, 'Invalid schema definition name, must be equal to the module name');
       $schema->createSchemaFromDefinition($schemaDefinition);
     }
     else {
       if (count($schemaDefinition) !== 0) {
-        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+        @trigger_error("Not returning a Schema object from {$extensionName}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
       }
       foreach ($schemaDefinition as $name => $table) {
         $schema->createTable($name, $table);
@@ -841,19 +858,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * Removes all tables defined in a module's hook_schema().
    *
-   * @param string $module
-   *   The module for which the tables will be removed.
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The extension for which the tables will be removed.
    *
    * @internal
    */
-  protected function uninstallSchema(string $module): void {
-    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
+  protected function uninstallSchema(Extension $extension): void {
+    $extensionName = $extension->getName();
+    $schemaDefinition = $this->invoke($extension, 'schema', 'Install/Schema') ?? [];
     if ($schemaDefinition instanceof Schema) {
       $table_names = $schemaDefinition->tableNames();
     }
     else {
       if (count($schemaDefinition) !== 0) {
-        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+        @trigger_error("Not returning a Schema object from {$extensionName}_schema() to " . __METHOD__ . " is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
       }
       $table_names = array_keys($schemaDefinition);
     }
@@ -878,10 +896,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * - hook_update_last_removed()
    * - hook_update_N()
    *
-   * @param string $module
-   *   The module (it can be a profile, too).
+   * @param \Drupal\Core\Extension\Extension $extension
+   *   The module or profile.
    * @param string $hook
    *   The name of the hook to invoke.
+   * @param string $directory_search
+   *   The namespace to check.
    * @param array $args
    *   Arguments to pass to the hook.
    *
@@ -889,9 +909,47 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The return value of the procedural hook. Defaults to NULL if a hook
    *   function does not exist.
    */
-  protected function invoke(string $module, string $hook, array $args = []): mixed {
-    $function = $module . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+  protected function invoke(Extension $extension, string $hook, string $directory_search = '', array $args = []): mixed {
+    try {
+      $class_name = install_get_fixed_class_name($extension, $directory_search);
+      $install_task = $this->classResolver->getInstanceFromDefinition($class_name);
+
+      switch ($hook) {
+        case 'install':
+          if ($install_task instanceof InstallInterface) {
+            $install_task->doInstall(...$args);
+            return NULL;
+          }
+          break;
+
+        case 'schema':
+          if ($install_task instanceof SchemaInterface) {
+            return $install_task->getSchema();
+          }
+          break;
+
+        case 'uninstall':
+          if ($install_task instanceof UninstallInterface) {
+            $install_task->doUninstall(...$args);
+            return NULL;
+          }
+          break;
+
+        case 'update_last_removed':
+          if ($install_task instanceof LastRemovedInterface) {
+            return $install_task->getLastRemoved();
+          }
+          break;
+      }
+    }
+    catch (\InvalidArgumentException) {
+      $function = $extension->getName() . '_' . $hook;
+      if (function_exists($function)) {
+        return $function(...$args);
+      }
+    }
+
+    return NULL;
   }
 
 }
