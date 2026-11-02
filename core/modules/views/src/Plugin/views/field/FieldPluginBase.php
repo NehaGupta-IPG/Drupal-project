@@ -1628,6 +1628,11 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     // The path has been heavily processed above, so it should be used as-is.
     $final_url = CoreUrl::fromUri($path, $options);
 
+    // Do not display the link if the current user does not have access.
+    if (!$final_url->access()) {
+      return '';
+    }
+
     // Build the link based on our altered Url object, adding on the optional
     // prefix and suffix.
     $render = [
