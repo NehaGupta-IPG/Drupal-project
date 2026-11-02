@@ -11,6 +11,7 @@ use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityDisplayRepository;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -52,6 +53,13 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   protected $entityTypeManager;
 
   /**
+   * Entity display repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityDisplayRepository
+   */
+  protected $entityDisplayRepository;
+
+  /**
    * The current active user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -80,16 +88,19 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   Any third party settings.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
+   * @param \Drupal\Core\Entity\EntityDisplayRepository $entity_display_repository
+   *   Entity display repository service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current active user.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepository $entity_display_repository, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
+    $this->entityDisplayRepository = $entity_display_repository;
   }
 
   /**
@@ -103,6 +114,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('entity_type.manager'),
+      $container->get('entity_display.repository'),
       $container->get('current_user'),
       $container->get('module_handler')
     );
@@ -121,6 +133,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public static function defaultSettings() {
     return [
       'media_types' => [],
+      'media_library_view_display' => 'media_library.widget',
+      'media_entity_view_mode' => 'media_library',
     ] + parent::defaultSettings();
   }
 
@@ -177,10 +191,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $elements = [];
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
-    if (count($media_type_ids) <= 1) {
-      return $elements;
-    }
-
     $elements['media_types'] = [
       '#type' => 'table',
       '#header' => [
@@ -214,6 +224,50 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         '#attributes' => ['class' => ['draggable']],
       ];
       $weight++;
+    }
+
+    $views = $this->entityTypeManager->getStorage('view')
+      ->loadByProperties(['base_table' => 'media_field_data']);
+    $displays = [];
+    /** @var \Drupal\views\Entity\View $view */
+    foreach ($views as $view) {
+      foreach ($view->get('display') as $id => $display) {
+        $view->getExecutable()->setDisplay($id);
+        $display = $view->getExecutable()->getDisplay();
+        if (!$display->usesFields() || !$display->hasPath()) {
+          continue;
+        }
+        foreach ($display->options['fields'] as $field) {
+          if ($field['id'] == 'media_library_select_form') {
+            $displays[$view->id() . '.' . $id] = $view->label() . ' - ' . $display->pluginTitle() . ' [' . $view->id() . ' - ' . $id . ']';
+          }
+        }
+      }
+    }
+    // Skip the form, if no applicable display exists.
+    if ($displays) {
+      $elements['media_library_view_display'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Media Library View display'),
+        '#description' => $this->t('Select a view display the modal should rendered in.'),
+        '#options' => $displays,
+        '#default_value' => $this->getSetting('media_library_view_display'),
+        '#required' => FALSE,
+      ];
+
+      // Media entity preview view mode selector.
+      $media_entity_view_modes = $this->entityDisplayRepository->getViewModes('media');
+      $elements['media_entity_view_mode'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Media item view mode'),
+        '#description' => $this->t('Select a view mode the media items should be rendered in.'),
+        '#options' => array_combine(
+          array_keys($media_entity_view_modes),
+          array_column($media_entity_view_modes, 'label')
+        ),
+        '#default_value' => $this->getSetting('media_entity_view_mode'),
+        '#required' => FALSE,
+      ];
     }
 
     return $elements;
@@ -269,6 +323,22 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       }
       $summary[] = $this->t('Tab order: @order', ['@order' => implode(', ', $media_type_labels)]);
     }
+
+    list($view, $display) = explode('.', $this->getSetting('media_library_view_display'));
+    if (!($view = $this->entityTypeManager->getStorage('view')->load($view))) {
+      return [$this->t('The selected view does not exists anymore.')];
+    }
+
+    $display = $view->get('display')[$display];
+    // Media entity type selected view mode.
+    $view_mode = $this->entityDisplayRepository->getViewModes('media')[$this->getSetting('media_entity_view_mode')];
+
+    $summary[] = $this->t('Media library view display: @view - @display', [
+      '@view' => $view->label(),
+      '@display' => $display['display_title'],
+    ]);
+    $summary[] = $this->t('Media entity view mode: @view_mode', ['@view_mode' => $view_mode['label']]);
+
     return $summary;
   }
 
@@ -389,10 +459,12 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       ],
     ];
 
+    $view_mode = $this->getSetting('media_entity_view_mode');
+
     foreach ($referenced_entities as $delta => $media_item) {
       if ($media_item->access('view')) {
-        // @todo Make the view mode configurable in https://www.drupal.org/project/drupal/issues/2971209
-        $preview = $view_builder->view($media_item, 'media_library');
+        $preview = $view_builder->view($media_item, $view_mode);
+        $preview['#attributes']['class'][] = 'media--view-mode-' . $view_mode;
       }
       else {
         $item_label = $media_item->access('view label') ? $media_item->label() : new FormattableMarkup('@label @id', [
@@ -506,7 +578,23 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         $opener_parameters['revision_id'] = (string) $entity->getRevisionId();
       }
     }
-    $state = MediaLibraryState::create('media_library.opener.field_widget', $allowed_media_type_ids, $selected_type_id, $remaining, $opener_parameters);
+    $view_id = NULL;
+    $display_id = NULL;
+
+    $view_display = $this->getSetting('media_library_view_display');
+    if ($view_display) {
+      [$view_id, $display_id] = explode('.', $view_display);
+    }
+
+    $state = MediaLibraryState::create(
+      'media_library.opener.field_widget',
+      $allowed_media_type_ids,
+      $selected_type_id,
+      $remaining,
+      $opener_parameters,
+      $view_id,
+      $display_id
+    );
 
     // Add a button that will load the Media library in a modal using AJAX.
     $element['open_button'] = [

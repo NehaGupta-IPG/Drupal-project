@@ -8,6 +8,13 @@ field.widget.settings.media_library_widget:
       sequence:
         type: string
         label: 'Media type ID'
+    media_library_view_display:
+      type: string
+      label: 'Media library view display'
+    media_entity_view_mode:
+      type: string
+      label: 'Media entity view mode'
+
 
 media_library.settings:
   type: config_object
