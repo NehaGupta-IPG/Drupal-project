@@ -19468,10 +19468,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysqli/tests/src/Kernel/mysqli/LargeQueryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\navigation\\\\Form\\\\LayoutForm\\:\\:redirectOnSubmit\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\navigation_layout\\\\Form\\\\LayoutForm\\:\\:redirectOnSubmit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/Form/LayoutForm.php',
+	'path' => __DIR__ . '/modules/navigation_layout/src/Form/LayoutForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$file of method Drupal\\\\navigation\\\\Form\\\\SettingsForm\\:\\:adjustLogoDimensions\\(\\) expects Drupal\\\\file\\\\Entity\\\\File, array\\|Drupal\\\\file\\\\FileInterface given\\.$#',
@@ -19486,52 +19486,46 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/navigation/src/Plugin/Derivative/SystemMenuNavigationBlock.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:buildLayoutRoutes\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\navigation_layout\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:buildLayoutRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/Plugin/SectionStorage/NavigationSectionStorage.php',
+	'path' => __DIR__ . '/modules/navigation_layout/src/Plugin/SectionStorage/NavigationSectionStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:setContext\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\navigation_layout\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:setContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/Plugin/SectionStorage/NavigationSectionStorage.php',
+	'path' => __DIR__ . '/modules/navigation_layout/src/Plugin/SectionStorage/NavigationSectionStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:buildLayoutRoutes\\(\\) expects Drupal\\\\layout_builder\\\\SectionStorage\\\\SectionStorageDefinition, array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/src/Plugin/SectionStorage/NavigationSectionStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\navigation\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\navigation_layout\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
+	'path' => __DIR__ . '/modules/navigation_layout/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\navigation\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableAfter\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\navigation_layout\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableAfter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
+	'path' => __DIR__ . '/modules/navigation_layout/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\navigation\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableTo\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\navigation_layout\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableTo\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
+	'path' => __DIR__ . '/modules/navigation_layout/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\navigation\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableUpdate\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\navigation_layout\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:sortableUpdate\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
+	'path' => __DIR__ . '/modules/navigation_layout/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\navigation\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\navigation_layout\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/navigation/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
+	'path' => __DIR__ . '/modules/navigation_layout/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\ConfigTranslation\\\\NodeTypeMapper\\:\\:setEntity\\(\\) should return bool but return statement is missing\\.$#',

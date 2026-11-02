@@ -31,12 +31,12 @@ class NavigationMenuMarkupTest extends KernelTestBase {
    */
   protected static $modules = [
     'system',
+    'layout_discovery',
     'navigation',
     'menu_test',
     'menu_link_content',
     'user',
     'link',
-    'layout_builder',
   ];
 
   /**

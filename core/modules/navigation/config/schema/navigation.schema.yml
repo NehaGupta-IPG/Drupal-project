@@ -59,7 +59,51 @@ navigation.block_layout:
     sections:
       type: sequence
       sequence:
-        type: layout_builder.section
+        type: navigation.block_layout.section
+
+navigation.block_layout.section:
+  type: mapping
+  label: 'Layout section'
+  mapping:
+    layout_id:
+      type: string
+      label: 'Layout ID'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.core.layout
+          interface: '\Drupal\Core\Layout\LayoutInterface'
+    layout_settings:
+      type: layout_plugin.settings.[%parent.layout_id]
+      label: 'Layout settings'
+    components:
+      type: sequence
+      label: 'Components'
+      sequence:
+        type: navigation.block_layout.component
+    third_party_settings:
+      type: sequence
+      label: 'Third party settings'
+      sequence:
+        type: '[%parent.%parent.%type].third_party.[%key]'
+
+navigation.block_layout.component:
+  type: mapping
+  label: 'Component'
+  mapping:
+    uuid:
+      type: uuid
+      label: 'UUID'
+    region:
+      type: string
+      label: 'Region'
+    configuration:
+      type: block.settings.[id]
+    weight:
+      type: weight
+      label: 'Weight'
+    additional:
+      type: ignore
+      label: 'Additional data'
 
 block.settings.navigation_menu:*:
   type: block_settings

@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\ConfigAction;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\Context\Context;
-use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\layout_builder\SectionComponent;
-use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
-use Drupal\layout_builder\SectionStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class AddNavigationBlock implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
   public function __construct(
-    protected readonly SectionStorageManagerInterface $sectionStorageManager,
+    protected readonly ConfigFactoryInterface $configFactory,
     protected readonly UuidInterface $uuidGenerator,
   ) {
   }
@@ -38,7 +35,7 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
-      $container->get(SectionStorageManagerInterface::class),
+      $container->get(ConfigFactoryInterface::class),
       $container->get(UuidInterface::class),
     );
   }
@@ -50,36 +47,46 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
     if ($configName !== 'navigation.block_layout') {
       throw new ConfigActionException('addNavigationBlock can only be executed for the navigation.block_layout config.');
     }
-    // Load the navigation section storage.
-    $navigation_storage = $this->sectionStorageManager->load('navigation', [
-      'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
-    ]);
-    if (!$navigation_storage instanceof SectionStorageInterface) {
-      throw new ConfigActionException('Unable to load Navigation Layout storage.');
+
+    $config = $this->configFactory->getEditable('navigation.block_layout');
+    $components = $config->get('sections.0.components');
+    if (!is_array($components)) {
+      throw new ConfigActionException('Unable to load the Navigation layout.');
     }
 
-    $section = $navigation_storage->getSection(0);
-    // Create the component from the recipe values.
-    $delta = $value['delta'] ?? 0;
-    // Weight is set to 0 because it is irrelevant now. It will be adjusted to
-    // its final value in insertComponent() or appendComponent().
-    $component = [
-      'uuid' => $this->uuidGenerator->generate(),
-      'region' => $section->getDefaultRegion(),
+    // The delta is the position of the new block among the blocks of the
+    // content region, ordered by weight, and defaults to the first position. A
+    // delta beyond the last position appends the block.
+    $content = array_filter($components, fn (array $component): bool => $component['region'] === 'content');
+    uasort($content, [SortArray::class, 'sortByWeightElement']);
+    $uuids = array_keys($content);
+    $delta = max(0, min((int) ($value['delta'] ?? 0), count($uuids)));
+
+    $uuid = $this->uuidGenerator->generate();
+    $components[$uuid] = [
+      'uuid' => $uuid,
+      'region' => 'content',
       'weight' => 0,
       'configuration' => $value['configuration'] ?? [],
       'additional' => $value['additional'] ?? [],
     ];
 
-    // Insert the new component in Navigation.
-    $new_component = SectionComponent::fromArray($component);
-    try {
-      $section->insertComponent($delta, $new_component);
+    if ($delta === count($uuids)) {
+      // Append the block after the last one.
+      $weights = array_column($content, 'weight');
+      $components[$uuid]['weight'] = $weights ? max($weights) + 1 : 0;
     }
-    catch (\OutOfBoundsException) {
-      $section->appendComponent($new_component);
+    else {
+      // Take over the weight of the block currently at the requested position
+      // and move that block and all the following ones down by one.
+      $weight = $content[$uuids[$delta]]['weight'];
+      $components[$uuid]['weight'] = $weight++;
+      foreach (array_slice($uuids, $delta) as $existing_uuid) {
+        $components[$existing_uuid]['weight'] = $weight++;
+      }
     }
-    $navigation_storage->save();
+
+    $config->set('sections.0.components', $components)->save();
   }
 
 }

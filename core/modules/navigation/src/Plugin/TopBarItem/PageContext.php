@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\navigation\Plugin\TopBarItem;
 
 use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -75,15 +76,18 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function build(): array {
-    $build = [
-      '#cache' => [
-        'contexts' => ['route'],
-      ],
-    ];
+    $build = [];
+
+    $cacheability_metadata = new CacheableMetadata();
+    $cacheability_metadata->addCacheContexts(['route']);
 
     if (!$entity = $this->entityRouteHelper->getContentEntityFromRoute()) {
+      $cacheability_metadata->applyTo($build);
       return $build;
     }
+
+    $cacheability_metadata->addCacheableDependency($entity);
+    $cacheability_metadata->applyTo($build);
 
     $entity_label = $this->getEntityLabel($entity);
     if (!$entity_label) {

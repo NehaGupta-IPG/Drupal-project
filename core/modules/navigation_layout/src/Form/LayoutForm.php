@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\navigation\Form;
+namespace Drupal\navigation_layout\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -10,7 +10,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\Form\LayoutBuilderEntityFormTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a form for configuring navigation blocks.
@@ -52,15 +51,6 @@ final class LayoutForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    return new static(
-      $container->get('layout_builder.tempstore_repository')
-    );
-  }
-
-  /**
    * Handles switching the configuration type selector.
    *
    * @return array
@@ -78,7 +68,7 @@ final class LayoutForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL): array {
     $form['#prefix'] = '<div id="js-config-form-wrapper">';
     $form['#suffix'] = '</div>';
     $form['#attributes']['class'][] = 'layout-builder-form';
@@ -88,7 +78,7 @@ final class LayoutForm extends FormBase {
       '#type' => 'layout_builder',
       '#section_storage' => $section_storage,
     ];
-    $form['#attached']['library'][] = 'navigation/navigation.layoutBuilder';
+    $form['#attached']['library'][] = 'navigation_layout/navigation_layout.layoutBuilder';
 
     $form['actions'] = [
       'enable_edit_mode' => [

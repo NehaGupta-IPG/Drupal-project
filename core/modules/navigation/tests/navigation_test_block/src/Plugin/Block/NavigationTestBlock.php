@@ -24,6 +24,15 @@ final class NavigationTestBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build(): array {
+    // Allow tests to make the block render nothing, while still declaring why.
+    if (\Drupal::state()->get('navigation_test_block.empty', FALSE)) {
+      return [
+        '#cache' => [
+          'tags' => ['navigation_test_block.empty'],
+        ],
+      ];
+    }
+
     $config = $this->configuration;
     $build = [];
 

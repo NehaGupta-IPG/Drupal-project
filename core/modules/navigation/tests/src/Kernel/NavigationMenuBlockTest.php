@@ -41,13 +41,13 @@ class NavigationMenuBlockTest extends KernelTestBase {
    */
   protected static $modules = [
     'system',
+    'layout_discovery',
     'navigation',
     'menu_test',
     'menu_link_content',
     'block',
     'user',
     'link',
-    'layout_builder',
   ];
 
   /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\navigation\Plugin\SectionStorage;
+namespace Drupal\navigation_layout\Plugin\SectionStorage;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
@@ -20,9 +20,10 @@ use Drupal\layout_builder\Plugin\SectionStorage\SectionStorageLocalTaskProviderI
 use Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListTrait;
+use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\layout_builder\SupportAwareSectionStorageInterface;
-use Drupal\navigation\Form\LayoutForm;
+use Drupal\navigation_layout\Form\LayoutForm;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -134,8 +135,10 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function buildRoutes(RouteCollection $collection): void {
-    $this->buildLayoutRoutes($collection, $this->getPluginDefinition(), '/admin/config/user-interface/navigation-block');
-    $default_route = 'layout_builder.' . $this->getPluginDefinition()->id() . '.view';
+    $definition = $this->getPluginDefinition();
+    assert($definition instanceof SectionStorageDefinition);
+    $this->buildLayoutRoutes($collection, $definition, '/admin/config/user-interface/navigation-block');
+    $default_route = 'layout_builder.' . $definition->id() . '.view';
     $route = $collection->get($default_route);
     // Use a form for editing the layout instead of a controller.
     $defaults = $route->getDefaults();

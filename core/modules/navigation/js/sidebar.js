@@ -31,12 +31,9 @@
             '[data-toolbar-back-control]',
           );
           if (!backButton) {
-            // We're in layout editing mode and the .admin-toolbar we have in
-            // scope here is the empty one that only exists to leave space for
-            // the one added by layout builder. We need to use an empty
-            // .admin-toolbar element because the css uses the adjacent
-            // sibling selector.
-            // @see \navigation_page_top();
+            // Without a back button this is not an interactive sidebar, for
+            // example when the navigation layout template has been overridden
+            // without it, so there is nothing to wire up.
             return;
           }
 

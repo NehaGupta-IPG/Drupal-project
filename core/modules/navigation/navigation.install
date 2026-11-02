@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the navigation module.
  */
 
+use Drupal\user\Entity\Role;
+
 /**
  * Implements hook_install().
  */
@@ -26,4 +28,19 @@ function navigation_install(bool $is_syncing): void {
  */
 function navigation_update_last_removed(): int {
   return 11002;
+}
+
+/**
+ * Install Navigation Layout to keep navigation customization available.
+ */
+function navigation_update_12001(): void {
+  \Drupal::service('module_installer')->install(['navigation_layout']);
+  // Re-save affected roles to recalculate dependencies.
+  $permission = 'configure navigation layout';
+  foreach (Role::loadMultiple() as $role) {
+    if (!in_array($permission, $role->getPermissions(), TRUE)) {
+      continue;
+    }
+    $role->save();
+  }
 }

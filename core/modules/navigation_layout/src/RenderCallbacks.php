@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\navigation;
+namespace Drupal\navigation_layout;
 
 use Drupal\Core\Security\Attribute\TrustedCallback;
-use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
+use Drupal\navigation_layout\Plugin\SectionStorage\NavigationSectionStorage;
 
 /**
  * Defines a class for render element callbacks.

@@ -30,7 +30,6 @@ class NavigationContentTopTest extends KernelTestBase {
     'test_page_test',
     'user',
     'system',
-    'layout_builder',
     'layout_discovery',
   ];
 

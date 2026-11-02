@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\Unit;
 
 use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -36,6 +38,12 @@ class PageContextTest extends UnitTestCase {
     parent::setUp();
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
+
+    // This is needed due to the assert() calls.
+    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
+    $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);
+    $cache_contexts_manager->reveal();
+    $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
   }
 
@@ -54,6 +62,8 @@ class PageContextTest extends UnitTestCase {
     $this->assertSame([
       '#cache' => [
         'contexts' => ['route'],
+        'tags' => [],
+        'max-age' => CacheBackendInterface::CACHE_PERMANENT,
       ],
     ], $build);
   }
@@ -73,6 +83,9 @@ class PageContextTest extends UnitTestCase {
     // Route returns an entity with different label return types.
     $entity = $this->prophesize(ContentEntityInterface::class);
     $entity->label()->willReturn($label_value);
+    $entity->getCacheTags()->willReturn(['entity:1']);
+    $entity->getCacheContexts()->willReturn([]);
+    $entity->getCacheMaxAge()->willReturn(CacheBackendInterface::CACHE_PERMANENT);
 
     $route_helper = $this->prophesize(EntityRouteHelper::class);
     $route_helper->getContentEntityFromRoute()->willReturn($entity->reveal());
@@ -86,6 +99,8 @@ class PageContextTest extends UnitTestCase {
     $expected_base = [
       '#cache' => [
         'contexts' => ['route'],
+        'tags' => ['entity:1'],
+        'max-age' => CacheBackendInterface::CACHE_PERMANENT,
       ],
     ];
 
@@ -139,6 +154,9 @@ class PageContextTest extends UnitTestCase {
     $entity->willImplement(EntityPublishedInterface::class);
     $entity->isPublished()->willReturn(TRUE);
     $entity->label()->willReturn('Published Title');
+    $entity->getCacheTags()->willReturn(['entity:1']);
+    $entity->getCacheContexts()->willReturn([]);
+    $entity->getCacheMaxAge()->willReturn(CacheBackendInterface::CACHE_PERMANENT);
 
     $route_helper = $this->prophesize(EntityRouteHelper::class);
     $route_helper->getContentEntityFromRoute()->willReturn($entity->reveal());
@@ -175,6 +193,9 @@ class PageContextTest extends UnitTestCase {
     $entity->getEntityTypeId()->willReturn('node');
     $entity->id()->willReturn('1');
     $entity->label()->willReturn('Example Title');
+    $entity->getCacheTags()->willReturn(['entity:1']);
+    $entity->getCacheContexts()->willReturn([]);
+    $entity->getCacheMaxAge()->willReturn(CacheBackendInterface::CACHE_PERMANENT);
 
     // Workflow chain: workflow -> type plugin -> state('draft')->label() => 'Draft'.
     $state = $this->prophesize(StateInterface::class);
@@ -217,6 +238,9 @@ class PageContextTest extends UnitTestCase {
     $entity->getEntityTypeId()->willReturn('node');
     $entity->id()->willReturn('1');
     $entity->label()->willReturn('Example Title');
+    $entity->getCacheTags()->willReturn(['entity:1']);
+    $entity->getCacheContexts()->willReturn([]);
+    $entity->getCacheMaxAge()->willReturn(CacheBackendInterface::CACHE_PERMANENT);
 
     $active = $this->prophesize(ContentEntityInterface::class);
     $active->get('moderation_state')->willReturn((object) ['value' => 'published']);
@@ -262,6 +286,9 @@ class PageContextTest extends UnitTestCase {
   public function testNoValidBadge(): void {
     $entity = $this->prophesize(ContentEntityInterface::class);
     $entity->label()->willReturn('Simple Title');
+    $entity->getCacheTags()->willReturn(['entity:1']);
+    $entity->getCacheContexts()->willReturn([]);
+    $entity->getCacheMaxAge()->willReturn(CacheBackendInterface::CACHE_PERMANENT);
 
     $route_helper = $this->prophesize(EntityRouteHelper::class);
     $route_helper->getContentEntityFromRoute()->willReturn($entity->reveal());
