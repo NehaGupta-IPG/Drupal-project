@@ -105,4 +105,13 @@ export default defineConfig(
       },
     },
   },
+  {
+    // ESLint configuration files run in Node.js rather than the browser, so
+    // they can use newer syntax. This also allows eslint-plugin-import to parse
+    // the plugins they import, which may use syntax newer than ES2020.
+    files: ['eslint*.config.mjs'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+    },
+  },
 );
