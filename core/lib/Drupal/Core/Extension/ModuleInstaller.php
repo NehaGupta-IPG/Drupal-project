@@ -932,7 +932,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
             return NULL;
           }
           break;
-        case 'last_removed':
+        case 'update_last_removed':
           if ($install_task instanceof LastRemovedInterface) {
             return $install_task->getLastRemoved();
           }
