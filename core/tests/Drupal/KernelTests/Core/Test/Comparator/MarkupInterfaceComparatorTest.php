@@ -8,7 +8,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,7 +21,7 @@ use SebastianBergmann\Comparator\Factory;
  * We need to test the class with a kernel test since casting MarkupInterface
  * objects to strings can require an initialized container.
  */
-#[CoversClass(MarkupInterfaceComparator::class)]
+#[CoversNothing]
 #[Group('Test')]
 #[RunTestsInSeparateProcesses]
 class MarkupInterfaceComparatorTest extends KernelTestBase {

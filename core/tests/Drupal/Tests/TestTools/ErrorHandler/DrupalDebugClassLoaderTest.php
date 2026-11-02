@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\TestTools\ErrorHandler;
 
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests the DrupalDebugClassLoader.
  */
-#[CoversClass(DrupalDebugClassLoader::class)]
+#[CoversNothing]
 #[Group('TestTools')]
 class DrupalDebugClassLoaderTest extends TestCase {
 

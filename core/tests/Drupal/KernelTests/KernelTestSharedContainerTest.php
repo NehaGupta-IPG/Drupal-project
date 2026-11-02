@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\TestTools\Attribute\ShareEnvironment;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 /**
  * Tests that the container is shared between kernel test methods.
  */
-#[CoversClass(KernelTestBase::class)]
+#[CoversNothing]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
 #[ShareEnvironment]

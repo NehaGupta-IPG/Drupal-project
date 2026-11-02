@@ -9,14 +9,14 @@ use Behat\Mink\Session;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\DrupalTestBrowser;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Tests\BrowserTestBase.
  */
-#[CoversClass(BrowserTestBase::class)]
+#[CoversNothing]
 #[Group('Test')]
 class BrowserTestBaseTest extends UnitTestCase {
 

@@ -9,7 +9,7 @@ use Drupal\Core\Database\Database;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,7 +21,7 @@ use Psr\Http\Client\ClientExceptionInterface;
  *
  * @final
  */
-#[CoversClass(KernelTestBase::class)]
+#[CoversNothing]
 #[Group('PHPUnit')]
 #[Group('Test')]
 #[Group('KernelTests')]
