@@ -1,0 +1,7 @@
+name: 'Import map test conflict'
+type: module
+description: 'Provides a conflicting import map definition for testing.'
+package: Testing
+core_version_requirement: ^12 || ^13
+dependencies:
+  - drupal:importmap_test

@@ -1,0 +1,13 @@
+name: 'Import map test theme'
+type: theme
+description: 'Test theme that overrides the importmap of the importmap_test module in libraries-override.'
+version: VERSION
+base theme: false
+hidden: true
+libraries-override:
+  importmap_test/importmap:
+    importmap:
+      imports:
+        importmap-test-foo: js/theme-foo.js
+      integrity:
+        /core/modules/system/tests/themes/importmap_test_theme/js/theme-foo.js: sha384-theme

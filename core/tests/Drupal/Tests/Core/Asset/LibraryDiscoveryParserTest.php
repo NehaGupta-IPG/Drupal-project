@@ -6,10 +6,12 @@ namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException;
+use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
 use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Asset\LibrariesDirectoryFileFinder;
 use Drupal\Core\Asset\LibraryDiscoveryParser;
+use Drupal\Core\Asset\LibraryImportMapProcessor;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -117,7 +119,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
     $this->yamlCacheCollector = new YamlCacheCollector('library.yaml_parser', new MemoryCache(new Time()), new NullLockBackend(), new Time());
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
   }
 
   /**
@@ -143,7 +145,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    */
   #[RunInSeparateProcess]
   public function testBuildByExtensionSimple(): void {
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_module')
@@ -361,12 +363,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $css = $library['css'];
     $this->assertCount(10, $css);
 
-    // The following default weights are tested:
-    // - CSS_BASE: -200
-    // - CSS_LAYOUT: -100
-    // - CSS_COMPONENT: 0
-    // - CSS_STATE: 100
-    // - CSS_THEME: 200
+    // The following default weights are tested: CSS_BASE (-200),
+    // CSS_LAYOUT (-100), CSS_COMPONENT (0), CSS_STATE (100), CSS_THEME (200).
     $this->assertEquals(200, $css[0]['weight']);
     $this->assertEquals(200 + 29, $css[1]['weight']);
     $this->assertEquals(-200, $css[2]['weight']);
@@ -399,6 +397,458 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
     $this->expectException(\UnexpectedValueException::class);
     $this->libraryDiscoveryParser->buildByExtension('js_positive_weight');
+  }
+
+  /**
+   * Tests that import map definitions are validated and resolved.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMap(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module');
+    $library = $libraries['importmap'];
+    $this->assertEquals([
+      'imports' => [
+        'importmap-test-foo' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-absolute' => [
+          'data' => 'core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-libraries' => [
+          'data' => 'libraries/llama/lib.mjs',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-protocol-free' => [
+          'data' => '//example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-external' => [
+          'data' => 'https://example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-prefix/' => [
+          'data' => $path . '/js/prefix/',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-root' => [
+          'data' => '',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+      ],
+      'scopes' => [
+        $path . '/js/v1' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v1.js',
+            'external' => FALSE,
+            'version' => '2.0',
+            'cache' => TRUE,
+          ],
+        ],
+        'absolute-scope' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v2.js',
+            'external' => FALSE,
+            'version' => '2.0',
+            'cache' => TRUE,
+          ],
+        ],
+      ],
+      'integrity' => [
+        $path . '/js/foo.js' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+          'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
+        ],
+        'core/misc/align-right.js' => [
+          'data' => 'core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+          'integrity' => 'sha384-other',
+        ],
+      ],
+    ], $library['importmap']);
+  }
+
+  /**
+   * Tests that an import map entry in the libraries directory is resolved.
+   *
+   * An absolute path to the libraries directory is resolved through the
+   * libraries directory file finder, mirroring the resolution of js and css
+   * asset sources.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapLibrariesDirectory(): void {
+    $this->librariesDirectoryFileFinder = $this->createMock(LibrariesDirectoryFileFinder::class);
+    $this->librariesDirectoryFileFinder->expects($this->once())
+      ->method('find')
+      ->with('llama/lib.mjs')
+      ->willReturn('libraries/llama/lib.mjs');
+
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+
+    $parser = $this->createParser();
+    $libraries = $parser->buildByExtension('importmap_module');
+    $this->assertSame('libraries/llama/lib.mjs', $libraries['importmap']['importmap']['imports']['importmap-test-libraries']['data']);
+  }
+
+  /**
+   * Builds the library discovery parser for the importmap_module fixture.
+   *
+   * The active theme provides the given importmap override of the
+   * 'importmap' library.
+   *
+   * @param array $override
+   *   The importmap override of the 'importmap' library, as specified in
+   *   libraries-override.
+   *
+   * @return \Drupal\Tests\Core\Asset\TestLibraryDiscoveryParser
+   *   The library discovery parser.
+   */
+  protected function buildImportMapOverrideParser(array $override): TestLibraryDiscoveryParser {
+    $mock_theme_path = 'mocked_themes/kittens';
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->activeTheme = $this->createMock(ActiveTheme::class);
+    $this->activeTheme->expects($this->atLeastOnce())
+      ->method('getLibrariesOverride')
+      ->willReturn([
+        $mock_theme_path => [
+          'importmap_module/importmap' => [
+            'importmap' => $override,
+          ],
+        ],
+      ]);
+    $this->themeManager
+      ->method('getActiveTheme')
+      ->willReturn($this->activeTheme);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+    $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
+
+    $parser = $this->createParser();
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+    return $parser;
+  }
+
+  /**
+   * Tests that the importmap of a library can be overridden.
+   *
+   * The override uses the same structure as the importmap definition. The
+   * sources are resolved relative to the theme. Entries that do not exist in
+   * the library definition are ignored, except that integrity entries may be
+   * added.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverride(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'imports' => [
+        // Replaced with a theme-relative source.
+        'importmap-test-foo' => 'js/override-foo.js',
+        // Replaced with an absolute path.
+        'importmap-test-absolute' => '/core/misc/other.js',
+        // Removed.
+        'importmap-test-external' => FALSE,
+        // Does not exist in the library definition: ignored.
+        'importmap-test-unknown' => 'js/unknown.js',
+      ],
+      'scopes' => [
+        'js/v1' => [
+          'importmap-test-foo' => 'js/override-foo-v1.js',
+        ],
+        // Does not exist in the library definition: ignored.
+        'js/unknown-scope' => [
+          'importmap-test-foo' => 'js/unknown.js',
+        ],
+      ],
+      'integrity' => [
+        // Replaced.
+        'js/foo.js' => 'sha384-override',
+        // Added, for the replacement source.
+        '/mocked_themes/kittens/js/override-foo.js' => 'sha384-added',
+      ],
+    ]);
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+
+    $libraries = $parser->buildByExtension('importmap_module');
+    $library = $libraries['importmap'];
+    $this->assertEquals([
+      'imports' => [
+        'importmap-test-foo' => [
+          'data' => 'mocked_themes/kittens/js/override-foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-absolute' => [
+          'data' => 'core/misc/other.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-libraries' => [
+          'data' => 'libraries/llama/lib.mjs',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-protocol-free' => [
+          'data' => '//example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-prefix/' => [
+          'data' => $path . '/js/prefix/',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+        'importmap-test-root' => [
+          'data' => '',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+        ],
+      ],
+      'scopes' => [
+        $path . '/js/v1' => [
+          'importmap-test-foo' => [
+            'data' => 'mocked_themes/kittens/js/override-foo-v1.js',
+            'external' => FALSE,
+            'version' => '2.0',
+            'cache' => TRUE,
+          ],
+        ],
+        'absolute-scope' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v2.js',
+            'external' => FALSE,
+            'version' => '2.0',
+            'cache' => TRUE,
+          ],
+        ],
+      ],
+      'integrity' => [
+        $path . '/js/foo.js' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+          'integrity' => 'sha384-override',
+        ],
+        'core/misc/align-right.js' => [
+          'data' => 'core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+          'integrity' => 'sha384-other',
+        ],
+        'mocked_themes/kittens/js/override-foo.js' => [
+          'data' => 'mocked_themes/kittens/js/override-foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'cache' => TRUE,
+          'integrity' => 'sha384-added',
+        ],
+      ],
+    ], $library['importmap']);
+  }
+
+  /**
+   * Tests that an importmap override with an unknown key is rejected.
+   *
+   * The asset-to-asset override format of the other asset types is not
+   * accepted for the importmap.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideUnknownKey(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'js/foo.js' => 'js/bar.js',
+    ]);
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("Unknown key 'js/foo.js' in the importmap override of the library importmap_module/importmap. Only the keys 'imports', 'scopes' and 'integrity' are allowed.");
+    $parser->buildByExtension('importmap_module');
+  }
+
+  /**
+   * Tests that an importmap override with an invalid source is rejected.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideInvalidSource(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'imports' => [
+        'importmap-test-foo' => 123,
+      ],
+    ]);
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("The source of the module specifier 'importmap-test-foo' in the importmap override of the library importmap_module/importmap must be a string, or FALSE to remove the entry.");
+    $parser->buildByExtension('importmap_module');
+  }
+
+  /**
+   * Tests an importmap override with an invalid integrity value.
+   *
+   * An importmap override is rejected when the integrity metadata is not a
+   * non-empty string or FALSE.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideInvalidIntegrity(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'integrity' => [
+        'js/foo.js' => '',
+      ],
+    ]);
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("The integrity metadata for 'js/foo.js' in the importmap override of the library importmap_module/importmap must be a non-empty string, or FALSE to remove the entry.");
+    $parser->buildByExtension('importmap_module');
+  }
+
+  /**
+   * Tests that a library can consist of an import map definition only.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapOnlyLibrary(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_only_importmap')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_only_importmap')
+      ->willReturn($path);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module_only_importmap');
+    $library = $libraries['importmap'];
+    $this->assertEquals(-1, $library['importmap']['imports']['importmap-test-foo']['version']);
+    $this->assertEquals($path . '/js/foo.js', $library['importmap']['imports']['importmap-test-foo']['data']);
+  }
+
+  /**
+   * Tests that an import map definition with an unknown key is invalid.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithUnknownKey(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_unknown_key')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_unknown_key')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("Unknown key 'bogus' in the importmap definition of the library importmap_module_unknown_key/importmap. Only the keys 'imports', 'scopes' and 'integrity' are allowed.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_unknown_key');
+  }
+
+  /**
+   * Tests that trailing-slash specifiers require trailing-slash values.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithTrailingSlashMismatch(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_trailing_slash')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_trailing_slash')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("The module specifier 'importmap-test-prefix/' in the importmap definition of the library importmap_module_trailing_slash/importmap ends with a slash, so its value must also end with a slash.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_trailing_slash');
+  }
+
+  /**
+   * Tests that the value of a module specifier must be a string.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithNonStringValue(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_non_string')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_non_string')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("The value of the module specifier 'importmap-test-foo' in the importmap definition of the library importmap_module_non_string/importmap must be a non-empty string, or a mapping with a 'path' key.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_non_string');
   }
 
   /**
@@ -671,7 +1121,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -727,7 +1177,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'deprecated')
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+    $this->libraryDiscoveryParser = $this->createParser();
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -881,6 +1331,17 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertEquals([], $libraries);
   }
 
+  /**
+   * Returns the library discovery parser under test.
+   *
+   * @return \Drupal\Tests\Core\Asset\TestLibraryDiscoveryParser
+   *   The library discovery parser, wired with the dependencies shared by the
+   *   tests of this file.
+   */
+  protected function createParser(): TestLibraryDiscoveryParser {
+    return new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector, new LibraryImportMapProcessor($this->librariesDirectoryFileFinder, $this->streamWrapperManager));
+  }
+
 }
 
 /**
@@ -895,10 +1356,27 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
    */
   protected array $validUris;
 
+  /**
+   * Determines if the supplied file is a valid URI.
+   *
+   * @param string $source
+   *   The file source to check.
+   *
+   * @return bool
+   *   TRUE if the file is a valid URI, according to the test data.
+   */
   protected function fileValidUri($source): bool {
     return $this->validUris[$source] ?? FALSE;
   }
 
+  /**
+   * Sets the validity of a URI in the test data.
+   *
+   * @param string $source
+   *   The file source.
+   * @param bool $valid
+   *   TRUE if the file is a valid URI.
+   */
   public function setFileValidUri(string $source, bool $valid): void {
     $this->validUris[$source] = $valid;
   }

@@ -3,7 +3,6 @@
 namespace Drupal\Core\Render;
 
 // cspell:ignore turbolinks
-
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -41,6 +40,36 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected $config;
 
+  /**
+   * Constructs a HtmlResponseAttachmentsProcessor instance.
+   *
+   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
+   *   The asset resolver.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $cssCollectionRenderer
+   *   The CSS collection renderer.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $jsCollectionRenderer
+   *   The JS collection renderer.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   *   The file URL generator.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface|null $importMapRenderer
+   *   The import map renderer. Omitted for backwards compatibility with
+   *   subclasses; the 'asset.importmap.renderer' service is used as a
+   *   fallback.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface|null $modulePreloadRenderer
+   *   The module preload renderer. Omitted for backwards compatibility with
+   *   subclasses; the 'asset.modulepreload.renderer' service is used as a
+   *   fallback.
+   */
   public function __construct(
     protected AssetResolverInterface $assetResolver,
     ConfigFactoryInterface $config_factory,
@@ -51,8 +80,18 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
+    protected AssetCollectionRendererInterface|null $importMapRenderer = NULL,
+    protected AssetCollectionRendererInterface|null $modulePreloadRenderer = NULL,
   ) {
     $this->config = $config_factory->get('system.performance');
+    if (!isset($importMapRenderer)) {
+      $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    if (!isset($modulePreloadRenderer)) {
+      $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -173,6 +212,23 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // 'html_head_link'.
         if (!empty($attached['html_head'])) {
           $variables['head'] = $this->processHtmlHead($attached['html_head']);
+        }
+
+        // Render the import map and the module preloads, and add them to the
+        // start of the head. An import map must be processed by the browser
+        // before any module script or module preload, so the import map has
+        // to come first, followed by the module preloads.
+        //
+        // The import map is only rendered for the main HTML document. Browsers
+        // only support a single import map per page, and responses other than
+        // the main document (e.g., Ajax responses and BigPipe placeholder
+        // replacements) must not add a second import map; they can only add
+        // module preloads. See
+        // \Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor::processAttachments().
+        $head_elements = $this->importMapRenderer->render($this->assetResolver->getImportMap())
+          + $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
+        if ($head_elements) {
+          $variables['head'] = $head_elements + ($variables['head'] ?? []);
         }
       }
 
@@ -298,6 +354,21 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($assets, $optimize_js, $this->languageManager->getCurrentLanguage());
       $variables['scripts'] = $this->jsCollectionRenderer->render($js_assets_header);
       $variables['scripts_bottom'] = $this->jsCollectionRenderer->render($js_assets_footer);
+    }
+
+    // Print module preloads - if a placeholder for them is present.
+    //
+    // HTMX responses, rendered by \Drupal\Core\Render\MainContent\HtmxRenderer,
+    // have no head placeholder, so they declare a modulepreload placeholder
+    // instead. The module preloads tell the browser to fetch the modules of
+    // the attached libraries' import maps, so that the module scripts can
+    // start importing them as soon as possible. The HTMX client picks the
+    // preloads up from the response and adds them to the head. See
+    // core/misc/htmx/htmx-assets.js. The import map itself is not rendered:
+    // a page only supports a single import map, and it was already sent with
+    // the main HTML document.
+    if (isset($placeholders['modulepreload'])) {
+      $variables['modulepreload'] = $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
     }
 
     return $variables;

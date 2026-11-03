@@ -1092,6 +1092,72 @@ function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $asset
 }
 
 /**
+ * Alter the aggregated import map of the current response.
+ *
+ * The import map is aggregated from the 'importmap' of the libraries of all
+ * known extensions: core, the enabled modules, and the active theme including
+ * its base themes. It is emitted in the HTML head of every page, via a
+ * <script type="importmap"> element, so that module scripts can resolve bare
+ * module specifiers (e.g., `import React from 'react'`).
+ *
+ * Use this hook to alter the aggregated import map in ways that the
+ * per-library mechanisms cannot express: to change an entry that is provided
+ * by another extension, or to resolve a conflict between two libraries that
+ * define the same module specifier with different values. In the latter case,
+ * the merge keeps the definition of the extension that comes first in the
+ * merge order (core, then the enabled modules sorted by machine name, then the
+ * themes in the theme chain), and logs an error mentioning the two libraries.
+ * An implementation that resolves the conflict (by changing or removing the
+ * entry) should unset the conflict from $conflicts, so that the error is not
+ * logged.
+ *
+ * The hook is invoked when the cached import map is built, and the altered
+ * map is cached, so implementations must be static, like
+ * hook_library_info_alter(). Implementations that depend on the request (e.g.,
+ * the current user) must invalidate the 'library_info' cache tag when that
+ * dependency changes.
+ *
+ * The module preloads of the libraries attached to a response (see
+ * \Drupal\Core\Asset\AssetResolverInterface::getModulePreloads()) are derived
+ * from the altered map, so replacing or removing an entry here also changes
+ * what is preloaded.
+ *
+ * @param array $import_map
+ *   The aggregated import map, passed by reference, with the keys 'imports',
+ *   'scopes' and 'integrity'. Entries under 'imports' and 'scopes' are keyed
+ *   by the module specifier, and resolve to an array with the keys 'data'
+ *   (the resolved path or URL), 'external' (a boolean, TRUE for external
+ *   URLs), 'version' and 'cache' (a boolean, FALSE for modules that must not
+ *   be cached). Entries under 'integrity' are keyed by the resolved path or
+ *   URL, and resolve to an array with the same keys plus 'integrity' (the
+ *   integrity metadata string).
+ * @param array $conflicts
+ *   The conflicts found while the import map was aggregated, passed by
+ *   reference, with the same top-level keys as $import_map. Each conflict is
+ *   keyed by the module specifier or path, and lists the definitions involved
+ *   in the conflict, keyed by the name of the library that provided the
+ *   definition, e.g. 'module/library'. The first definition listed is the
+ *   one used by the merge, which is the entry currently in $import_map.
+ *   An implementation that resolves a conflict (by changing or removing the
+ *   entry in $import_map) should unset the conflict from $conflicts; the
+ *   remaining conflicts are logged as errors. Only remove keys from
+ *   $conflicts: adding a key that no library definition provides cannot be
+ *   attributed to a library, and is reported as an error without details.
+ *
+ * @see \Drupal\Core\Asset\AssetResolver::getImportMap()
+ * @see hook_library_info_alter()
+ */
+function hook_importmap_alter(array &$import_map, array &$conflicts): void {
+  // Two libraries define the module specifier 'react' with different values.
+  // Use the definition of the 'react' module, instead of the definition that
+  // the merge picked, and suppress the logged conflict.
+  if (isset($conflicts['imports']['react']['react/react'])) {
+    $import_map['imports']['react'] = $conflicts['imports']['react']['react/react'];
+    unset($conflicts['imports']['react']);
+  }
+}
+
+/**
  * Add attachments (typically assets) to a page before it is rendered.
  *
  * Use this hook when you want to conditionally add attachments to a page. This

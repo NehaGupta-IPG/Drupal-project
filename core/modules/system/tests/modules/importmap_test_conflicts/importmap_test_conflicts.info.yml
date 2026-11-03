@@ -1,0 +1,5 @@
+name: 'Import map test conflicts'
+type: module
+description: 'Provides multiple conflicting import map definitions for testing.'
+package: Testing
+core_version_requirement: ^12 || ^13

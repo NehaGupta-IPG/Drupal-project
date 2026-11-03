@@ -1,0 +1,5 @@
+name: 'Import map test'
+type: module
+description: 'Tests the import map functionality of the libraries API.'
+package: Testing
+core_version_requirement: ^12 || ^13

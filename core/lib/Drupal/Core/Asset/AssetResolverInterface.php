@@ -23,12 +23,8 @@ interface AssetResolverInterface {
    * Returns the CSS assets for the current response's libraries.
    *
    * It returns the CSS assets in order, according to the SMACSS categories
-   * specified in the assets' weights:
-   * - CSS_BASE
-   * - CSS_LAYOUT
-   * - CSS_COMPONENT
-   * - CSS_STATE
-   * - CSS_THEME
+   * specified in the assets' weights (CSS_BASE, CSS_LAYOUT, CSS_COMPONENT,
+   * CSS_STATE, CSS_THEME).
    *
    * This ensures proper cascading of styles so themes can easily override
    * module styles through CSS selectors.
@@ -103,5 +99,60 @@ interface AssetResolverInterface {
    *   An array of font assets.
    */
   public function getFontAssets(AttachedAssetsInterface $assets, ?LanguageInterface $language = NULL): array;
+
+  /**
+   * Returns the import map for the current response.
+   *
+   * The import map contains the entries of all libraries provided by core,
+   * the enabled modules and the active theme (including its base themes).
+   * It is emitted in the HTML head of the page, so that module scripts that
+   * are attached later (e.g., in an Ajax response) can also resolve their
+   * imports.
+   *
+   * When a module specifier or integrity key is defined by multiple libraries
+   * with different values, the first definition in the merge order (core,
+   * then the modules in the module list, then the themes in the theme chain)
+   * is used, and the conflict is logged as an error. Modules and themes can
+   * change that in hook_importmap_alter(), which also allows any other
+   * alteration of the aggregated import map. The hook is invoked when the
+   * cached import map is built, and the altered map is cached.
+   *
+   * @return array
+   *   The import map, with the keys 'imports', 'scopes' and 'integrity'.
+   *   Entries under 'imports' and 'scopes' are keyed by the module specifier,
+   *   and resolve to an array with the keys 'data' (the resolved path or
+   *   URL), 'external' (a boolean, TRUE for external URLs), 'version' and
+   *   'cache' (a boolean, FALSE for assets that must not be cached, mirroring
+   *   the 'cache' key of the library definition). Entries under 'integrity'
+   *   are keyed by the resolved path or URL, and resolve to an array with the
+   *   same keys plus 'integrity' (the integrity metadata string).
+   *
+   * @see hook_importmap_alter()
+   * @see \Drupal\Core\Asset\ImportMapBuilderInterface
+   */
+  public function getImportMap(): array;
+
+  /**
+   * Returns the module preloads for the current response.
+   *
+   * When a library that defines import map entries is attached to the page,
+   * the browser is instructed to preload the mapped modules, so that module
+   * scripts can start importing them as soon as they execute. The preloads
+   * are rendered as <link rel="modulepreload"> elements.
+   *
+   * The entries to preload are taken from the aggregated import map of the
+   * libraries that are attached to the response, so that an entry replaced or
+   * removed by hook_importmap_alter() is never preloaded.
+   *
+   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   *   The assets attached to the current response.
+   *
+   * @return array
+   *   An array of import map entries to preload, each with the keys 'data',
+   *   'external', 'version' and 'cache'.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
+   */
+  public function getModulePreloads(AttachedAssetsInterface $assets): array;
 
 }

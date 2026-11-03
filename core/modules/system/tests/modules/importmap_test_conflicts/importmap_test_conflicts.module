@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Provides multiple conflicting import map definitions for testing.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_importmap_alter().
+ *
+ * The 'importmap-test-multi' module specifier is defined by three libraries
+ * of this module with different values, and 'importmap-test-pair' by two of
+ * them. The conflicts passed to the hook are recorded in the
+ * 'importmap_test_conflicts.last_conflicts' state value, so that tests can
+ * verify their structure.
+ *
+ * When the 'importmap_test_conflicts.resolve' state value is set, the
+ * 'importmap-test-multi' conflict is resolved by using the first definition
+ * that the merge did not pick, and unsetting the conflict. The
+ * 'importmap-test-pair' conflict is left unresolved, so that tests can verify
+ * that conflicts are resolved per module specifier.
+ */
+function importmap_test_conflicts_importmap_alter(array &$import_map, array &$conflicts): void {
+  \Drupal::state()->set('importmap_test_conflicts.last_conflicts', $conflicts);
+  if (\Drupal::state()->get('importmap_test_conflicts.resolve')) {
+    if (isset($conflicts['imports']['importmap-test-multi'])) {
+      $used = $import_map['imports']['importmap-test-multi'];
+      foreach ($conflicts['imports']['importmap-test-multi'] as $definition) {
+        if ($definition !== $used) {
+          $import_map['imports']['importmap-test-multi'] = $definition;
+          break;
+        }
+      }
+      unset($conflicts['imports']['importmap-test-multi']);
+    }
+  }
+}

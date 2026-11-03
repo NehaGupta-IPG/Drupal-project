@@ -31,8 +31,21 @@ class LibraryDiscoveryParser {
     protected ExtensionPathResolver $extensionPathResolver,
     protected ComponentPluginManager $componentPluginManager,
     protected YamlCacheCollector $yamlCacheCollector,
+    ?LibraryImportMapProcessorInterface $importMapProcessor = NULL,
   ) {
+    if (!isset($importMapProcessor)) {
+      @trigger_error('Constructing LibraryDiscoveryParser without an import map processor is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+      $importMapProcessor = new LibraryImportMapProcessor($this->librariesDirectoryFileFinder, $this->streamWrapperManager);
+    }
+    $this->importMapProcessor = $importMapProcessor;
   }
+
+  /**
+   * The import map processor.
+   *
+   * @var \Drupal\Core\Asset\LibraryImportMapProcessorInterface
+   */
+  protected $importMapProcessor;
 
   /**
    * Parses and builds up all the libraries information of an extension.
@@ -46,7 +59,8 @@ class LibraryDiscoveryParser {
    * @throws \Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException
    *   Thrown when a library has no js/css/setting.
    * @throws \UnexpectedValueException
-   *   Thrown when a js file defines a positive weight.
+   *   Thrown when a js file defines a positive weight, or when an importmap
+   *   entry in a library definition is invalid.
    * @throws \UnknownExtensionTypeException
    *   Thrown when the extension type is unknown.
    * @throws \UnknownExtensionException
@@ -79,10 +93,10 @@ class LibraryDiscoveryParser {
     $libraries = $this->applyLibrariesOverride($libraries, $extension);
 
     foreach ($libraries as $id => &$library) {
-      if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
+      if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies']) && !isset($library['importmap'])) {
         throw new IncompleteLibraryDefinitionException(sprintf("Incomplete library definition for definition '%s' in extension '%s'", $id, $extension));
       }
-      $library += ['dependencies' => [], 'js' => [], 'css' => [], 'fonts' => []];
+      $library += ['dependencies' => [], 'js' => [], 'css' => [], 'fonts' => [], 'importmap' => []];
 
       if (isset($library['header']) && !is_bool($library['header'])) {
         throw new \LogicException(sprintf("The 'header' key in the library definition '%s' in extension '%s' is invalid: it must be a boolean.", $id, $extension));
@@ -102,6 +116,11 @@ class LibraryDiscoveryParser {
       // If this is a 3rd party library, the license info is required.
       if (isset($library['remote']) && !isset($library['license'])) {
         throw new LibraryDefinitionMissingLicenseException(sprintf("Missing license information in library definition for definition '%s' extension '%s': it has a remote, but no license.", $id, $extension));
+      }
+
+      // Validate the importmap definition, and resolve its paths.
+      if (!empty($library['importmap'])) {
+        $library['importmap'] = $this->importMapProcessor->processImportMapDefinition($library['importmap'], $id, $extension, $path, $library['version'] ?? -1);
       }
 
       // Assign Drupal's license to libraries that don't have license info.
@@ -295,6 +314,61 @@ class LibraryDiscoveryParser {
    * - header: By default, JavaScript files are included in the footer. If the
    *   script must be included in the header (along with all its dependencies),
    *   set this to true. Defaults to false.
+   * - importmap: An import map, as delivered to the browser via a
+   *   <script type="importmap"> element. It contains the keys 'imports',
+   *   'scopes' and 'integrity', mirroring the import map JSON representation
+   *   of the HTML specification. Each entry under 'imports' maps a module
+   *   specifier to a JavaScript module file. The path format is the same as
+   *   for the JavaScript files. If a module specifier key ends with a slash,
+   *   the corresponding value must also end with a slash. Each entry under
+   *   'scopes' maps a URL path prefix to an 'imports' array, which only
+   *   applies to modules imported by code under that path. The scope path is
+   *   resolved like the entry paths, so it can be relative to the
+   *   registering extension, or an absolute path or URL. Note that per the
+   *   specification, a scope only matches modules whose URL starts with the
+   *   scope, so a scope that is meant to match a directory must end with a
+   *   slash. Each entry under 'integrity'
+   *   maps a file path or URL to Subresource Integrity metadata. The import
+   *   map entries are emitted in the HTML head of every page, so that module
+   *   scripts attached later (e.g., in an Ajax response) can also resolve
+   *   their imports. When a library with import map entries is attached to a
+   *   page, its entries are preloaded with <link rel="modulepreload">
+   *   elements. All of its entries are preloaded, including entries that the
+   *   attached module scripts do not import, so a library should keep its
+   *   import map entries limited to the modules that its scripts import: the
+   *   entries of every enabled module are shipped to every page, and each
+   *   preloaded module is fetched by the browser. The value of an entry under
+   *   'imports' or a scope is either the module source, or a mapping with the
+   *   keys 'path' and 'cache'. Set 'cache' to FALSE when the same file is
+   *   attached as a JavaScript asset with 'cache: false': the query string of
+   *   a module URL is derived from its cacheability, and a browser identifies
+   *   an ES module by its URL, so the two URLs must match or the module is
+   *   instantiated twice. Libraries that consume an import map entry should
+   *   declare a normal library dependency on the library that provides the
+   *   entry. The importmap of a library may be overridden in the
+   *   libraries-override of a theme: the override uses the same structure as
+   *   the definition. The sources of the override are relative to the theme,
+   *   or may be absolute paths or URLs; FALSE removes an entry; integrity
+   *   entries may be added.
+   *   Note that the aggregated import map resolves conflicts between
+   *   extensions in favor of the first definition, so an override has no
+   *   effect when an extension that comes earlier in that order (core, then
+   *   the enabled modules sorted by machine name, then the themes in the
+   *   theme chain) defines the same module specifier with a different value.
+   *   Such a conflict is logged as an error; it can be resolved, and the log
+   *   message suppressed, by implementing hook_importmap_alter().
+   *   @code
+   *   importmap:
+   *     imports:
+   *       my-library: js/dist/my-library.js
+   *     scopes:
+   *       js/v1/:
+   *         my-library: js/dist/my-library-v1.js
+   *     integrity:
+   *       js/dist/my-library.js: sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU
+   *   @endcode
+   *   @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+   *   @see https://html.spec.whatwg.org/multipage/webappapis.html#import-map
    * - minified: If the file is already minified, set this to true to avoid
    *   minifying it again. Defaults to false.
    * - remote: If the library is a third-party script, this provides the
@@ -496,6 +570,12 @@ class LibraryDiscoveryParser {
                 // drupalSettings may not be overridden.
                 throw new InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$sub_key"));
               }
+              elseif ($sub_key === 'importmap') {
+                // The importmap has a nested structure (imports, scopes and
+                // integrity), which does not use the asset-to-asset override
+                // format of the other asset types.
+                $this->applyImportMapOverride($libraries[$library_name], $value, $theme_path, $extension, $library_name);
+              }
               elseif ($sub_key === 'css') {
                 // SMACSS category should be incorporated into the asset name.
                 foreach ($value as $category => $overrides) {
@@ -512,6 +592,118 @@ class LibraryDiscoveryParser {
     }
 
     return $libraries;
+  }
+
+  /**
+   * Applies the importmap override of a library from libraries-override.
+   *
+   * The importmap override uses the same structure as the importmap
+   * definition of the library, with the keys 'imports', 'scopes' and
+   * 'integrity'. The entries address the module specifiers, scopes and URLs
+   * as declared by the library. A string value replaces the source of an
+   * import or scope entry, or the integrity metadata of an integrity entry;
+   * sources are resolved relative to the theme, or may be absolute paths or
+   * URLs. FALSE removes the entry. Entries that do not exist in the library
+   * definition are ignored, like for other asset overrides, except that
+   * integrity entries may be added, so that a theme can provide integrity
+   * metadata for a replacement source.
+   *
+   * The importmap definition is still raw at this point: the sources are
+   * validated and resolved by processImportMapDefinition() after all
+   * overrides have been applied.
+   *
+   * @param array $library
+   *   The library definition, by reference.
+   * @param array $override
+   *   The importmap override, as specified in libraries-override.
+   * @param string $theme_path
+   *   The path of the theme providing the override.
+   * @param string $extension
+   *   The name of the extension providing the library.
+   * @param string $library_name
+   *   The name of the library.
+   */
+  protected function applyImportMapOverride(array &$library, array $override, string $theme_path, string $extension, string $library_name): void {
+    foreach (array_keys($override) as $section) {
+      if (!in_array($section, ['imports', 'scopes', 'integrity'], TRUE)) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("Unknown key '%s' in the importmap override of the library %s/%s. Only the keys 'imports', 'scopes' and 'integrity' are allowed.", $section, $extension, $library_name));
+      }
+    }
+    $importmap = $library['importmap'] ?? [];
+    if (isset($override['imports'])) {
+      if (!is_array($override['imports'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'imports' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['imports'] as $specifier => $source) {
+        $specifier = (string) $specifier;
+        if (!isset($importmap['imports'][$specifier])) {
+          continue;
+        }
+        if ($source === FALSE) {
+          unset($importmap['imports'][$specifier]);
+        }
+        elseif (is_string($source)) {
+          $importmap['imports'][$specifier] = $this->resolveThemeAssetPath($theme_path, $source);
+        }
+        else {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The source of the module specifier '%s' in the importmap override of the library %s/%s must be a string, or FALSE to remove the entry.", $specifier, $extension, $library_name));
+        }
+      }
+    }
+    if (isset($override['scopes'])) {
+      if (!is_array($override['scopes'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'scopes' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['scopes'] as $scope => $entries) {
+        $scope = (string) $scope;
+        if (!is_array($entries)) {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The entries of the scope '%s' in the importmap override of the library %s/%s must be an array.", $scope, $extension, $library_name));
+        }
+        if (!isset($importmap['scopes'][$scope])) {
+          continue;
+        }
+        foreach ($entries as $specifier => $source) {
+          $specifier = (string) $specifier;
+          if (!isset($importmap['scopes'][$scope][$specifier])) {
+            continue;
+          }
+          if ($source === FALSE) {
+            unset($importmap['scopes'][$scope][$specifier]);
+          }
+          elseif (is_string($source)) {
+            $importmap['scopes'][$scope][$specifier] = $this->resolveThemeAssetPath($theme_path, $source);
+          }
+          else {
+            throw new InvalidLibrariesOverrideSpecificationException(sprintf("The source of the module specifier '%s' in scope '%s' of the importmap override of the library %s/%s must be a string, or FALSE to remove the entry.", $specifier, $scope, $extension, $library_name));
+          }
+        }
+      }
+    }
+    if (isset($override['integrity'])) {
+      if (!is_array($override['integrity'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'integrity' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['integrity'] as $url => $integrity) {
+        $url = (string) $url;
+        if ($integrity === FALSE) {
+          unset($importmap['integrity'][$url]);
+        }
+        elseif (is_string($integrity) && $integrity !== '') {
+          // Integrity entries may be added, even when the library does not
+          // define one for the URL yet.
+          $importmap['integrity'][$url] = $integrity;
+        }
+        else {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The integrity metadata for '%s' in the importmap override of the library %s/%s must be a non-empty string, or FALSE to remove the entry.", $url, $extension, $library_name));
+        }
+      }
+    }
+    if ($importmap) {
+      $library['importmap'] = $importmap;
+    }
+    else {
+      unset($library['importmap']);
+    }
   }
 
   /**

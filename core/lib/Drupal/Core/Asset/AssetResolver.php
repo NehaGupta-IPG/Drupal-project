@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * The default asset resolver.
@@ -67,6 +68,20 @@ class AssetResolver implements AssetResolverInterface {
   protected $themeHandler;
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
+   * The import map builder.
+   *
+   * @var \Drupal\Core\Asset\ImportMapBuilderInterface
+   */
+  protected $importMapBuilder;
+
+  /**
    * Constructs a new AssetResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -83,8 +98,14 @@ class AssetResolver implements AssetResolverInterface {
    *   The cache backend.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   The logger. Omitted for backwards compatibility; the 'asset' logger
+   *   channel is used as a fallback.
+   * @param \Drupal\Core\Asset\ImportMapBuilderInterface|null $import_map_builder
+   *   The import map builder. Omitted for backwards compatibility; the
+   *   'asset.import_map_builder' service is used as a fallback.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler) {
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?LoggerInterface $logger = NULL, ?ImportMapBuilderInterface $import_map_builder = NULL) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -92,6 +113,20 @@ class AssetResolver implements AssetResolverInterface {
     $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->themeHandler = $theme_handler;
+    if (!isset($logger)) {
+      $this->logger = \Drupal::logger('asset');
+      @trigger_error('Constructing AssetResolver without a logger is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    else {
+      $this->logger = $logger;
+    }
+    if (!isset($import_map_builder)) {
+      $this->importMapBuilder = \Drupal::service('asset.import_map_builder');
+      @trigger_error('Constructing AssetResolver without an import map builder is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    else {
+      $this->importMapBuilder = $import_map_builder;
+    }
   }
 
   /**
@@ -209,6 +244,75 @@ class AssetResolver implements AssetResolverInterface {
     $this->cache->set($cid, $fonts, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
     return $fonts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getImportMap(): array {
+    return $this->importMapBuilder->getImportMap();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getModulePreloads(AttachedAssetsInterface $assets): array {
+    if (!$assets->getLibraries()) {
+      return [];
+    }
+    // Get the complete list of libraries to load, including dependencies.
+    $libraries_to_load = $this->getLibrariesToLoad($assets);
+
+    if (!$libraries_to_load) {
+      return [];
+    }
+    // The preloads are derived from the aggregated import map rather than from
+    // the library definitions, so that the map the browser receives is
+    // authoritative: an entry that hook_importmap_alter() replaced or removed,
+    // or that a conflict dropped in favour of another library's definition,
+    // must not be preloaded. The aggregated map is cached by
+    // \Drupal\Core\Asset\ImportMapBuilderInterface, and what is left here is a
+    // lookup in that map, so the result is not cached separately.
+    $import_map = $this->importMapBuilder->getImportMap();
+    $provenance = $this->importMapBuilder->getProvenance();
+    $loaded = array_flip($libraries_to_load);
+    $preloads = [];
+    foreach ($provenance['imports'] as $specifier => $library) {
+      if (isset($loaded[$library])) {
+        $this->addModulePreload($preloads, $import_map['imports'][$specifier] ?? NULL);
+      }
+    }
+    foreach ($provenance['scopes'] as $scope => $entries) {
+      foreach ($entries as $specifier => $library) {
+        if (isset($loaded[$library])) {
+          $this->addModulePreload($preloads, $import_map['scopes'][$scope][$specifier] ?? NULL);
+        }
+      }
+    }
+
+    return array_values($preloads);
+  }
+
+  /**
+   * Adds an import map entry to the list of modules to preload.
+   *
+   * @param array $preloads
+   *   The entries to preload, by reference, keyed by the module path or URL so
+   *   that a module mapped by more than one specifier is preloaded once.
+   * @param array|null $entry
+   *   The import map entry to preload, or NULL when there is no entry, for
+   *   example because hook_importmap_alter() removed it.
+   */
+  protected function addModulePreload(array &$preloads, ?array $entry): void {
+    if ($entry === NULL) {
+      return;
+    }
+    // Module specifier mappings with a trailing slash map a class of modules to
+    // a class of URLs, and there is no single module to preload.
+    if (str_ends_with($entry['data'], '/')) {
+      return;
+    }
+    $preloads[$entry['data']] = $entry;
   }
 
   /**

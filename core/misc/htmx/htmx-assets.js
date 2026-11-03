@@ -41,6 +41,37 @@
     const assets = doc.querySelectorAll(
       'link[rel="stylesheet"][href], script[src]',
     );
+
+    // 3. Move module preloads to the document head.
+    //
+    // Module preloads instruct the browser to fetch modules, so that module
+    // scripts added by the response can start importing them as soon as
+    // possible. They are not loaded with loadjs, but added to the head
+    // directly. The import map that resolves their bare module specifiers was
+    // already sent with the main HTML document. A page only supports a single
+    // import map; module preloads may be added to a page multiple times.
+    //
+    // The preloads are added before the assets are loaded, so the browser can
+    // start fetching the modules while the module scripts are still loading.
+    // The hrefs already in the document, collected once so that the check
+    // below is not quadratic in the number of preloads.
+    const preloaded = new Set(
+      Array.from(
+        document.head.querySelectorAll('link[rel="modulepreload"]'),
+        (link) => link.getAttribute('href'),
+      ),
+    );
+    doc.querySelectorAll('link[rel="modulepreload"][href]').forEach((el) => {
+      const href = el.getAttribute('href');
+      // Do not add the same module preload twice.
+      if (preloaded.has(href)) {
+        el.remove();
+        return;
+      }
+      preloaded.add(href);
+      document.head.appendChild(el);
+    });
+
     if (assets.length) {
       const assetData = Array.from(assets).map(({ attributes }) => {
         const attrs = {};
@@ -54,7 +85,7 @@
       await Drupal.htmx.addAssets(assetData);
     }
 
-    // 3. Return cleaned HTML.
+    // 4. Return cleaned HTML.
     return doc.documentElement.outerHTML;
   }
 

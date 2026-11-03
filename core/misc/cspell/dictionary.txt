@@ -209,6 +209,8 @@ idekey
 iframeupload
 imageavif
 imagecache
+importmap
+importmaps
 inglés
 inited
 inno
@@ -268,6 +270,7 @@ mocktail
 mocktails
 moderatable
 modernizr
+modulepreload
 mojito
 msgctxt
 multibuys
@@ -426,6 +429,7 @@ subproperties
 subrequest
 subrequest's
 subrequests
+subresource
 subresults
 subselect
 substrategies

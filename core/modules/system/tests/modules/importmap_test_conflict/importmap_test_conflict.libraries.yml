@@ -1,0 +1,6 @@
+conflict:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-foo: js/conflict-foo.js
+      importmap-test-duplicate: js/duplicate.js

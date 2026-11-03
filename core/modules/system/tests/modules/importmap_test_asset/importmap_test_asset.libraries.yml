@@ -1,0 +1,40 @@
+# Each library declares a file both as a JavaScript asset and as an import map
+# entry, so the same module is reachable as an attached asset and through a bare
+# specifier. Browsers identify an ES module by its resolved URL, so both must
+# resolve to exactly the same URL.
+#
+# The files are declared with 'attributes: { type: module }'. That also keeps
+# them out of JavaScript aggregation, because files with attributes are never
+# preprocessed: an aggregated file would have a different URL than the mapped
+# module.
+#
+# @see \Drupal\Tests\KernelTests\Core\Asset\ImportMapUrlParityTest
+
+cached:
+  version: '1.0'
+  js:
+    js/cached.js: { attributes: { type: module } }
+  importmap:
+    imports:
+      importmap-test-asset: js/cached.js
+
+not-cached:
+  version: '1.0'
+  js:
+    js/not-cached.js: { cache: false, attributes: { type: module } }
+  importmap:
+    imports:
+      importmap-test-not-cached: { path: js/not-cached.js, cache: false }
+
+# The 'cache: false' of the JavaScript file is deliberately not repeated on the
+# import map entry, to pin down the consequence of that mistake: the two URLs
+# differ, and the browser fetches and instantiates the module twice.
+#
+# @see \Drupal\Tests\KernelTests\Core\Asset\ImportMapUrlParityTest::testCacheOptionIsNotInherited()
+not-mirrored:
+  version: '1.0'
+  js:
+    js/not-mirrored.js: { cache: false, attributes: { type: module } }
+  importmap:
+    imports:
+      importmap-test-not-mirrored: js/not-mirrored.js

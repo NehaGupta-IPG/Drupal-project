@@ -1,0 +1,19 @@
+conflict-a:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-multi: js/multi-a.js
+      importmap-test-pair: js/pair-a.js
+
+conflict-b:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-multi: js/multi-b.js
+      importmap-test-pair: js/pair-b.js
+
+conflict-c:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-multi: js/multi-c.js

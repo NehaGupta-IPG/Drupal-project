@@ -1,0 +1,6 @@
+importmap:
+  importmap:
+    imports:
+      importmap-test-foo: js/foo.js
+    bogus:
+      importmap-test-foo: js/foo.js

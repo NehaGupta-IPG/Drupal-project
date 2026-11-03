@@ -65,6 +65,7 @@ class HtmxRenderer implements MainContentRendererInterface {
 <head>
 <meta name="robots" content="noindex">
 <title>{{ title }}</title>
+<modulepreload-placeholder token="{{ placeholder_token }}">
 <css-placeholder token="{{ placeholder_token }}">
 <js-placeholder token="{{ placeholder_token }}">
 <js-bottom-placeholder token="{{ placeholder_token }}">
@@ -84,6 +85,7 @@ HTMX_RESPONSE,
     // Create placeholder strings for these keys.
     // @see \Drupal\Core\Render\HtmlResponseSubscriber
     $types = [
+      'modulepreload' => 'modulepreload',
       'styles' => 'css',
       'scripts' => 'js',
       'scripts_bottom' => 'js-bottom',

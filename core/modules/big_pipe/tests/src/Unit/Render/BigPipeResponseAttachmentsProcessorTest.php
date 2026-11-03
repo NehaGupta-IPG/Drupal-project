@@ -165,7 +165,9 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
       $this->prophesize(RendererInterface::class)->reveal(),
       $this->prophesize(ModuleHandlerInterface::class)->reveal(),
       $this->prophesize(LanguageManagerInterface::class)->reveal(),
-      $this->prophesize(FileUrlGeneratorInterface::class)->reveal()
+      $this->prophesize(FileUrlGeneratorInterface::class)->reveal(),
+      $this->prophesize(AssetCollectionRendererInterface::class)->reveal(),
+      $this->prophesize(AssetCollectionRendererInterface::class)->reveal()
     );
   }
 

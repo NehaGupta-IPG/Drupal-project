@@ -8,16 +8,20 @@ use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\AssetResolver;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Asset\ImportMapBuilder;
 use Drupal\Core\Asset\JsCollectionGrouper;
 use Drupal\Core\Asset\LibraryDependencyResolver;
 use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Theme\ActiveTheme;
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -79,6 +83,13 @@ class AssetResolverTest extends UnitTestCase {
   protected ThemeHandlerInterface&Stub $themeHandler;
 
   /**
+   * The logger.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface&\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $logger;
+
+  /**
    * A English language object.
    */
   protected LanguageInterface&Stub $english;
@@ -91,6 +102,29 @@ class AssetResolverTest extends UnitTestCase {
    * An array of library definitions.
    */
   protected array $libraries = [];
+
+  /**
+   * The library definitions, keyed by extension.
+   *
+   * @var array<string, array<string, array>>
+   */
+  protected array $extensionLibraries = [];
+
+  /**
+   * The enabled module names.
+   *
+   * @var string[]
+   */
+  /**
+   * The machine names of the enabled modules.
+   *
+   * The import map is aggregated from the libraries of core, the enabled
+   * modules and the active theme, so the modules whose libraries the tests use
+   * have to be enabled.
+   *
+   * @var string[]
+   */
+  protected array $modules = ['llama', 'piggy'];
 
   /**
    * {@inheritdoc}
@@ -177,13 +211,87 @@ class AssetResolverTest extends UnitTestCase {
           'core/ckeditor5',
         ],
       ],
+      'llama/llama-library' => [
+        'version' => '2.0',
+        'css' => [],
+        'js' => [],
+        'importmap' => [
+          'imports' => [
+            'llama' => [
+              'data' => 'modules/llama/llama.mjs',
+              'external' => FALSE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
+            'llama-prefix/' => [
+              'data' => 'modules/llama/',
+              'external' => FALSE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
+            'llama-ext' => [
+              'data' => 'https://example.com/llama.mjs',
+              'external' => TRUE,
+              'version' => '2.0',
+              'cache' => TRUE,
+            ],
+          ],
+          'scopes' => [
+            '/modules/llama/v1' => [
+              'llama' => [
+                'data' => 'modules/llama/v1/llama.mjs',
+                'external' => FALSE,
+                'version' => '1.0',
+                'cache' => TRUE,
+              ],
+            ],
+          ],
+          'integrity' => [
+            'modules/llama/llama.mjs' => [
+              'data' => 'modules/llama/llama.mjs',
+              'external' => FALSE,
+              'version' => '2.0',
+              'cache' => TRUE,
+              'integrity' => 'sha384-llama',
+            ],
+          ],
+        ],
+        'license' => '',
+      ],
+      'piggy/consumer' => [
+        'version' => '1.0',
+        'css' => [],
+        'js' => [],
+        'importmap' => [],
+        'license' => '',
+        'dependencies' => [
+          'llama/llama-library',
+        ],
+      ],
     ];
+    // Group the library definitions by extension, so that the two lookups of
+    // the library discovery stubs stay consistent: the import map is aggregated
+    // per extension, while the asset resolvers look up a single library.
+    foreach ($this->libraries as $library_id => $definition) {
+      [$extension, $name] = explode('/', $library_id, 2);
+      $this->extensionLibraries[$extension][$name] = $definition;
+    }
+
     $this->libraryDependencyResolver = new LibraryDependencyResolver($this->libraryDiscovery);
+    $this->libraryDiscovery
+      ->method('getLibrariesByExtension')
+      ->willReturnCallback(function (string $extension) {
+        return $this->extensionLibraries[$extension] ?? [];
+      });
     $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->moduleHandler
+      ->method('getModuleList')
+      ->willReturnCallback(fn() => array_combine($this->modules, array_fill(0, count($this->modules), NULL)));
+    $active_theme = new Extension($this->root, 'theme', 'core/themes/stark/stark.info.yml');
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->themeManager
       ->method('getActiveTheme')
-      ->willReturn($this->createStub(ActiveTheme::class));
+      ->willReturn(new ActiveTheme(['name' => $active_theme->getName()]));
 
     $english = $this->createStub('\Drupal\Core\Language\LanguageInterface');
     $english
@@ -202,8 +310,38 @@ class AssetResolverTest extends UnitTestCase {
     $this->cache = new TestMemoryBackend(new Time());
 
     $this->themeHandler = $this->createStub(ThemeHandlerInterface::class);
+    $this->themeHandler
+      ->method('getTheme')
+      ->willReturn(new Extension($this->root, 'theme', 'core/themes/stark/stark.info.yml'));
 
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler);
+    $this->logger = $this->createStub(LoggerChannelInterface::class);
+
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger, $this->createImportMapBuilder());
+  }
+
+  /**
+   * Re-creates the asset resolver with a mock logger.
+   *
+   * Used by tests that assert on the log messages of the asset resolver.
+   */
+  protected function createAssetResolverWithLogger(): void {
+    $this->logger = $this->createMock(LoggerChannelInterface::class);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger, $this->createImportMapBuilder());
+  }
+
+  /**
+   * Returns an import map builder using the same stubs as the resolver.
+   *
+   * The resolver delegates the aggregation of the import map to the builder, so
+   * the tests for the module preloads exercise the real collaboration instead of
+   * a mocked builder that would only assert the mock's configuration.
+   *
+   * @return \Drupal\Core\Asset\ImportMapBuilder
+   *   The import map builder.
+   */
+  protected function createImportMapBuilder(): ImportMapBuilder {
+    $state = $this->createStub(StateInterface::class);
+    return new ImportMapBuilder($this->libraryDiscovery, $this->moduleHandler, $this->themeManager, $state, $this->cache, $this->logger);
   }
 
   /**
@@ -221,6 +359,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_css_cache_item_count, $this->cache->getAllCids());
   }
 
+  /**
+   * Returns the data for testing the CSS assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected number of cache items.
+   */
   public static function providerAttachedCssAssets(): array {
     return [
       'one js only library and one css only library' => [
@@ -255,6 +400,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_multilingual_js_cache_item_count, $this->cache->getAllCids());
   }
 
+  /**
+   * Returns the data for testing the JavaScript assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected number of cache items.
+   */
   public static function providerAttachedJsAssets(): array {
     $time = time();
     return [
@@ -283,6 +435,13 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertSame($expected, $fonts);
   }
 
+  /**
+   * Returns the data for testing the font assets.
+   *
+   * @return array
+   *   - The attached assets.
+   *   - The expected font assets.
+   */
   public static function providerAttachedFontAssets(): array {
     return [
       [
@@ -327,6 +486,48 @@ class AssetResolverTest extends UnitTestCase {
     }
   }
 
+  /**
+   * Tests get module preloads.
+   */
+  #[DataProvider('providerGetModulePreloads')]
+  public function testGetModulePreloads(array $attached, array $expected): void {
+    $assets = (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries($attached);
+    $this->assertSame($expected, $this->assetResolver->getModulePreloads($assets));
+  }
+
+  /**
+   * Returns the data for testing the module preloads.
+   *
+   * @return array
+   *   - The attached libraries.
+   *   - The expected module preloads.
+   */
+  public static function providerGetModulePreloads(): array {
+    return [
+      'no libraries attached' => [[], []],
+      'library without import map' => [
+        ['piggy/css'],
+        [],
+      ],
+      'library with import map' => [
+        ['llama/llama-library'],
+        [
+          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0', 'cache' => TRUE],
+        ],
+      ],
+      'import map pulled in as a dependency' => [
+        ['piggy/consumer'],
+        [
+          ['data' => 'modules/llama/llama.mjs', 'external' => FALSE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'https://example.com/llama.mjs', 'external' => TRUE, 'version' => '2.0', 'cache' => TRUE],
+          ['data' => 'modules/llama/v1/llama.mjs', 'external' => FALSE, 'version' => '1.0', 'cache' => TRUE],
+        ],
+      ],
+    ];
+  }
+
 }
 
 if (!defined('CSS_AGGREGATE_DEFAULT')) {
@@ -342,6 +543,9 @@ if (!defined('JS_DEFAULT')) {
  */
 class TestMemoryBackend extends MemoryBackend {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getAllCids(): array {
     return array_keys($this->cache);
   }

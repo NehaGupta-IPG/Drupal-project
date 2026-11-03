@@ -38,9 +38,13 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
     ModuleHandlerInterface $module_handler,
     LanguageManagerInterface $language_manager,
     FileUrlGeneratorInterface $file_url_generator,
+    #[Autowire(service: 'asset.importmap.renderer')]
+    AssetCollectionRendererInterface|null $import_map_renderer = NULL,
+    #[Autowire(service: 'asset.modulepreload.renderer')]
+    AssetCollectionRendererInterface|null $module_preload_renderer = NULL,
   ) {
 
-    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager, $file_url_generator);
+    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager, $file_url_generator, $import_map_renderer, $module_preload_renderer);
   }
 
   /**

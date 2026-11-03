@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Provides a conflicting import map definition for testing.
+ */
+
+declare(strict_types=1);
