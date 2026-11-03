@@ -68,7 +68,7 @@ class LayoutSectionItem extends FieldItemBase {
       'columns' => [
         'section' => [
           'type' => 'blob',
-          'size' => 'normal',
+          'size' => 'big',
           'serialize' => TRUE,
         ],
       ],
