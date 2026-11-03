@@ -62,6 +62,9 @@ class LanguageTest extends KernelTestBase {
     ])->save();
 
     $this->installConfig(['system', 'language']);
+    // Disable the default URL-based language negotiation so the interface
+    // language always matches the default language.
+    $this->config('language.types')->set('negotiation.language_interface.enabled', [])->save();
   }
 
   /**

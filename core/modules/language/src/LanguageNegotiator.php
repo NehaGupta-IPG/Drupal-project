@@ -19,13 +19,6 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   use LoggerChannelTrait;
 
   /**
-   * The current active user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
    * Local cache for language negotiation method instances.
    *
    * @var array
@@ -47,6 +40,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     protected ConfigFactoryInterface $configFactory,
     protected Settings $settings,
     protected RequestStack $requestStack,
+    protected AccountInterface $currentUser,
   ) {}
 
   /**
@@ -82,30 +76,28 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
   public function initializeType($type) {
     $language = NULL;
 
-    if ($this->currentUser) {
-      // Execute the language negotiation methods in the order they were set up
-      // and return the first valid language found.
-      foreach ($this->getEnabledNegotiators($type) as $method_id => $info) {
-        if (!isset($this->negotiatedLanguages[$method_id])) {
-          try {
-            $this->negotiatedLanguages[$method_id] = $this->negotiateLanguage($type, $method_id);
-          }
-          catch (PluginNotFoundException $e) {
-            // If a plugin is not found, log the error so user can handle it.
-            $this->getLogger('language')->error($e->getMessage());
-          }
+    // Execute the language negotiation methods in the order they were set up
+    // and return the first valid language found.
+    foreach ($this->getEnabledNegotiators($type) as $method_id => $info) {
+      if (!isset($this->negotiatedLanguages[$method_id])) {
+        try {
+          $this->negotiatedLanguages[$method_id] = $this->negotiateLanguage($type, $method_id);
         }
-
-        // Since objects are references, we need to return a clone to prevent
-        // the language negotiation method cache from being unintentionally
-        // altered. The same methods might be used with different language types
-        // based on configuration.
-        $language = !empty($this->negotiatedLanguages[$method_id]) ? clone($this->negotiatedLanguages[$method_id]) : NULL;
-
-        if ($language) {
-          $this->getNegotiationMethodInstance($method_id)->persist($language);
-          break;
+        catch (PluginNotFoundException $e) {
+          // If a plugin is not found, log the error so user can handle it.
+          $this->getLogger('language')->error($e->getMessage());
         }
+      }
+
+      // Since objects are references, we need to return a clone to prevent
+      // the language negotiation method cache from being unintentionally
+      // altered. The same methods might be used with different language types
+      // based on configuration.
+      $language = !empty($this->negotiatedLanguages[$method_id]) ? clone($this->negotiatedLanguages[$method_id]) : NULL;
+
+      if ($language) {
+        $this->getNegotiationMethodInstance($method_id)->persist($language);
+        break;
       }
     }
 

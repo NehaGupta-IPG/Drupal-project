@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\PathProcessor;
 
+use Drupal\Component\DependencyInjection\Container;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\PathProcessorDecode;
@@ -19,6 +20,7 @@ use Drupal\path_alias\AliasManager;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -112,7 +114,7 @@ class PathProcessorTest extends UnitTestCase {
       ->method('getNegotiationMethods')
       ->willReturn([
         LanguageNegotiationUrl::METHOD_ID => [
-          'class' => 'Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl',
+          'class' => LanguageNegotiationUrl::class,
           'weight' => 9,
         ],
       ]);
@@ -123,9 +125,6 @@ class PathProcessorTest extends UnitTestCase {
       ->method('getNegotiationMethodInstance')
       ->willReturn($method);
 
-    // Create a user stub.
-    $current_user = $this->createStub(AccountInterface::class);
-
     // Create a config event subscriber stub.
     $config_subscriber = $this->createStub(ConfigSubscriber::class);
 
@@ -133,7 +132,7 @@ class PathProcessorTest extends UnitTestCase {
     $alias_processor = new AliasPathProcessor($alias_manager);
     $decode_processor = new PathProcessorDecode();
     $front_processor = new PathProcessorFront($config_factory_stub);
-    $language_processor = new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $current_user, $config_subscriber);
+    $language_processor = new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $config_subscriber);
 
     // First, test the processor manager with the processors in the incorrect
     // order. The alias processor will run before the language processor,
@@ -177,6 +176,24 @@ class PathProcessorTest extends UnitTestCase {
     $request = Request::create($test_path);
     $processed = $processor_manager->processInbound($test_path, $request);
     $this->assertEquals('/user/1', $processed, 'Processing in the correct order resolves the system path from an alias.');
+  }
+
+  /**
+   * Tests the constructor deprecation for PathProcessorLanguage.
+   */
+  #[IgnoreDeprecations]
+  public function testLanguageLegacy(): void {
+    $config_factory_stub = $this->getConfigFactoryStub();
+    $negotiator = $this->createStub(LanguageNegotiatorInterface::class);
+    $current_user = $this->createStub(AccountInterface::class);
+    $config_subscriber = $this->createStub(ConfigSubscriber::class);
+
+    $container = new Container();
+    $container->set('language.config_subscriber', $config_subscriber);
+    \Drupal::setContainer($container);
+
+    new PathProcessorLanguage($config_factory_stub, $this->languageManager, $negotiator, $current_user);
+    $this->expectUserDeprecationMessage('Calling ' . PathProcessorLanguage::class . ' constructor with the $current_user argument is deprecated in drupal:12.1.0 and it will be removed in drupal:14.0.0. See https://www.drupal.org/node/3544400');
   }
 
 }
