@@ -25,7 +25,7 @@
         // Click the hidden checkbox when the trigger is clicked.
         const $input = $(event.currentTarget)
           .closest('.js-click-to-select')
-          .find('.js-click-to-select-checkbox input');
+          .find('.js-click-to-select-checkbox input:not(:disabled)');
         $input.prop('checked', !$input.prop('checked')).trigger('change');
       });
 
