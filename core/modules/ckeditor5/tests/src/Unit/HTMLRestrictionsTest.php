@@ -940,11 +940,11 @@ class HTMLRestrictionsTest extends UnitTestCase {
     foreach (['diff', 'intersection', 'union'] as $op) {
       $parameter = "expected_$op";
       // Ensure that the operation expectation is 'a' or 'b' whenever possible.
-      if ($a == $$parameter) {
+      if ($a === $$parameter) {
         throw new \LogicException("List 'a' as the expected $op rather than specifying it in full, to keep the tests legible.");
       }
       else {
-        if ($b == $$parameter) {
+        if ($b === $$parameter) {
           throw new \LogicException("List 'b' as the expected $op rather than specifying it in full, to keep the tests legible.");
         }
       }
@@ -1237,15 +1237,15 @@ class HTMLRestrictionsTest extends UnitTestCase {
     yield 'wildcard + matching tag: attribute intersection — without possible resolving' => [
       'a' => new HTMLRestrictions(['p' => ['class' => TRUE]]),
       'b' => new HTMLRestrictions(['$text-container' => ['class' => TRUE]]),
-      'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_diff' => HTMLRestrictions::emptySet(),
+      'expected_intersection' => 'a',
       'expected_union' => new HTMLRestrictions(['p' => ['class' => TRUE], '$text-container' => ['class' => TRUE]]),
     ];
     yield 'wildcard + matching tag: attribute intersection — without possible resolving — vice versa' => [
       'a' => new HTMLRestrictions(['$text-container' => ['class' => TRUE]]),
       'b' => new HTMLRestrictions(['p' => ['class' => TRUE]]),
       'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_intersection' => 'b',
       'expected_union' => new HTMLRestrictions(['p' => ['class' => TRUE], '$text-container' => ['class' => TRUE]]),
     ];
     yield 'wildcard + matching tag: attribute intersection — WITH possible resolving' => [
@@ -1265,8 +1265,14 @@ class HTMLRestrictionsTest extends UnitTestCase {
     yield 'wildcard + matching tag: attribute value intersection — without possible resolving' => [
       'a' => new HTMLRestrictions(['p' => ['class' => ['text-align-center' => TRUE, 'text-align-justify' => TRUE]]]),
       'b' => new HTMLRestrictions(['$text-container' => ['class' => ['text-align-center' => TRUE]]]),
-      'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_diff' => new HTMLRestrictions(['p' => ['class' => ['text-align-justify' => TRUE]]]),
+      'expected_intersection' => new HTMLRestrictions([
+        'p' => [
+          'class' => [
+            'text-align-center' => TRUE,
+          ],
+        ],
+      ]),
       'expected_union' => new HTMLRestrictions([
         'p' => [
           'class' => [
@@ -1281,7 +1287,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       'a' => new HTMLRestrictions(['$text-container' => ['class' => ['text-align-center' => TRUE]]]),
       'b' => new HTMLRestrictions(['p' => ['class' => ['text-align-center' => TRUE, 'text-align-justify' => TRUE]]]),
       'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_intersection' => new HTMLRestrictions(['p' => ['class' => ['text-align-center' => TRUE]]]),
       'expected_union' => new HTMLRestrictions([
         'p' => [
           'class' => [
@@ -1340,7 +1346,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       'a' => new HTMLRestrictions(['p' => TRUE]),
       'b' => new HTMLRestrictions(['$text-container' => ['class' => ['foo' => TRUE, 'bar' => TRUE]]]),
       'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_intersection' => new HTMLRestrictions(['p' => ['class' => ['foo' => TRUE, 'bar' => TRUE]]]),
       'expected_union' => new HTMLRestrictions([
         'p' => TRUE,
         '$text-container' => ['class' => ['foo' => TRUE, 'bar' => TRUE]],
@@ -1350,7 +1356,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       'a' => new HTMLRestrictions(['$text-container' => ['class' => ['foo' => TRUE, 'bar' => TRUE]]]),
       'b' => new HTMLRestrictions(['p' => TRUE]),
       'expected_diff' => 'a',
-      'expected_intersection' => HTMLRestrictions::emptySet(),
+      'expected_intersection' => new HTMLRestrictions(['p' => ['class' => ['foo' => TRUE, 'bar' => TRUE]]]),
       'expected_union' => new HTMLRestrictions([
         'p' => TRUE,
         '$text-container' => ['class' => ['foo' => TRUE, 'bar' => TRUE]],
