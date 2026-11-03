@@ -8,11 +8,15 @@ use Drupal\autowire_test\TestInjection;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
 use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
+use Drupal\Core\Command\DrupalConsoleLogger;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
+use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
@@ -24,6 +28,7 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
+#[CoversClass(DrupalConsoleLogger::class)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 
@@ -115,6 +120,37 @@ class ConsoleTest extends KernelTestBase {
     $code = $tester->run(['command' => 'example:sub:command'], ['capture_stderr_separately' => TRUE]);
     $this->assertEquals(Command::SUCCESS, $code, $tester->getErrorOutput());
     $this->assertStringContainsString('[OK] Done', $tester->getDisplay());
+  }
+
+  /**
+   * Tests the console logger with a \Stringable message.
+   *
+   * PSR-3 allows \Stringable messages, and TranslatableMarkup is one. This
+   * must not trigger a deprecation, nor fatal, as passing a plain string
+   * would not.
+   */
+  public function testConsoleLoggerStringableMessage(): void {
+    $this->assertInstanceOf(DrupalConsoleLogger::class, $this->container->get('logger.console'));
+    \Drupal::logger('test')->warning(new TranslatableMarkup('Value %v is invalid.'), ['%v' => 'x']);
+  }
+
+  /**
+   * Tests the console logger with a message that is not a string or \Stringable.
+   *
+   * PSR-3's LoggerInterface (and the convenience methods on AbstractLogger,
+   * such as warning()) type $message as string|\Stringable, so a value that
+   * is neither can only reach DrupalConsoleLogger::log() by calling it
+   * directly: its override widens the parameter to accept any value, for
+   * backwards compatibility with callers that do not comply with the
+   * modern PSR-3 contract.
+   */
+  #[IgnoreDeprecations]
+  public function testConsoleLoggerNonStringableMessageIsDeprecated(): void {
+    /** @var \Drupal\Core\Command\DrupalConsoleLogger $logger */
+    $logger = $this->container->get('logger.console');
+    $this->assertInstanceOf(DrupalConsoleLogger::class, $logger);
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Command\DrupalConsoleLogger::log() with a $message that is not a string or \Stringable is deprecated in drupal:12.1.0 and is required from drupal:13.0.0. See https://www.drupal.org/node/3616478');
+    $logger->log(RfcLogLevel::WARNING, ['not a string or Stringable']);
   }
 
 }
