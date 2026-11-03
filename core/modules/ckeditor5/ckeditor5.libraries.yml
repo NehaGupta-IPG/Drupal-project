@@ -117,6 +117,12 @@ internal.drupal.ckeditor5.table:
   dependencies:
     - core/ckeditor5
 
+internal.drupal.ckeditor5.tableColumnResize:
+  js:
+    js/build/tableColResize.js: { minified: true }
+  dependencies:
+    - ckeditor5/internal.drupal.ckeditor5.table
+
 internal.admin:
   js:
     js/ckeditor5.admin.js: { }

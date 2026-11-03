@@ -553,6 +553,27 @@ ckeditor5_table_cell_properties:
       - <th style>
       - <th rowspan colspan style>
 
+ckeditor5_tableColumnResize:
+  ckeditor5:
+    plugins:
+      - table.TableColumnResize
+      - tableColResize.TableColResize
+    config:
+      tableColResize:
+        dataAttribute: data-resize-width
+  drupal:
+    label: Table Column Resize
+    library: ckeditor5/internal.drupal.ckeditor5.tableColumnResize
+    conditions:
+      filter: filter_resize_tablecolumns
+      plugins:
+        - ckeditor5_table
+    elements:
+      - <table data-resize-width>
+      - <colgroup>
+      - <col>
+      - <col data-resize-width>
+
 ckeditor5_image:
   ckeditor5:
     plugins:
