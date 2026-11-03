@@ -34,7 +34,7 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
   default_widget: "file_generic",
   default_formatter: "file_default",
   list_class: FileFieldItemList::class,
-  constraints: ["ReferenceAccess" => [], "FileValidation" => []],
+  constraints: ["ReferenceAccess" => [], "FileValidation" => [], "FileDescriptionRequired" => []],
   column_groups: [
     'target_id' => [
       'label' => new TranslatableMarkup('File'),
@@ -74,7 +74,8 @@ class FileItem extends EntityReferenceItem {
       'file_extensions' => 'txt',
       'file_directory' => '[date:custom:Y]-[date:custom:m]',
       'max_filesize' => '',
-      'description_field' => 0,
+      'description_field' => FALSE,
+      'description_field_required' => FALSE,
     ] + parent::defaultFieldSettings();
   }
 
@@ -225,6 +226,18 @@ class FileItem extends EntityReferenceItem {
       '#default_value' => $settings['description_field'] ?? '',
       '#description' => $this->t('The description field allows users to enter a description about the uploaded file.'),
       '#weight' => 11,
+    ];
+
+    $element['description_field_required'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Require the <em>Description</em> field'),
+      '#default_value' => $settings['description_field_required'] ?? FALSE,
+      '#weight' => 20,
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[description_field]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     return $element;
