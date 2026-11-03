@@ -157,6 +157,9 @@ views_display:
         use_ajax:
           type: boolean
           label: 'Use AJAX'
+        use_ajax_options:
+          type: boolean
+          label: 'AJAX options'
         hide_attachment_summary:
           type: boolean
           label: 'Hide attachments when displaying a contextual filter summary'
@@ -228,6 +231,19 @@ views_display:
     use_ajax:
       type: boolean
       label: 'Use AJAX'
+    use_ajax_options:
+      type: mapping
+      label: 'AJAX options'
+      mapping:
+        pager:
+          type: boolean
+          label: 'Use AJAX on the pager'
+        sorting:
+          type: boolean
+          label: 'Use AJAX on table click sorting and summary links'
+        exposed_form:
+          type: boolean
+          label: 'Use AJAX on the exposed form'
     group_by:
       type: boolean
       label: 'Aggregate'

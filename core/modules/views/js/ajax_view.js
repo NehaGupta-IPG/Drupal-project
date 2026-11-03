@@ -34,6 +34,9 @@
           if ($(selector, context).length) {
             delete Drupal.views.instances[i];
             delete settings.views.ajaxViews[i];
+            if (settings.views.ajaxOptions) {
+              delete settings.views.ajaxOptions[i];
+            }
           }
         });
       }
@@ -69,6 +72,16 @@
         '-',
       )}-${settings.view_display_id.replace(/_/g, '-')}`,
     );
+
+    // The elements of the view on which AJAX is used, all by default.
+    this.ajaxOptions = {
+      pager: true,
+      sorting: true,
+      exposed_form: true,
+      ...drupalSettings.views.ajaxOptions?.[
+        `views_dom_id:${settings.view_dom_id}`
+      ],
+    };
 
     // Retrieve the path to use for views' ajax.
     let ajaxPath = drupalSettings.views.ajax_path;
@@ -120,11 +133,13 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
-    once('exposed-form', this.$exposed_form).forEach(
-      this.attachExposedFormAjax.bind(this),
-    );
+    if (this.ajaxOptions.exposed_form) {
+      once('exposed-form', this.$exposed_form).forEach(
+        this.attachExposedFormAjax.bind(this),
+      );
+    }
 
-    // Add the ajax to pagers.
+    // Add the ajax to pagers, table click sorting and summary links.
     once(
       'ajax-pager',
       this.$view
@@ -184,11 +199,18 @@
    * Attach the ajax behavior to each link.
    */
   Drupal.views.ajaxView.prototype.attachPagerAjax = function () {
-    this.$view
-      .find(
-        '.js-pager__items a, th.views-field a, .attachment .views-summary a',
-      )
-      .each(this.attachPagerLinkAjax.bind(this));
+    const selectors = [];
+    if (this.ajaxOptions.pager) {
+      selectors.push('.js-pager__items a');
+    }
+    if (this.ajaxOptions.sorting) {
+      selectors.push('th.views-field a', '.attachment .views-summary a');
+    }
+    if (selectors.length) {
+      this.$view
+        .find(selectors.join(', '))
+        .each(this.attachPagerLinkAjax.bind(this));
+    }
   };
 
   /**

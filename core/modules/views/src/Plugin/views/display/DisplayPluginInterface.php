@@ -111,6 +111,20 @@ interface DisplayPluginInterface {
   public function isPagerEnabled();
 
   /**
+   * Returns on which elements of the display AJAX is used.
+   *
+   * Only relevant when AJAX is enabled for the display.
+   *
+   * @return bool[]
+   *   Whether AJAX is used, keyed by element: 'pager' for the pager links,
+   *   'sorting' for table click sorting and attachment summary links, and
+   *   'exposed_form' for the exposed form.
+   *
+   * @see \Drupal\views\Plugin\views\display\DisplayPluginInterface::ajaxEnabled()
+   */
+  public function getAjaxOptions(): array;
+
+  /**
    * Whether the display allows the use of a 'more' link or not.
    *
    * @return bool

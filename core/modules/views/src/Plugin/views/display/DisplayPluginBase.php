@@ -310,6 +310,28 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * {@inheritdoc}
    */
+  public function getAjaxOptions(): array {
+    $ajax_options = $this->getOption('use_ajax_options') ?? [];
+    return array_map('boolval', $ajax_options + static::defaultAjaxOptions());
+  }
+
+  /**
+   * Returns the default AJAX options, where AJAX is used on every element.
+   *
+   * @return bool[]
+   *   AJAX usage keyed by element: 'pager', 'sorting' and 'exposed_form'.
+   */
+  protected static function defaultAjaxOptions(): array {
+    return [
+      'pager' => TRUE,
+      'sorting' => TRUE,
+      'exposed_form' => TRUE,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function usesMore() {
     return $this->usesMore;
   }
@@ -398,7 +420,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       'cache' => ['cache'],
       'title' => ['title'],
       'css_class' => ['css_class'],
-      'use_ajax' => ['use_ajax'],
+      'use_ajax' => ['use_ajax', 'use_ajax_options'],
       'hide_attachment_summary' => ['hide_attachment_summary'],
       'show_admin_links' => ['show_admin_links'],
       'group_by' => ['group_by'],
@@ -462,6 +484,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
+          'use_ajax_options' => TRUE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
@@ -507,6 +530,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       ],
       'use_ajax' => [
         'default' => FALSE,
+      ],
+      'use_ajax_options' => [
+        'default' => static::defaultAjaxOptions(),
       ],
       'hide_attachment_summary' => [
         'default' => FALSE,
@@ -1466,6 +1492,23 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#title' => $this->t('Use AJAX'),
           '#default_value' => $this->getOption('use_ajax') ? 1 : 0,
         ];
+
+        $form['use_ajax_options'] = [
+          '#type' => 'checkboxes',
+          '#title' => $this->t('Use AJAX on'),
+          '#options' => [
+            'pager' => $this->t('Pager'),
+            'sorting' => $this->t('Table click sorting and summary links'),
+            'exposed_form' => $this->t('Exposed form'),
+          ],
+          '#default_value' => array_keys(array_filter($this->getAjaxOptions())),
+          '#description' => $this->t('If none are selected, AJAX will be used on all of them.'),
+          '#states' => [
+            'visible' => [
+              ':input[name="use_ajax"]' => ['checked' => TRUE],
+            ],
+          ],
+        ];
         break;
 
       case 'hide_attachment_summary':
@@ -1981,6 +2024,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'use_ajax':
+        $this->setOption($section, (bool) $form_state->getValue($section));
+        $ajax_options = array_map('boolval', array_intersect_key($form_state->getValue('use_ajax_options', []), static::defaultAjaxOptions()));
+        // No element selected means AJAX is used on all of them.
+        $this->setOption('use_ajax_options', array_filter($ajax_options) ? $ajax_options : static::defaultAjaxOptions());
+        break;
+
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':
