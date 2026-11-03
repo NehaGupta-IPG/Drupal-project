@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\ParamConverter;
 
 use Drupal\Core\ParamConverter\EntityConverter;
+use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
@@ -73,6 +74,21 @@ class EntityConverterTest extends KernelTestBase {
 
     $definition = [
       'type' => 'entity:entity_test',
+    ];
+
+    // Check that all entities are returned when 'bundle' is not defined.
+    $converted = $converter->convert($entity1->id(), $definition, 'qux', []);
+    $this->assertSame($entity1->id(), $converted->id());
+    $converted = $converter->convert($entity2->id(), $definition, 'qux', []);
+    $this->assertSame($entity2->id(), $converted->id());
+    $converted = $converter->convert($entity3->id(), $definition, 'qux', []);
+    $this->assertSame($entity3->id(), $converted->id());
+    // A non-existing entity returns NULL.
+    $converted = $converter->convert('some-non-existing-entity-id', $definition, 'qux', []);
+    $this->assertNull($converted);
+
+    $definition = [
+      'type' => 'entity:entity_test',
       'bundle' => [
         'foo',
         'bar',
@@ -87,27 +103,14 @@ class EntityConverterTest extends KernelTestBase {
     $converted = $converter->convert($entity2->id(), $definition, 'qux', []);
     $this->assertSame($entity2->id(), $converted->id());
 
-    // An entity whose bundle is missed from definition is not converted.
-    $converted = $converter->convert($entity3->id(), $definition, 'qux', []);
-    $this->assertNull($converted);
-
     // A non-existing entity returns NULL.
     $converted = $converter->convert('some-non-existing-entity-id', $definition, 'qux', []);
     $this->assertNull($converted);
 
-    $definition = [
-      'type' => 'entity:entity_test',
-    ];
-
-    // Check that all entities are returned when 'bundle' is not defined.
-    $converted = $converter->convert($entity1->id(), $definition, 'qux', []);
-    $this->assertSame($entity1->id(), $converted->id());
-    $converted = $converter->convert($entity2->id(), $definition, 'qux', []);
-    $this->assertSame($entity2->id(), $converted->id());
-    $converted = $converter->convert($entity3->id(), $definition, 'qux', []);
-    $this->assertSame($entity3->id(), $converted->id());
-    $converted = $converter->convert('some-non-existing-entity-id', $definition, 'qux', []);
-    $this->assertNull($converted);
+    // An entity whose bundle is missing from definition is not converted.
+    $this->expectException(ParamNotConvertedException::class);
+    $this->expectExceptionMessage('Entity of type "entity_test" with ID "3" and bundle "baz" did not match the required bundle(s) "foo, bar"');
+    $converter->convert($entity3->id(), $definition, 'qux', []);
   }
 
   /**
