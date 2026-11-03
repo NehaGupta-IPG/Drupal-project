@@ -14,7 +14,6 @@ use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\EntityFieldDefinitionTrait;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Source plugin to get content entities from the current version of Drupal.
@@ -117,21 +116,6 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
       }
     }
     parent::__construct($configuration + $this->defaultConfiguration, $plugin_id, $plugin_definition, $migration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): static {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $migration,
-      $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $container->get('entity_type.bundle.info')
-    );
   }
 
   /**

@@ -12,6 +12,7 @@ use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Row;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The base class for source plugins.
@@ -263,6 +264,26 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     if ($this->highWaterProperty && $this->trackChanges) {
       throw new MigrateException('You should either use a high-water mark or track changes not both. They are both designed to solve the same problem');
     }
+  }
+
+  /**
+   * Instantiates a new instance of the implementing class using autowiring.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container to pull out services used in the plugin.
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\migrate\Plugin\MigrationInterface|null $migration
+   *   The migration context in which the plugin will run.
+   *
+   * @return static
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
+    return static::createInstanceAutowired($container, $configuration, $plugin_id, $plugin_definition, $migration);
   }
 
   /**
