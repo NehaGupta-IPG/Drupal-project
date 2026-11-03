@@ -29,4 +29,20 @@ class ContentModerationViewsHooks {
     return $viewsData->getViewsData();
   }
 
+ /**
+   * Implements hook_views_data_alter().
+   * 
+   * This hook removes extra language field in order to fix the issue #2846605
+   * where unpublished translations of moderated content are not listed in 
+   * node_field_data table. It will list only published translations. 
+   * This is a problem because nid relationship has extra condition to match the language 
+   * 
+   */
+  #[Hook('views_data_alter')]
+  public function viewsDataAlter(array &$data): void {
+    if (isset($data['node_field_revision']['nid']['relationship']['extra'])) {
+      unset($data['node_field_revision']['nid']['relationship']['extra']);
+    }
+  }
+
 }
