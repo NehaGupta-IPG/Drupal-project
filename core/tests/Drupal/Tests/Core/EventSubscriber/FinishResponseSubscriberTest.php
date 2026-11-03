@@ -143,7 +143,7 @@ class FinishResponseSubscriberTest extends UnitTestCase {
   public function testDebugHeaders(): void {
     $finishSubscriber = new FinishResponseSubscriber(
       $this->languageManager,
-      $this->getConfigFactoryStub(),
+      $this->getConfigFactoryStub(['system.performance' => []]),
       $this->requestPolicy,
       $this->responsePolicy,
       $this->cacheContextsManager,
@@ -182,7 +182,7 @@ class FinishResponseSubscriberTest extends UnitTestCase {
   public function testDebugCacheTagAndCacheContextsHeadersLength(): void {
     $finishSubscriber = new FinishResponseSubscriber(
       $this->languageManager,
-      $this->getConfigFactoryStub(),
+      $this->getConfigFactoryStub(['system.performance' => []]),
       $this->requestPolicy,
       $this->responsePolicy,
       $this->cacheContextsManager,

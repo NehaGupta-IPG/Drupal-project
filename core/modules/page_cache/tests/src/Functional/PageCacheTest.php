@@ -386,7 +386,9 @@ class PageCacheTest extends BrowserTestBase {
       404 => $invalid_url,
     ];
     $cache_ttl_4xx = Settings::get('cache_ttl_4xx', 3600);
+    $config = $this->config('system.performance');
     foreach ($tests as $code => $content_url) {
+      $config->set('cache.page.4xx_max_age', 300)->save();
       // Anonymous user, without permissions.
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
@@ -394,9 +396,12 @@ class PageCacheTest extends BrowserTestBase {
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
+      $this->assertSession()->responseHeaderEquals('Cache-Control', 'max-age=300, public');
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
+
+      // Saving an entity clears 4xx cache tag.
       $entity_values = [
         'name' => $this->randomMachineName(),
         'user_id' => 1,
@@ -409,19 +414,28 @@ class PageCacheTest extends BrowserTestBase {
       ];
       $entity = EntityTest::create($entity_values);
       $entity->save();
-      // Saving an entity clears 4xx cache tag.
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
+
       // Rebuilding the router should invalidate the 4xx cache tag.
       $this->container->get('router.builder')->rebuild();
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+      $this->drupalGet($content_url);
+      $this->assertSession()->statusCodeEquals($code);
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
 
+      // Setting cache.page.4xx_max_age should invalidate the 4xx cache tag.
+      $config->set('cache.page.4xx_max_age', 0)->save();
+      $this->drupalGet($content_url);
+      $this->assertSession()->statusCodeEquals($code);
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+      $this->assertSession()->responseHeaderEquals('Cache-Control', 'must-revalidate, no-cache, private');
       // Ensure the 'expire' field on the cache entry uses cache_ttl_4xx.
       $cache_item = \Drupal::service('cache.page')->get($this->getUrl() . ':');
       $difference = $cache_item->expire - (int) $cache_item->created;

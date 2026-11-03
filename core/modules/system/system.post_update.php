@@ -91,3 +91,12 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Set max-age for 4xx responses to null.
+ */
+function system_post_update_set_max_age_4xx(): void {
+  \Drupal::configFactory()->getEditable('system.performance')
+    ->set('cache.page.4xx_max_age', NULL)
+    ->save();
+}

@@ -1,6 +1,7 @@
 cache:
   page:
     max_age: 0
+    4xx_max_age: null
 css:
   preprocess: true
   compress: true
