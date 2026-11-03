@@ -91,7 +91,15 @@ class EntityRepository implements EntityRepositoryInterface {
    * {@inheritdoc}
    */
   public function getTranslationFromContext(EntityInterface $entity, $langcode = NULL, $context = []) {
-    $translation = $entity;
+    $context += ['fallback_to_passed_entity' => TRUE];
+    if ($context['fallback_to_passed_entity']) {
+      // @todo Consider deprecating this usage.
+      // @see https://www.drupal.org/project/drupal/issues/2951294
+      $translation = $entity;
+    }
+    else {
+      $translation = NULL;
+    }
 
     if ($entity instanceof TranslatableDataInterface && count($entity->getTranslationLanguages()) > 1) {
       if (empty($langcode)) {
