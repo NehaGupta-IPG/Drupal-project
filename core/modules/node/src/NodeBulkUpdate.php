@@ -42,13 +42,17 @@ class NodeBulkUpdate {
    * @param bool $revisions
    *   (optional) TRUE if $nodes contains an array of revision IDs instead of
    *   node IDs. Defaults to FALSE; will be ignored if $load is FALSE.
+   * @param bool $syncing
+   *   (optional) TRUE if the update is happening as part of a content
+   *   synchronization process and there should be no content updates during an
+   *   editorial process. Defaults to FALSE.
    */
-  public function process(array $nodes, array $updates, ?string $langcode = NULL, bool $load = FALSE, bool $revisions = FALSE): void {
+  public function process(array $nodes, array $updates, ?string $langcode = NULL, bool $load = FALSE, bool $revisions = FALSE, bool $syncing = FALSE): void {
     // We use batch processing to prevent timeout when updating a large number
     // of nodes.
     if (count($nodes) > 10) {
       $batch_builder = (new BatchBuilder())
-        ->addOperation([static::class, 'batchProcess'], [$nodes, $updates, $langcode, $load, $revisions])
+        ->addOperation([static::class, 'batchProcess'], [$nodes, $updates, $langcode, $load, $revisions, $syncing])
         ->setFinishCallback([static::class, 'batchFinished'])
         ->setTitle($this->t('Processing'))
         ->setErrorMessage($this->t('The update has encountered an error.'))
@@ -64,7 +68,7 @@ class NodeBulkUpdate {
         $nodes = $revisions ? $storage->loadMultipleRevisions($nodes) : $storage->loadMultiple($nodes);
       }
       foreach ($nodes as $node) {
-        static::processNode($node, $updates, $langcode);
+        static::processNode($node, $updates, $langcode, $syncing);
       }
       $this->messenger->addStatus($this->t('The update has been performed.'));
     }
@@ -80,13 +84,17 @@ class NodeBulkUpdate {
    * @param string|null $langcode
    *   (optional) The language updates should be applied to. If NULL all
    *   available languages are processed.
+   * @param bool $syncing
+   *   (optional) TRUE if the update is happening as part of a content
+   *   synchronization process and there should be no content updates during an
+   *   editorial process. Defaults to FALSE.
    *
    * @return \Drupal\node\NodeInterface
    *   An updated node object.
    *
    * @see self::process()
    */
-  protected static function processNode(NodeInterface $node, array $updates, string|null $langcode = NULL): NodeInterface {
+  protected static function processNode(NodeInterface $node, array $updates, string|null $langcode = NULL, bool $syncing = FALSE): NodeInterface {
     $langcodes = isset($langcode) ? [$langcode] : array_keys($node->getTranslationLanguages());
     // For efficiency manually save the original node before applying any
     // changes.
@@ -96,7 +104,10 @@ class NodeBulkUpdate {
         $node->getTranslation($langcode)->$name = $value;
       }
     }
+    $original_syncing = $node->isSyncing();
+    $node->setSyncing($syncing);
     $node->save();
+    $node->setSyncing($original_syncing);
     return $node;
   }
 
@@ -116,10 +127,14 @@ class NodeBulkUpdate {
    * @param bool $revisions
    *   (optional) TRUE if $nodes contains an array of revision IDs instead of
    *   node IDs. Defaults to FALSE; will be ignored if $load is FALSE.
+   * @param bool $syncing
+   *   (optional) TRUE if the update is happening as part of a content
+   *   synchronization process and there should be no content updates during an
+   *   editorial process. Defaults to FALSE.
    * @param array|\ArrayAccess $context
    *   An array of contextual key/values.
    */
-  public static function batchProcess(array $nodes, array $updates, ?string $langcode, bool $load, bool $revisions, array|\ArrayAccess &$context): void {
+  public static function batchProcess(array $nodes, array $updates, ?string $langcode, bool $load, bool $revisions, bool $syncing, array|\ArrayAccess &$context): void {
     if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
       $context['sandbox']['max'] = count($nodes);
@@ -135,7 +150,7 @@ class NodeBulkUpdate {
       if ($load) {
         $node = $revisions ? $storage->loadRevision($node) : $storage->load($node);
       }
-      $node = static::processNode($node, $updates, $langcode);
+      $node = static::processNode($node, $updates, $langcode, $syncing);
 
       // Store result for post-processing in the finished callback.
       $context['results'][] = $node->toLink()->toString();
