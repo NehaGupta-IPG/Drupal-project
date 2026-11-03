@@ -67,6 +67,7 @@ class StringFormatter extends FormatterBase {
 
     $options['link_to_entity'] = FALSE;
     $options['link_rel'] = 'canonical';
+    $options['tag'] = '';
     return $options;
   }
 
@@ -110,6 +111,14 @@ class StringFormatter extends FormatterBase {
       }
     }
 
+    $form['tag'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Display as'),
+      '#options' => $this->getTagOptions(),
+      '#empty_value' => '',
+      '#default_value' => $this->getSetting('tag'),
+    ];
+
     return $form;
   }
 
@@ -129,6 +138,8 @@ class StringFormatter extends FormatterBase {
         default => $this->t('Linked to @link_template', ['@link_template' => $link_rel]),
       };
     }
+    $tag = $this->getSetting('tag');
+    $summary[] = isset($this->getTagOptions()[$tag]) ? $this->t('Displayed as @tag', ['@tag' => $tag]) : $this->t('Displayed as plain text');
     return $summary;
   }
 
@@ -137,6 +148,7 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $tag = $this->getSetting('tag');
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
@@ -162,6 +174,13 @@ class StringFormatter extends FormatterBase {
       else {
         $elements[$delta] = $this->viewValue($item);
       }
+
+      // Formatter settings are not always validated before they are saved, so
+      // only add tags from the allowed list to the output.
+      if (isset($this->getTagOptions()[$tag])) {
+        $elements[$delta]['#prefix'] = "<$tag>";
+        $elements[$delta]['#suffix'] = "</$tag>";
+      }
     }
 
     return $elements;
@@ -184,6 +203,23 @@ class StringFormatter extends FormatterBase {
       '#template' => '{{ value|nl2br }}',
       '#context' => ['value' => $item->value],
     ];
+  }
+
+  /**
+   * Returns the tags that can wrap each value.
+   *
+   * @return array<string, string>
+   *   Option labels, keyed by tag name.
+   */
+  protected function getTagOptions(): array {
+    $options = [
+      'span' => 'span',
+      'div' => 'div',
+    ];
+    foreach (range(1, 6) as $level) {
+      $options['h' . $level] = 'H' . $level;
+    }
+    return $options;
   }
 
   /**

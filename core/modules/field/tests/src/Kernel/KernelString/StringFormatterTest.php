@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Kernel\KernelString;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\entity_test\Entity\EntityTestRev;
@@ -87,6 +88,7 @@ class StringFormatterTest extends KernelTestBase {
       'field_name' => $this->fieldName,
       'entity_type' => $this->entityType,
       'type' => 'string',
+      'cardinality' => -1,
     ]);
     $field_storage->save();
 
@@ -196,6 +198,77 @@ class StringFormatterTest extends KernelTestBase {
     $this->renderEntityFields($entity_new_revision, $this->display);
     $this->assertLink($value, 0);
     $this->assertLinkByHref($entity->toUrl('canonical')->toString());
+  }
+
+  /**
+   * Tests the tag selector, summary and schema validation.
+   */
+  public function testTagSettings(): void {
+    $formatter = $this->display->getRenderer($this->fieldName);
+    $form = $formatter->settingsForm([], new FormState());
+    $this->assertSame('', $form['tag']['#empty_value']);
+    $tags = array_keys($form['tag']['#options']);
+    $this->assertSame(['span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'], $tags);
+    $this->assertSame('Displayed as plain text', (string) $formatter->settingsSummary()[0]);
+    $formatter->setSetting('tag', 'h2');
+    $this->assertSame('Displayed as h2', (string) $formatter->settingsSummary()[0]);
+
+    $typed_config = $this->container->get('config.typed');
+    foreach (['', ...$tags] as $tag) {
+      $settings = ['tag' => $tag] + $formatter->getSettings();
+      $this->assertCount(0, $typed_config->createFromNameAndData('field.formatter.settings.string', $settings)->validate());
+    }
+    // Invalid tags fail validation, and are ignored if saved regardless.
+    $entity = EntityTestRev::create([$this->fieldName => 'Value']);
+    foreach (['p', 'script', 'div class="x"'] as $tag) {
+      $settings = ['tag' => $tag] + $formatter->getSettings();
+      $this->assertCount(1, $typed_config->createFromNameAndData('field.formatter.settings.string', $settings)->validate());
+      $formatter->setSetting('tag', $tag);
+      $this->assertSame('Displayed as plain text', (string) $formatter->settingsSummary()[0]);
+      $elements = $formatter->viewElements($entity->{$this->fieldName}, 'en');
+      $this->assertSame('Value', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
+    }
+  }
+
+  /**
+   * Tests wrapping each value, with and without a link.
+   */
+  #[TestWith([''])]
+  #[TestWith(['div'])]
+  #[TestWith(['h2'])]
+  public function testTags(string $tag): void {
+    $values = ['First', 'Second'];
+    $entity = EntityTestRev::create([$this->fieldName => $values]);
+    $entity->save();
+    $url = $entity->toUrl()->toString();
+    foreach ([FALSE, TRUE] as $linked) {
+      $this->display->setComponent($this->fieldName, [
+        'type' => 'string',
+        'settings' => ['tag' => $tag, 'link_to_entity' => $linked],
+      ]);
+      $elements = $this->display->getRenderer($this->fieldName)->viewElements($entity->{$this->fieldName}, 'en');
+      foreach ($values as $delta => $value) {
+        $expected = $linked ? "<a href=\"$url\" hreflang=\"en\">$value</a>" : $value;
+        if ($tag !== '') {
+          $expected = "<$tag>$expected</$tag>";
+        }
+        $this->assertSame($expected, (string) $this->container->get('renderer')->renderInIsolation($elements[$delta]));
+      }
+    }
+  }
+
+  /**
+   * Tests wrapping the inherited language formatter's output.
+   */
+  public function testLanguageTag(): void {
+    $entity = EntityTestRev::create(['langcode' => 'en']);
+    $formatter = $this->container->get('plugin.manager.field.formatter')->getInstance([
+      'field_definition' => $entity->getFieldDefinition('langcode'),
+      'view_mode' => 'default',
+      'configuration' => ['type' => 'language', 'settings' => ['tag' => 'span']],
+    ]);
+    $elements = $formatter->viewElements($entity->langcode, 'en');
+    $this->assertSame('<span>English</span>', (string) $this->container->get('renderer')->renderInIsolation($elements[0]));
   }
 
   /**
