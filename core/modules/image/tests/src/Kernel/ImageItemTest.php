@@ -238,6 +238,62 @@ class ImageItemTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that resubmitting an unchanged image is not an affecting change.
+   *
+   * The widget submits no dimensions and renders a NULL title as an empty
+   * string, so a stored item would otherwise never compare as equal.
+   *
+   * @see \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator
+   */
+  public function testUnchangedImageHasNoAffectingChanges(): void {
+    $entity = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      'image_test' => [
+        'target_id' => $this->image->id(),
+        'alt' => $this->randomMachineName(),
+      ],
+    ]);
+    $entity->save();
+    $entity = EntityTest::load($entity->id());
+
+    // The dimensions are computed on save, while the title was never set.
+    $image = $this->imageFactory->get('public://example.jpg');
+    $this->assertEquals($image->getWidth(), $entity->image_test->width);
+    $this->assertEquals($image->getHeight(), $entity->image_test->height);
+    $this->assertNull($entity->image_test->title);
+
+    $form_object = $this->container->get(EntityTypeManagerInterface::class)->getFormObject('entity_test', 'default');
+    \assert($form_object instanceof ContentEntityForm);
+    $form_object->setEntity($entity);
+    $form_display = EntityFormDisplay::collectRenderDisplay($entity, 'default');
+    \assert($form_display instanceof EntityFormDisplay);
+    $form_state = new FormState();
+    $form_object->setFormDisplay($form_display, $form_state);
+    $form = $this->container->get(FormBuilderInterface::class)->buildForm($form_object, $form_state);
+    $element = $form['image_test']['widget'][0];
+
+    // The dimensions have no form control, so they are never submitted, while
+    // the title is submitted as an empty string.
+    $this->assertArrayNotHasKey('width', $element);
+    $this->assertArrayNotHasKey('height', $element);
+    $this->assertSame('', $element['title']['#default_value']);
+
+    // Submit the form exactly as it was rendered, without touching anything.
+    $edited = clone $entity;
+    $edited->get('image_test')->setValue([
+      [
+        'target_id' => reset($element['fids']['#value']),
+        'alt' => $element['alt']['#default_value'],
+        'title' => $element['title']['#default_value'],
+        'display' => $element['display']['#value'] ?? 1,
+      ],
+    ]);
+
+    $this->assertFalse($edited->get('image_test')->filterEmptyItems()
+      ->hasAffectingChanges($entity->get('image_test')->filterEmptyItems(), 'en'));
+  }
+
+  /**
    * Validates the image file URI generated for a given file directory.
    *
    * @param string $file_directory
