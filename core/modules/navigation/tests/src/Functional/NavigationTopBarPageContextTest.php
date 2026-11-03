@@ -91,6 +91,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
 
     // Test the PageContext output for the unpublished node.
     $this->drupalGet($node->toUrl());
+    // @todo #3590502 Remove local tasks from more actions without breaking.
     // Ensure the top bar exists and is valid.
     $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-title', 'No easy twist on the bow');
     $this->assertSession()->elementTextEquals('css', '.top-bar .top-bar__context .toolbar-badge', 'Unpublished');

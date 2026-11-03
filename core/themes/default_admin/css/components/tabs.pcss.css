@@ -11,7 +11,7 @@
   --tabs--focus-height: 3px;
   --tabs--active-height: 3px;
   --tabs-link-height: 3rem; /* 48px */
-  --tabs-secondary-link-height: 2.5rem; /* 40px */
+  --tabs-secondary-link-height: 2rem; /* 32px */
   --tabs-base-border: 1px solid var(--admin-color-border);
   --tabs-trigger-border: 1px solid rgb(216, 217, 224, 0.8);
 }
@@ -85,7 +85,7 @@
       position: relative; /* Anchor ::after */
       overflow: hidden;
       margin-inline: calc(calc(var(--tabs--focus-height) + 3px) * -1);
-      padding-block: calc(var(--tabs--focus-height) + 3px) 0;
+      padding-block: calc(var(--tabs--focus-height) + 3px);
       padding-inline: calc(var(--tabs--focus-height) + 3px);
       border-radius: 0;
 
@@ -93,29 +93,8 @@
         width: 100%;
       }
 
-      &::after {
-        position: absolute;
-        display: block;
-        width: 100%;
-        max-width: calc(100% - var(--admin-space-m));
-        content: "";
-        pointer-events: none;
-        border-block-end: 1px solid var(--admin-color-border);
-        inset-block-end: 0;
-        inset-inline-start: 0;
-      }
-
       .tabs__tab {
         font-size: var(--admin-font-size-s);
-      }
-
-      .tabs__link {
-        min-block-size: var(--tabs-secondary-link-height);
-        padding-block: var(--admin-space-xs);
-
-        &:focus {
-          min-block-size: var(--tabs-secondary-link-height);
-        }
       }
     }
   }
@@ -277,20 +256,21 @@
   }
 
   .is-horizontal .tabs--secondary & {
+    &.is-active {
+      color: var(--admin-color-primary-active);
+    }
+
     @media (--tabs-horizontal) {
-      padding: var(--admin-space-m);
-      border-radius: var(--admin-radius-m) var(--admin-radius-m) 0 0;
+      min-height: 2rem;
+      margin-inline-end: 0.25em;
+      border-radius: 2rem;
+      font-size: var(--admin-font-size);
+      padding-block: calc(var(--admin-space-xs) - 2px);
+      padding-inline: var(--admin-space-s);
 
       &.is-active {
-        color: var(--admin-color-primary);
-
-        &::before {
-          all: revert;
-          position: absolute;
-          content: "";
-          inset: auto 0 0;
-          border-block-end: var(--tabs--active-height) solid var(--admin-color-primary);
-        }
+        border: solid 1px transparent; /* Forced-colors mode. */
+        background: var(--admin-color-primary-soft);
       }
     }
   }
