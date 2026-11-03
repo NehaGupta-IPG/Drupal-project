@@ -237,8 +237,8 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
 
     if ($scheme == 'private') {
       $this->assertSession()->responseHeaderEquals('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
-      // Check that Cache-Control header contains 'no-cache' to prevent caching.
-      $this->assertSession()->responseHeaderContains('Cache-Control', 'no-cache');
+      // Check that Cache-Control header contains 'no-store' to prevent caching.
+      $this->assertSession()->responseHeaderContains('Cache-Control', 'no-store');
       $this->assertSession()->responseHeaderEquals('X-Image-Owned-By', 'image_module_test');
 
       // Make sure that a second request to the already existing derivative
@@ -283,7 +283,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     }
     else {
       $this->assertSession()->responseHeaderEquals('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
-      $this->assertSession()->responseHeaderNotContains('Cache-Control', 'no-cache');
+      $this->assertSession()->responseHeaderNotContains('Cache-Control', 'no-store');
 
       if ($clean_url) {
         // Add some extra chars to the token.

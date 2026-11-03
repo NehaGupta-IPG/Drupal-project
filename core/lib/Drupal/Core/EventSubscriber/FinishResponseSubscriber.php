@@ -222,7 +222,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   A request object.
    */
   protected function setResponseNotCacheable(Response $response, Request $request) {
-    $this->setCacheControlNoCache($response);
+    $this->setCacheControlNoStore($response);
     $this->setExpiresNoCache($response);
 
     // There is no point in sending along headers necessary for cache
@@ -275,13 +275,27 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Disable caching in the browser and for HTTP/1.1 proxies and clients.
+   * Set cache control header to no-cache.
+   *
+   * Force the proxy caches and browsers to revalidate the cache before
+   * downloading the request body. This means a HTTP request occurs each time,
+   * but the browser may skip retrieving the HTTP body if the content is valid.
    *
    * @param \Symfony\Component\HttpFoundation\Response $response
    *   A response object.
    */
   protected function setCacheControlNoCache(Response $response) {
-    $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
+    $response->headers->set('Cache-Control', 'no-cache', TRUE);
+  }
+
+  /**
+   * Disable caching in the browser and for HTTP/1.1 proxies and clients.
+   *
+   * @param \Symfony\Component\HttpFoundation\Response $response
+   *   A response object.
+   */
+  protected function setCacheControlNoStore(Response $response) {
+    $response->headers->set('Cache-Control', 'no-store', TRUE);
   }
 
   /**
