@@ -25,7 +25,16 @@ class RequestContext extends SymfonyRequestContext {
    *   The current request stack.
    */
   public function fromRequestStack(RequestStack $request_stack) {
-    $this->fromRequest($request_stack->getCurrentRequest());
+    $request = $request_stack->getCurrentRequest();
+    // The request stack can be empty during request-less execution, such as
+    // route rebuilds triggered from the CLI (for example a module's install
+    // hook or event subscriber running under `drush site:install`). In that
+    // case there is nothing to populate the context from, so leave it at its
+    // constructor defaults instead of passing a NULL request to
+    // static::fromRequest(), which requires a Request object.
+    if ($request) {
+      $this->fromRequest($request);
+    }
   }
 
   /**
