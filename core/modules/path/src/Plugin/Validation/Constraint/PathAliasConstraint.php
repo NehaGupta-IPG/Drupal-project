@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
- * Validation constraint for changing path aliases in pending revisions.
+ * Validation constraint for path alias changes.
  */
 #[Constraint(
   id: 'PathAlias',
@@ -20,6 +20,7 @@ class PathAliasConstraint extends SymfonyConstraint {
   public function __construct(
     mixed $options = NULL,
     public $message = 'You can only change the URL alias for the <em>published</em> version of this content.',
+    public $pidMessage = 'The path alias ID does not match an alias for this content.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
