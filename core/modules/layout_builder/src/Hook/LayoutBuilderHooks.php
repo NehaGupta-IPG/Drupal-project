@@ -9,6 +9,8 @@ use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\layout_builder\FormElement\LayoutBuilderDisplayElement;
+use Drupal\layout_builder\FormElement\LayoutBuilderEntityDisplayElement;
 use Drupal\layout_builder\InlineBlockEntityOperations;
 use Drupal\layout_builder\Plugin\Block\ExtraFieldBlock;
 use Drupal\Core\Render\Element;
@@ -413,6 +415,28 @@ class LayoutBuilderHooks {
     if (isset($element['#third_party_settings']['layout_builder']['view_mode'])) {
       // See system_theme_suggestions_field().
       $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'] . '__' . $element['#third_party_settings']['layout_builder']['view_mode'];
+    }
+  }
+
+  /**
+   * Implements hook_config_schema_info_alter().
+   */
+  #[Hook('config_schema_info_alter', order: Order::Last)]
+  public function configSchemaInfoAlter(&$definitions): void {
+    // This must run after the main logic is done in the field_ui module hooks.
+    $map = [
+      'core.entity_view_display.*.*.*.third_party.layout_builder' => LayoutBuilderDisplayElement::class,
+      'core.entity_form_display.*.*.*' => LayoutBuilderEntityDisplayElement::class,
+      'core.entity_view_display.*.*.*' => LayoutBuilderEntityDisplayElement::class,
+    ];
+
+    // Provide specific handling for entity view display layout builder settings
+    // and enhance entity view and form display definitions in order to generate
+    // translatable labels.
+    foreach ($definitions as $type => &$definition) {
+      if (isset($map[$type])) {
+        $definition['form_element_class'] = $map[$type];
+      }
     }
   }
 
