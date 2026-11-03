@@ -130,7 +130,7 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
     if (is_string($this->migration->provider)) {
       return $this->migration->provider;
     }
-    else {
+    if (is_array($this->migration->provider)) {
       return reset($this->migration->provider);
     }
   }

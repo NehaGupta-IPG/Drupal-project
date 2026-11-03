@@ -1,0 +1,5 @@
+name: 'Migration provider null test'
+type: module
+package: Testing
+dependencies:
+  - drupal:migrate_drupal
