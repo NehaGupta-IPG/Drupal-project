@@ -76,6 +76,27 @@ class Tasks extends InstallTasks {
    */
   protected function connect() {
     try {
+      // Check for unix_socket in SIMPLETEST_DB environment variable
+      // during tests.
+      $db_url = getenv('SIMPLETEST_DB');
+      if ($db_url && strpos($db_url, 'unix_socket=') !== FALSE) {
+        $connection_info = Database::getConnectionInfo('default');
+
+        // Parse unix_socket from SIMPLETEST_DB URL.
+        $parsed_url = parse_url($db_url);
+        if (isset($parsed_url['query'])) {
+          parse_str($parsed_url['query'], $query_params);
+          if (isset($query_params['unix_socket'])) {
+            // Add unix_socket to connection info if not present.
+            if (!isset($connection_info['default']['unix_socket'])) {
+              $connection_info['default']['unix_socket'] = $query_params['unix_socket'];
+              Database::removeConnection('default');
+              Database::addConnectionInfo('default', 'default', $connection_info['default']);
+            }
+          }
+        }
+      }
+
       // This doesn't actually test the connection.
       Database::setActiveConnection();
       // Now actually do a check.
@@ -150,6 +171,14 @@ class Tasks extends InstallTasks {
         ':performance_doc' => 'https://www.drupal.org/docs/system-requirements/setting-the-mysql-transaction-isolation-level',
       ]),
     ];
+
+    // Add unix_socket as a hidden field to preserve it during form processing.
+    if (isset($database['unix_socket'])) {
+      $form['advanced_options']['unix_socket'] = [
+        '#type' => 'hidden',
+        '#default_value' => $database['unix_socket'],
+      ];
+    }
 
     return $form;
   }

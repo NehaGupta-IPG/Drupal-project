@@ -1408,6 +1408,16 @@ abstract class Connection {
       $database['prefix'] = $url_components['fragment'];
     }
 
+    // Extract unix_socket parameter from the URL query string.
+    // This is the only query parameter that should be passed through to the
+    // connection options, as it's a legitimate connection-level setting.
+    if (!empty($url_components['query'])) {
+      parse_str($url_components['query'], $query_params);
+      if (isset($query_params['unix_socket'])) {
+        $database['unix_socket'] = $query_params['unix_socket'];
+      }
+    }
+
     return $database;
   }
 
@@ -1456,9 +1466,22 @@ abstract class Connection {
 
     $db_url .= '/' . $connection_options['database'];
 
+    // Build query parameters for URL.
+    $query_params = [];
+
     // Add the module when the driver is provided by a module.
     if (isset($connection_options['module'])) {
-      $db_url .= '?module=' . $connection_options['module'];
+      $query_params['module'] = $connection_options['module'];
+    }
+
+    // Add unix_socket parameter if present (needed for child processes)
+    if (isset($connection_options['unix_socket'])) {
+      $query_params['unix_socket'] = $connection_options['unix_socket'];
+    }
+
+    // Add query string if we have parameters.
+    if (!empty($query_params)) {
+      $db_url .= '?' . http_build_query($query_params);
     }
 
     if (isset($connection_options['prefix']) && $connection_options['prefix'] !== '') {
