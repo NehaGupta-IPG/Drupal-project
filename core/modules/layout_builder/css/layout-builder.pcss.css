@@ -166,3 +166,6 @@
 .layout-builder-components-table .tabledrag-changed-warning {
   display: none !important;
 }
+#drupal-off-canvas .configured-conditions {
+  margin: 0.5em 0 1.5em;
+}

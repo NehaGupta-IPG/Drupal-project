@@ -254,7 +254,8 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
       'link' => [
         '#type' => 'link',
         '#title' => $title,
-        '#url' => Url::fromRoute('layout_builder.choose_section',
+        '#url' => Url::fromRoute(
+          'layout_builder.choose_section',
           [
             'section_storage_type' => $storage_type,
             'section_storage' => $storage_id,
@@ -326,7 +327,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
               // links that were cached before the 'move' link was added.
               // @see layout_builder.links.contextual.yml
               'metadata' => [
-                'operations' => 'move:update:remove',
+                'operations' => 'move:update:remove:visibility',
               ],
             ],
           ];
@@ -340,7 +341,8 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
           '@section' => $section_label,
           '@region' => $region_labels[$region],
         ]),
-        '#url' => Url::fromRoute('layout_builder.choose_block',
+        '#url' => Url::fromRoute(
+          'layout_builder.choose_block',
           [
             'section_storage_type' => $storage_type,
             'section_storage' => $storage_id,

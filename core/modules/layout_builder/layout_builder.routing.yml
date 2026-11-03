@@ -145,3 +145,42 @@ layout_builder.move_block:
     parameters:
       section_storage:
         layout_builder_tempstore: TRUE
+
+layout_builder.visibility:
+  path: '/layout_builder/visibility/block/{section_storage_type}/{section_storage}/{delta}/{uuid}'
+  defaults:
+    _form: '\Drupal\layout_builder\Form\BlockVisibilityForm'
+    _title_callback: '\Drupal\layout_builder\Form\BlockVisibilityForm::title'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+
+layout_builder.add_visibility:
+  path: '/layout_builder/visibility/block/{section_storage_type}/{section_storage}/{delta}/{uuid}/{plugin_id}'
+  defaults:
+    _form: '\Drupal\layout_builder\Form\ConfigureVisibilityForm'
+    _title_callback: '\Drupal\layout_builder\Form\ConfigureVisibilityForm::title'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE
+
+layout_builder.delete_visibility:
+  path: '/layout_builder/visibility/block/{section_storage_type}/{section_storage}/{delta}/{uuid}/{plugin_id}/delete'
+  defaults:
+    _form: '\Drupal\layout_builder\Form\DeleteVisibilityForm'
+    _title_callback: '\Drupal\layout_builder\Form\DeleteVisibilityForm::title'
+  requirements:
+    _layout_builder_access: 'view'
+  options:
+    _admin_route: TRUE
+    parameters:
+      section_storage:
+        layout_builder_tempstore: TRUE

@@ -27,3 +27,13 @@ layout_builder_block_remove:
       class: ['use-ajax']
       data-dialog-type: dialog
       data-dialog-renderer: off_canvas
+
+layout_builder_block_visibility:
+  title: 'Control visibility'
+  route_name: 'layout_builder.visibility'
+  group: 'layout_builder_block'
+  options:
+    attributes:
+      class: ['use-ajax']
+      data-dialog-type: dialog
+      data-dialog-renderer: off_canvas
