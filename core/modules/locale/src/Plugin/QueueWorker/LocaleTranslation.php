@@ -76,7 +76,9 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
     // iterative (usually the batch import function) the batch context is passed
     // through via the queue and is part of the $data.
     $last = count($args) - 1;
-    if (!is_array($args[$last]) || !isset($args[$last]['finished'])) {
+    // Operations with no arguments (e.g. prepareTranslationsDirectory) have an
+    // empty $args list; treat that as needing a fresh batch context.
+    if ($last === -1 || !is_array($args[$last]) || !isset($args[$last]['finished'])) {
       $batch_context = [
         'sandbox'  => [],
         'results'  => [],

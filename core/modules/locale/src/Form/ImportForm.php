@@ -12,6 +12,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\File\LocaleFile;
 use Drupal\locale\LocaleConfigBatch;
+use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleImportBatch;
 use Drupal\locale\LocaleLanguages;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -37,6 +38,7 @@ class ImportForm extends FormBase {
     protected LocaleImportBatch $localeImportBatch,
     protected LocaleConfigBatch $localeConfigBatch,
     protected LocaleLanguages $localeLanguages,
+    protected LocaleFetch $localeFetch,
   ) {}
 
   /**
@@ -138,6 +140,9 @@ class ImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    // The uploaded file is moved into the translations directory, so make sure
+    // it exists.
+    $this->localeFetch->prepareTranslationsDirectory();
     $this->file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['file'], $form_state, 0);
 
     // Ensure we have the file uploaded.

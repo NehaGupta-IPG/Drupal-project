@@ -411,6 +411,26 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that a missing translations directory is created on import.
+   */
+  public function testTranslationDirectoryCreation(): void {
+    $directory = 'translations://';
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = \Drupal::service('file_system');
+    $file_system->deleteRecursive($directory);
+    $this->assertDirectoryDoesNotExist($directory);
+
+    $this->importPoFile($this->getPoFile(), [
+      'langcode' => 'fr',
+    ]);
+
+    // Make sure the directory is created and no error message displayed.
+    $this->assertDirectoryExists($directory);
+    $this->assertSession()->pageTextContains('One translation file imported');
+    $this->assertSession()->pageTextNotContains('File upload error. Could not move uploaded file');
+  }
+
+  /**
    * Helper function: import a standalone .po file in a given language.
    *
    * @param string $contents
