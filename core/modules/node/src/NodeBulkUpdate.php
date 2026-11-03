@@ -135,10 +135,13 @@ class NodeBulkUpdate {
       if ($load) {
         $node = $revisions ? $storage->loadRevision($node) : $storage->load($node);
       }
-      $node = static::processNode($node, $updates, $langcode);
 
-      // Store result for post-processing in the finished callback.
-      $context['results'][] = $node->toLink()->toString();
+      if ($node instanceof NodeInterface) {
+        $node = static::processNode($node, $updates, $langcode);
+
+        // Store result for post-processing in the finished callback.
+        $context['results'][] = $node->toLink()->toString();
+      }
 
       // Update our progress information.
       $context['sandbox']['progress']++;
@@ -148,6 +151,9 @@ class NodeBulkUpdate {
     // estimation of the completion level we reached.
     if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
       $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+    }
+    else {
+      $context['finished'] = 1;
     }
   }
 
@@ -174,7 +180,7 @@ class NodeBulkUpdate {
         '#theme' => 'item_list',
         '#items' => $results,
       ];
-      $message .= \Drupal::service('renderer')->render($item_list);
+      $message .= \Drupal::service('renderer')->renderInIsolation($item_list);
       $messenger->addStatus($message);
     }
   }
