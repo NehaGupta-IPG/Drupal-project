@@ -58,12 +58,20 @@ class FileSystemForm extends ConfigFormBase {
    *   The stream wrapper manager.
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system.
+   * @param string|null $appRoot
+   *   Drupal root directory.
+   *
+   * @see https://www.drupal.org/node/3341696
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, StreamWrapperManagerInterface $stream_wrapper_manager, FileSystemInterface $file_system) {
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, StreamWrapperManagerInterface $stream_wrapper_manager, FileSystemInterface $file_system, protected ?string $appRoot = NULL) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->dateFormatter = $date_formatter;
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->fileSystem = $file_system;
+    if ($this->appRoot === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $appRoot argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3341696', E_USER_DEPRECATED);
+      $this->appRoot = \Drupal::root();
+    }
   }
 
   /**
@@ -75,7 +83,8 @@ class FileSystemForm extends ConfigFormBase {
       $container->get('config.typed'),
       $container->get('date.formatter'),
       $container->get('stream_wrapper_manager'),
-      $container->get('file_system')
+      $container->get('file_system'),
+      $container->getParameter('app.root')
     );
   }
 
@@ -90,6 +99,13 @@ class FileSystemForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['app_root'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Application root directory'),
+      '#markup' => $this->appRoot,
+      '#description' => $this->t('The top level directory of the Drupal installation.'),
+    ];
+
     $form['file_public_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Public file system path'),
