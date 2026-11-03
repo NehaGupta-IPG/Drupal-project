@@ -13,6 +13,18 @@ entity.user.collection:
   description: 'Manage user accounts, roles, and permissions.'
   parent: system.admin
   weight: 4
+user.admin_permissions:
+  title: Permissions
+  route_name: user.admin_permissions
+  parent: entity.user.collection
+  description: 'Manage permissions assigned to user roles.'
+  weight: 5
+entity.user_role.collection:
+  title: Roles
+  route_name: entity.user_role.collection
+  parent: entity.user.collection
+  description: 'Manage user roles.'
+  weight: 10
 user.admin_index:
   title: People
   route_name: user.admin_index
