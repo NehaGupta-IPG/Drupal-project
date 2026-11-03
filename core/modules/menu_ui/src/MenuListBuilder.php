@@ -51,13 +51,23 @@ class MenuListBuilder extends ConfigEntityListBuilder {
     $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if (isset($operations['edit'])) {
-      $operations['edit']['title'] = $this->t('Edit menu');
+      // The default "edit" action keeps its natural meaning: the menu's own
+      // settings. Managing links is the more common task, so it leads the
+      // dropbutton as the primary action. The menu_tree_ui module re-points
+      // "Edit links" to its scalable tree when enabled.
+      $operations['edit']['title'] = $this->t('Edit');
+      $operations['edit']['weight'] = 10;
+      $operations['edit-links'] = [
+        'title' => $this->t('Edit links'),
+        'weight' => 0,
+        'url' => $entity->toUrl('links'),
+      ];
       $operations['add'] = [
         'title' => $this->t('Add link'),
         'weight' => 20,
         'url' => $entity->toUrl('add-link-form'),
         'query' => [
-          'destination' => $entity->toUrl('edit-form')->toString(),
+          'destination' => $entity->toUrl('links')->toString(),
         ],
       ];
     }

@@ -1,0 +1,213 @@
+{#
+/**
+ * @file
+ * Tree UI for one menu. Server-renders the top level so:
+ *  - no-JS users see at least the top level
+ *  - the custom element upgrades existing DOM rather than rebuilding
+ *  - first paint is the actual tree, not a loading spinner.
+ *
+ * Available variables:
+ * - menu:             the menu entity
+ * - top_level:        rendered row render-arrays for the root level
+ * - columns:          array of column header info keyed by plugin ID,
+ *                     each entry: { id, label }
+ * - search_action:    URL for the search results endpoint
+ * - children_action:  URL for the children rows endpoint
+ * - csrf_token:       placeholder for the CSRF header token, replaced when the
+ *                     page is rendered
+ * - column_update_url: URL the column-update client posts checkbox changes to
+ * - move_url:         URL the reorder feature posts moves to
+ * - reorder_blocked:  whether reordering is off because a link has a pending
+ *                     revision
+ */
+#}
+<div class="menu-tree-ui">
+  <noscript>
+    <div class="messages messages--warning">
+      {% if truncated %}
+        {{ 'Only the first @shown of @total links are shown. This tree UI needs JavaScript to load the rest, expand levels, and search. To edit @menu without JavaScript, use the classic menu administration:'|t({'@shown': page_size, '@total': total, '@menu': menu.label}) }}
+      {% else %}
+        {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu administration:'|t({'@menu': menu.label}) }}
+      {% endif %}
+      <a href="{{ path('entity.menu.links', {menu: menu.id}) }}">{{ 'Open the classic administration for @menu'|t({'@menu': menu.label}) }}</a>
+    </div>
+  </noscript>
+
+  {#
+    The "Keyboard commands" dialog. A native <dialog> opened by the trigger at
+    the end of the instruction line below; the close button uses
+    <form method="dialog"> so closing needs no JS. menu-tree.js wires the open.
+  #}
+  <dialog class="menu-tree-ui__help-dialog" aria-labelledby="menu-tree-ui-help-title">
+    <div class="menu-tree-ui__help-dialog-inner">
+      <h2 id="menu-tree-ui-help-title">{{ 'Keyboard commands'|t }}</h2>
+
+      <h3>{{ 'Moving around'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move between items.'|t }}</dd>
+        <dt><kbd>{{ 'Right'|t }}</kbd></dt>
+        <dd>{{ 'Open an item that has children, or move to its first child.'|t }}</dd>
+        <dt><kbd>{{ 'Left'|t }}</kbd></dt>
+        <dd>{{ 'Close an item, or move to its parent.'|t }}</dd>
+        <dt><kbd>{{ 'Home'|t }}</kbd> / <kbd>{{ 'End'|t }}</kbd></dt>
+        <dd>{{ 'Jump to the first or last item.'|t }}</dd>
+        <dt><kbd>{{ 'Enter'|t }}</kbd></dt>
+        <dd>{{ 'Open or close an item that has children.'|t }}</dd>
+      </dl>
+
+      <h3>{{ 'Moving an item'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Space'|t }}</kbd></dt>
+        <dd>{{ 'Pick up the focused item to move it. The item then moves with you to show where it will land, and stays in view the whole time.'|t }}</dd>
+        <dt><kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move the item up or down one position.'|t }}</dd>
+        <dt><kbd>{{ 'Right'|t }}</kbd> / <kbd>{{ 'Left'|t }}</kbd></dt>
+        <dd>{{ 'Change how deeply the item is nested. Right nests it under the item above, opening that item if it is closed; Left moves it back out.'|t }}</dd>
+        <dt><kbd>{{ 'Enter'|t }}</kbd> / <kbd>{{ 'Space'|t }}</kbd></dt>
+        <dd>{{ 'Drop the item at the position you chose.'|t }}</dd>
+        <dt><kbd>{{ 'Escape'|t }}</kbd></dt>
+        <dd>{{ 'Cancel the move and put the item back.'|t }}</dd>
+        <dt>{{ 'Mouse'|t }}</dt>
+        <dd>{{ 'Click the handle to pick an item up, click a row to set where it goes, then click the handle again to drop it. Searching for a destination keeps the item picked up.'|t }}</dd>
+      </dl>
+
+      <h3>{{ 'Quick reorder'|t }}</h3>
+      <dl class="menu-tree-ui__help-list">
+        <dt><kbd>{{ 'Shift'|t }}</kbd> + <kbd>{{ 'Up'|t }}</kbd> / <kbd>{{ 'Shift'|t }}</kbd> + <kbd>{{ 'Down'|t }}</kbd></dt>
+        <dd>{{ 'Move an item up or down among its siblings.'|t }}</dd>
+      </dl>
+
+      <form method="dialog">
+        <button class="menu-tree-ui__help-close">{{ 'Close'|t }}</button>
+      </form>
+    </div>
+  </dialog>
+
+  {#
+    Add link. The primary create action for the menu, kept distinct from the
+    Save/Cancel bar (which keeps or discards reorders). It links to the standard
+    menu-link add form with a destination back to this page.
+  #}
+  {% if add_link_url %}
+    <div class="menu-tree-ui__primary-actions">
+      <a href="{{ add_link_url }}" class="button button--action button--primary menu-tree-ui__add-link">{{ 'Add link'|t }}</a>
+    </div>
+  {% endif %}
+
+  {# Search bar above the list, with results popover anchored to the input. #}
+  <div class="menu-tree-ui__search-container" role="search">
+    <label for="menu-tree-ui-search-input" class="visually-hidden">
+      {{ 'Search @menu'|t({'@menu': menu.label}) }}
+    </label>
+    <input
+      id="menu-tree-ui-search-input"
+      type="search"
+      name="q"
+      class="menu-tree-ui__search-input form-element"
+      placeholder="{{ 'Search menu links…'|t }}"
+      autocomplete="off"
+      hx-get="{{ search_action }}"
+      hx-trigger="keyup changed delay:250ms, search"
+      hx-target="#menu-tree-ui-search-results"
+      hx-select="[data-mtu-search-results] > *"
+      hx-swap="innerHTML ignoreTitle:true"
+    >
+    <div
+      id="menu-tree-ui-search-results"
+      class="menu-tree-ui__search-results"
+      aria-live="polite"
+    ></div>
+  </div>
+
+  {% if locked %}
+    <div class="menu-tree-ui__lock messages messages--warning" role="alert">
+      {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({'@user': lock_owner}) }}
+      {% if lock_updated %}
+        {{ 'Their changes were last saved @time.'|t({'@time': lock_updated|format_date('short')}) }}
+      {% endif %}
+      {% if break_lock_url %}
+        <a href="{{ break_lock_url }}">{{ 'Break lock'|t }}</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if reorder_blocked %}
+    <div class="menu-tree-ui__pending-revisions messages messages--warning" role="alert">
+      {{ 'Reordering is off because links in this menu have pending revisions. Publish or discard those revisions to re-enable it.'|t }}
+    </div>
+  {% endif %}
+
+  {#
+    Save / Cancel action bar. Moves are recorded in a per-user working copy
+    rather than written immediately, so the editor can apply many changes and
+    then keep or discard them. working-copy.js posts to the save/cancel routes
+    and toggles the unsaved notice after the first change.
+
+    The bar (and only the bar) is sticky at the top while the tree scrolls.
+    Save/Cancel lead; the unsaved notice sits to their right and wraps above
+    them when the row is too narrow. Other page messages use the normal space.
+  #}
+  <div class="menu-tree-ui__action-bar">
+    <div class="menu-tree-ui__actions">
+      <button type="button" class="menu-tree-ui__save button button--primary" data-mtu-action="save"{{ locked ? ' disabled' : '' }}>{{ 'Save'|t }}</button>
+      <button type="button" class="menu-tree-ui__cancel button" data-mtu-action="cancel"{{ locked ? ' disabled' : '' }}>{{ 'Cancel'|t }}</button>
+    </div>
+    <div
+      class="menu-tree-ui__unsaved messages messages--warning{{ has_changes ? '' : ' js-hide' }}"
+      aria-live="polite"
+      role="status"
+    >{{ 'You have unsaved changes.'|t }}</div>
+    <div class="menu-tree-ui__save-error"></div>
+    <div class="menu-tree-ui__needs-reload messages messages--warning" data-mtu-needs-reload hidden>
+      <span class="menu-tree-ui__needs-reload-message" id="menu-tree-ui-needs-reload-message" data-mtu-needs-reload-message></span>
+      <button type="button" class="menu-tree-ui__reload button" aria-describedby="menu-tree-ui-needs-reload-message" data-mtu-action="reload">{{ 'Reload'|t }}</button>
+    </div>
+  </div>
+
+  {#
+    Always-visible interaction hint, with the "Keyboard commands" dialog trigger
+    at the end of the line. The tree is one tab stop and is then driven with the
+    arrow keys, which is easy to miss; this names the keys up front and is the
+    treegrid's aria-describedby target, so assistive tech announces it on entry.
+    The full shortcut list is in the dialog the trigger opens.
+  #}
+  <p class="menu-tree-ui__instructions">
+    <span id="menu-tree-ui-instructions">{{ "Use the arrow keys to move between items, Space to pick one up and move it, and Tab to reach a row's controls."|t }}</span>
+    <button type="button" class="menu-tree-ui__help-toggle">{{ 'All keyboard commands'|t }}</button>
+  </p>
+
+  {% if truncated %}
+    <div class="menu-tree-ui__truncation messages messages--status" role="status">
+      {{ 'Showing the first @shown of @total links. The rest load as you scroll.'|t({'@shown': page_size, '@total': total}) }}
+    </div>
+  {% endif %}
+
+  <drupal-treegrid
+    class="menu-tree-ui__tree"
+    data-provider="menu_tree_ui"
+    data-menu="{{ menu.id }}"
+    data-children-url="{{ children_action }}"
+    data-treegrid-csrf-token="{{ csrf_token }}"
+    data-treegrid-column-update-url="{{ column_update_url }}"
+    data-treegrid-reorder-move-url="{{ move_url }}"
+    data-treegrid-top-total="{{ total }}"
+    data-treegrid-page-size="{{ page_size }}"
+  >
+    <table role="treegrid" aria-label="{{ menu.label }}" aria-describedby="menu-tree-ui-instructions" class="menu-tree-ui__table">
+      <thead>
+        <tr>
+          <th scope="col" class="menu-tree-ui__col menu-tree-ui__col--name">{{ 'Name'|t }}</th>
+          {% for col in columns %}
+            <th scope="col" class="menu-tree-ui__col {{ col.id == 'operations' ? 'menu-tree-ui__col--operations' : 'menu-tree-ui__col--data' }}">{{ col.label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in top_level %}
+          {{ row }}
+        {% endfor %}
+      </tbody>
+    </table>
+  </drupal-treegrid>
+</div>

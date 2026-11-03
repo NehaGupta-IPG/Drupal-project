@@ -1,0 +1,37 @@
+/**
+ * @file
+ * Minimal styling for the reorder test consumer.
+ *
+ * Only a drag handle, the toggle and spacer, and the form fields; the drop
+ * indicator and the row states come from treegrid_reorder's stylesheet.
+ */
+
+.reorder-test-handle {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-inline-end: 0.5rem;
+  cursor: grab;
+  vertical-align: middle;
+  background: #ccc;
+}
+
+.reorder-test-toggle,
+.reorder-test-spacer {
+  display: inline-block;
+  min-width: 1rem;
+  min-height: 1rem;
+  margin-inline-end: 0.5rem;
+  vertical-align: middle;
+}
+
+/* The inactive one of the toggle and spacer is hidden by the row's state. */
+tr[data-has-children="true"] .reorder-test-spacer,
+tr[data-has-children="false"] .reorder-test-toggle {
+  display: none;
+}
+
+.reorder-test-field {
+  display: block;
+  margin-block: 0.5rem;
+}

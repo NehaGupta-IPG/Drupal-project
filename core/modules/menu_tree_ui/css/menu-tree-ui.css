@@ -1,0 +1,513 @@
+/*
+ * Menu tree UI styles.
+ *
+ * Strategy: define a thin bridge layer of --mtu-color-* variables, scoped to
+ * .menu-tree-ui. All color rules in this file use ONLY those bridge
+ * variables — never hardcoded hex. Each bridge variable resolves to a
+ * semantic token of the default admin theme (--admin-color-*, dark-mode
+ * aware via light-dark()) with a static light-scheme fallback for themes
+ * that do not define the token. Any theme can also override the bridge
+ * variables on its own selectors.
+ *
+ * Virtualization: [data-treegrid-virtualized="true"] is set by RowWindow
+ * (IntersectionObserver, see treegrid/js/windowing.js) for rows deep
+ * off-screen; the rule below hard-floors their cost via visibility:hidden +
+ * fixed height.
+ */
+
+.menu-tree-ui {
+  --mtu-color-divider: var(--admin-color-border, #e0e0e0);
+  --mtu-color-divider-light: var(--admin-color-border-table, #f0f0f0);
+  --mtu-color-bg: var(--admin-color-bg-surface, #fff);
+  --mtu-color-bg-raised: var(--admin-color-bg-raised, #fff);
+  --mtu-color-bg-inset: var(--admin-color-bg-sunken, #f0f0f0);
+  --mtu-color-text: var(--admin-color-text, #1a1a1a);
+  --mtu-color-text-muted: var(--admin-color-text-soft, #757575);
+  --mtu-color-icon: var(--admin-color-icon, #787878);
+  --mtu-color-focus: var(--admin-color-focus, #2563eb);
+  --mtu-color-link: var(--admin-color-link, #2563eb);
+  --mtu-color-focus-bg: var(--admin-color-bg-item, rgb(37, 99, 235, 0.08));
+  --mtu-shadow-popover: var(--admin-shadow-2, 0 8px 24px rgb(0, 0, 0, 0.12));
+
+  /* The reorder feature draws its indicator and row states in these. */
+  --treegrid-reorder-color: var(--mtu-color-focus);
+  --treegrid-reorder-indicator-size: 3px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/*
+ * The search container anchors the results popover. `position: relative`
+ * scopes the absolutely-positioned results below.
+ */
+.menu-tree-ui__search-container {
+  position: relative;
+}
+
+/*
+ * The search <input> carries the `form-element` class so the admin theme
+ * supplies its padding, border, border-radius, and font — no overrides needed here.
+ */
+.menu-tree-ui__search-input {
+  width: 100%;
+}
+
+/*
+ * Autocomplete-style results popover. Hangs from the input on its z-axis.
+ * `:not(:has(*))` hides it when the htmx swap leaves no element children.
+ */
+.menu-tree-ui__search-results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  left: 0;
+  overflow-y: auto;
+  max-height: 60vh;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 4px;
+  background: var(--mtu-color-bg-raised);
+  box-shadow: var(--mtu-shadow-popover);
+}
+
+.menu-tree-ui__search-results:not(:has(*)) {
+  display: none;
+}
+
+.menu-tree-ui-search-results__empty,
+.menu-tree-ui-search-results__summary {
+  margin: 0 0 0.25rem;
+  color: var(--mtu-color-text-muted);
+  font-size: 0.85rem;
+}
+
+.menu-tree-ui-search-results__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-tree-ui-search-results__item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--mtu-color-divider-light);
+}
+
+.menu-tree-ui-search-results__item:last-child {
+  border-bottom: 0;
+}
+
+.menu-tree-ui-search-results__title {
+  display: inline-block;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--mtu-color-link);
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+}
+
+.menu-tree-ui-search-results__title:hover,
+.menu-tree-ui-search-results__title:focus {
+  text-decoration: underline;
+  outline: none;
+}
+
+.menu-tree-ui-search-results__title:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: 2px;
+}
+
+.menu-tree-ui-search-results__breadcrumb {
+  color: var(--mtu-color-text-muted);
+  font-size: 0.8rem;
+}
+
+.menu-tree-ui-search-results__item--disabled .menu-tree-ui-search-results__title {
+  text-decoration: line-through;
+  color: var(--mtu-color-text-muted);
+}
+
+/* ───────────────────────────────────────────────────── save / cancel */
+
+/*
+ * The action bar sticks to the top while the tree scrolls (the column header
+ * is intentionally not sticky). wrap-reverse keeps Save/Cancel on the left with
+ * the unsaved notice pushed to their right, and sends the notice to a line
+ * ABOVE the buttons (not below) once the row is too narrow. A solid background
+ * keeps scrolled rows from showing through; the z-index sits above the rows but
+ * below the search results popover (z-index 10).
+ */
+.menu-tree-ui__action-bar {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-block: 0.5rem;
+  background: var(--mtu-color-bg);
+}
+
+.menu-tree-ui__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/*
+ * The unsaved notice rides in the action bar rather than the message space:
+ * sized to its content and pushed to the right edge when it shares the row with
+ * the buttons (wrap-reverse lifts it above them when it cannot fit). Its
+ * vertical padding is trimmed to the Save/Cancel row height so revealing it does
+ * not grow the sticky bar and shift the tree below it; the descendant selector
+ * outranks the themed .messages padding it would otherwise inherit.
+ */
+.menu-tree-ui__action-bar .menu-tree-ui__unsaved {
+  flex: 0 1 auto;
+  margin: 0;
+  margin-inline-start: auto;
+  padding-block: 0.25rem;
+}
+
+/*
+ * Save and Cancel failures render here (Drupal.Message), on a row of their own
+ * in the action bar. aria-disabled marks the buttons as busy while a request
+ * is in flight; the admin theme only styles the disabled attribute.
+ */
+.menu-tree-ui__save-error {
+  flex-basis: 100%;
+}
+
+.menu-tree-ui__save-error:empty {
+  display: none;
+}
+
+.menu-tree-ui__actions [aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* ──────────────────────────────────────────────────────────────── tree */
+
+/*
+ * The tree is a real <table>, so the admin theme styles the header, cell
+ * padding, borders, and row hover for free — matching the classic menu admin.
+ * Only the tree-specific bits below are layered on top.
+ */
+.menu-tree-ui__table {
+  width: 100%;
+}
+
+.menu-tree-ui__table td {
+  vertical-align: middle;
+}
+
+/* The checkbox column controls sit centered under their header. The
+   operations column is a full column too, but its dropbutton keeps the default
+   alignment. */
+.menu-tree-ui__col--data,
+.menu-tree-ui-row__column:not([data-column="operations"]) {
+  text-align: center;
+}
+
+/* The operations dropbutton is a list; drop the theme's bullets and margins. */
+.menu-tree-ui-row__operations li,
+.menu-tree-ui-row__operations ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Keep the keyboard cursor clear of the sticky action bar. focusRow() lets the
+ * browser scroll a focused row into view, and the browser ignores the sticky
+ * overlay, so without this the cursor can land hidden under the bar. The offset
+ * is the bar's live height: menu-tree.js measures it into --mtu-sticky-offset
+ * and keeps it current as the bar wraps; the fallback covers the moment before
+ * that script runs.
+ */
+.menu-tree-ui-row {
+  scroll-margin-block-start: var(--mtu-sticky-offset, 4rem);
+}
+
+/*
+ * Highlight the row that holds focus (on its handle, toggle, switch, or links).
+ * Raise it above its neighbors so the focused control's focus ring — which the
+ * theme draws as a box-shadow extending outside the element — is not painted
+ * over by the adjacent rows.
+ */
+.menu-tree-ui-row:focus-within {
+  position: relative;
+  z-index: 1;
+  background-color: var(--mtu-color-focus-bg);
+}
+
+@keyframes menu-tree-ui-flash {
+  0% {
+    background-color: var(--mtu-color-focus-bg);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.menu-tree-ui-row--flash {
+  animation: menu-tree-ui-flash 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-tree-ui-row--flash {
+    animation: none;
+    background-color: var(--mtu-color-focus-bg);
+  }
+}
+
+.menu-tree-ui-row__name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.menu-tree-ui-row__handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 2.25rem;
+  user-select: none;
+  touch-action: none;
+  color: var(--mtu-color-icon);
+}
+
+:where(.menu-tree-ui-row__handle) {
+  cursor: grab;
+}
+
+/*
+ * Movable handles reuse core's tabledrag move icon so the affordance matches
+ * the classic menu admin. The icon is a mask filled with currentColor, so it
+ * follows the handle's color in both color schemes and picks up the
+ * stronger text color on hover/focus. The locked variant overrides this
+ * back to a dimmed dot below.
+ */
+.menu-tree-ui-row__handle-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  font-size: 0;
+  mask-image: url(../../../misc/icons/787878/move.svg);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+.menu-tree-ui-row__handle:hover,
+.menu-tree-ui-row__handle:focus-visible {
+  color: var(--mtu-color-text);
+}
+
+.menu-tree-ui-row__handle:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: -2px;
+}
+
+.menu-tree-ui-row__handle--locked {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.menu-tree-ui-row__handle--locked .menu-tree-ui-row__handle-icon {
+  width: auto;
+  height: auto;
+  background-color: transparent;
+  font-size: 0.6rem;
+  mask-image: none;
+}
+
+.menu-tree-ui__needs-reload[hidden] {
+  display: none;
+}
+
+.menu-tree-ui-row__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  cursor: pointer;
+  color: var(--mtu-color-text);
+  border: 0;
+  background: transparent;
+}
+
+.menu-tree-ui-row__toggle--spacer {
+  cursor: default;
+}
+
+/*
+ * Every row renders both the toggle and the spacer; data-has-children decides
+ * which one shows.
+ */
+.menu-tree-ui-row[data-has-children="true"] .menu-tree-ui-row__toggle--spacer,
+.menu-tree-ui-row[data-has-children="false"] button.menu-tree-ui-row__toggle {
+  display: none;
+}
+
+/*
+ * CSS-drawn chevron (font-size:0 hides the ▸ glyph; borders form the arrow).
+ * Collapsed: rotate(45deg) → right.  Expanded: rotate(135deg) → down.
+ */
+.menu-tree-ui-row__chevron {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  transition: transform 160ms ease;
+  transform: rotate(45deg);
+  transform-origin: 50% 50%;
+  border-top: 0.125rem solid currentColor;
+  border-right: 0.125rem solid currentColor;
+  font-size: 0;
+}
+
+.menu-tree-ui-row[aria-expanded="true"] .menu-tree-ui-row__chevron {
+  transform: rotate(135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-tree-ui-row__chevron {
+    transition: none;
+  }
+}
+
+.menu-tree-ui-row__title {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.menu-tree-ui-row--disabled .menu-tree-ui-row__title {
+  text-decoration: line-through;
+  color: var(--mtu-color-text-muted);
+}
+
+/*
+ * Hard-floor virtualization: rows deep off-screen hide their content but
+ * keep their height so the scrollbar stays accurate.
+ */
+.menu-tree-ui-row[data-treegrid-virtualized="true"] > .menu-tree-ui-row__cell {
+  visibility: hidden;
+}
+
+/* ─────────────────────────────────────────────────────── operations */
+
+.menu-tree-ui-row__operations {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+/* ──────────────────────────────────────────────────── keyboard help */
+
+.menu-tree-ui__help-toggle {
+  align-self: flex-start;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--mtu-color-link);
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.menu-tree-ui__help-toggle:focus-visible {
+  outline: 2px solid var(--mtu-color-focus);
+  outline-offset: 2px;
+}
+
+.menu-tree-ui__help-dialog {
+  width: calc(100% - 2rem);
+  max-width: 32rem;
+  padding: 0;
+  color: var(--mtu-color-text);
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 6px;
+  background: var(--mtu-color-bg);
+}
+
+.menu-tree-ui__help-dialog::backdrop {
+  background: rgb(0, 0, 0, 0.4);
+}
+
+.menu-tree-ui__help-dialog-inner {
+  padding: 1.25rem 1.5rem;
+}
+
+.menu-tree-ui__help-dialog h2 {
+  margin-top: 0;
+}
+
+.menu-tree-ui__help-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0 0 1rem;
+}
+
+.menu-tree-ui__help-list dt {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.menu-tree-ui__help-list dd {
+  margin: 0;
+}
+
+.menu-tree-ui__help-dialog kbd {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--mtu-color-divider);
+  border-radius: 3px;
+  background: var(--mtu-color-bg-inset);
+  font-size: 0.85em;
+}
+
+/* "Add link" primary action, above the search box. */
+.menu-tree-ui__primary-actions {
+  margin-block-end: 1rem;
+}
+
+/*
+ * Scroll sentinel for top-level paging: an empty, non-interactive marker after
+ * the table. A small height keeps the IntersectionObserver reliable across
+ * browsers.
+ */
+.menu-tree-ui__paging-sentinel {
+  height: 1px;
+}
+
+/*
+ * Forced colors remove the handle icon's background fill and the grabbed row's
+ * shadow. The handle icon is drawn in a system color, and the grabbed row gets
+ * a dashed outline with enough specificity to beat the admin theme's focus
+ * outline on the focused row.
+ */
+@media (forced-colors: active) {
+  .menu-tree-ui-row__handle-icon {
+    background-color: LinkText;
+  }
+
+  .menu-tree-ui .menu-tree-ui-row[data-treegrid-reorder-grabbed] {
+    outline: 2px dashed Highlight;
+    outline-offset: -2px;
+  }
+}

@@ -127,9 +127,9 @@ class MenuLinkContentFormTest extends BrowserTestBase {
     ]);
     $menu_link->save();
 
-    // When we are on the listing page, we should be able to see the altered
+    // When we are on the menu links page, we should be able to see the altered
     // values by alter hook in the operations link menu.
-    $this->drupalGet('/admin/structure/menu/manage/main');
+    $this->drupalGet('/admin/structure/menu/manage/main/links');
     $this->assertSession()->linkExists('Altered Edit Title');
     $this->assertSession()->linkExists('Custom Home');
   }

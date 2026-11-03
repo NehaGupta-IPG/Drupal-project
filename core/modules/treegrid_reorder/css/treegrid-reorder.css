@@ -1,0 +1,84 @@
+/**
+ * @file
+ * Styles for the drop indicator and the row states treegrid_reorder sets.
+ *
+ * Every selector sits inside :where(), so it carries no specificity and a
+ * consumer's own rule wins. The colors and the indicator's thickness come from
+ * two custom properties a consumer can set on the tree or any ancestor:
+ *  - --treegrid-reorder-color (default Highlight)
+ *  - --treegrid-reorder-indicator-size (default 3px)
+ */
+
+/*
+ * The line shown between rows while dragging. It is drawn with a border:
+ * forced-colors modes drop backgrounds and shadows, but keep borders.
+ */
+:where(.treegrid-reorder-indicator) {
+  position: absolute;
+  z-index: 5;
+  display: none;
+  height: 0;
+  margin-block-start: calc(var(--treegrid-reorder-indicator-size, 3px) / -2);
+  pointer-events: none;
+  border-block-start: var(--treegrid-reorder-indicator-size, 3px) solid var(--treegrid-reorder-color, Highlight);
+}
+
+:where(tr[data-treegrid-reorder-dragging]) {
+  opacity: 0.4;
+}
+
+/*
+ * The row picked up for a move. An inset shadow and a tint, so the row's
+ * focus outline stays free for the focus ring.
+ */
+:where(tr[data-treegrid-reorder-grabbed]) {
+  background-color: color-mix(in sRGB, var(--treegrid-reorder-color, Highlight) 12%, transparent);
+  box-shadow: inset 0 0 0 2px var(--treegrid-reorder-color, Highlight);
+}
+
+/* The row a drop would nest the moved row under. */
+:where(tr[data-treegrid-reorder-drop-target="child"]) {
+  outline: 2px solid var(--treegrid-reorder-color, Highlight);
+  outline-offset: -2px;
+  background-color: color-mix(in sRGB, var(--treegrid-reorder-color, Highlight) 12%, transparent);
+}
+
+@keyframes treegrid-reorder-flash {
+  0% {
+    background-color: color-mix(in sRGB, var(--treegrid-reorder-color, Highlight) 20%, transparent);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+:where(tr[data-treegrid-reorder-flash]) {
+  animation: treegrid-reorder-flash 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(tr[data-treegrid-reorder-flash]) {
+    animation: none;
+    background-color: color-mix(in sRGB, var(--treegrid-reorder-color, Highlight) 20%, transparent);
+  }
+}
+
+/* Forced colors drop shadows, so the grabbed row gets a dashed outline. */
+@media (forced-colors: active) {
+  :where(tr[data-treegrid-reorder-grabbed]) {
+    outline: 2px dashed Highlight;
+    outline-offset: -2px;
+    box-shadow: none;
+  }
+}
+
+/* A closed hand on the handle of the row being dragged. */
+:where(tr[data-treegrid-reorder-dragging] [data-treegrid-reorder-handle]) {
+  cursor: grabbing;
+}
+
+/* A busy pointer on the handles while a move is unfinished. */
+:where([data-treegrid-reorder-moving] [data-treegrid-reorder-handle]) {
+  cursor: progress;
+}

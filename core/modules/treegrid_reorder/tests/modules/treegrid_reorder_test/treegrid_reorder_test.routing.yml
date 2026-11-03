@@ -1,0 +1,36 @@
+treegrid_reorder_test.page:
+  path: '/treegrid-reorder-test'
+  defaults:
+    _controller: 'Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController::page'
+    _title: 'Tree grid reorder test'
+  requirements:
+    _access: 'TRUE'
+
+treegrid_reorder_test.children:
+  path: '/treegrid-reorder-test/children'
+  defaults:
+    _controller: 'Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController::children'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _htmx_route: TRUE
+    no_cache: TRUE
+    _no_big_pipe: TRUE
+
+treegrid_reorder_test.move:
+  path: '/treegrid-reorder-test/move'
+  defaults:
+    _controller: 'Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController::move'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'
+
+treegrid_reorder_test.echo:
+  path: '/treegrid-reorder-test/echo'
+  defaults:
+    _controller: 'Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController::echoWrite'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'

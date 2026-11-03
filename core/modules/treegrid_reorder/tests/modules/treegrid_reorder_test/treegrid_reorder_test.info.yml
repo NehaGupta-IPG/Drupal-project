@@ -1,0 +1,8 @@
+name: 'Tree grid reorder test'
+type: module
+description: 'A minimal treegrid consumer for exercising the reorder gestures in isolation.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:treegrid
+  - drupal:treegrid_reorder

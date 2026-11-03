@@ -1,0 +1,6 @@
+name: 'Tree grid'
+type: module
+description: 'Reusable lazy-loaded, keyboard-navigable treegrid for building scalable hierarchical admin UIs.'
+package: 'Core (Experimental)'
+version: VERSION
+lifecycle: experimental

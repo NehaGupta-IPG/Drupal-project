@@ -1,0 +1,7 @@
+name: 'Tree grid test UI'
+type: module
+description: 'A minimal treegrid consumer for exercising the spine (element, lazy load, navigation, loaded rows) in isolation.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:treegrid

@@ -1,0 +1,19 @@
+treegrid:
+  version: VERSION
+  js:
+    js/tree-nav.js: {}
+    js/queue.js: {}
+    js/csrf-token.js: {}
+    js/column-update.js: {}
+    js/keyboard.js: {}
+    js/expand.js: {}
+    js/windowing.js: {}
+    js/treegrid-element.js: {}
+  css:
+    component:
+      css/treegrid.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.announce
+    - core/drupal.htmx

@@ -1,0 +1,8 @@
+name: 'Tree grid reorder'
+type: module
+description: 'Adds drag-and-drop and keyboard reordering to Tree grid UIs, with universal move validation and an optional working copy. Consumers supply the domain rules and the write.'
+package: 'Core (Experimental)'
+version: VERSION
+lifecycle: experimental
+dependencies:
+  - drupal:treegrid

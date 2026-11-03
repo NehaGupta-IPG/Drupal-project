@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * A checkbox cell for a treegrid column.
+ *
+ * Variables:
+ * - value: whether the box is checked.
+ * - label: plain text for the control's aria-label.
+ * - interactive: whether the box can be changed; FALSE renders it disabled.
+ * - column_id: the column plugin ID, sent when the value changes.
+ */
+#}
+<input
+  type="checkbox"
+  class="treegrid-cell-checkbox"
+  {% if value %}checked{% endif %}
+  {% if not interactive %}disabled{% endif %}
+  aria-label="{{ label }}"
+  data-column-id="{{ column_id }}"
+  data-treegrid-control
+>

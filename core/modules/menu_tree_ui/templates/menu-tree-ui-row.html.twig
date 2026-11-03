@@ -1,0 +1,118 @@
+{#
+/**
+ * @file
+ * A single row in the menu tree.
+ *
+ * Rendered as a flat <tr role="row"> in a <table role="treegrid">. Hierarchy is
+ * not structural (tables cannot nest rows): a row's depth is carried by
+ * aria-level and its parent by data-parent-id, and children are inserted as
+ * sibling <tr>s immediately after their parent. See js/tree-nav.js for the
+ * descendant-run helpers that read this shape.
+ *
+ * Variables:
+ * - element:    \Drupal\Core\Menu\MenuLinkTreeElement
+ * - parent_id:  parent link plugin ID, or '' for the top level
+ * - depth:      1-based depth (matches aria-level)
+ * - pos_in_set: 1-based position among siblings
+ * - set_size:   total siblings at this level
+ * - movable:    whether the link supports parent/weight changes
+ * - columns:    keyed by column plugin ID, each a cell render array (the
+ *               operations dropbutton is the last column)
+ */
+#}
+{% set link = element.link %}
+{% set has_children = element.hasChildren %}
+{% set plugin_id = link.getPluginId() %}
+{% set title = link.getTitle() %}
+{% set enabled = link.isEnabled() %}
+
+<tr
+  role="row"
+  class="menu-tree-ui-row {{ enabled ? '' : 'menu-tree-ui-row--disabled' }} {{ has_children ? 'menu-tree-ui-row--parent' : 'menu-tree-ui-row--leaf' }}"
+  data-id="{{ plugin_id }}"
+  data-parent-id="{{ parent_id }}"
+  data-has-children="{{ has_children ? 'true' : 'false' }}"
+  data-movable="{{ movable ? 'true' : 'false' }}"
+  aria-level="{{ depth }}"
+  aria-posinset="{{ pos_in_set }}"
+  aria-setsize="{{ set_size }}"
+  {% if has_children %}aria-expanded="false"{% endif %}
+  {#
+    The row carries its own accessible name so a screen reader announces one
+    curated string (the title, plus "(locked)" when the link cannot be
+    reordered) instead of flattening every control in the row into one
+    utterance. Per-column state is announced by each cell's own control on Tab,
+    so this name stays column-agnostic.
+  #}
+  aria-label="{{ movable ? title : '@title (locked)'|t({'@title': title}) }}"
+  {#
+    The row is the keyboard cursor and the tree's single roving tab stop: the
+    first top-level row is the initial stop, every other row starts at -1 and is
+    promoted as the cursor moves (see js/tree-nav.js focusRow). aria-selected is
+    added only while a row is picked up for a move (see js/move-mode.js).
+  #}
+  tabindex="{{ (parent_id == '' and pos_in_set == 1) ? '0' : '-1' }}"
+>
+  {#
+    Menu-link cell. Like the classic menu admin, the drag handle, expand toggle,
+    and title share one cell, and the whole group is indented by depth, so the
+    handle moves with the item. Keyboard focus lives on the row, not the handle:
+    the handle is a pointer/drag affordance only and is hidden from assistive
+    technology (aria-hidden), since keyboard users reorder from the row (Space)
+    and the row's aria-label already names the item. Movable links (content
+    links and static links that support parent/weight overrides) grab to
+    reorder; the rest keep the locked class so the pointer drag skips them.
+    See \Drupal\menu_tree_ui\MenuLinkMovability.
+  #}
+  <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__cell--name">
+    <div class="menu-tree-ui-row__name" data-treegrid-name-cell style="padding-inline-start: calc({{ depth - 1 }} * var(--treegrid-indent, 1.25rem));">
+      {% if movable %}
+        <span
+          class="menu-tree-ui-row__handle"
+          title="{{ 'Drag to reorder, or click to pick up'|t }}"
+          aria-hidden="true"
+          data-treegrid-reorder-handle
+        >
+          <span class="menu-tree-ui-row__handle-icon"></span>
+        </span>
+      {% else %}
+        <span
+          class="menu-tree-ui-row__handle menu-tree-ui-row__handle--locked"
+          aria-hidden="true"
+          data-treegrid-reorder-handle
+        >
+          <span class="menu-tree-ui-row__handle-icon">·</span>
+        </span>
+      {% endif %}
+
+      {#
+        Both are always rendered; the row's data-has-children decides which one
+        shows (see the stylesheet), so a row that gains or loses children needs
+        no markup change.
+      #}
+      <button
+        type="button"
+        class="menu-tree-ui-row__toggle"
+        aria-label="{{ 'Toggle children of @title'|t({'@title': title}) }}"
+        data-treegrid-toggle
+        tabindex="-1"
+      >
+        <span aria-hidden="true" class="menu-tree-ui-row__chevron">▸</span>
+      </button>
+      <span class="menu-tree-ui-row__toggle menu-tree-ui-row__toggle--spacer" aria-hidden="true"></span>
+
+      {% if linked %}
+        <a href="{{ url }}" class="menu-tree-ui-row__title" data-treegrid-control data-treegrid-reorder-title>{{ title }}</a>
+      {% else %}
+        <span class="menu-tree-ui-row__title" data-treegrid-reorder-title>{{ title }}</span>
+      {% endif %}
+    </div>
+  </td>
+
+  {# Column cells — one gridcell per active column plugin. #}
+  {% for col_id, cell in columns %}
+    <td role="gridcell" class="menu-tree-ui-row__cell menu-tree-ui-row__column" data-column="{{ col_id }}">
+      {{ cell }}
+    </td>
+  {% endfor %}
+</tr>

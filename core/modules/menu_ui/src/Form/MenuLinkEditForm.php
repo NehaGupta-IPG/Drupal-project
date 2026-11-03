@@ -97,7 +97,7 @@ class MenuLinkEditForm extends FormBase {
 
     $this->messenger()->addStatus($this->t('The menu link has been saved.'));
     $form_state->setRedirect(
-      'entity.menu.edit_form',
+      'entity.menu.links',
       ['menu' => $link->getMenuName()]
     );
   }

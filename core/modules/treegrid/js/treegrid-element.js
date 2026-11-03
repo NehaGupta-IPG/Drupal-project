@@ -1,0 +1,470 @@
+/**
+ * @file
+ * The <drupal-treegrid> custom element: the reusable treegrid spine.
+ *
+ * Upgrades a server-rendered <table role="treegrid"> into an interactive,
+ * lazy-loaded, keyboard-navigable tree. It owns the generic behavior — row
+ * windowing, lazy expand/collapse, WAI-ARIA navigation, and the roving-tabindex
+ * focus model — and nothing domain-specific.
+ *
+ * A consumer provides data-children-url: the endpoint returning one level as a
+ * rows response. Rows are rendered by the consumer's own template, and treegrid
+ * sets their position, level and tab stop when it places them.
+ *
+ * Features (reorder, columns, search, …) attach without the element knowing
+ * about them, through:
+ *  - element.ready, a promise that resolves once the element has initialized
+ *    (data-treegrid-ready is set at the same moment).
+ *  - lifecycle events dispatched on the element: treegrid:connected (detail
+ *    { element, tree, reconnected }, bubbles) after init and after each
+ *    reconnect, and treegrid:disconnected ({ element }).
+ *  - an interaction-handler registry: addClickHandler(fn) / addKeyHandler(fn).
+ *    Handlers run in registration order before the element's built-in
+ *    navigation; a handler returns true to consume the event. Each call
+ *    returns a function that removes the handler.
+ *
+ * An element initializes once, when the document has been parsed (an element
+ * added later initializes as it connects). Moving it in the DOM pauses its
+ * listeners and windowing on disconnect and resumes them on reconnect.
+ *
+ * No Drupal.behaviors: connectedCallback fires automatically when the element
+ * enters the DOM, including htmx-swapped content.
+ *
+ * DOM contract:
+ *   <drupal-treegrid data-children-url="…">
+ *     <table role="treegrid">
+ *       <tbody>
+ *         <tr role="row" data-id data-parent-id aria-level …>…</tr>
+ *       </tbody>
+ *     </table>
+ *   </drupal-treegrid>
+ * Rows are flat siblings; hierarchy is aria-level + data-parent-id (see
+ * js/tree-nav.js). The disclosure toggle carries data-treegrid-toggle.
+ */
+
+((Drupal) => {
+  Drupal.treegrid = Drupal.treegrid || {};
+  const { rowOf, focusRow, initRovingTabindex, childRows, visibleRows } =
+    Drupal.treegrid.treeNav;
+  const { handleKeyDown } = Drupal.treegrid;
+
+  const TREE = 'table[role="treegrid"]';
+  const ROW = 'tr[role="row"]';
+  const TOGGLE = '[data-treegrid-toggle]';
+  const INTERACTIVE =
+    'a, button, input, select, textarea, [role="button"], [role="switch"]';
+
+  /**
+   * Creates the hidden table that loaded rows are swapped into.
+   *
+   * It has no role, so the table-wide row queries (which look for the treegrid
+   * table) never see staged rows.
+   *
+   * @return {HTMLTableElement}
+   *   The staging table.
+   */
+  function createStaging() {
+    const table = document.createElement('table');
+    table.setAttribute('data-treegrid-staging', '');
+    table.hidden = true;
+    table.append(document.createElement('tbody'));
+    return table;
+  }
+
+  // Per-element state kept out of the element's public surface.
+  const internals = new WeakMap();
+
+  /**
+   * Adds a handler to a list and returns a function that removes it.
+   *
+   * @param {Array<object>} list
+   *   The handler entries.
+   * @param {function} handler
+   *   The handler.
+   *
+   * @return {function(): void}
+   *   Removes this registration.
+   */
+  function register(list, handler) {
+    const entry = { handler };
+    list.push(entry);
+    return () => {
+      const index = list.indexOf(entry);
+      if (index !== -1) {
+        list.splice(index, 1);
+      }
+    };
+  }
+
+  class TreegridElement extends HTMLElement {
+    constructor() {
+      super();
+      const state = {
+        tree: null,
+        initialized: false,
+        expand: null,
+        clickHandlers: [],
+        keyHandlers: [],
+        onClick: this.onClick.bind(this),
+        onKeyDown: this.onKeyDown.bind(this),
+      };
+      // Inside a unit the loading methods run at once instead of queueing.
+      state.queue = new Drupal.treegrid.Queue(() => ({
+        expandRow: (row) => state.expand.expandInline(row),
+        refreshLevel: (parentId) => state.expand.refresh(parentId),
+      }));
+      state.ready = new Promise((resolve) => {
+        state.resolveReady = resolve;
+      });
+      internals.set(this, state);
+    }
+
+    /**
+     * The <table role="treegrid"> inside the element.
+     *
+     * @return {?HTMLTableElement}
+     *   The table, or null before the element has connected.
+     */
+    get tree() {
+      return internals.get(this).tree;
+    }
+
+    /**
+     * Resolves once the element has initialized.
+     *
+     * @return {Promise<void>}
+     *   The ready promise.
+     */
+    get ready() {
+      return internals.get(this).ready;
+    }
+
+    /**
+     * Adds a click handler that runs before built-in navigation.
+     *
+     * @param {function(MouseEvent): boolean} handler
+     *   Returns true to consume the event (built-in nav is then skipped).
+     *
+     * @return {function(): void}
+     *   Removes the handler.
+     */
+    addClickHandler(handler) {
+      return register(internals.get(this).clickHandlers, handler);
+    }
+
+    /**
+     * Adds a keydown handler that runs before built-in navigation.
+     *
+     * @param {function(KeyboardEvent): boolean} handler
+     *   Returns true to consume the event.
+     *
+     * @return {function(): void}
+     *   Removes the handler.
+     */
+    addKeyHandler(handler) {
+      return register(internals.get(this).keyHandlers, handler);
+    }
+
+    /**
+     * Runs work through the element's request queue.
+     *
+     * Units run one at a time, first in first out. Calling the element's own
+     * queued methods from inside a unit waits behind that unit and never
+     * finishes; use the unit object's methods there.
+     *
+     * @param {function(object): *} fn
+     *   The work. Receives the unit object.
+     *
+     * @return {Promise<*>}
+     *   Settles with what fn returned or threw.
+     */
+    exclusive(fn) {
+      return internals.get(this).queue.run(fn);
+    }
+
+    /**
+     * Opens a row, loading its children first if they are not loaded yet.
+     *
+     * The load waits its turn in the queue. Call the unit object's expandRow()
+     * instead when running inside a unit.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     *
+     * @return {Promise<boolean>}
+     *   True once the row is open and its level is in. False when the load
+     *   failed or was canceled, or the row has no children.
+     */
+    expandRow(row) {
+      return internals.get(this).expand.expandRow(row);
+    }
+
+    /**
+     * Collapses a row, hiding its loaded descendants.
+     *
+     * Never queued. Collapsing a row whose queued load is still waiting cancels
+     * the load.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     *
+     * @return {boolean}
+     *   False when a row marked data-treegrid-keep-visible blocks the collapse.
+     */
+    collapseRow(row) {
+      return internals.get(this).expand.collapseRow(row);
+    }
+
+    /**
+     * Removes a row's descendant rows and forgets that they were loaded.
+     *
+     * Detaches the behaviors of the removed rows. DOM only, never queued.
+     *
+     * @param {HTMLElement} row
+     *   The parent row.
+     */
+    clearChildren(row) {
+      internals.get(this).expand.clearChildren(row);
+    }
+
+    /**
+     * Reloads a level from the server and reconciles its rows.
+     *
+     * Runs through the queue. Call the unit object's refreshLevel() instead
+     * when running inside a unit.
+     *
+     * @param {string} parentId
+     *   The parent's id, or '' for the top level.
+     * @param {object} [options]
+     *   Reserved; no option is defined.
+     *
+     * @return {Promise<boolean>}
+     *   False when the fetch failed.
+     */
+    refreshLevel(parentId, options = {}) {
+      return this.exclusive((unit) => unit.refreshLevel(parentId, options));
+    }
+
+    /**
+     * Validates the markup, then initializes or resumes the element.
+     */
+    connectedCallback() {
+      const state = internals.get(this);
+      if (state.initialized) {
+        this.resume();
+        return;
+      }
+      const tree = this.querySelector(TREE);
+      if (!tree) {
+        console.warn(
+          '[drupal-treegrid] Missing <table role="treegrid"> — skipping upgrade.',
+        );
+        return;
+      }
+      state.tree = tree;
+      if (!this.dataset.childrenUrl) {
+        console.warn(
+          '[drupal-treegrid] Missing data-children-url — skipping upgrade.',
+        );
+        return;
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener(
+          'DOMContentLoaded',
+          () => {
+            if (this.isConnected && !state.initialized) {
+              this.init();
+            }
+          },
+          { once: true },
+        );
+      } else {
+        this.init();
+      }
+    }
+
+    /**
+     * Wires the spine once the document is parsed.
+     *
+     * @internal
+     */
+    init() {
+      const state = internals.get(this);
+      state.initialized = true;
+      this.append(createStaging());
+      this.rowWindow = new Drupal.treegrid.RowWindow(this);
+      this.tree.querySelectorAll(ROW).forEach((row) => {
+        this.rowWindow.observe(row);
+      });
+      state.expand = new Drupal.treegrid.ExpandManager(this);
+
+      this.addListeners();
+
+      // Upgrade server-rendered cell widgets (e.g. dropbuttons) so their
+      // focusable controls exist before priming the roving tab order; otherwise
+      // a control added by a later attachBehaviors pass would linger in the tab
+      // order.
+      if (Drupal.attachBehaviors) {
+        Drupal.attachBehaviors(this.tree);
+      }
+      initRovingTabindex(this.tree);
+      this.autoExpandSmall();
+
+      this.setAttribute('data-treegrid-ready', '');
+      this.dispatchConnected(false);
+      state.resolveReady();
+    }
+
+    /**
+     * Resumes listeners and windowing after the element is moved in the DOM.
+     */
+    resume() {
+      const { tree } = internals.get(this);
+      this.rowWindow = new Drupal.treegrid.RowWindow(this);
+      visibleRows(tree).forEach((row) => {
+        this.rowWindow.observe(row);
+      });
+      this.addListeners();
+      this.dispatchConnected(true);
+    }
+
+    /**
+     * Adds the element's own delegated listeners to the tree.
+     */
+    addListeners() {
+      const state = internals.get(this);
+      state.tree.addEventListener('click', state.onClick);
+      state.tree.addEventListener('keydown', state.onKeyDown);
+      state.detachColumnUpdates = Drupal.treegrid.attachColumnUpdates(this);
+    }
+
+    /**
+     * Removes the element's own delegated listeners from the tree.
+     */
+    removeListeners() {
+      const state = internals.get(this);
+      state.tree?.removeEventListener('click', state.onClick);
+      state.tree?.removeEventListener('keydown', state.onKeyDown);
+      state.detachColumnUpdates?.();
+      state.detachColumnUpdates = null;
+    }
+
+    /**
+     * Announces that the element is initialized or has been reconnected.
+     *
+     * @param {boolean} reconnected
+     *   Whether this follows a DOM move rather than the first init.
+     */
+    dispatchConnected(reconnected) {
+      this.dispatchEvent(
+        new CustomEvent('treegrid:connected', {
+          bubbles: true,
+          detail: { element: this, tree: this.tree, reconnected },
+        }),
+      );
+    }
+
+    /**
+     * Pauses listeners and windowing when removed from the DOM.
+     */
+    disconnectedCallback() {
+      if (internals.get(this).initialized) {
+        this.removeListeners();
+        this.rowWindow?.disconnect();
+      }
+      this.dispatchEvent(
+        new CustomEvent('treegrid:disconnected', { detail: { element: this } }),
+      );
+    }
+
+    /**
+     * Delegated click handler: feature handlers first, then built-in nav.
+     *
+     * @param {MouseEvent} event
+     *   The click event.
+     */
+    onClick(event) {
+      const { target } = event;
+      if (!(target instanceof Element)) {
+        return;
+      }
+      const { clickHandlers } = internals.get(this);
+      if (clickHandlers.some((entry) => entry.handler(event))) {
+        return;
+      }
+      const toggle = target.closest(TOGGLE);
+      if (toggle) {
+        const row = toggle.closest(ROW);
+        if (row && row.dataset.hasChildren === 'true') {
+          event.preventDefault();
+          internals.get(this).expand.toggle(row);
+        }
+        return;
+      }
+      // Don't steal focus from an interactive control; a plain click elsewhere
+      // on a row moves the cursor there.
+      if (target.closest(INTERACTIVE)) {
+        return;
+      }
+      const row = rowOf(target);
+      if (row) {
+        focusRow(this.tree, row);
+      }
+    }
+
+    /**
+     * Delegated keydown handler: feature handlers first, then built-in nav.
+     *
+     * @param {KeyboardEvent} event
+     *   The keydown event.
+     */
+    onKeyDown(event) {
+      const { keyHandlers } = internals.get(this);
+      if (keyHandlers.some((entry) => entry.handler(event))) {
+        return;
+      }
+      handleKeyDown(event, {
+        tree: this.tree,
+        expand: internals.get(this).expand,
+      });
+    }
+
+    /**
+     * Expands a bounded extra level on initial load for very small trees.
+     *
+     * A tree with only one or two top-level items opens fully collapsed
+     * otherwise, hiding all of its structure. Expanding a bounded extra level
+     * keeps the lazy-load posture — a couple of /children fetches, never the
+     * whole tree.
+     *
+     * @return {Promise<void>}
+     *   Resolves once the bounded auto-expand finishes.
+     */
+    async autoExpandSmall() {
+      const parsed = parseInt(this.dataset.autoExpandThreshold, 10);
+      const threshold = Number.isNaN(parsed) ? 2 : parsed;
+      const topRows = Array.from(this.tree.querySelectorAll(ROW));
+      if (topRows.length === 0 || topRows.length > threshold) {
+        return;
+      }
+      const topParents = topRows.filter(
+        (row) => row.dataset.hasChildren === 'true',
+      );
+      await Promise.all(topParents.map((row) => this.expandRow(row)));
+
+      if (topRows.length === 1 && topParents.length === 1) {
+        const children = childRows(topParents[0]);
+        if (children.length <= threshold) {
+          const childParents = children.filter(
+            (row) => row.dataset.hasChildren === 'true',
+          );
+          await Promise.all(childParents.map((row) => this.expandRow(row)));
+        }
+      }
+    }
+  }
+
+  if (!customElements.get('drupal-treegrid')) {
+    customElements.define('drupal-treegrid', TreegridElement);
+  }
+})(Drupal);

@@ -1,0 +1,16 @@
+/**
+ * @file
+ * Minimal layout for the treegrid spine test consumer.
+ *
+ * The element's own display/positioning comes from treegrid's stylesheet; this
+ * only gives the test fixture clickable, visible controls.
+ */
+
+.tgu-toggle {
+  cursor: pointer;
+}
+
+.tgu-toggle-spacer {
+  display: inline-block;
+  width: 1em;
+}

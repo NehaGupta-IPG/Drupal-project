@@ -1,0 +1,21 @@
+menu_tree_ui:
+  version: VERSION
+  js:
+    js/top-level-paging.js: {}
+    js/jump-to.js: {}
+    js/search.js: {}
+    js/menu-tree.js: {}
+    js/working-copy.js: {}
+  css:
+    component:
+      css/menu-tree-ui.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - core/htmx
+    - core/drupal.htmx
+    - core/drupal.dropbutton
+    - core/drupal.message
+    - treegrid/treegrid
+    - treegrid_reorder/treegrid_reorder

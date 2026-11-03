@@ -54,6 +54,18 @@ entity.menu.edit_form:
   requirements:
     _entity_access: 'menu.update'
 
+entity.menu.links:
+  path: '/admin/structure/menu/manage/{menu}/links'
+  defaults:
+    _form: '\Drupal\menu_ui\Form\MenuLinksOverviewForm'
+    _title_callback: '\Drupal\menu_ui\Controller\MenuController::menuTitle'
+  requirements:
+    _entity_access: 'menu.update'
+  options:
+    parameters:
+      menu:
+        type: entity:menu
+
 entity.menu.delete_form:
   path: '/admin/structure/menu/manage/{menu}/delete'
   defaults:

@@ -1,0 +1,3 @@
+services:
+  menu_tree_ui_test.lazy_title:
+    class: Drupal\menu_tree_ui_test\MenuTreeUiTestLazyTitle

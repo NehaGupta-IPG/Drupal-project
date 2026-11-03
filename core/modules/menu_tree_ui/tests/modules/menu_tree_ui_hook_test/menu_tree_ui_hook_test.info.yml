@@ -1,0 +1,7 @@
+name: 'Menu tree UI - hook test'
+type: module
+description: 'Reacts to menu_tree_ui hooks to simulate changes made by other modules during Save. Not for production sites.'
+package: 'Testing'
+version: VERSION
+dependencies:
+  - drupal:menu_tree_ui

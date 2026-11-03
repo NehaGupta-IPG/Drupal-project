@@ -1,0 +1,4 @@
+foreign:
+  version: VERSION
+  js:
+    js/menu-tree-ui-test-foreign.js: {}

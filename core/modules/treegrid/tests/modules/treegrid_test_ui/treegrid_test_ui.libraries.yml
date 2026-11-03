@@ -1,0 +1,21 @@
+treegrid_test_ui:
+  version: VERSION
+  js:
+    js/treegrid-test-ui-consumer.js: {}
+    js/treegrid-test-ui-detach.js: {}
+    js/treegrid-test-ui-attach-count.js: {}
+  css:
+    component:
+      css/treegrid-test-ui.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+    - treegrid/treegrid
+
+row_asset:
+  version: VERSION
+  js:
+    js/treegrid-test-ui-row-asset.js: {}
+  dependencies:
+    - core/drupal

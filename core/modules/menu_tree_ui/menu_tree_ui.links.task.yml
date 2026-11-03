@@ -1,0 +1,5 @@
+menu_tree_ui.edit:
+  title: 'Links'
+  route_name: menu_tree_ui.edit
+  base_route: entity.menu.edit_form
+  weight: 10

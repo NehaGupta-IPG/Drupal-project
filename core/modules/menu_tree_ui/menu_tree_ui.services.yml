@@ -1,0 +1,53 @@
+services:
+  menu_tree_ui.working_copy:
+    class: Drupal\treegrid_reorder\TreegridWorkingCopy
+    arguments:
+      - '@tempstore.shared'
+      - '@current_user'
+      - 'menu_tree_ui.working_copy'
+  Drupal\treegrid_reorder\TreegridWorkingCopy: '@menu_tree_ui.working_copy'
+
+  menu_tree_ui.title_reader:
+    class: Drupal\menu_tree_ui\Service\MenuTreeTitleReader
+    autowire: true
+  Drupal\menu_tree_ui\Service\MenuTreeTitleReader: '@menu_tree_ui.title_reader'
+
+  menu_tree_ui.loader:
+    class: Drupal\menu_tree_ui\Service\MenuTreeLoader
+    arguments:
+      - '@menu.link_tree'
+      - '@menu.tree_storage'
+      - '@module_handler'
+      - !tagged_iterator menu_tree_ui.search_provider
+      - '@menu_tree_ui.working_copy'
+      - '@plugin.manager.menu.link'
+      - '@menu_tree_ui.title_reader'
+  Drupal\menu_tree_ui\Service\MenuTreeLoader: '@menu_tree_ui.loader'
+
+  menu_tree_ui.mover:
+    class: Drupal\menu_tree_ui\Service\MenuTreeMover
+    arguments:
+      - '@menu.tree_storage'
+      - '@module_handler'
+      - '@menu_tree_ui.loader'
+      - '@plugin.manager.menu.link'
+      - '@logger.channel.menu_tree_ui'
+      - '@string_translation'
+  Drupal\menu_tree_ui\Service\MenuTreeMover: '@menu_tree_ui.mover'
+
+  menu_tree_ui.working_copy_lock:
+    class: Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock
+    arguments:
+      - '@lock'
+  Drupal\menu_tree_ui\Service\MenuTreeWorkingCopyLock: '@menu_tree_ui.working_copy_lock'
+
+  logger.channel.menu_tree_ui:
+    parent: logger.channel_base
+    arguments: ['menu_tree_ui']
+
+  menu_tree_ui.search_provider.menu_link_content:
+    class: Drupal\menu_tree_ui\SearchProvider\MenuLinkContentSearchProvider
+    autowire: true
+    tags:
+      - { name: menu_tree_ui.search_provider, priority: 0 }
+  Drupal\menu_tree_ui\SearchProvider\MenuTreeSearchProviderInterface: '@menu_tree_ui.search_provider.menu_link_content'

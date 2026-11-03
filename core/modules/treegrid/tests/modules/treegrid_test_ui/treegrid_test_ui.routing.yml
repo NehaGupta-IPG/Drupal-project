@@ -1,0 +1,27 @@
+treegrid_test_ui.page:
+  path: '/treegrid-test-ui'
+  defaults:
+    _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::page'
+    _title: 'Tree grid test UI'
+  requirements:
+    _access: 'TRUE'
+
+treegrid_test_ui.children:
+  path: '/treegrid-test-ui/children'
+  defaults:
+    _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::children'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _htmx_route: TRUE
+    no_cache: TRUE
+    _no_big_pipe: TRUE
+
+treegrid_test_ui.column_update:
+  path: '/treegrid-test-ui/column-update'
+  defaults:
+    _controller: 'Drupal\treegrid_test_ui\Controller\TreegridTestUiController::columnUpdate'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'

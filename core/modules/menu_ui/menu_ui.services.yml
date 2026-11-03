@@ -9,3 +9,11 @@ services:
     class: Drupal\menu_ui\Menu\MenuUiMenuTreeManipulators
   Drupal\menu_ui\Menu\MenuUiMenuTreeManipulators: '@menu_ui.menu_tree_manipulators'
   Drupal\menu_ui\MenuUiUtility: ~
+  Drupal\menu_ui\MenuOverviewBuilder:
+    arguments:
+      - '@plugin.manager.menu.link'
+      - '@menu.link_tree'
+      - '@entity_type.manager'
+      - '@request_stack'
+      - '@redirect.destination'
+      - '@string_translation'

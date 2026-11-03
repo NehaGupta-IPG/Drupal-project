@@ -1,0 +1,17 @@
+treegrid_reorder:
+  version: VERSION
+  js:
+    js/intent.js: {}
+    js/indicator.js: {}
+    js/request.js: {}
+    js/commit.js: {}
+    js/controller.js: {}
+    js/move-mode.js: {}
+    js/reorder-keys.js: {}
+    js/attach.js: {}
+  css:
+    component:
+      css/treegrid-reorder.css: {}
+  dependencies:
+    - core/drupal
+    - treegrid/treegrid

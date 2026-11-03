@@ -33330,6 +33330,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Unit/MenuLinkPluginTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$workspace of method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:setActiveWorkspace\\(\\) expects Drupal\\\\workspaces\\\\WorkspaceInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreePendingRevisionsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$workspace_association in PHPDoc tag @var does not match assigned variable \\$workspace_tracker\\.$#',
+	'identifier' => 'varTag.differentVariable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreePendingRevisionsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$workspace of method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:setActiveWorkspace\\(\\) expects Drupal\\\\workspaces\\\\WorkspaceInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreeUiWorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$workspace_association in PHPDoc tag @var does not match assigned variable \\$workspace_tracker\\.$#',
+	'identifier' => 'varTag.differentVariable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreeUiWorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -33398,18 +33422,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Direct injection of entity storage via \\$menu_link_content_storage is not recommended\\. Inject Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface and call getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStorageDirectInjection',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:buildOverviewForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
 ];
@@ -33422,24 +33434,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_ui\\\\MenuForm\\:\\:submitOverviewForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
-	'identifier' => 'drupal.entityStoragePropertyAssignment',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
 ];

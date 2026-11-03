@@ -51,6 +51,10 @@ parameters:
     - scripts/update-countries.sh
     # Skip data files.
     - lib/Drupal/Component/Transliteration/data/*.php
+    # The Drush seeder command depends on Drush classes that are not on the
+    # PHPStan scan path (Drush is an optional test-only dependency).
+    - modules/menu_tree_ui/tests/modules/menu_tree_ui_test/src/Drush/Commands/MenuTreeSeederCommands.php
+
     # The following classes deliberately extend non-existent classes for testing.
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php

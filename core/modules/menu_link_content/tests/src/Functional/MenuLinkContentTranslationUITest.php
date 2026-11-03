@@ -80,10 +80,10 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
   }
 
   /**
-   * Ensure that a translate link can be found on the menu edit form.
+   * Ensure that a translate link can be found on the menu links page.
    */
   public function testTranslationLinkOnMenuEditForm(): void {
-    $this->drupalGet('admin/structure/menu/manage/tools');
+    $this->drupalGet('admin/structure/menu/manage/tools/links');
     $this->assertSession()->linkNotExists('Translate');
 
     $menu_link_content = MenuLinkContent::create([
@@ -92,7 +92,7 @@ class MenuLinkContentTranslationUITest extends ContentTranslationUITestBase {
       'title' => 'Link test',
     ]);
     $menu_link_content->save();
-    $this->drupalGet('admin/structure/menu/manage/tools');
+    $this->drupalGet('admin/structure/menu/manage/tools/links');
     $this->assertSession()->linkExists('Translate');
   }
 

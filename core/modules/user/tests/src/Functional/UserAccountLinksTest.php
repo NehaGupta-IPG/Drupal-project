@@ -76,13 +76,13 @@ class UserAccountLinksTest extends BrowserTestBase {
     // Verify that the 'My account' link is enabled. Do not assume the value of
     // auto-increment is 1. Use XPath to obtain input element id and name using
     // the consistent label text.
-    $this->drupalGet('admin/structure/menu/manage/account');
+    $this->drupalGet('admin/structure/menu/manage/account/links');
     $label = $this->getNodeElementsByXpath('//label[contains(.,:text)]/@for', [':text' => 'Enable My account menu link']);
     $this->assertSession()->checkboxChecked($label[0]->getText());
 
     // Disable the 'My account' link.
     $edit['links[menu_plugin_id:user.page][enabled]'] = FALSE;
-    $this->drupalGet('admin/structure/menu/manage/account');
+    $this->drupalGet('admin/structure/menu/manage/account/links');
     $this->submitForm($edit, 'Save');
 
     // Get the homepage.

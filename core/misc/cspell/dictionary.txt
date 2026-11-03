@@ -223,6 +223,7 @@ jessebeach
 jqueryui
 justinrainbow
 keypresses
+keyup
 kinberg
 kolkata
 lamoids

@@ -1,0 +1,47 @@
+/**
+ * @file
+ * Baseline styling for the <drupal-treegrid> custom element.
+ */
+
+/*
+ * Custom elements are inline by default; the treegrid must lay out as a block.
+ * It also establishes a positioning context so features can place an
+ * absolutely-positioned overlay (such as the reorder drop indicator) within it.
+ */
+drupal-treegrid {
+  position: relative;
+  display: block;
+}
+
+/*
+ * The table loaded rows are swapped into before treegrid places them.
+ */
+[data-treegrid-staging] {
+  display: none;
+}
+
+/*
+ * Collapse marks a row's descendant run with data-treegrid-hidden; see
+ * expand.js.
+ */
+tr[role="row"][data-treegrid-hidden="true"] {
+  display: none;
+}
+
+/*
+ * Windowing marks rows far outside the viewport with data-treegrid-virtualized.
+ * They keep their height so the scrollbar stays accurate; a consumer can hide
+ * their content too.
+ */
+:where(tr[role="row"][data-treegrid-virtualized="true"]) {
+  height: var(--treegrid-virtualized-row-height, 2.5rem);
+}
+
+/*
+ * The focused row is the tree's cursor. The selector has no specificity, so a
+ * theme's own focus outline wins.
+ */
+:where(drupal-treegrid tr[role="row"]:focus-visible) {
+  outline: 2px solid Highlight;
+  outline-offset: -2px;
+}

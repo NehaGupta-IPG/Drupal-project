@@ -1,0 +1,12 @@
+treegrid_reorder_test:
+  version: VERSION
+  js:
+    js/treegrid-reorder-test.js: {}
+  css:
+    component:
+      css/treegrid-reorder-test.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - treegrid/treegrid
+    - treegrid_reorder/treegrid_reorder

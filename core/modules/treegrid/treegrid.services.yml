@@ -1,0 +1,9 @@
+services:
+  plugin.manager.treegrid_column:
+    class: Drupal\treegrid\TreegridColumnManager
+    parent: default_plugin_manager
+
+  treegrid.csrf_token:
+    class: Drupal\treegrid\TreegridCsrfToken
+    autowire: true
+  Drupal\treegrid\TreegridCsrfToken: '@treegrid.csrf_token'

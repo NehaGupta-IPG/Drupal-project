@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the treegrid_test module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_treegrid_column_info_alter().
+ *
+ * Marks a discovered definition so a kernel test can assert the alter ran.
+ */
+function treegrid_test_treegrid_column_info_alter(array &$definitions): void {
+  if (isset($definitions['treegrid_test_a'])) {
+    $definitions['treegrid_test_a']['altered'] = TRUE;
+  }
+}
