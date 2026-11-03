@@ -25,7 +25,7 @@ interface AccountInterface {
   /**
    * Returns the user ID or 0 for anonymous.
    *
-   * @return int
+   * @return int|string
    *   The user ID.
    */
   public function id();
