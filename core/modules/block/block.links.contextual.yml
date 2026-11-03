@@ -7,3 +7,8 @@ block_remove:
   title: 'Remove block'
   route_name: 'entity.block.delete_form'
   group: 'block'
+
+block_disable:
+  title: 'Disable block'
+  route_name: 'entity.block.disable'
+  group: 'block'
