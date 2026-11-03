@@ -7,6 +7,7 @@ namespace Drupal\Tests\language\Kernel;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,7 +21,7 @@ class OverriddenConfigImportTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'language'];
+  protected static $modules = ['system', 'language', 'config_test'];
 
   /**
    * {@inheritdoc}
@@ -80,6 +81,44 @@ class OverriddenConfigImportTest extends KernelTestBase {
     // Verify the overridden site name.
     $override = $language_manager->getLanguageConfigOverride('fr', 'system.site');
     $this->assertEquals('French site name', $override->get('name'));
+  }
+
+  /**
+   * Tests importing an override when the base config loses all override keys.
+   */
+  public function testConfigImportOverrideWithRemovedKeys(): void {
+    $storage = $this->container->get('config.storage');
+    $sync = $this->container->get('config.storage.sync');
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = $this->container->get('language_manager');
+
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('config_test.foo')
+      ->set('value', ['key' => 'original'])
+      ->set('label', 'Original')
+      // `label` is translatable, hence a `langcode` is required.
+      ->set('langcode', 'en')
+      ->save();
+    // The French override contains only a key that the sync storage removes
+    // from the base configuration.
+    $language_manager->getLanguageConfigOverride('fr', 'config_test.foo')
+      ->set('value', ['key' => 'French value'])
+      ->save();
+    $this->copyConfig($storage, $sync);
+
+    // Remove the overridden key from the base configuration and override a
+    // different key instead.
+    $data = $sync->read('config_test.foo');
+    $data['value'] = [];
+    $sync->write('config_test.foo', $data);
+    $sync->createCollection('language.fr')->write('config_test.foo', ['label' => 'French label']);
+
+    $this->configImporter->reset()->import();
+
+    $this->assertSame([], $this->configImporter->getErrors());
+    $this->assertSame([], $this->config('config_test.foo')->get('value'));
+    $override = $language_manager->getLanguageConfigOverride('fr', 'config_test.foo');
+    $this->assertSame(['label' => 'French label'], $override->get());
   }
 
 }

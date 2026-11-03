@@ -152,6 +152,12 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function onConfigSave(ConfigCrudEvent $event) {
+    // During a configuration synchronization the importer writes the override
+    // collections itself. Filtering here could delete an override that the
+    // importer is about to update, which fails with "Update target is missing".
+    if (\Drupal::isConfigSyncing()) {
+      return;
+    }
     $config = $event->getConfig();
     $name = $config->getName();
     foreach (\Drupal::languageManager()->getLanguages() as $language) {
