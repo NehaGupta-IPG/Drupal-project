@@ -134,9 +134,20 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
    *   A render array.
    */
   public function applyTo(array &$build) {
-    $build['#cache']['contexts'] = $this->cacheContexts;
-    $build['#cache']['tags'] = $this->cacheTags;
-    $build['#cache']['max-age'] = $this->cacheMaxAge;
+    $build['#cache']['contexts'] = isset($build['#cache']['contexts'])
+      // @todo determine if we want to use Cache::mergeContexts() here.
+      // Note that we cannot use Cache::mergeContexts() here, because the
+      // it uses an assertion that depends on the cache contexts manager service
+      // being available, which might not always be the case. This can be during
+      // the installation process or in tests.
+      ? array_values(array_unique(array_merge($this->cacheContexts, $build['#cache']['contexts'])))
+      : $this->cacheContexts;
+    $build['#cache']['tags'] = isset($build['#cache']['tags'])
+      ? Cache::mergeTags($this->cacheTags, $build['#cache']['tags'])
+      : $this->cacheTags;
+    $build['#cache']['max-age'] = isset($build['#cache']['max-age'])
+      ? Cache::mergeMaxAges($this->cacheMaxAge, $build['#cache']['max-age'])
+      : $this->cacheMaxAge;
   }
 
   /**
