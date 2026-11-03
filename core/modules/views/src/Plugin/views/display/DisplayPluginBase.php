@@ -398,7 +398,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       'cache' => ['cache'],
       'title' => ['title'],
       'css_class' => ['css_class'],
-      'use_ajax' => ['use_ajax'],
+      'use_ajax' => ['use_ajax', 'disable_scroll_to_top'],
       'hide_attachment_summary' => ['hide_attachment_summary'],
       'show_admin_links' => ['show_admin_links'],
       'group_by' => ['group_by'],
@@ -462,6 +462,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
+          'disable_scroll_to_top' => TRUE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
@@ -506,6 +507,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         'default' => '',
       ],
       'use_ajax' => [
+        'default' => FALSE,
+      ],
+      'disable_scroll_to_top' => [
         'default' => FALSE,
       ],
       'hide_attachment_summary' => [
@@ -1466,6 +1470,12 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           '#title' => $this->t('Use AJAX'),
           '#default_value' => $this->getOption('use_ajax') ? 1 : 0,
         ];
+        $form['disable_scroll_to_top'] = [
+          '#description' => $this->t('Disable the Scroll To Top behavior when AJAX actions happen.'),
+          '#type' => 'checkbox',
+          '#title' => $this->t('Disable Scroll to Top'),
+          '#default_value' => $this->getOption('disable_scroll_to_top') ? 1 : 0,
+        ];
         break;
 
       case 'hide_attachment_summary':
@@ -1981,6 +1991,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         break;
 
       case 'use_ajax':
+        $this->setOption($section, (bool) $form_state->getValue($section));
+        $this->setOption('disable_scroll_to_top', (bool) $form_state->getValue('disable_scroll_to_top'));
+        break;
+
       case 'hide_attachment_summary':
       case 'show_admin_links':
       case 'exposed_block':

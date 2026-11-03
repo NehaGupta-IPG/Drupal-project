@@ -157,6 +157,9 @@ views_display:
         use_ajax:
           type: boolean
           label: 'Use AJAX'
+        disable_scroll_to_top:
+          type: boolean
+          label: 'Disable the Scroll To Top behavior when AJAX actions happen'
         hide_attachment_summary:
           type: boolean
           label: 'Hide attachments when displaying a contextual filter summary'
@@ -228,6 +231,9 @@ views_display:
     use_ajax:
       type: boolean
       label: 'Use AJAX'
+    disable_scroll_to_top:
+      type: boolean
+      label: 'Disable the Scroll To Top behavior when AJAX actions happen'
     group_by:
       type: boolean
       label: 'Aggregate'

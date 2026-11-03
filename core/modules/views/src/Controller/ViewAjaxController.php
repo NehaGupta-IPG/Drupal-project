@@ -155,7 +155,9 @@ class ViewAjaxController implements ContainerInjectionInterface {
 
         // Override the display's pager_element with the one actually used.
         if (isset($pager_element)) {
-          $response->addCommand(new ScrollTopCommand(".js-view-dom-id-$dom_id"));
+          if (!$view->display_handler->getOption('disable_scroll_to_top')) {
+            $response->addCommand(new ScrollTopCommand(".js-view-dom-id-$dom_id"));
+          }
           $view->displayHandlers->get($display_id)->setOption('pager_element', $pager_element);
         }
         // Reuse the same DOM id so it matches that in drupalSettings.
