@@ -186,6 +186,36 @@ class WorkspaceEntityRepositoryTest extends KernelTestBase {
     $active = $this->entityRepository->getActive($entity_type_id, $entity->id(), $ro_contexts);
     $this->assertSame($cheese_revision_ro->getLoadedRevisionId(), $active->getLoadedRevisionId());
     $this->assertSame($cheese_revision_ro->language()->getId(), $active->language()->getId());
+
+    // Create new entity in live.
+    $this->switchToLive();
+    $entity_type_id = 'entity_test_revpub';
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    $values = ['name' => $this->randomString()];
+    $entity_3 = $storage->create($values);
+    $storage->save($entity_3);
+
+    $active = $this->entityRepository->getActive($entity_type_id, $entity_3->id(), $en_contexts);
+    $this->assertSame($entity_3->getLoadedRevisionId(), $active->getLoadedRevisionId());
+    $this->assertSame($entity_3->language()->getId(), $active->language()->getId());
+
+    // Create a non-default revision.
+    $non_default_live_revision = $storage->createRevision($entity_3, FALSE);
+    $storage->save($non_default_live_revision);
+
+    // Since this entity is not tracked in any workspace, the active revision
+    // should be the latest revision, even if it's non-default.
+    $active = $this->entityRepository->getActive($entity_type_id, $entity_3->id(), $en_contexts);
+    $this->assertSame($non_default_live_revision->getLoadedRevisionId(), $active->getLoadedRevisionId());
+    $this->assertSame($non_default_live_revision->language()->getId(), $active->language()->getId());
+    // Get the same active revision using ::getActiveMultiple().
+    $active = $this->entityRepository->getActiveMultiple($entity_type_id, [$entity_3->id()], $en_contexts)[0];
+    $this->assertSame($non_default_live_revision->getLoadedRevisionId(), $active->getLoadedRevisionId());
+    $this->assertSame($non_default_live_revision->language()->getId(), $active->language()->getId());
+
+    // Make sure methods return null when entity doesn't exist.
+    $this->assertNull($this->entityRepository->getActive($entity_type_id, 123456, $en_contexts));
+    $this->assertEmpty($this->entityRepository->getActiveMultiple($entity_type_id, [123456, 654321], $en_contexts));
   }
 
 }

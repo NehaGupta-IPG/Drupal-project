@@ -13,6 +13,7 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
   public function __construct(
     protected EntityRepositoryInterface $inner,
     protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceTrackerInterface $workspaceTracker,
   ) {}
 
   /**
@@ -40,10 +41,13 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
    * {@inheritdoc}
    */
   public function getActive($entity_type_id, $entity_id, ?array $contexts = NULL) {
-    // When there's no active workspace, the active entity variant is the
-    // canonical one.
+    // When there's no active workspace and the entity is being edited in a
+    // workspace, the active entity variant is the canonical one.
     if (!$this->workspaceManager->hasActiveWorkspace()) {
-      return $this->inner->getCanonical($entity_type_id, $entity_id, $contexts);
+      $canonical = $this->inner->getCanonical($entity_type_id, $entity_id, $contexts);
+      if ($canonical && $this->workspaceTracker->getEntityTrackingWorkspaceIds($canonical, TRUE)) {
+        return $canonical;
+      }
     }
     return $this->inner->getActive($entity_type_id, $entity_id, $contexts);
   }
@@ -52,10 +56,17 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
    * {@inheritdoc}
    */
   public function getActiveMultiple($entity_type_id, array $entity_ids, ?array $contexts = NULL) {
-    // When there's no active workspace, the active entity variant is the
-    // canonical one.
+    // When there's no active workspace and the entity is being edited in a
+    // workspace, the active entity variant is the canonical one.
     if (!$this->workspaceManager->hasActiveWorkspace()) {
-      return $this->inner->getCanonicalMultiple($entity_type_id, $entity_ids, $contexts);
+      $entities = [];
+      foreach ($entity_ids as $entity_id) {
+        $active = $this->getActive($entity_type_id, $entity_id, $contexts);
+        if ($active) {
+          $entities[] = $active;
+        }
+      }
+      return $entities;
     }
     return $this->inner->getActiveMultiple($entity_type_id, $entity_ids, $contexts);
   }
