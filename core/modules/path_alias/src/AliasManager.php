@@ -119,7 +119,8 @@ class AliasManager implements AliasManagerInterface {
     // Check the path prefix, if the top-level part before the first / is not in
     // the list, then there is no need to do anything further, it is not in the
     // database.
-    if ($path === '/' || !$this->pathPrefixes->get(strtok(trim($path, '/'), '/'))) {
+    $trimmed_path = trim($path, '/');
+    if ($path === '/' || $trimmed_path === '' || !$this->pathPrefixes->get(strtok($trimmed_path, '/'))) {
       return $path;
     }
 

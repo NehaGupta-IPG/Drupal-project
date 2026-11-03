@@ -203,6 +203,23 @@ class AliasManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the getAliasByPath method for a path consisting only of slashes.
+   */
+  public function testGetAliasByPathOnlySlashes(): void {
+    $this->setUpCurrentLanguage();
+
+    $this->aliasPrefixList->expects($this->any())
+      ->method('get')
+      ->willReturnCallback(function (string $key): bool {
+        return FALSE;
+      });
+    $this->aliasRepository->expects($this->never())
+      ->method('lookupBySystemPath');
+
+    $this->assertEquals('//', $this->aliasManager->getAliasByPath('//'));
+  }
+
+  /**
    * Tests the getAliasByPath method for a path that has a matching alias.
    */
   public function testGetAliasByPathMatch(): void {
