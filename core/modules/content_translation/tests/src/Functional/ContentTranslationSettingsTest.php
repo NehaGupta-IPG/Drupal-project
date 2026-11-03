@@ -11,6 +11,7 @@ use Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Language\Language;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
@@ -337,6 +338,53 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
   public function testNonTranslatableTranslationSettingsUI(): void {
     $this->drupalGet('admin/config/regional/content-language');
     $this->assertSession()->fieldNotExists('settings[entity_test][entity_test][translatable]');
+  }
+
+  /**
+   * Tests enabling translation on a bundle that has reference fields.
+   *
+   * The bundle has no translatable fields of its own, but has an untranslatable
+   * entity reference field. Enabling translation for it must be allowed, as
+   * the referenced entities may themselves be translatable.
+   */
+  public function testReferenceOnlyBundleCanBeTranslatable(): void {
+    FieldStorageConfig::create([
+      'field_name' => 'test_reference',
+      'entity_type' => 'comment',
+      'type' => 'entity_reference',
+      'settings' => ['target_type' => 'node'],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'test_reference',
+      'entity_type' => 'comment',
+      'bundle' => 'comment_article',
+      'label' => 'Test reference',
+      'translatable' => FALSE,
+    ])->save();
+
+    $edit = [
+      'entity_types[comment]' => TRUE,
+      'settings[comment][comment_article][translatable]' => TRUE,
+      'settings[comment][comment_article][fields][changed]' => FALSE,
+      'settings[comment][comment_article][fields][created]' => FALSE,
+      'settings[comment][comment_article][fields][homepage]' => FALSE,
+      'settings[comment][comment_article][fields][hostname]' => FALSE,
+      'settings[comment][comment_article][fields][mail]' => FALSE,
+      'settings[comment][comment_article][fields][name]' => FALSE,
+      'settings[comment][comment_article][fields][status]' => FALSE,
+      'settings[comment][comment_article][fields][subject]' => FALSE,
+      'settings[comment][comment_article][fields][uid]' => FALSE,
+      'settings[comment][comment_article][fields][comment_body]' => FALSE,
+      'settings[comment][comment_article][fields][test_reference]' => FALSE,
+    ];
+    $this->assertSettings('comment', 'comment_article', TRUE, $edit);
+    $this->assertSession()->statusMessageNotExists('error');
+
+    $entity_field_manager = \Drupal::service('entity_field.manager');
+    $entity_field_manager->clearCachedFieldDefinitions();
+    $definitions = $entity_field_manager->getFieldDefinitions('comment', 'comment_article');
+    $this->assertFalse($definitions['test_reference']->isTranslatable());
+    $this->assertFalse($definitions['comment_body']->isTranslatable());
   }
 
 }
