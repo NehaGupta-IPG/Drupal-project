@@ -198,6 +198,7 @@ class DisplayPathTest extends UITestBase {
       '<Main navigation>',
       '<Tools>',
       '-- Test menu link',
+      '-- Test parent path',
     ], $menu_options);
 
     // The cache contexts associated with the (in)accessible menu links are

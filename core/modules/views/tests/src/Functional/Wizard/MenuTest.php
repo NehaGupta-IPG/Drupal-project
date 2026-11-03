@@ -55,7 +55,7 @@ class MenuTest extends WizardTestBase {
     $url = $link->getUrlObject();
     $this->assertEquals('view.' . $view['id'] . '.page_1', $url->getRouteName(), "Found a link to {$view['page[path]']} in the main menu");
     $metadata = $link->getMetaData();
-    $this->assertEquals(['view_id' => $view['id'], 'display_id' => 'page_1'], $metadata);
+    $this->assertEquals(['view_id' => $view['id'], 'display_id' => 'page_1', 'options' => 'menu'], $metadata);
   }
 
 }

@@ -463,14 +463,50 @@ class Page extends PathPluginBase {
         ];
         $form['tab_options']['weight'] = [
           '#suffix' => '</div>',
-          '#title' => $this->t('Tab weight'),
+          '#title' => $this->t('Weight'),
           '#type' => 'textfield',
           '#default_value' => $tab_options['weight'],
           '#size' => 5,
-          '#description' => $this->t('If the parent menu link is a tab, enter the weight of the tab. Heavier tabs will sink and the lighter tabs will be positioned nearer to the first menu link.'),
+          '#description' => $this->t('If the parent menu link is a tab or menu item, enter the weight. Heavier tabs will sink and the lighter tabs will be positioned nearer to the first menu link.'),
           '#states' => [
             'visible' => [
-              ':input[name="tab_options[type]"]' => ['value' => 'tab'],
+              [
+                ':input[name="tab_options[type]"]' => ['value' => 'normal'],
+              ],
+              [
+                ':input[name="tab_options[type]"]' => ['value' => 'tab'],
+              ],
+            ],
+          ],
+        ];
+        $form['tab_options']['expanded'] = [
+          '#title' => $this->t('Show as expanded'),
+          '#type' => 'checkbox',
+          '#default_value' => !empty($tab_options['expanded']),
+          '#description' => $this->t('If selected and this menu link has children, the menu will always appear expanded.'),
+          '#states' => [
+            'visible' => [
+              [
+                ':input[name="tab_options[type]"]' => ['value' => 'normal'],
+              ],
+            ],
+          ],
+        ];
+        if (isset($tab_options['menu_name'])) {
+          $menu_parent = $tab_options['menu_name'] . ':' . $tab_options['parent'];
+        }
+        else {
+          $menu_parent = $tab_options['parent'] ?? '';
+        }
+        $menu_link = 'views_view:views.' . $form_state->get('view')->id() . '.' . $form_state->get('display_id');
+        $form['tab_options']['parent'] = $this->parentFormSelector->parentSelectElement($menu_parent, $menu_link);
+        $form['tab_options']['parent'] += [
+          '#title' => $this->t('Parent'),
+          '#description' => $this->t('The maximum depth for a link and all its children is fixed. Some menu links may not be available as parents if selecting them would exceed this limit.'),
+          '#attributes' => ['class' => ['menu-title-select']],
+          '#states' => [
+            'visible' => [
+              ':input[name="tab_options[type]"]' => ['value' => 'normal'],
             ],
           ],
         ];
@@ -537,7 +573,11 @@ class Page extends PathPluginBase {
         break;
 
       case 'tab_options':
-        $this->setOption('tab_options', $form_state->getValue('tab_options'));
+        $tab_options = $form_state->getValue('tab_options');
+        if ($tab_options['type'] == 'normal') {
+          [$tab_options['menu_name'], $tab_options['parent']] = explode(':', $tab_options['parent'], 2);
+        }
+        $this->setOption('tab_options', $tab_options);
         break;
 
       case 'use_admin_theme':
@@ -603,6 +643,15 @@ class Page extends PathPluginBase {
     $menu = $this->getOption('menu');
     if ($menu['type'] === 'normal' && ($menu_entity = $this->menuStorage->load($menu['menu_name']))) {
       $dependencies[$menu_entity->getConfigDependencyKey()][] = $menu_entity->getConfigDependencyName();
+    }
+    elseif ($menu['type'] === 'default tab') {
+      $tab_options = $this->getOption('tab_options');
+      if (!isset($tab_options['menu_name'])) {
+        [$tab_options['menu_name'], $tab_options['parent']] = explode(':', $tab_options['parent'], 2);
+      }
+      if ($tab_options['type'] === 'normal' && ($menu_entity = $this->menuStorage->load($tab_options['menu_name']))) {
+        $dependencies[$menu_entity->getConfigDependencyKey()][] = $menu_entity->getConfigDependencyName();
+      }
     }
 
     return $dependencies;

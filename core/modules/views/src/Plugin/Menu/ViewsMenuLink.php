@@ -93,16 +93,18 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function getTitle() {
+    $options = $this->pluginDefinition['metadata']['options'] ?? 'menu';
     // @todo Get the translated value from the config without instantiating the
     //   view. https://www.drupal.org/node/2310379
-    return $this->loadView()->display_handler->getOption('menu')['title'];
+    return $this->loadView()->display_handler->getOption($options)['title'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->loadView()->display_handler->getOption('menu')['description'];
+    $options = $this->pluginDefinition['metadata']['options'] ?? 'menu';
+    return $this->loadView()->display_handler->getOption($options)['description'];
   }
 
   /**
@@ -125,8 +127,13 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
       // Just save the title to the original view.
       $changed = FALSE;
       foreach ($overrides as $key => $new_definition_value) {
-        if (empty($display['display_options']['menu'][$key]) || $display['display_options']['menu'][$key] != $new_definition_value) {
-          $display['display_options']['menu'][$key] = $new_definition_value;
+        $menu_key = 'menu';
+        if (isset($display['display_options']['menu']['type']) && $display['display_options']['menu']['type'] == 'default tab'
+          && isset($display['display_options']['tab_options']['type']) && $display['display_options']['tab_options']['type'] == 'normal') {
+          $menu_key = 'tab_options';
+        }
+        if (empty($display['display_options'][$menu_key][$key]) || $display['display_options'][$menu_key][$key] != $new_definition_value) {
+          $display['display_options'][$menu_key][$key] = $new_definition_value;
           $changed = TRUE;
         }
       }

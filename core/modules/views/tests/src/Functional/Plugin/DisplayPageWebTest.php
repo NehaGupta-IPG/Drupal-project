@@ -114,23 +114,29 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->assertSession()->elementTextEquals('xpath', "//ul[contains(@class, 'tabs primary')]//a[contains(@class, 'is-active')]/child::text()", 'Test local tab');
     $this->assertSession()->titleEquals('Test local page | Drupal');
 
-    // Check an ordinary menu link.
+    // Check menu link visibility.
     $admin_user = $this->drupalCreateUser(['administer menu']);
     $this->drupalLogin($admin_user);
     $this->drupalPlaceBlock('system_menu_block:tools');
     $this->drupalGet('<front>');
 
-    $menu_link = $this->cssSelect('nav.block-menu ul.menu a');
-    $this->assertEquals('Test menu link', $menu_link[0]->getText());
+    $menu_links = $this->cssSelect('nav.block-menu ul.menu a');
+    $this->assertEquals('Test menu link', $menu_links[0]->getText());
+    $this->assertEquals('Test parent path', $menu_links[1]->getText());
     $this->container->get('module_installer')->install(['menu_ui', 'menu_link_content']);
 
-    // Update the menu link.
+    // Update the ordinary menu link.
     $this->drupalGet("admin/structure/menu/link/views_view:views.test_page_display_menu.page_3/edit");
     $this->submitForm(['title' => 'New title'], 'Save');
 
+    // Update the parent menu link.
+    $this->drupalGet("admin/structure/menu/link/views_view:views.test_page_display_menu.page_1/edit");
+    $this->submitForm(['title' => 'New parent title'], 'Save');
+
     $this->drupalGet('<front>');
-    $menu_link = $this->cssSelect('nav.block-menu ul.menu a');
-    $this->assertEquals('New title', $menu_link[0]->getText());
+    $menu_links = $this->cssSelect('nav.block-menu ul.menu a');
+    $this->assertEquals('New title', $menu_links[0]->getText());
+    $this->assertEquals('New parent title', $menu_links[1]->getText());
   }
 
   /**

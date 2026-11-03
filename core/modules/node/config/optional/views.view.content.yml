@@ -658,7 +658,7 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: admin/content/node
+      path: admin/content
       menu:
         type: 'default tab'
         title: Content
@@ -667,11 +667,14 @@ display:
         menu_name: admin
         context: ''
       tab_options:
-        type: normal
+        type: none
         title: Content
         description: 'Find and manage content'
         weight: -10
         menu_name: admin
+        parent: 'admin:system.admin'
+        expanded: false
+        enabled: true
     cache_metadata:
       max-age: 0
       contexts:

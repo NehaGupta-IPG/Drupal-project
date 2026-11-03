@@ -893,7 +893,7 @@ display:
         show_admin_links: false
       show_admin_links: false
       display_extenders: {  }
-      path: admin/people/list
+      path: admin/people
       menu:
         type: 'default tab'
         title: List
@@ -902,11 +902,14 @@ display:
         menu_name: admin
         context: ''
       tab_options:
-        type: normal
+        type: none
         title: People
         description: 'Manage user accounts, roles, and permissions.'
         weight: 0
         menu_name: admin
+        parent: system.admin
+        expanded: false
+        enabled: true
     cache_metadata:
       max-age: 0
       contexts:

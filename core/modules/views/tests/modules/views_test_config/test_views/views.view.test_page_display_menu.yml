@@ -41,7 +41,7 @@ display:
         title: 'Test parent path'
         description: ''
         menu_name: tools
-        weight: 0
+        weight: 10
       defaults:
         title: false
     display_plugin: page
