@@ -119,7 +119,7 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
     $this->assertSame([
       // Event name, workflow, original state, new state, entity type,
       // revision ID, langcode.
-      ['content_moderation.state_changed', 'editorial', FALSE, 'draft', 'node', 1, 'en'],
+      ['content_moderation.state_changed', 'editorial', NULL, 'draft', 'node', 1, 'en'],
       ['content_moderation.state_changed', 'editorial', 'draft', 'published', 'node', 2, 'en'],
       ['content_moderation.state_changed', 'editorial', 'published', 'archived', 'node', 3, 'en'],
       ['content_moderation.state_changed', 'editorial', NULL, 'published', 'node', 4, 'fr'],

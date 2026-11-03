@@ -28,9 +28,9 @@ class ContentModerationStateChangedEvent extends Event {
   protected $newState;
 
   /**
-   * The state the content was before, or FALSE if none existed.
+   * The state the content was before, or NULL if none existed.
    *
-   * @var string|false
+   * @var string|null
    */
   protected $originalState;
 
@@ -46,18 +46,18 @@ class ContentModerationStateChangedEvent extends Event {
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $moderated_entity
    *   The entity that is being moderated.
-   * @param string $new_state
-   *   The new state the content is moving to.
-   * @param string $original_state
-   *   The original state of the content, before the change was made.
    * @param string $workflow
    *   The ID of the workflow that allowed the state change.
+   * @param string $new_state
+   *   The new state the content is moving to.
+   * @param string|null $original_state
+   *   The original state of the content, before the change was made.
    */
-  public function __construct(ContentEntityInterface $moderated_entity, $new_state, $original_state, $workflow) {
+  public function __construct(ContentEntityInterface $moderated_entity, $workflow, $new_state, $original_state = NULL) {
     $this->moderatedEntity = $moderated_entity;
+    $this->workflow = $workflow;
     $this->newState = $new_state;
     $this->originalState = $original_state;
-    $this->workflow = $workflow;
   }
 
   /**
@@ -83,7 +83,7 @@ class ContentModerationStateChangedEvent extends Event {
   /**
    * Get the original state of the content.
    *
-   * @return string
+   * @return string|null
    *   The state the content was before.
    */
   public function getOriginalState() {

@@ -204,7 +204,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    */
   protected function realSave() {
     if (!$this->getLoadedRevisionId()) {
-      $original_state = FALSE;
+      $original_state = NULL;
     }
     else {
       $original_content_moderation_state = \Drupal::entityTypeManager()
@@ -218,7 +218,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
 
     $result = parent::save();
 
-    $event = new ContentModerationStateChangedEvent($this->loadModeratedEntity(), $this->moderation_state->value, $original_state, $this->workflow->target_id);
+    $event = new ContentModerationStateChangedEvent($this->loadModeratedEntity(), $this->workflow->target_id, $this->moderation_state->value, $original_state);
     \Drupal::service('event_dispatcher')->dispatch($event, ContentModerationEvents::STATE_CHANGED);
 
     return $result;
