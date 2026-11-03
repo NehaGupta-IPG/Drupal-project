@@ -7,6 +7,7 @@ namespace Drupal\menu_ui;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -110,6 +111,7 @@ class MenuUiUtility {
     /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = $node->type->entity;
     $menu_name = strtok($node_type->getThirdPartySetting('menu_ui', 'parent', 'main:'), ':');
+    $langcode = $node->language()->getId();
     $defaults = FALSE;
     if ($node->id()) {
       $id = FALSE;
@@ -126,6 +128,7 @@ class MenuUiUtility {
           ->accessCheck()
           ->condition('link.uri', $uri_candidates, 'IN')
           ->condition('menu_name', $menu_name)
+          ->condition('langcode', [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED, LanguageInterface::LANGCODE_NOT_APPLICABLE], 'IN')
           ->sort('id')
           ->range(0, 1);
         $result = $query->execute();
@@ -139,6 +142,7 @@ class MenuUiUtility {
           ->accessCheck()
           ->condition('link.uri', $uri_candidates, 'IN')
           ->condition('menu_name', array_values($type_menus), 'IN')
+          ->condition('langcode', [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED, LanguageInterface::LANGCODE_NOT_APPLICABLE], 'IN')
           ->sort('id')
           ->range(0, 1);
         $result = $query->execute();

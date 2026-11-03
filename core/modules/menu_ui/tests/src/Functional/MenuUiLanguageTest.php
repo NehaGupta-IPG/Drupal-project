@@ -6,8 +6,10 @@ namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
+use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\menu_ui\Traits\MenuUiTrait;
+use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -21,6 +23,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class MenuUiLanguageTest extends BrowserTestBase {
 
+  use EntityDefinitionTestTrait;
   use MenuUiTrait;
 
   /**
@@ -30,6 +33,8 @@ class MenuUiLanguageTest extends BrowserTestBase {
     'language',
     'menu_link_content',
     'menu_ui',
+    'node',
+    'content_translation',
   ];
 
   /**
@@ -45,7 +50,13 @@ class MenuUiLanguageTest extends BrowserTestBase {
 
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
+      'administer content types',
       'administer menu',
+      'administer nodes',
+      'create content translations',
+      'update content translations',
+      'administer languages',
+      'administer content translation',
     ]));
 
     // Add some custom languages.
@@ -154,4 +165,71 @@ class MenuUiLanguageTest extends BrowserTestBase {
     $this->assertSession()->fieldNotExists('edit-langcode-0-value');
   }
 
+  /**
+   * Tests menu language settings for node add/edit forms.
+   */
+  public function testNodeMenuLanguage() {
+    // Add menus for the aa and bb languages.
+    $edit = [
+      'id' => 'aa_language_menu',
+      'description' => '',
+      'label' => 'AA language menu',
+      'langcode' => 'aa',
+    ];
+    $menu = Menu::create($edit);
+    $menu->save();
+    $edit = [
+      'id' => 'bb_language_menu',
+      'description' => '',
+      'label' => 'BB language menu',
+      'langcode' => 'bb',
+    ];
+    $menu = Menu::create($edit);
+    $menu->save();
+    // Create content type "basic page".
+    $this->drupalCreateContentType([
+      'type' => 'page',
+      'name' => 'Basic page',
+      'display_submitted' => FALSE,
+    ]);
+    // Enable translation for pages.
+    $this->enableTranslation('node', 'page');
+    // Enable aa and bb language menus and make aa language menu the default parent.
+    $edit = [
+      'menu_options[main]' => 0,
+      'menu_options[aa_language_menu]' => 1,
+      'menu_options[bb_language_menu]' => 1,
+      'menu_parent' => 'aa_language_menu:',
+    ];
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->submitForm($edit, 'Save content type');
+    $this->assertSession()->responseContains(t('The content type %name has been updated.', ['%name' => 'Basic page']));
+    // Default page content type language to current interface language.
+    $edit = [
+      'settings[node][page][settings][language][langcode]' => 'current_interface',
+    ];
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->submitForm($edit, 'Save configuration');
+    // Add a page in aa language.
+    $this->drupalGet('aa/node/add/page');
+    // Check that the bb menu is not available for a node added in aa language.
+    $this->assertSession()->responseContains('AA language menu');
+    $this->assertSession()->responseNotContains('BB language menu');
+    // Add a page in bb language.
+    $this->drupalGet('bb/node/add/page');
+    // Check that the aa menu is not available for a node added in bb language.
+    $this->assertSession()->responseContains('BB language menu');
+    $this->assertSession()->responseNotContains('AA language menu');
+  }
+
+  /**
+   * Enables translation for the given entity type and bundle.
+   */
+  protected function enableTranslation($entity_type, $bundle) {
+    \Drupal::service('content_translation.manager')->setEnabled($entity_type, $bundle, TRUE);
+    drupal_static_reset();
+    \Drupal::entityTypeManager()->clearCachedDefinitions();
+    \Drupal::service('router.builder')->rebuild();
+    $this->applyEntityUpdates($entity_type);
+  }
 }
