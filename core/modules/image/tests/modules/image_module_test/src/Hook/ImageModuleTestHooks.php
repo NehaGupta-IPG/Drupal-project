@@ -55,7 +55,12 @@ class ImageModuleTestHooks {
   public function fileDownload($uri): array|int {
     $default_uri = \Drupal::keyValue('image')->get('test_file_download', FALSE);
     if ($default_uri == $uri) {
-      return ['X-Image-Owned-By' => 'image_module_test'];
+      $image = \Drupal::service('image.factory')->get($uri);
+      return [
+        'X-Image-Owned-By' => 'image_module_test',
+        'Content-Type' => $image->getMimeType(),
+        'Content-Length' => $image->getFileSize(),
+      ];
     }
     // When we have custom stream wrapper is enabled, do the validation based
     // on state variable to allow it.

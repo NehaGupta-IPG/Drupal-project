@@ -227,10 +227,8 @@ class ImageStyleDownloadController extends FileDownloadController {
     if ($success) {
       $image = $this->imageFactory->get($derivative_uri);
       $uri = $image->getSource();
-      $headers += [
-        'Content-Type' => $image->getMimeType(),
-        'Content-Length' => $image->getFileSize(),
-      ];
+      $headers['Content-Type'] = $image->getMimeType();
+      $headers['Content-Length'] = $image->getFileSize();
       // \Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()
       // sets response as not cacheable if the Cache-Control header is not
       // already modified. When $is_public is TRUE, the following sets the
