@@ -407,6 +407,17 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
       // Both are empty we can safely assume that it did not change.
       return TRUE;
     }
+
+    // Field types can declare which items should be considered as empty. It is
+    // possible that one item list does not contain any items while the other
+    // contains items that are considered as empty. This can happen when
+    // updating an entity and, usually, upon saving the entity the empty items
+    // will be removed. We should therefore consider that both item lists are
+    // equal if the isEmpty() considers both of them as empty.
+    if ($this->isEmpty() && $list_to_compare->isEmpty()) {
+      return TRUE;
+    }
+
     if ($count1 !== $count2) {
       // One of them is empty but not the other one so the value changed.
       return FALSE;
