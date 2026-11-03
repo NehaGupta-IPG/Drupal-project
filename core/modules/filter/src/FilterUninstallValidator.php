@@ -5,6 +5,8 @@ namespace Drupal\filter;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -46,13 +48,13 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
         $filters = $filter_format->filters();
         foreach ($filter_plugins as $filter_plugin) {
           if ($filters->has($filter_plugin['id']) && $filters->get($filter_plugin['id'])->status) {
-            $used_in[] = $filter_format->label();
+            $used_in[] = Link::createFromRoute($filter_format->label(), 'entity.filter_format.edit_form', ['filter_format' => $filter_format->id()])->toString();
             break;
           }
         }
       }
       if (!empty($used_in)) {
-        $reasons[] = $this->t('Provides a filter plugin that is in use in the following filter formats: %formats', ['%formats' => implode(', ', $used_in)]);
+        $reasons[] = $this->t('Provides a filter plugin that is in use in the following text formats: %formats', ['%formats' => Markup::create(implode(', ', $used_in))]);
       }
     }
     return $reasons;
