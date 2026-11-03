@@ -895,7 +895,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (isset($build_info['base_form_id'])) {
       $hooks[] = 'form_' . $build_info['base_form_id'];
     }
-    $hooks[] = 'form_' . $form_id;
+    if (empty($form['#skip_alter_form_id'])) {
+      $hooks[] = 'form_' . $form_id;
+    }
     $this->moduleHandler->alter($hooks, $form, $form_state, $form_id);
     $this->themeManager->alter($hooks, $form, $form_state, $form_id);
   }
