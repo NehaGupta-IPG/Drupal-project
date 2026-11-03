@@ -5,9 +5,7 @@
  * Theming for maintenance pages.
  */
 
-use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Site\MaintenanceModeInterface;
-use Drupal\Core\Site\Settings;
 
 /**
  * Sets up the theming system for maintenance page.

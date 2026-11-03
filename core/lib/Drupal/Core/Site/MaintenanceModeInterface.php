@@ -51,6 +51,6 @@ interface MaintenanceModeInterface {
    *
    * @see \Drupal\Core\Installer\InstallerKernel::INSTALL_THEME
    */
-  function setTheme(): void;
+  public function setTheme(): void;
 
 }
