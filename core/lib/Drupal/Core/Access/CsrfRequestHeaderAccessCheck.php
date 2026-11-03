@@ -66,8 +66,10 @@ class CsrfRequestHeaderAccessCheck implements AccessInterface {
     // This check only applies if
     // 1. the user was successfully authenticated and
     // 2. the request comes with a session cookie.
+    // 3. the authentication method is other than Bearer.
     if ($account->isAuthenticated()
       && $this->sessionConfiguration->hasSession($request)
+      && strpos($request->headers->get('Authorization'), 'Bearer ') === FALSE
     ) {
       if (!$request->headers->has('X-CSRF-Token')) {
         return AccessResult::forbidden()->setReason('X-CSRF-Token request header is missing')->setCacheMaxAge(0);

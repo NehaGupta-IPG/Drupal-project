@@ -56,17 +56,29 @@ class CsrfRequestHeaderTest extends BrowserTestBase {
     // authenticated user.
     $post_options['cookies'] = $this->getSessionCookies();
 
+    // Add Authorization Bearer token for POST options so that all other
+    // requests are for the authenticated user.
+    $post_options['headers']['Authorization'] = 'this-is-invalid';
+
     // Test that access is denied with no token in header.
     $result = $client->post($url, $post_options);
     $this->assertEquals(403, $result->getStatusCode());
 
     // Test that access is allowed with correct token in header.
     $post_options['headers']['X-CSRF-Token'] = $csrf_token;
+
+    // Test that access is allowed with Authorization Bearer token in header.
+    $post_options['headers']['Authorization'] = 'Bearer valid';
+
     $result = $client->post($url, $post_options);
     $this->assertEquals(200, $result->getStatusCode());
 
     // Test that access is denied with incorrect token in header.
     $post_options['headers']['X-CSRF-Token'] = 'this-is-not-the-token-you-are-looking-for';
+
+    // Test that access is denied with invalid Authorization Bearer in header.
+    $post_options['headers']['Authorization'] = 'this-is-invalid';
+
     $result = $client->post($url, $post_options);
     $this->assertEquals(403, $result->getStatusCode());
 
