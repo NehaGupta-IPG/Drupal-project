@@ -102,6 +102,8 @@ class Full extends SqlBase {
       '#parameters' => $input,
       '#quantity' => $this->options['quantity'],
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      // Skip generic modal AJAX attributes when Views AJAX handles paging.
+      '#skip_modal_ajax' => $this->view->ajaxEnabled(),
     ];
   }
 
