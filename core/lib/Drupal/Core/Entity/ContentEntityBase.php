@@ -1482,7 +1482,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!$original) {
       $id = $this->getOriginalId() ?? $this->id();
       $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
-      $original = $this->getLoadedRevisionId() && $storage instanceof RevisionableStorageInterface
+      $original = !$this->isDefaultRevision() && $storage instanceof RevisionableStorageInterface
         ? $storage->loadRevisionUnchanged($this->getLoadedRevisionId())
         : $storage->loadUnchanged($id);
     }

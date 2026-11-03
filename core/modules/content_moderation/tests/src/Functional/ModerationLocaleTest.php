@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_moderation\Functional;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -131,6 +133,79 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $this->assertTrue($english_node->isPublished());
     $this->assertEquals('draft', $french_node->moderation_state->value);
     $this->assertFalse($french_node->isPublished());
+
+    // Test content moderation with untranslatable fields in new revisions.
+    // Add an untranslatable text field.
+    $field_storage = FieldStorageConfig::create([
+      'entity_type' => 'node',
+      'field_name' => 'untranslatable_text',
+      'type' => 'text',
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'label' => $this->randomMachineName(),
+      'bundle' => 'article',
+      'translatable' => FALSE,
+    ]);
+    $field->save();
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article', 'default')
+      ->setComponent('untranslatable_text', ['type' => 'text_textarea'])
+      ->save();
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'article', 'default')
+      ->setComponent('untranslatable_text')
+      ->save();
+    $fieldStorage = FieldStorageConfig::loadByName('node', 'body');
+    FieldConfig::create([
+      'field_storage' => $fieldStorage,
+      'bundle' => 'article',
+      'label' => 'Body',
+      'settings' => [
+        'display_summary' => TRUE,
+        'allowed_formats' => [],
+      ],
+    ])->save();
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article', 'default')
+      ->setComponent('body', ['type' => 'text_textarea'])
+      ->save();
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'article', 'default')
+      ->setComponent('body')
+      ->save();
+
+    // Create an EN node.
+    $edit = [
+      'title[0][value]' => 'EN node',
+      'langcode[0][value]' => 'en',
+      'moderation_state[0][state]' => 'published',
+      'body[0][value]' => 'I can be translated',
+      'untranslatable_text[0][value]' => 'I cannot be translated',
+    ];
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Article EN node has been created.');
+    $this->assertSession()->pageTextContains('I can be translated');
+    $this->assertSession()->pageTextContains('I cannot be translated');
+    $english_node = $this->drupalGetNodeByTitle('EN node');
+
+    // Create a draft changing the content of the untranslatable field.
+    $this->drupalGet('node/' . $english_node->id() . '/edit');
+    $this->submitForm([
+      'moderation_state[0][state]' => 'draft',
+      'untranslatable_text[0][value]' => 'I will not be translated'
+    ], 'Save');
+    $this->assertSession()->pageTextContains('Article EN node has been updated.');
+
+    // Create a FR translation for the node and save it.
+    $this->drupalGet('node/' . $english_node->id() . '/translations');
+    $this->clickLink(t('Add'));
+    $this->assertSession()->fieldValueEquals('body[0][value]', 'I can be translated');
+    $edit = [
+      'title[0][value]' => 'FR node',
+      'moderation_state[0][state]' => 'published',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+    $this->assertSession()->pageTextContains('Article FR node has been updated.');
 
     // Create another article with its translation. This time we will publish
     // the translation first.
