@@ -93,45 +93,32 @@ table {
       color: var(--admin-color-text-loud);
     }
   }
-
-  &.sticky-table-header {
-    position: sticky;
-    z-index: 97;
-    visibility: hidden;
-    overflow: hidden;
-    width: auto !important;
-    margin-block-start: calc(var(--admin-space-xs) * -1);
-    inset-block-start: calc(var(--admin-theme-toolbar-y-offset) + var(--admin-theme-height-sticky) - 1px);
-
-    tr {
-      display: block;
-      width: max-content;
-    }
-  }
 }
 
 table.sticky-header {
-  inset-inline-start: auto !important;
   min-width: 100%;
   max-width: fit-content;
   background: transparent;
-}
 
-table.position-sticky,
-table.sticky-header {
   thead {
-    position: static;
-  }
+    position: sticky;
+    z-index: 97;
+    inset-block-start: calc(var(--admin-theme-toolbar-y-offset) + var(--admin-theme-height-sticky) - 1px);
 
-  &.--is-processed thead {
-    pointer-events: none;
-
+    /* Collapsed row borders stay with the table, so draw the header border
+       on the cells where it follows the sticky header. */
     tr {
-      border-color: transparent;
+      border-block-end-color: transparent;
+    }
 
-      .sortable-heading.is-active > a::before {
-        display: none;
-      }
+    th::after {
+      position: absolute;
+      z-index: -1;
+      block-size: 2px;
+      content: "";
+      background: var(--admin-color-border-loud);
+      inset-block-end: -2px;
+      inset-inline: 0;
     }
   }
 }
@@ -407,6 +394,14 @@ td.priority-medium {
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   margin-block-start: calc(var(--admin-space-xs) * -1);
+
+  /* A scroll container traps position: sticky, so let sticky headers stick to
+     the viewport on wide screens and keep horizontal scrolling on small ones. */
+  &:has(> table.sticky-header) {
+    @media (min-width: 64em) {
+      overflow: visible;
+    }
+  }
 }
 
 .horizontal-scroll-shadow {

@@ -407,12 +407,6 @@ escape_admin:
   dependencies:
     - core/once
 
-# Libs
-
-scroll_sync:
-  js:
-    migration/js/scroll_sync.js: { minified: true, weight: -1 }
-
 # Overrides
 
 media_embed_ckeditor_theme:
@@ -446,13 +440,6 @@ settings:
       css/components/settings.css: { minified: false }
   dependencies:
     - core/drupalSettings
-
-tableheader:
-  js:
-    migration/js/tableheader.js: { minified: false }
-  dependencies:
-    - core/once
-    - default_admin/scroll_sync
 
 tooltip:
   css:

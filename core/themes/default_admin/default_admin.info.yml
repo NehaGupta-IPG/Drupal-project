@@ -78,10 +78,6 @@ libraries-override:
     js:
       js/media_library.view.js: migration/js/media_library.view.js
 
-  core/drupal.tableselect:
-    js:
-      misc/tableselect.js: migration/js/tableselect.js
-
   default_admin/global-styling:
     css:
       layout:
@@ -90,11 +86,8 @@ libraries-override:
         css/theme/colors.css: false
 
   core/drupal.tableheader:
-    js:
-      misc/tableheader.js: false
     css:
       component:
-        css/components/sticky-header.module.css: false
         misc/components/sticky-header.module.css: false
 
 libraries-extend:
@@ -156,8 +149,6 @@ libraries-extend:
     - default_admin/media_library
   image/admin:
     - default_admin/image.admin
-  core/drupal.tableheader:
-    - default_admin/tableheader
   contextual/drupal.contextual-links:
     - default_admin/contextual_links
 
