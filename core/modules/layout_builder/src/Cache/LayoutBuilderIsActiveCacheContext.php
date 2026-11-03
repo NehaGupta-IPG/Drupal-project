@@ -64,11 +64,27 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
     if (!$entity_type_id) {
       throw new \LogicException('Missing entity type ID');
     }
-
+    $entity = $this->routeMatch->getParameter($entity_type_id);
     $cacheable_metadata = new CacheableMetadata();
-    if ($display = $this->getDisplay($entity_type_id)) {
-      $cacheable_metadata->addCacheableDependency($display);
+    if ($entity === NULL) {
+      return $cacheable_metadata;
     }
+
+    // Try to load the display for the full and default view modes.
+    // In most cases, one of these will exist.
+    $display_ids = [
+      \sprintf('%s.%s.full', $entity_type_id, $entity->bundle()),
+      \sprintf('%s.%s.default', $entity_type_id, $entity->bundle()),
+    ];
+    $displays = EntityViewDisplay::loadMultiple($display_ids);
+    $display = $displays ? reset($displays) : NULL;
+
+    // If the display can't be directly loaded, fallback to generating it
+    // from the entity type.
+    if ($display === NULL) {
+      $display = $this->getDisplay($entity_type_id);
+    }
+    $cacheable_metadata->addCacheableDependency($display);
     return $cacheable_metadata;
   }
 
