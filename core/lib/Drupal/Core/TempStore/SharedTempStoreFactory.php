@@ -90,7 +90,10 @@ class SharedTempStoreFactory {
     if (!isset($owner)) {
       $owner = $this->currentUser->id();
       if ($this->currentUser->isAnonymous()) {
-        $owner = $this->requestStack->getSession()->get('core.tempstore.shared.owner', Crypt::randomBytesBase64());
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->hasSession()) {
+          $owner = $request->getSession()->get('core.tempstore.shared.owner', Crypt::randomBytesBase64());
+        }
       }
     }
 

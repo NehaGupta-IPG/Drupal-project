@@ -121,9 +121,12 @@ class PrivateTempStore {
    */
   public function set($key, $value) {
     if ($this->currentUser->isAnonymous()) {
-      $session = $this->requestStack->getSession();
-      if (!$session->has('core.tempstore.private.owner')) {
-        $session->set('core.tempstore.private.owner', Crypt::randomBytesBase64());
+      $request = $this->requestStack->getCurrentRequest();
+      if ($request !== NULL && $request->hasSession()) {
+        $session = $request->getSession();
+        if (!$session->has('core.tempstore.private.owner')) {
+          $session->set('core.tempstore.private.owner', Crypt::randomBytesBase64());
+        }
       }
     }
 
@@ -219,9 +222,11 @@ class PrivateTempStore {
   protected function getOwner() {
     $owner = $this->currentUser->id();
     if ($this->currentUser->isAnonymous()) {
-      // Check to see if an owner key exists in the session.
-      $session = $this->requestStack->getSession();
-      $owner = $session->get('core.tempstore.private.owner');
+      $request = $this->requestStack->getCurrentRequest();
+      if ($request !== NULL && $request->hasSession()) {
+        // Check to see if an owner key exists in the session.
+        $owner = $request->getSession()->get('core.tempstore.private.owner');
+      }
     }
     return $owner;
   }

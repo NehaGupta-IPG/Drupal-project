@@ -300,7 +300,10 @@ class SharedTempStore {
    */
   protected function ensureAnonymousSession() {
     if ($this->currentUser->isAnonymous()) {
-      $this->requestStack->getSession()->set('core.tempstore.shared.owner', $this->owner);
+      $request = $this->requestStack->getCurrentRequest();
+      if ($request && $request->hasSession()) {
+        $request->getSession()->set('core.tempstore.shared.owner', $this->owner);
+      }
     }
   }
 
