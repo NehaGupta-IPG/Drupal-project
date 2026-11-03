@@ -142,6 +142,96 @@ class FieldItemListTest extends UnitTestCase {
     // not exist ('3').
     $datasets[] = [TRUE, $field_item_h, $field_item_i];
 
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_o */
+    $field_item_o = new FieldItemTestClass();
+    $field_item_o->setValue(['+2']);
+
+    // Tests field item lists where both have same values but different data
+    // types with leading plus.
+    $datasets[] = [FALSE, $field_item_e, $field_item_o];
+
+    // Tests field item lists where both have different data type
+    // and different data.
+    $datasets[] = [FALSE, $field_item_b, $field_item_o];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_p */
+    $field_item_p = new FieldItemTestClass();
+    $field_item_p->setValue(['02']);
+
+    // Tests field item lists where string values differ.
+    $datasets[] = [FALSE, $field_item_o, $field_item_p];
+
+    // Tests field item lists where both have different data type
+    // and different data.
+    $datasets[] = [FALSE, $field_item_b, $field_item_p];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_q */
+    $field_item_q = new FieldItemTestClass();
+    $field_item_q->setValue([TRUE]);
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_r */
+    $field_item_r = new FieldItemTestClass();
+    $field_item_r->setValue(['true']);
+
+    // Tests field item lists where boolean converted to string values differ.
+    $datasets[] = [TRUE, $field_item_q, $field_item_r];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_s */
+    $field_item_s = new FieldItemTestClass();
+    $field_item_s->setValue([FALSE]);
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_t */
+    $field_item_t = new FieldItemTestClass();
+    $field_item_t->setValue([0]);
+
+    // Tests field item lists where converted to string values differ.
+    $datasets[] = [TRUE, $field_item_s, $field_item_t];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_u */
+    $field_item_u = new FieldItemTestClass();
+    $field_item_u->setValue(['1']);
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_v */
+    $field_item_v = new FieldItemTestClass();
+    $field_item_v->setValue([1]);
+
+    // Tests field item lists where boolean compared with text is equal.
+    $datasets[] = [TRUE, $field_item_q, $field_item_u];
+    // Tests field item lists where boolean compared with int is equal.
+    $datasets[] = [TRUE, $field_item_q, $field_item_v];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_w */
+    $field_item_w = new FieldItemTestClass();
+    $field_item_w->setValue(['']);
+
+    // Tests field item lists where boolean compared with text is equal.
+    $datasets[] = [TRUE, $field_item_s, $field_item_w];
+    // Tests field item lists where boolean compared with int differs.
+    $datasets[] = [FALSE, $field_item_t, $field_item_w];
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_x */
+    $field_item_x = new FieldItemTestClass();
+    $field_item_x->setValue([
+      0 => [
+        'filter_format' => 'HTML',
+        'value' => 2,
+        'extra' => 'something',
+      ],
+    ]);
+
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_y */
+    $field_item_y = new FieldItemTestClass();
+    $field_item_y->setValue([
+      0 => [
+        'filter_format' => 'HTML',
+        'value' => '02',
+        'extra' => 'something',
+      ],
+    ]);
+
+    // Tests field item lists where array compared with another unequal array.
+    $datasets[] = [FALSE, $field_item_x, $field_item_y];
+
     /** @var \Drupal\Core\Field\FieldItemBase  $field_item_j */
     $field_item_j = new FieldItemTestClass();
     $field_item_j->setValue(['0' => 1]);
@@ -154,12 +244,16 @@ class FieldItemListTest extends UnitTestCase {
     /** @var \Drupal\Core\Field\FieldItemBase  $field_item_m */
     $field_item_m = new FieldItemTestClass();
     $field_item_m->setValue(['0' => 1, '1' => '']);
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_n */
+    $field_item_n = new FieldItemTestClass();
+    $field_item_n->setValue(['0' => 1, '1' => '2', '2' => '3']);
 
     // Tests filter properties with a NULL value. Empty strings or other false-y
     // values are not filtered.
     $datasets[] = [TRUE, $field_item_j, $field_item_k];
     $datasets[] = [FALSE, $field_item_j, $field_item_l];
     $datasets[] = [FALSE, $field_item_j, $field_item_m];
+    $datasets[] = [FALSE, $field_item_n, $field_item_j];
 
     return $datasets;
   }

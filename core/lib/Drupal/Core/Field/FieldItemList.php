@@ -440,7 +440,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
     array_walk($value1, $callback);
     array_walk($value2, $callback);
 
-    return $value1 == $value2;
+    return $this->arrayEquals($value1, $value2);
   }
 
   /**
@@ -448,6 +448,54 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
    */
   public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode) {
     return !$this->equals($original_items);
+  }
+
+  /**
+   * Compares multidimensional arrays.
+   *
+   * Uses soft rules to compare scalar values inside of the arrays.
+   *
+   * @param array $array1
+   *   The array to compare to.
+   * @param array $array2
+   *   The array to compare to.
+   *
+   * @return bool
+   *   TRUE if arrays are equal, FALSE if not.
+   */
+  protected function arrayEquals(array $array1, array $array2): bool {
+    if (count($array1) !== count($array2)) {
+      return FALSE;
+    }
+
+    foreach ($array1 as $key => $value) {
+      if (!array_key_exists($key, $array2)) {
+        return FALSE;
+      }
+      if (is_array($value)) {
+        if (!is_array($array2[$key]) || !$this->arrayEquals($value, $array2[$key])) {
+          return FALSE;
+        }
+      }
+      elseif (is_array($array2[$key])) {
+        return FALSE;
+      }
+      elseif (gettype($array2[$key]) === gettype($value)) {
+        if ($array2[$key] !== $value) {
+          return FALSE;
+        }
+      }
+      elseif (is_bool($array2[$key]) || is_bool($value)) {
+        if ($array2[$key] != $value) {
+          return FALSE;
+        }
+      }
+      elseif ((string) $array2[$key] !== (string) $value) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
 }
