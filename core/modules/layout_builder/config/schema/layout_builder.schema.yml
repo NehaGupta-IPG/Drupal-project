@@ -86,6 +86,12 @@ inline_block:
       nullable: true
       constraints:
         Serialized: []
+    type:
+      type: string
+      label: 'Block type'
+    uuid:
+      type: uuid
+      label: 'Block UUID'
   constraints:
     FullyValidatable: ~
     AtLeastOneOf:

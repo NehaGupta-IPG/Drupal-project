@@ -46,8 +46,8 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
   protected function setSections(array $sections) {
     $this->list = [];
     $sections = array_values($sections);
-    /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $item */
     foreach ($sections as $section) {
+      /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $item */
       $item = $this->appendItem();
       $item->section = $section;
     }
@@ -102,6 +102,9 @@ class LayoutSectionItemList extends FieldItemList implements SectionListInterfac
    */
   public function defaultAccess($operation = 'view', ?AccountInterface $account = NULL) {
     // @todo Allow access in https://www.drupal.org/node/2942975.
+    if ($operation === 'view') {
+      return parent::defaultAccess($operation, $account);
+    }
     return AccessResult::forbidden();
   }
 
