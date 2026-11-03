@@ -747,7 +747,7 @@ class Renderer implements RendererInterface {
     }
     $iterations = 0;
     while (count($fibers) > 0) {
-      foreach ($fibers as $placeholder => $fiber) {
+      foreach ($fibers as $fiber_placeholder => $fiber) {
         if (!$fiber->isStarted()) {
           $fiber->start();
         }
@@ -770,8 +770,8 @@ class Renderer implements RendererInterface {
         }
         [$markup, $placeholder_element] = $fiber->getReturn();
 
-        $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
-        unset($fibers[$placeholder]);
+        $elements = $this->doReplacePlaceholder($fiber_placeholder, $markup, $elements, $placeholder_element);
+        unset($fibers[$fiber_placeholder]);
       }
       $iterations++;
     }
