@@ -66,6 +66,14 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * {@inheritdoc}
    */
+  public function form(FieldItemListInterface $items, array &$form, FormStateInterface $form_state, $get_delta = NULL) {
+    unset($this->options);
+    return parent::form($items, $form, $form_state, $get_delta);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Prepare some properties for the child methods to build the actual form
     // element.
