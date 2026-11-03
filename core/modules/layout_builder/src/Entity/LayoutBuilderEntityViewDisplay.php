@@ -246,6 +246,41 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       $field->setTranslatable(FALSE);
       $field->save();
     }
+    $this->addTranslationField($entity_type_id, $bundle, OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME);
+  }
+
+  /**
+   * Adds a layout translation field to a given bundle.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $bundle
+   *   The bundle.
+   * @param string $field_name
+   *   The name for the translation field.
+   */
+  protected function addTranslationField($entity_type_id, $bundle, $field_name): void {
+    $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_name);
+    if (!$field) {
+      $field_storage = FieldStorageConfig::loadByName($entity_type_id, $field_name);
+      if (!$field_storage) {
+        $field_storage = FieldStorageConfig::create([
+          'entity_type' => $entity_type_id,
+          'field_name' => $field_name,
+          'type' => 'layout_translation',
+          'locked' => TRUE,
+        ]);
+        $field_storage->setTranslatable(TRUE);
+        $field_storage->save();
+      }
+
+      $field = FieldConfig::create([
+        'field_storage' => $field_storage,
+        'bundle' => $bundle,
+        'label' => $this->t('Layout Labels'),
+      ]);
+      $field->save();
+    }
   }
 
   /**

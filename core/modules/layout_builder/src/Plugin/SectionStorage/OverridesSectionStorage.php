@@ -22,6 +22,7 @@ use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
+use Drupal\layout_builder\TranslatableSectionStorageInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -55,7 +56,7 @@ use Symfony\Component\Routing\RouteCollection;
   ],
   handles_permission_check: TRUE,
 )]
-class OverridesSectionStorage extends SectionStorageBase implements ContainerFactoryPluginInterface, OverridesSectionStorageInterface, SectionStorageLocalTaskProviderInterface {
+class OverridesSectionStorage extends SectionStorageBase implements ContainerFactoryPluginInterface, OverridesSectionStorageInterface, TranslatableSectionStorageInterface, SectionStorageLocalTaskProviderInterface {
 
   use LayoutEntityHelperTrait;
 
@@ -65,6 +66,13 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    * @var string
    */
   const FIELD_NAME = 'layout_builder__layout';
+
+  /**
+   * The field name for translated configuration used by this storage.
+   *
+   * @var string
+   */
+  const TRANSLATED_CONFIGURATION_FIELD_NAME = 'layout_builder__translation';
 
   /**
    * The entity type manager.
@@ -179,7 +187,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    */
   private function extractEntityFromRoute($value, array $defaults) {
     if (str_contains($value, '.')) {
-      [$entity_type_id, $entity_id] = explode('.', $value, 2);
+      [$entity_type_id, $entity_id] = explode('.', $value);
     }
     elseif (isset($defaults['entity_type_id']) && !empty($defaults[$defaults['entity_type_id']])) {
       $entity_type_id = $defaults['entity_type_id'];
@@ -368,8 +376,21 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    */
   protected function handleTranslationAccess(AccessResult $result, $operation, AccountInterface $account) {
     $entity = $this->getEntity();
+
+    // This may be invoked for entities that don't have any layout field yet
+    // in case no entity of the bundle/type created any layout yet as the field
+    // is created on demand only once a first layout was created.
+    if (!$entity || !$entity->hasField(static::FIELD_NAME)) {
+      return AccessResult::neutral();
+    }
+
     // Access is always denied on non-default translations.
-    return $result->andIf(AccessResult::allowedIf(!($entity instanceof TranslatableInterface && !$entity->isDefaultTranslation())))->addCacheableDependency($entity);
+    $field_config = $entity->getFieldDefinition(static::FIELD_NAME)->getConfig($entity->bundle());
+    // Access is allow if one of the following conditions is true:
+    // 1. This is the default translation.
+    // 2. The entity is translatable and the layout is overridden and the layout
+    //    field is not translatable.
+    return $result->andIf(AccessResult::allowedIf($this->isDefaultTranslation() || ($entity instanceof TranslatableInterface && $this->isOverridden() && !$field_config->isTranslatable())))->addCacheableDependency($entity)->addCacheableDependency($field_config);
   }
 
   /**
@@ -390,6 +411,86 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
     // storage has been overridden. Do not use count() as it does not include
     // blank sections.
     return !empty($this->getSections());
+  }
+
+  /**
+   * Indicates if the layout is translatable.
+   *
+   * @return bool
+   *   TRUE if the layout is translatable, otherwise FALSE.
+   */
+  protected function isTranslatable() {
+    $entity = $this->getEntity();
+    if ($entity instanceof TranslatableInterface) {
+      return $entity->isTranslatable();
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDefaultTranslation() {
+    if ($this->isTranslatable()) {
+      /** @var \Drupal\Core\Entity\TranslatableInterface $entity */
+      $entity = $this->getEntity();
+      return $entity->isDefaultTranslation();
+    }
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTranslatedComponentConfiguration($uuid, array $configuration): void {
+    if (!$this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->isEmpty()) {
+      $translation_settings = $this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->getValue()[0];
+    }
+    $translation_settings['value']['components'][$uuid] = $configuration;
+    $this->getEntity()->set(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME, [$translation_settings]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTranslatedComponentConfiguration($uuid) {
+    if ($this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->isEmpty()) {
+      return [];
+    }
+    $translation_settings = $this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->getValue()[0];
+    return $translation_settings['value']['components'][$uuid] ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTranslatedConfiguration() {
+    if ($this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->isEmpty()) {
+      return [];
+    }
+    return $this->getEntity()->get(OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME)->getValue()[0];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTranslationLanguage() {
+    if (!$this->isDefaultTranslation()) {
+      return $this->getEntity()->language();
+    }
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSourceLanguage() {
+    if (!$this->isDefaultTranslation()) {
+      /** @var \Drupal\Core\Entity\TranslatableInterface $entity */
+      $entity = $this->getEntity();
+      return $entity->getUntranslated()->language();
+    }
+    return NULL;
   }
 
   /**
