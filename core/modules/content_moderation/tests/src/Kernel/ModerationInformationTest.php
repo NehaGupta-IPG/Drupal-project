@@ -35,6 +35,7 @@ class ModerationInformationTest extends KernelTestBase {
     'workflows',
     'language',
     'content_translation',
+    'system',
   ];
 
   /**
@@ -53,6 +54,7 @@ class ModerationInformationTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_rev');
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('content_moderation_state');
+    $this->installEntitySchema('action');
     $this->installConfig(['content_moderation']);
 
     $this->moderationInformation = $this->container->get('content_moderation.moderation_information');

@@ -31,6 +31,7 @@ class ContentModerationResaveTest extends KernelTestBase {
     'entity_test',
     'user',
     'workflows',
+    'system',
   ];
 
   /**
@@ -57,6 +58,7 @@ class ContentModerationResaveTest extends KernelTestBase {
 
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema($entity_type_id);
+    $this->installEntitySchema('action');
 
     $workflow = $this->createEditorialWorkflow();
     $this->addEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $entity_type_id);

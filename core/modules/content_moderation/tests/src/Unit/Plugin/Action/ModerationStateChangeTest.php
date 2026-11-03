@@ -1,0 +1,467 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\content_moderation\Unit\Plugin\Action;
+
+use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\content_moderation\Plugin\Action\ModerationStateChange;
+use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityConstraintViolationListInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
+use Drupal\node\NodeStorageInterface;
+use Drupal\Tests\UnitTestCase;
+use Drupal\workflows\StateInterface;
+use Drupal\content_moderation\StateTransitionValidationInterface;
+use Drupal\workflows\WorkflowInterface;
+use Drupal\workflows\WorkflowTypeInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
+/**
+ * Test the moderation state change action.
+ */
+#[CoversClass(ModerationStateChange::class)]
+#[Group('content_moderation')]
+class ModerationStateChangeTest extends UnitTestCase {
+
+  /**
+   * The mocked node.
+   *
+   * @var \Drupal\node\NodeInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $node;
+
+  /**
+   * The moderation info service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformationInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $moderationInfo;
+
+  /**
+   * The moderation info service.
+   *
+   * @var \Drupal\workflows\WorkflowInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $workflow;
+
+  /**
+   * The cache contexts manager.
+   *
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheContextsManager;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The user storage handler.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $nodeStorage;
+
+  /**
+   * The language object.
+   *
+   * @var \Drupal\Core\Language\LanguageInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $language;
+
+  /**
+   * The user object.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
+   * Moderation state transition validation service.
+   *
+   * @var \Drupal\content_moderation\StateTransitionValidationInterface
+   */
+  protected $validator;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->cacheContextsManager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
+    $container = new ContainerBuilder();
+    $container->set('cache_contexts_manager', $this->cacheContextsManager);
+    \Drupal::setContainer($container);
+
+    $this->setupMocks();
+  }
+
+  /**
+   * Tests the execute method.
+   */
+  public function testExecuteModerationStateChange(): void {
+    $this->moderationInfo = $this->createMock(ModerationInformationInterface::class);
+
+    $this->node->expects($this->once())
+      ->method('save');
+
+    $moderation_state = $this
+      ->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('draft');
+    $this->node->method('get')
+      ->with('moderation_state')
+      ->willReturn($moderation_state);
+
+    $this->node->expects($this->once())
+      ->method('set')
+      ->with('moderation_state', 'foobar');
+
+    $config = ['state' => 'foobar'];
+    $plugin = $this->getModerationStateChangeMock($config, $this->moderationInfo, $this->node);
+    $plugin->execute($this->node);
+  }
+
+  /**
+   * Data provider for the access method test.
+   */
+  public static function providerAccessModerationStateChange(): array {
+    $instance = new self("test");
+
+    $instance->setupMocks();
+    $instance->moderationInfo = $instance->createMock(ModerationInformationInterface::class);
+
+    $instance->workflow = $instance->createMock(WorkflowInterface::class);
+    $instance->workflow->expects($instance->any())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+    $instance->workflow->expects($instance->any())
+      ->method('getCacheTags')
+      ->willReturn([]);
+    $instance->workflow->expects($instance->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(0);
+
+    $moderation_info = clone $instance->moderationInfo;
+
+    // No object given.
+    $data['no-object-given'] = [$moderation_info, NULL, FALSE];
+
+    // Invalid object given.
+    $moderation_info = clone $instance->moderationInfo;
+
+    $data['invalid-object-given'] = [$moderation_info, new \stdClass(), FALSE];
+
+    // Object has no workflow.
+    $moderation_info = clone $instance->moderationInfo;
+    $node = clone $instance->node;
+
+    $moderation_info->expects($instance->once())
+      ->method('getWorkflowForEntity')
+      ->with($node)
+      ->willReturn(NULL);
+
+    $data['no-workflow'] = [$moderation_info, $node, FALSE];
+
+    // Different workflow.
+    $workflow = clone $instance->workflow;
+
+    $workflow->expects($instance->once())
+      ->method('id')
+      ->willReturn('bar');
+
+    $moderation_info = clone $instance->moderationInfo;
+    $node = clone $instance->node;
+
+    $moderation_info->expects($instance->once())
+      ->method('getWorkflowForEntity')
+      ->with($node)
+      ->willReturn($workflow);
+
+    $data['different-workflow'] = [$moderation_info, $node, FALSE];
+
+    // The transition is not allowed, so access is denied without ever
+    // checking the entity's own access.
+    $workflow = clone $instance->workflow;
+
+    $workflow->expects($instance->once())
+      ->method('id')
+      ->willReturn('foo');
+
+    $moderation_info = clone $instance->moderationInfo;
+    $node = clone $instance->node;
+
+    $moderation_info->expects($instance->once())
+      ->method('getWorkflowForEntity')
+      ->with($node)
+      ->willReturn($workflow);
+
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
+
+    $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
+    $state = $instance->createMock(StateInterface::class);
+
+    $workflow_type->expects($instance->once())
+      ->method('getState')
+      ->with('foobar')
+      ->willReturn($state);
+
+    $state->expects($instance->once())
+      ->method('canTransitionTo')
+      ->with('bar')
+      ->willReturn(FALSE);
+
+    $workflow->expects($instance->once())
+      ->method('getTypePlugin')
+      ->willReturn($workflow_type);
+
+    $data['invalid-transition'] = [$moderation_info, $node, FALSE];
+
+    // The transition is valid, but the validator denies it (e.g. a missing
+    // transition permission), so the entity's own access is never checked
+    // either.
+    $workflow = clone $instance->workflow;
+    $workflow->expects($instance->once())
+      ->method('id')
+      ->willReturn('foo');
+
+    $moderation_info = clone $instance->moderationInfo;
+    $node = clone $instance->node;
+
+    $moderation_info->expects($instance->once())
+      ->method('getWorkflowForEntity')
+      ->with($node)
+      ->willReturn($workflow);
+
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
+
+    $account = $instance->createMock(AccountInterface::class);
+
+    $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
+    $state = $instance->createMock(StateInterface::class);
+    $toState = $instance->createMock(StateInterface::class);
+
+    $workflow_type->expects($instance->exactly(2))
+      ->method('getState')
+      ->willReturnMap([
+        ['foobar', $state],
+        ['bar', $toState],
+      ]);
+
+    $state->expects($instance->once())
+      ->method('canTransitionTo')
+      ->with('bar')
+      ->willReturn(TRUE);
+
+    $validator = clone $instance->validator;
+    $validator->expects($instance->once())
+      ->method('isTransitionValid')
+      ->with($workflow, $state, $toState, $account, $node)
+      ->willReturn(FALSE);
+
+    $workflow->expects($instance->exactly(2))
+      ->method('getTypePlugin')
+      ->willReturn($workflow_type);
+
+    $data['no-transition-access'] = [
+      $moderation_info,
+      $node,
+      FALSE,
+      $account,
+      $validator,
+    ];
+
+    // The transition is valid and the validator allows it, so access is
+    // granted.
+    $workflow = clone $instance->workflow;
+    $workflow->expects($instance->exactly(2))
+      ->method('id')
+      ->willReturn('foo');
+
+    $moderation_info = clone $instance->moderationInfo;
+    $node = clone $instance->node;
+
+    $moderation_info->expects($instance->once())
+      ->method('getWorkflowForEntity')
+      ->with($node)
+      ->willReturn($workflow);
+
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
+
+    $account = $instance->createMock(AccountInterface::class);
+
+    $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
+    $state = $instance->createMock(StateInterface::class);
+    $toState = $instance->createMock(StateInterface::class);
+
+    $workflow_type->expects($instance->exactly(2))
+      ->method('getState')
+      ->willReturnMap([
+        ['foobar', $state],
+        ['bar', $toState],
+      ]);
+
+    $state->expects($instance->once())
+      ->method('canTransitionTo')
+      ->with('bar')
+      ->willReturn(TRUE);
+
+    $validator = clone $instance->validator;
+    $validator->expects($instance->once())
+      ->method('isTransitionValid')
+      ->with($workflow, $state, $toState, $account, $node)
+      ->willReturn(TRUE);
+
+    $workflow->expects($instance->exactly(2))
+      ->method('getTypePlugin')
+      ->willReturn($workflow_type);
+
+    $data['transition-access'] = [$moderation_info, $node, TRUE, $account, $validator];
+
+    return $data;
+  }
+
+  /**
+   * Tests the access method.
+   *
+   * @param \Drupal\content_moderation\ModerationInformationInterface|\PHPUnit_Framework_MockObject_MockObject $moderation_info
+   *   The moderation info service.
+   * @param \Drupal\node\NodeInterface|\PHPUnit_Framework_MockObject_MockObject|\StdClass|null $node
+   *   The mocked node.
+   * @param bool $result
+   *   The access result.
+   * @param \Drupal\Core\Session\AccountInterface|null $account
+   *   (optional) The user for which to check access, or NULL to check access
+   *   for the current user. Defaults to NULL.
+   * @param \Drupal\content_moderation\StateTransitionValidationInterface|null $validator
+   *   (optional) A state transition validator mock with true and false
+   *   rules set up. Defaults to NULL.
+   */
+  #[DataProvider('providerAccessModerationStateChange')]
+  public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, ?AccountInterface $account = NULL, ?StateTransitionValidationInterface $validator = NULL): void {
+    $config = ['workflow' => 'foo', 'state' => 'bar'];
+    $plugin = $this->getModerationStateChangeMock($config, $moderation_info, $node, $validator);
+    $this->assertEquals($result, $plugin->access($node, $account));
+  }
+
+  /**
+   * Mock required objects.
+   */
+  protected function setupMocks(): void {
+    $this->node = $this->getMockBuilder(NodeInterface::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $entity_type_id = 'node';
+    $entity_id = 1;
+    $this->node->expects($this->any())
+      ->method('getEntityTypeId')
+      ->willReturn($entity_type_id);
+
+    $this->node->expects($this->any())
+      ->method('id')
+      ->willReturn($entity_id);
+
+    $this->language = $this->createMock(LanguageInterface::class);
+    $this->language->expects($this->any())
+      ->method('getId')
+      ->willReturn('und');
+
+    $this->node->expects($this->any())
+      ->method('language')
+      ->willReturn($this->language);
+
+    $validations = $this->createMock(EntityConstraintViolationListInterface::class);
+    $validations->expects($this->any())
+      ->method('count')
+      ->willReturn(0);
+
+    $this->node->expects($this->any())
+      ->method('validate')
+      ->willReturn($validations);
+
+    $this->nodeStorage = $this->createMock(NodeStorageInterface::class);
+    $this->nodeStorage->expects($this->any())
+      ->method('getLatestTranslationAffectedRevisionId')
+      ->with($entity_id, $this->node->language()->getId())
+      ->willReturn($this->node->id());
+
+    $this->nodeStorage->expects($this->any())
+      ->method('loadRevision')
+      ->with($entity_id)
+      ->willReturn($this->node);
+
+    $this->nodeStorage->expects($this->any())
+      ->method('createRevision')
+      ->with($this->node)
+      ->willReturn($this->node);
+
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $this->entityTypeManager->expects($this->any())
+      ->method('getStorage')
+      ->with('node')
+      ->willReturn($this->nodeStorage);
+
+    $this->currentUser = $this->createMock(AccountInterface::class);
+    $this->currentUser->expects($this->any())
+      ->method('id')
+      ->willReturn(1);
+
+    $this->validator = $this->createMock(StateTransitionValidationInterface::class);
+  }
+
+  /**
+   * Mocks Moderation state change action.
+   */
+  protected function getModerationStateChangeMock($config, $moderation_info, $node, ?StateTransitionValidationInterface $validator = NULL): object {
+    $usedValidator = $this->validator;
+    if ($validator != NULL) {
+      $usedValidator = $validator;
+    }
+    $plugin = $this->getMockBuilder(ModerationStateChange::class)
+      ->setConstructorArgs([
+        $config,
+        'moderation_state_change',
+        ['type' => 'node'],
+        $moderation_info,
+        $this->entityTypeManager,
+        $this->currentUser,
+        $usedValidator,
+      ])
+      ->onlyMethods(['loadLatestRevision'])
+      ->getMock();
+
+    $plugin->expects($this->any())
+      ->method('loadLatestRevision')
+      ->willReturn($node);
+
+    return $plugin;
+  }
+
+}

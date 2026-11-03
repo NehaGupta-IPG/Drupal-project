@@ -33,6 +33,7 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     'user',
     'workflows',
     'entity_test',
+    'system',
   ];
 
   /**
