@@ -3,6 +3,8 @@
 namespace Drupal\Core\PathProcessor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,13 +21,23 @@ class PathProcessorFront implements InboundPathProcessorInterface {
   protected $config;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a PathProcessorFront object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   A config factory for retrieving the site front page configuration.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(ConfigFactoryInterface $config) {
+  public function __construct(ConfigFactoryInterface $config, ?LanguageManagerInterface $language_manager = NULL) {
     $this->config = $config;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -33,7 +45,16 @@ class PathProcessorFront implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     if ($path === '/') {
-      $path = $this->config->get('system.site')->get('page.front');
+      $path = NULL;
+      if ($path_langcode = $request->attributes->get('path_langcode')) {
+        if ($this->languageManager instanceof ConfigurableLanguageManagerInterface) {
+          $config_override = $this->languageManager->getLanguageConfigOverride($path_langcode, 'system.site');
+          $path = $config_override->get('page.front');
+        }
+      }
+      if (empty($path)) {
+        $path = $this->config->get('system.site')->get('page.front');
+      }
       if (empty($path)) {
         // We have to return a valid path but / does not have a route and config
         // might be broken so stop execution.

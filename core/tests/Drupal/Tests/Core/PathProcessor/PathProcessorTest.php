@@ -84,6 +84,11 @@ class PathProcessorTest extends UnitTestCase {
       ['/fr/foo', NULL, '/fr/foo'],
       ['/fr', NULL, '/fr'],
       ['/user/login', NULL, '/user/login'],
+      // Entries for when path_langcode is set to 'fr' by LanguageNegotiationUrl.
+      // After the language processor strips the '/fr' prefix, the alias
+      // processor will be called with 'fr' as the langcode.
+      ['/foo', 'fr', '/user/1'],
+      ['/user/login', 'fr', '/user/login'],
     ];
 
     $alias_manager
@@ -177,6 +182,21 @@ class PathProcessorTest extends UnitTestCase {
     $request = Request::create($test_path);
     $processed = $processor_manager->processInbound($test_path, $request);
     $this->assertEquals('/user/1', $processed, 'Processing in the correct order resolves the system path from an alias.');
+
+    // Test resolving an existing alias with no language prefix. The language
+    // processor will not strip any prefix or set a path_langcode, so the alias
+    // processor must fall back to a NULL langcode lookup.
+    $test_path = '/foo';
+    $request = Request::create($test_path);
+    $processed = $processor_manager->processInbound($test_path, $request);
+    $this->assertEquals('/user/1', $processed, 'Processing in the correct order resolves an alias with no language prefix.');
+
+    // Test that a direct system path with no language prefix passes through
+    // unchanged, confirming the NULL-langcode alias lookup returns the path as-is.
+    $test_path = '/user/login';
+    $request = Request::create($test_path);
+    $processed = $processor_manager->processInbound($test_path, $request);
+    $this->assertEquals('/user/login', $processed, 'Processing in the correct order passes through a system path with no language prefix.');
   }
 
 }

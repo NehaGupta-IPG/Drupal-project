@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\PathProcessor;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\PathProcessor\PathProcessorFront;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -82,6 +83,27 @@ class PathProcessorFrontTest extends UnitTestCase {
     $processor = new PathProcessorFront($config_factory->reveal());
     $this->expectException(NotFoundHttpException::class);
     $processor->processInbound('/', new Request());
+  }
+
+  /**
+   * Tests inbound processing with a language-specific frontpage config override.
+   */
+  public function testProcessInboundWithLanguageConfigOverride(): void {
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+
+    $override_config = $this->prophesize(ImmutableConfig::class);
+    $override_config->get('page.front')
+      ->willReturn('/node/111');
+
+    $language_manager = $this->prophesize(ConfigurableLanguageManagerInterface::class);
+    $language_manager->getLanguageConfigOverride('fr', 'system.site')
+      ->willReturn($override_config->reveal());
+
+    $processor = new PathProcessorFront($config_factory->reveal(), $language_manager->reveal());
+    $request = new Request();
+    $request->attributes->set('path_langcode', 'fr');
+
+    $this->assertEquals('/node/111', $processor->processInbound('/', $request));
   }
 
 }
