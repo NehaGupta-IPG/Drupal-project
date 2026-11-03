@@ -55,7 +55,7 @@
             $link.closest('.js-layout-builder-category').show();
           }
           // Toggle the li tag of the matching link.
-          $link.parent().toggle(textMatch);
+          $(link.parentElement).toggle(textMatch);
         };
 
         // Filter if the length of the query is at least 2 characters.
@@ -95,7 +95,9 @@
           // Show all categories since filter is turned off.
           $categories.find('.js-layout-builder-category').show();
           // Show all li tags since filter is turned off.
-          $filterLinks.parent().show();
+          $filterLinks.get().forEach(({ parentElement }) => {
+            $(parentElement).show();
+          });
           announce(Drupal.t('All available blocks are listed.'));
         }
       };

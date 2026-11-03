@@ -65,9 +65,9 @@
       const cssClasses = Drupal.user.password.css;
       once('password', 'input.js-password-field', context).forEach((value) => {
         const $mainInput = $(value);
-        const $mainInputParent = $mainInput
-          .parent()
-          .addClass(cssClasses.passwordParent);
+        const $mainInputParent = $(value.parentElement).addClass(
+          cssClasses.passwordParent,
+        );
         const $passwordWidget = $mainInput.closest(
           '.js-form-type-password-confirm',
         );
@@ -80,8 +80,7 @@
           .find('[data-drupal-selector="password-match-status-text"]')
           .first();
 
-        const $confirmInputParent = $confirmInput
-          .parent()
+        const $confirmInputParent = $($confirmInput[0].parentElement)
           .addClass('confirm-parent')
           .append($passwordConfirmMessage);
 

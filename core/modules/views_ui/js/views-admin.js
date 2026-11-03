@@ -295,7 +295,7 @@
     /**
      * Find the wrapper of the displayed text.
      */
-    this.$selected_div = this.$form.find('.views-selected-options').parent();
+    this.$selected_div = this.$form.find(':has(>.views-selected-options)');
     this.$selected_div.hide();
 
     /**
@@ -386,6 +386,7 @@
       const $displayButtons = $menu
         .nextAll('input.add-display, button.add-display')
         .detach();
+      // eslint-disable-next-line no-jquery/no-parent
       $displayButtons
         .appendTo($addDisplayDropdown.find('.action-list'))
         .wrap('<li>')
@@ -436,7 +437,7 @@
    *   where to put it.
    */
   Drupal.behaviors.viewsUiRenderAddViewButton.toggleMenu = function ($trigger) {
-    $trigger.parent().toggleClass('open');
+    $trigger[0].parentElement.classList.toggle('open');
     $trigger.next().slideToggle('fast');
   };
 
@@ -621,11 +622,9 @@
       const $contextualFilters = $contextualFiltersBucket.find(
         '.views-display-setting a',
       );
-      if ($contextualFilters.length) {
-        $('#preview-args').parent().show();
-      } else {
-        $('#preview-args').parent().hide();
-      }
+      $(document.getElementById('preview-args').parentElement).toggle(
+        $contextualFilters.length,
+      );
 
       // Executes an initial preview.
       const $livePreview = $(
@@ -761,7 +760,7 @@
             // button for adding a new filter group.
             $(
               `<ul class="action-links"><li><a id="views-add-group-link" href="#">${this.addGroupButton[0].value}</a></li></ul>`,
-            ).prependTo(this.table.parent()),
+            ).prependTo(this.table[0].parentElement),
           ),
         )
           .find('#views-add-group-link')
@@ -1181,15 +1180,10 @@
       const $context = $(context);
 
       function changeDefaultWidget(event) {
-        if ($(event.target).prop('checked')) {
-          $context.find('input.default-radios').parent().hide();
-          $context.find('td.any-default-radios-row').parent().hide();
-          $context.find('input.default-checkboxes').parent().show();
-        } else {
-          $context.find('input.default-checkboxes').parent().hide();
-          $context.find('td.any-default-radios-row').parent().show();
-          $context.find('input.default-radios').parent().show();
-        }
+        const isChecked = $(event.target).prop('checked');
+        $context.find(':has(>input.default-radios)').toggle(!isChecked);
+        $context.find(':has(>td.any-default-radios-row)').toggle(!isChecked);
+        $context.find(':has(>input.default-checkboxes)').toggle(isChecked);
       }
 
       // Update on widget change.
@@ -1211,7 +1205,12 @@
    */
   Drupal.viewsUi.Checkboxifier = function (button) {
     this.$button = $(button);
-    this.$parent = this.$button.parent('div.views-expose, div.views-grouped');
+    const parent = button.parentElement;
+    this.$parent =
+      parent.classList.contains('views-expose') ||
+      parent.classList.contains('views-grouped')
+        ? $(parent)
+        : $();
     this.$input = this.$parent.find('input:checkbox, input:radio');
     // Hide the button and its description.
     this.$button.hide();

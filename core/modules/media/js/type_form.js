@@ -19,8 +19,7 @@
       $context.find('#edit-workflow').drupalSetSummary((context) => {
         const values = [];
         $(context)
-          .find('input[name^="options"]:checked')
-          .parent()
+          .find(':has(>input[name^="options"]:checked)')
           .each(function () {
             values.push(
               Drupal.checkPlain($(this).find('label')[0].textContent),
