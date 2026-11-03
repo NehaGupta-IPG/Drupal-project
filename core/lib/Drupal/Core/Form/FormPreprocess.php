@@ -101,9 +101,10 @@ class FormPreprocess {
     ];
     $variables['attributes'] = $element['#wrapper_attributes'];
 
-    // Add element #id for #type 'item'.
-    if (isset($element['#markup']) && !empty($element['#id'])) {
+    // A non-labelable element exposes its #id on the wrapping div.
+    if (isset($element['#non_labelable']) && !empty($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'];
+      $variables['attributes']['aria-describedby'] = $element['#id'] . '--label';
     }
 
     // Pass elements #type and #name to template.
@@ -144,7 +145,8 @@ class FormPreprocess {
     // Add label_display and label variables to template.
     $variables['label_display'] = $element['#title_display'];
     $variables['label'] = ['#theme' => 'form_element_label'];
-    $variables['label'] += array_intersect_key($element, array_flip(['#id', '#required', '#title', '#title_display']));
+    $properties = ['#id', '#non_labelable', '#required', '#title', '#title_display', '#title_tag'];
+    $variables['label'] += array_intersect_key($element, array_flip($properties));
     $variables['label']['#attributes'] = $element['#label_attributes'];
     if (!empty($element['#label_for'])) {
       $variables['label']['#for'] = $element['#label_for'];
@@ -179,7 +181,8 @@ class FormPreprocess {
    * @param array $variables
    *   An associative array containing:
    *   - element: An associative array containing the properties of the element.
-   *     Properties used: #required, #title, #id, #value, #description, #for.
+   *     Properties used: #for, #id, #non_labelable, #required, #title,
+   *     #title_tag.
    */
   public function preprocessFormElementLabel(array &$variables): void {
     $element = $variables['element'];
@@ -188,11 +191,15 @@ class FormPreprocess {
       $variables['title'] = ['#markup' => $element['#title']];
     }
 
+    // Set tag to title_tag, defaulting to 'span' or 'label'.
+    $non_labelable = !empty($element['#non_labelable']);
+    $variables['tag'] = $element['#title_tag'] ?? ($non_labelable ? 'span' : 'label');
+
     // Pass elements title_display to template.
     $variables['title_display'] = $element['#title_display'];
 
     // A #for property of a dedicated #type 'label' element as precedence.
-    if (!empty($element['#for'])) {
+    if (!empty($element['#for']) && $variables['tag'] === 'label') {
       $variables['attributes']['for'] = $element['#for'];
       // A custom #id allows the referenced form input element to refer back to
       // the label element; e.g., in the 'aria-labelledby' attribute.
@@ -201,8 +208,12 @@ class FormPreprocess {
       }
     }
     // Otherwise, point to the #id of the form input element.
-    elseif (!empty($element['#id'])) {
+    elseif (!empty($element['#id']) && $variables['tag'] === 'label') {
       $variables['attributes']['for'] = $element['#id'];
+    }
+    // Provide an id so the wrapping div can reference it with aria-describedby.
+    elseif ($non_labelable && !empty($element['#id'])) {
+      $variables['attributes']['id'] = $element['#id'] . '--label';
     }
 
     // Pass elements required to template.

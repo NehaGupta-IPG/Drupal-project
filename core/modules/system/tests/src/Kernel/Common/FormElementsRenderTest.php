@@ -88,7 +88,7 @@ class FormElementsRenderTest extends KernelTestBase {
       '#title' => $this->randomMachineName(),
       '#markup' => $this->randomMachineName(),
     ];
-    $this->assertRenderedElement($element, '//div[contains(@class, :class) and contains(., :markup)]/label[contains(., :label)]', [
+    $this->assertRenderedElement($element, '//div[contains(@class, :class) and contains(., :markup)]/span[contains(., :label)]', [
       ':class' => 'js-form-type-item',
       ':markup' => $element['#markup'],
       ':label' => $element['#title'],

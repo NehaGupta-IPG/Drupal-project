@@ -26,6 +26,9 @@ class Item extends FormElementBase {
       // assigned by Form API based on the #default_value or #value properties.
       '#input' => TRUE,
       '#markup' => '',
+      // Item wrappers are not label targets; their titles are referenced
+      // through aria-describedby instead of label[for].
+      '#non_labelable' => TRUE,
       '#theme_wrappers' => ['form_element'],
     ];
   }
