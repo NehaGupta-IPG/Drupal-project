@@ -63,6 +63,16 @@ class LocaleStringIsSafeTest extends KernelTestBase {
     $string = 'DrupalLocaleModule<wbr>Test<wbr>Example';
     $result = LocaleXss::stringIsSafe($string);
     $this->assertTrue($result);
+
+    // Check safe html where the tag does not contain a space.
+    $string = 'Hello<br/>Drupal';
+    $result = LocaleXss::stringIsSafe($string);
+    $this->assertTrue($result);
+
+    // Check safe html where the tag contains too many spaces.
+    $string = 'Hello<br    />Drupal';
+    $result = LocaleXss::stringIsSafe($string);
+    $this->assertTrue($result);
   }
 
   /**
