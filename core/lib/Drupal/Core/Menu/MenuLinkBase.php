@@ -179,20 +179,20 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
     ];
 
     // Links can either be reset or deleted, not both.
-    if ($this->isResettable()) {
+    if ($this->isResettable() && $this->getResetRoute()) {
       $operations['reset'] = [
         'title' => $this->t('Reset'),
         'url' => $this->getResetRoute(),
       ];
     }
-    elseif ($this->isDeletable()) {
+    elseif ($this->isDeletable() && $this->getDeleteRoute()) {
       $operations['delete'] = [
         'title' => $this->t('Delete'),
         'url' => $this->getDeleteRoute(),
       ];
     }
 
-    if ($this->isTranslatable()) {
+    if ($this->isTranslatable() && $this->getTranslateRoute()) {
       $operations['translate'] = [
         'title' => $this->t('Translate'),
         'url' => $this->getTranslateRoute(),
