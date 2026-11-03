@@ -141,6 +141,8 @@ class FormErrorHandlerTest extends UnitTestCase {
         return '<ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
       });
 
+    $this->testForm['#inline_form_errors_summary'] = TRUE;
+
     $form_state = new FormState();
     $form_state->setErrorByName('test1', 'invalid');
     $form_state->setErrorByName('test2', 'invalid');
@@ -222,6 +224,56 @@ class FormErrorHandlerTest extends UnitTestCase {
     $this->formErrorHandler->handleFormErrors($this->testForm, $form_state);
 
     // Assert the #errors is populated for proper input.
+    $this->assertSame('invalid', $this->testForm['test1']['#errors']);
+    $this->assertSame('invalid', $this->testForm['test2']['#errors']);
+    $this->assertSame('invalid', $this->testForm['fieldset']['test3']['#errors']);
+    $this->assertSame('no error message', $this->testForm['test4']['#errors']);
+    $this->assertSame('no title given', $this->testForm['test5']['#errors']);
+    $this->assertSame('element is invisible', $this->testForm['test6']['#errors']);
+  }
+
+  /**
+   * Tests that disabling Inline Form Errors summary works.
+   */
+  public function testDisabledInlineErrorsSummary(): void {
+    $this->messenger->expects($this->exactly(2))
+      ->method('addError');
+
+    // Assert that messages are summarized for elements that have both no title
+    // and are missing or invisible.
+    $messages = [
+      'element is invisible',
+      'this missing element is invalid',
+    ];
+
+    $this->messenger->expects($this->exactly(count($messages)))
+      ->method('addError')
+      ->with(
+        $this->callback(function (string $message) use (&$messages): bool {
+          return array_shift($messages) === $message;
+        }),
+        FALSE
+      );
+
+    $this->messenger->expects($this->never())
+      ->method('addMessage');
+
+    $this->renderer->expects($this->never())
+      ->method('renderInIsolation');
+
+    $this->testForm['#inline_form_errors_summary'] = FALSE;
+
+    $form_state = new FormState();
+    $form_state->setErrorByName('test1', 'invalid');
+    $form_state->setErrorByName('test2', 'invalid');
+    $form_state->setErrorByName('fieldset][test3', 'invalid');
+    $form_state->setErrorByName('test4', 'no error message');
+    $form_state->setErrorByName('test5', 'no title given');
+    $form_state->setErrorByName('test6', 'element is invisible');
+    $form_state->setErrorByName('missing_element', 'this missing element is invalid');
+    $this->formErrorHandler->handleFormErrors($this->testForm, $form_state);
+
+    // Assert the inline error still exists.
     $this->assertSame('invalid', $this->testForm['test1']['#errors']);
     $this->assertSame('invalid', $this->testForm['test2']['#errors']);
     $this->assertSame('invalid', $this->testForm['fieldset']['test3']['#errors']);

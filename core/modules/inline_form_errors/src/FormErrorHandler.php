@@ -94,6 +94,10 @@ class FormErrorHandler extends CoreFormErrorHandler {
       if (!empty($form_element['#error_no_message'])) {
         unset($errors[$name]);
       }
+      // Do not show links to elements when the errors summary is disabled.
+      elseif ($is_visible_element && $has_id && !$form['#inline_form_errors_summary']) {
+        unset($errors[$name]);
+      }
       elseif ($is_visible_element && $has_title && $has_id) {
         $url = Url::fromRoute('<none>', [], ['fragment' => $form_element['#id'], 'external' => TRUE]);
         $error_links[] = ['value' => Link::fromTextAndUrl($title, $url)->toRenderable()];

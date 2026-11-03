@@ -42,6 +42,7 @@ class InlineFormErrorsHooks {
    */
   #[Hook('element_info_alter')]
   public function elementInfoAlter(array &$info): void {
+    $info['form']['#inline_form_errors_summary'] = TRUE;
     \Drupal::classResolver(RenderElementHelper::class)->alterElementInfo($info);
   }
 
