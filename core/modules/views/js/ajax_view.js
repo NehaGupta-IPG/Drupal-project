@@ -22,6 +22,38 @@
         Drupal.views.instances[i] = new Drupal.views.ajaxView(ajaxViews[i]);
       });
     }
+
+    $('input[name="use_ajax"]', context).each(function () {
+      $(this).on('change', function () {
+        if (!this.matches(':checked')) {
+          $('input[name="use_ajax_options[use_ajax_paging]"]', context).prop(
+            'checked',
+            false,
+          );
+          $('input[name="use_ajax_options[use_ajax_sorting]"]', context).prop(
+            'checked',
+            false,
+          );
+          $(
+            'input[name="use_ajax_options[use_ajax_exposed_filters]"]',
+            context,
+          ).prop('checked', false);
+        } else {
+          $('input[name="use_ajax_options[use_ajax_paging]"]', context).prop(
+            'checked',
+            true,
+          );
+          $('input[name="use_ajax_options[use_ajax_sorting]"]', context).prop(
+            'checked',
+            true,
+          );
+          $(
+            'input[name="use_ajax_options[use_ajax_exposed_filters]"]',
+            context,
+          ).prop('checked', true);
+        }
+      });
+    });
   };
   Drupal.behaviors.ViewsAjaxView.detach = (context, settings, trigger) => {
     if (trigger === 'unload') {
@@ -120,18 +152,44 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
+    this.$exposed_form = [];
+    if (
+      drupalSettings.views.ajaxOptions.hasOwnProperty(
+        'use_ajax_exposed_filters',
+      )
+    ) {
+      this.$exposed_form = $(
+        `form#views-exposed-form-${settings.view_name.replace(
+          /_/g,
+          '-',
+        )}-${settings.view_display_id.replace(/_/g, '-')}`,
+      );
+    }
     once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
 
     // Add the ajax to pagers.
-    once(
-      'ajax-pager',
-      this.$view
-        // Don't attach to nested views. Doing so would attach multiple behaviors
-        // to a given element.
-        .filter(this.filterNestedViews.bind(this)),
-    ).forEach(this.attachPagerAjax.bind(this));
+    if (drupalSettings.views.ajaxOptions.hasOwnProperty('use_ajax_paging')) {
+      once(
+        'ajax-pager',
+        this.$view
+          // Don't attach to nested views. Doing so would attach multiple behaviors
+          // to a given element.
+          .filter(this.filterNestedViews.bind(this)),
+      ).forEach(this.attachPagerAjax.bind(this));
+    }
+
+    // Add the ajax to sort and links.
+    if (drupalSettings.views.ajaxOptions.hasOwnProperty('use_ajax_sorting')) {
+      once(
+        'ajax-sorting',
+        this.$view
+          // Don't attach to nested views. Doing so would attach multiple behaviors
+          // to a given element.
+          .filter(this.filterNestedViews.bind(this)),
+      ).forEach(this.attachSortingAndLinksAjax.bind(this));
+    }
 
     // Add a trigger to update this view specifically. In order to trigger a
     // refresh use the following code.
@@ -185,9 +243,16 @@
    */
   Drupal.views.ajaxView.prototype.attachPagerAjax = function () {
     this.$view
-      .find(
-        '.js-pager__items a, th.views-field a, .attachment .views-summary a',
-      )
+      .find('.js-pager__items a')
+      .each(this.attachPagerLinkAjax.bind(this));
+  };
+
+  /**
+   * Attach the ajax behavior to each link.
+   */
+  Drupal.views.ajaxView.prototype.attachSortingAndLinksAjax = function () {
+    this.$view
+      .find('th.views-field a, .attachment .views-summary a')
       .each(this.attachPagerLinkAjax.bind(this));
   };
 

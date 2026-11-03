@@ -67,6 +67,7 @@ class ViewsHooks {
     if ($view->ajaxEnabled() && empty($view->is_attachment) && empty($view->live_preview)) {
       $view->element['#attached']['drupalSettings']['views'] = [
         'ajax_path' => Url::fromRoute('views.ajax')->toString(),
+        'ajaxOptions' => $view->getAjaxOptions(),
         'ajaxViews' => [
           'views_dom_id:' . $view->dom_id => [
             'view_name' => $view->storage->id(),
