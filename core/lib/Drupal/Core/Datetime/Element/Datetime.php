@@ -44,7 +44,7 @@ class Datetime extends DateElementBase {
       '#date_date_callbacks' => [],
       '#date_time_element' => 'time',
       '#date_time_callbacks' => [],
-      '#date_year_range' => '1900:2050',
+      '#date_year_range' => '1000:+100',
       '#date_increment' => 1,
     ];
   }
@@ -183,7 +183,7 @@ class Datetime extends DateElementBase {
    *     in either position means that specific year. A +/- value describes a
    *     dynamic value that is that many years earlier or later than the current
    *     year at the time the form is displayed. Used in HTML5 min/max date
-   *     settings. Defaults to '1900:2050'.
+   *     settings. Defaults to '1000:+100'.
    *   - #date_increment: The interval (step) to use when incrementing or
    *     decrementing time, in seconds. For example, if this value is set to 30,
    *     time increases (or decreases) in steps of 30 seconds (00:00:00,
