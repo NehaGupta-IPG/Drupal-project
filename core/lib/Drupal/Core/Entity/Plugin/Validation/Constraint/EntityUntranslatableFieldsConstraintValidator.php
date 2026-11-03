@@ -47,6 +47,12 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    * {@inheritdoc}
    */
   public function validate($entity, Constraint $constraint): void {
+    if (!isset($entity)) {
+      // A map's entity property that was not given a value is NULL, and the
+      // validator still recurses into it.
+      return;
+    }
+
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     /** @var \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraint $constraint */
 

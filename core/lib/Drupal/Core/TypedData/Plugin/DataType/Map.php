@@ -41,9 +41,9 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
   /**
    * An array of values for the contained properties.
    *
-   * @var array
+   * @var array|null
    */
-  protected $values = [];
+  protected $values = NULL;
 
   /**
    * The array of properties.

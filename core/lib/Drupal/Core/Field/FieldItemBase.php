@@ -20,6 +20,18 @@ use Drupal\Core\TypedData\TypedDataInterface;
 abstract class FieldItemBase extends Map implements FieldItemInterface {
 
   /**
+   * An array of values for the contained properties.
+   *
+   * Overrides Map::$values to keep an array default for field items, so that
+   * the field layer is unaffected by Map defaulting its storage to NULL.
+   *
+   * @var array
+   *
+   * @see https://www.drupal.org/node/3631125
+   */
+  protected $values = [];
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {
