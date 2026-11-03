@@ -99,7 +99,19 @@ class Rss extends StylePluginBase {
    *   A render array.
    */
   protected function getChannelElements() {
-    return [];
+    $url = $this->view->hasUrl() ? $this->view->getUrl()->setAbsolute()->toString() : '';
+    return [
+      [
+        'namespace' => ['xmlns:atom' => 'http://www.w3.org/2005/Atom'],
+        '#type' => 'html_tag',
+        '#tag' => 'atom:link',
+        '#attributes' => [
+          'href' => $url,
+          'rel' => 'self',
+          'type' => 'application/rss+xml',
+        ],
+      ],
+    ];
   }
 
   /**
@@ -130,9 +142,12 @@ class Rss extends StylePluginBase {
     // Fetch any additional elements for the channel and merge in their
     // namespaces.
     $this->channel_elements = $this->getChannelElements();
-    foreach ($this->channel_elements as $element) {
+    foreach ($this->channel_elements as &$element) {
       if (isset($element['namespace'])) {
         $this->namespaces = array_merge($this->namespaces, $element['namespace']);
+        // Remove namespace from the channel element render array as it has been
+        // merged into the RSS namespaces.
+        unset($element['namespace']);
       }
     }
 
