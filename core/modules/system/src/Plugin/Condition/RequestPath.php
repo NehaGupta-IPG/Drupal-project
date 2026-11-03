@@ -155,7 +155,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
   public function evaluate() {
     // Convert path to lowercase. This allows comparison of the same path
     // with different case. Ex: /Page, /page, /PAGE.
-    $pages = mb_strtolower($this->configuration['pages']);
+    $pages = mb_strtolower($this->configuration['pages'] ?? '');
     if (!$pages) {
       return TRUE;
     }
@@ -165,7 +165,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
     $path = $this->currentPath->getPath($request);
     // Do not trim a trailing slash if that is the complete path.
     $path = $path === '/' ? $path : rtrim($path, '/');
-    $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
+    $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path) ?? '');
 
     return $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath($path, $pages));
   }

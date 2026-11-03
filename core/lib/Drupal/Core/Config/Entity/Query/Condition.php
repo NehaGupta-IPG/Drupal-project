@@ -36,7 +36,7 @@ class Condition extends ConditionBase {
             $condition['value'] = array_map('mb_strtolower', $condition['value']);
           }
           elseif (!is_bool($condition['value'])) {
-            $condition['value'] = mb_strtolower($condition['value']);
+            $condition['value'] = mb_strtolower($condition['value'] ?? '');
           }
         }
 
