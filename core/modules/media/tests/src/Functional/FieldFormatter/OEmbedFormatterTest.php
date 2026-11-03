@@ -116,6 +116,21 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
         ],
         'self_closing' => TRUE,
       ],
+      'Vimeo video empty max size' => [
+        'https://vimeo.com/7073899',
+        'video_vimeo.json',
+        ['max_width' => '', 'max_height' => ''],
+        [
+          'iframe' => [
+            'src' => '/media/oembed?url=https%3A//vimeo.com/7073899',
+            'width' => '480',
+            'height' => '360',
+            'title' => 'Drupal Rap Video - Schipulcon09',
+            'loading' => 'lazy',
+          ],
+        ],
+        'self_closing' => TRUE,
+      ],
       'tweet' => [
         'https://twitter.com/drupaldevdays/status/935643039741202432',
         'rich_twitter.json',
@@ -244,6 +259,15 @@ class OEmbedFormatterTest extends MediaFunctionalTestBase {
         }
         else {
           $this->assertFalse($element->hasAttribute($attribute));
+        }
+      }
+
+      if ($selector === 'iframe') {
+        foreach (['max_width', 'max_height'] as $setting) {
+          if (array_key_exists($setting, $formatter_settings)) {
+            $value = intval($formatter_settings[$setting]);
+            $this->assertStringContainsString("$setting=$value", $element->getAttribute('src'));
+          }
         }
       }
     }

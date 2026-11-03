@@ -139,8 +139,8 @@ class OEmbedFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element = [];
-    $max_width = $this->getSetting('max_width');
-    $max_height = $this->getSetting('max_height');
+    $max_width = intval($this->getSetting('max_width') ?? 0);
+    $max_height = intval($this->getSetting('max_height') ?? 0);
 
     foreach ($items as $delta => $item) {
       $main_property = $item->getFieldDefinition()->getFieldStorageDefinition()->getMainPropertyName();
