@@ -1786,7 +1786,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
           $real_name = $this->getFieldIndexName($storage_definition, $name);
           $this->database->schema()->dropIndex($table, $real_name);
-          $this->database->schema()->dropIndex($revision_table, $real_name);
+          if (array_key_exists($revision_table, $actual_schema)) {
+            $this->database->schema()->dropIndex($revision_table, $real_name);
+          }
         }
       }
       $table = $table_mapping->getDedicatedDataTableName($storage_definition);
@@ -1811,7 +1813,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           // Check if the index exists because it might already have been
           // created as part of the earlier entity type update event.
           $this->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
-          $this->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          if (array_key_exists($revision_table, $actual_schema)) {
+            $this->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          }
         }
       }
       $this->saveFieldSchemaData($storage_definition, $this->getDedicatedTableSchema($storage_definition));

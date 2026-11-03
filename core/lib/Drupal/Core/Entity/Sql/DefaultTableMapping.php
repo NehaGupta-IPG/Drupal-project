@@ -12,6 +12,11 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 class DefaultTableMapping implements TableMappingInterface {
 
   /**
+   * Columns that every dedicated field table has.
+   */
+  protected const DEDICATED_TABLE_COLUMNS = ['bundle', 'deleted', 'entity_id', 'revision_id', 'langcode', 'delta'];
+
+  /**
    * The entity type definition.
    *
    * @var \Drupal\Core\Entity\ContentEntityTypeInterface
@@ -242,14 +247,6 @@ class DefaultTableMapping implements TableMappingInterface {
     $dedicated_table_definitions = array_filter($table_mapping->fieldStorageDefinitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
       return $table_mapping->requiresDedicatedTableStorage($definition);
     });
-    $extra_columns = [
-      'bundle',
-      'deleted',
-      'entity_id',
-      'revision_id',
-      'langcode',
-      'delta',
-    ];
     foreach ($dedicated_table_definitions as $field_name => $definition) {
       $tables = [$table_mapping->getDedicatedDataTableName($definition)];
       if ($revisionable && $definition->isRevisionable()) {
@@ -257,7 +254,7 @@ class DefaultTableMapping implements TableMappingInterface {
       }
       foreach ($tables as $table_name) {
         $table_mapping->setFieldNames($table_name, [$field_name]);
-        $table_mapping->setExtraColumns($table_name, $extra_columns);
+        $table_mapping->setExtraColumns($table_name, static::DEDICATED_TABLE_COLUMNS);
       }
     }
 
@@ -429,21 +426,29 @@ class DefaultTableMapping implements TableMappingInterface {
     $field_name = $storage_definition->getName();
 
     if ($this->allowsSharedTableStorage($storage_definition)) {
-      $column_name = count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
+      return count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
     }
     elseif ($this->requiresDedicatedTableStorage($storage_definition)) {
       if ($property_name == TableMappingInterface::DELTA) {
-        $column_name = 'delta';
+        return 'delta';
       }
-      else {
-        $column_name = !in_array($property_name, $this->getReservedColumns()) ? $field_name . '_' . $property_name : $property_name;
+
+      if (in_array($property_name, $this->getReservedColumns())) {
+        return $property_name;
       }
+
+      // A field's own property wins over a table column of the same name.
+      if (in_array($property_name, static::DEDICATED_TABLE_COLUMNS, TRUE)) {
+        if (!isset($storage_definition->getColumns()[$property_name])) {
+          return $property_name;
+        }
+      }
+
+      return $field_name . '_' . $property_name;
     }
     else {
       throw new SqlContentEntityStorageException("Column information not available for the '$field_name' field.");
     }
-
-    return $column_name;
   }
 
   /**

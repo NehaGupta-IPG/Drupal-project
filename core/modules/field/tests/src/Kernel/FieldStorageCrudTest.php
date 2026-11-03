@@ -13,6 +13,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests field storage create, read, update, and delete.
@@ -487,6 +488,51 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
       $field_storage->setCardinality(++$cardinality);
       $field_storage->save();
     } while ($cardinality < 6);
+  }
+
+  /**
+   * Tests changing the indexes of a dedicated table field that has data.
+   */
+  #[TestWith(['entity_test', 1])]
+  #[TestWith(['entity_test_rev', 2])]
+  public function testUpdateIndexesWithData(string $entity_type_id, int $table_count): void {
+    $this->installEntitySchema('entity_test_rev');
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_update_indexes',
+      'entity_type' => $entity_type_id,
+      'type' => 'test_field',
+      // Force dedicated table storage.
+      'cardinality' => 2,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'entity_type' => $entity_type_id,
+      'bundle' => $entity_type_id,
+    ])->save();
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
+    $storage->create(['field_update_indexes' => 1])->save();
+
+    $table_mapping = $storage->getTableMapping();
+    $tables = [$table_mapping->getDedicatedDataTableName($field_storage)];
+    if ($storage->getEntityType()->isRevisionable()) {
+      $tables[] = $table_mapping->getDedicatedRevisionTableName($field_storage);
+    }
+    $this->assertCount($table_count, $tables);
+    $schema = \Drupal::database()->schema();
+    foreach ($tables as $table) {
+      $this->assertFalse($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
+
+    $field_storage->setIndexes(['value' => ['value'], 'value_2' => ['value', 'entity_id']])->save();
+    foreach ($tables as $table) {
+      $this->assertTrue($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
+
+    $field_storage->setIndexes(['value' => ['value']])->save();
+    foreach ($tables as $table) {
+      $this->assertFalse($schema->indexExists($table, 'field_update_indexes_value_2'));
+    }
   }
 
   /**
