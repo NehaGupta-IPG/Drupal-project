@@ -2,8 +2,12 @@
 
 namespace Drupal\media\OEmbed;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
+use Drupal\Core\Queue\QueueFactory;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -12,9 +16,40 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 // cspell:ignore nocdata
 
 /**
- * Fetches and caches oEmbed resources.
+ * Fetches and stores oEmbed resources.
+ *
+ * Resource data is stored in an expirable key/value collection, so it survives
+ * cache clears. Before stored data expires, a queue item is added to refresh
+ * it, so the data can be served without a blocking HTTP request.
  */
 class ResourceFetcher implements ResourceFetcherInterface {
+
+  /**
+   * The name of the queue used to refresh stored resources.
+   */
+  const QUEUE_NAME = 'media_oembed_resource_refresh';
+
+  /**
+   * The key/value collection used to store resource data.
+   */
+  const KEY_VALUE_COLLECTION = 'media.oembed_resource';
+
+  /**
+   * The number of seconds stored resource data is kept for.
+   */
+  const MAX_AGE = 2592000;
+
+  /**
+   * The number of seconds after which stored resource data is refreshed.
+   */
+  const REFRESH_AGE = 1814400;
+
+  /**
+   * The number of seconds after which a refresh is queued again.
+   *
+   * This allows a refresh to be retried when a queue item was lost.
+   */
+  const REQUEUE_AGE = 86400;
 
   public function __construct(
     protected ClientInterface $httpClient,
@@ -22,20 +57,89 @@ class ResourceFetcher implements ResourceFetcherInterface {
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
     protected int $timeout = 5,
+    protected ?KeyValueExpirableFactoryInterface $keyValueExpirableFactory = NULL,
+    protected ?QueueFactory $queueFactory = NULL,
+    protected ?TimeInterface $time = NULL,
   ) {
+    if (!$this->keyValueExpirableFactory) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $keyValueExpirableFactory argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3634964', E_USER_DEPRECATED);
+      $this->keyValueExpirableFactory = \Drupal::service('keyvalue.expirable');
+    }
+    if (!$this->queueFactory) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $queueFactory argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3634964', E_USER_DEPRECATED);
+      $this->queueFactory = \Drupal::service('queue');
+    }
+    if (!$this->time) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3634964', E_USER_DEPRECATED);
+      $this->time = \Drupal::time();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function fetchResource($url) {
-    $cache_id = "media:oembed_resource:$url";
+    $key_value = $this->keyValueExpirableFactory->get(static::KEY_VALUE_COLLECTION);
+    $key = Crypt::hashBase64($url);
 
-    $cached = $this->cacheBackend->get($cache_id);
-    if ($cached) {
-      return $this->createResource($cached->data, $url);
+    $stored = $key_value->get($key);
+    if ($stored) {
+      $now = $this->time->getCurrentTime();
+      // Queue a refresh when the data is due for one, unless a refresh was
+      // queued recently.
+      if ($stored['refresh'] <= $now && (!$stored['queued'] || $stored['queued'] + static::REQUEUE_AGE <= $now)) {
+        $this->queueFactory->get(static::QUEUE_NAME)->createItem(['url' => $url]);
+        $stored['queued'] = $now;
+        $key_value->setWithExpire($key, $stored, max(1, $stored['expires'] - $now));
+      }
+      return $this->createResource($stored['data'], $url);
     }
 
+    $data = $this->refreshResource($url);
+    return $this->createResource($data, $url);
+  }
+
+  /**
+   * Fetches oEmbed resource data from the provider and stores it.
+   *
+   * @param string $url
+   *   Endpoint-specific URL of the oEmbed resource.
+   *
+   * @return array
+   *   The resource data returned by the provider.
+   *
+   * @throws \Drupal\media\OEmbed\ResourceException
+   *   If the oEmbed endpoint is not reachable or the response cannot be
+   *   decoded.
+   */
+  public function refreshResource(string $url): array {
+    $data = $this->doFetchResource($url);
+
+    $now = $this->time->getCurrentTime();
+    $this->keyValueExpirableFactory->get(static::KEY_VALUE_COLLECTION)->setWithExpire(Crypt::hashBase64($url), [
+      'data' => $data,
+      'refresh' => $now + static::REFRESH_AGE,
+      'expires' => $now + static::MAX_AGE,
+      'queued' => NULL,
+    ], static::MAX_AGE);
+
+    return $data;
+  }
+
+  /**
+   * Fetches oEmbed resource data from the provider.
+   *
+   * @param string $url
+   *   Endpoint-specific URL of the oEmbed resource.
+   *
+   * @return array
+   *   The resource data returned by the provider.
+   *
+   * @throws \Drupal\media\OEmbed\ResourceException
+   *   If the oEmbed endpoint is not reachable or the response cannot be
+   *   decoded.
+   */
+  protected function doFetchResource(string $url): array {
     try {
       $response = $this->httpClient->request('GET', $url, [
         RequestOptions::TIMEOUT => $this->timeout,
@@ -63,9 +167,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
 
-    $this->cacheBackend->set($cache_id, $data);
-
-    return $this->createResource($data, $url);
+    return $data;
   }
 
   /**
