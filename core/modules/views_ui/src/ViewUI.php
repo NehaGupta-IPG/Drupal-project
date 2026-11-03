@@ -566,6 +566,17 @@ class ViewUI implements ViewEntityInterface {
 
     $errors = $executable->validate();
     $executable->destroy();
+
+    // Checking that necessary arguments exist
+    $display = $this->get('display');
+    $display_options = $display[$display_id]['display_options'];
+    if (isset($display_options['path'])) {
+      $necessary_arguments_count = substr_count($display_options['path'], '%');
+      if (count($args) < $necessary_arguments_count) {
+        $errors['view_args'][] = t('Too few arguments.');
+      }
+    }
+
     if (empty($errors)) {
       $executable->live_preview = TRUE;
 

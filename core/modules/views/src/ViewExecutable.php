@@ -2016,13 +2016,13 @@ class ViewExecutable {
 
     foreach ($variables as $variable_name) {
       if (empty($args)) {
-        // Try to never put % in a URL; use the wildcard instead.
+        // Try to never put % in a URL; skip instead.
         if ($id && !empty($this->argument[$id]->options['exception']['value'])) {
           $parameters[$variable_name] = $this->argument[$id]->options['exception']['value'];
         }
         else {
-          // Provide some fallback in case no exception value could be found.
-          $parameters[$variable_name] = '*';
+          // Skip remaining arguments if an empty exception found.
+          break;
         }
       }
       else {

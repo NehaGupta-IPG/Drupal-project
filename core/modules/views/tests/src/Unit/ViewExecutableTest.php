@@ -294,7 +294,7 @@ class ViewExecutableTest extends UnitTestCase {
       ->with('views.test.page_1')
       ->willReturn($route);
 
-    $this->assertEquals(Url::fromRoute('views.test.page_1', ['arg_0' => '*', 'arg_1' => '*']), $this->executable->getUrl());
+    $this->assertEquals(Url::fromRoute('views.test.page_1', []), $this->executable->getUrl());
   }
 
   /**
