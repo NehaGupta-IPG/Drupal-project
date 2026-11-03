@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\Core\Routing\RouteBuilderInterface;
@@ -118,6 +119,10 @@ class EntityOperations implements ContainerInjectionInterface {
       $update_default_revision = $entity->isNew()
         || $current_state->isDefaultRevisionState()
         || !$this->moderationInfo->isDefaultRevisionPublished($entity);
+
+      if ($entity instanceof TranslatableInterface) {
+        $update_default_revision = $update_default_revision || $entity->isNewTranslation();
+      }
 
       // Fire per-entity-type logic for handling the save process.
       $this->entityTypeManager
