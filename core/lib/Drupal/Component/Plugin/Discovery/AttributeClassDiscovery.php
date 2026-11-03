@@ -4,11 +4,14 @@ namespace Drupal\Component\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Attribute\Plugin;
+use Drupal\Component\Plugin\Attribute\PluginPropertyInterface;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
+ *
+ * @phpstan-type PropertyAttribute array{class: class-string, arguments: array}
  */
 class AttributeClassDiscovery implements DiscoveryInterface {
 
@@ -90,7 +93,11 @@ class AttributeClassDiscovery implements DiscoveryInterface {
                   // instance.
                   $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
                   if (!$this->hasMissingDependencies($dependencies ?? [])) {
-                    $definitions[$cached['id']] = unserialize($cached['content']);
+                    $definition = unserialize($cached['content']);
+                    if (!empty($cached['property_attributes'])) {
+                      $definition = $this->addPropertiesToDefinition($cached['id'], $definition, unserialize($cached['property_attributes']));
+                    }
+                    $definitions[$cached['id']] = $definition;
                   }
                 }
                 continue;
@@ -117,15 +124,25 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               $result = $this->parseClass($class, $fileinfo);
               ['id' => $id, 'content' => $content] = $result;
               if ($id) {
-                if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
-                  $definitions[$id] = $content;
-                }
+                $property_attributes = $result['property_attributes'] ?? [];
                 // Explicitly serialize this to create a new object instance.
-                $this->fileCache->set($fileinfo->getPathName(), [
+                // This happens before any property attributes are applied,
+                // because object definitions are modified in place and the
+                // cache must hold the definition without them: which property
+                // attributes apply depends on the set of installed modules.
+                $serialized_content = serialize($content);
+                if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
+                  $definitions[$id] = $property_attributes ? $this->addPropertiesToDefinition($id, $content, $property_attributes) : $content;
+                }
+                $cache_item = [
                   'id' => $id,
-                  'content' => serialize($content),
+                  'content' => $serialized_content,
                   'dependencies' => serialize($result['dependencies'] ?? NULL),
-                ]);
+                ];
+                if ($property_attributes) {
+                  $cache_item['property_attributes'] = serialize($property_attributes);
+                }
+                $this->fileCache->set($fileinfo->getPathName(), $cache_item);
               }
               else {
                 // Store a NULL object, so that the file is not parsed again.
@@ -148,10 +165,14 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    * @param \SplFileInfo $fileinfo
    *   The SPL file information for the class.
    *
-   * @return array
-   *   An array with the keys 'id', 'content', and 'dependencies'. The 'id' is
-   *   the plugin ID, 'content' is the plugin definition, and 'dependencies' is
-   *   a list of class, interface or trait names in the plugin class hierarchy.
+   * @return array{id: ?string, content: array|object|null, dependencies?: array|null, property_attributes?: list<PropertyAttribute>}
+   *   An associative array with the following keys:
+   *   - id: The plugin ID.
+   *   - content: The plugin definition.
+   *   - dependencies: A list of class, interface or trait names in the plugin
+   *     class hierarchy.
+   *   - property_attributes: A list of unresolved attributes that may set
+   *     additional properties on the definition.
    *
    * @throws \ReflectionException
    * @throws \Error
@@ -162,6 +183,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     $reflection_class = new \ReflectionClass($class);
 
     $id = $content = NULL;
+    $property_attributes = [];
     if ($attributes = $reflection_class->getAttributes($this->pluginDefinitionAttributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
       /** @var \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute */
       $attribute = $attributes[0]->newInstance();
@@ -173,8 +195,81 @@ class AttributeClassDiscovery implements DiscoveryInterface {
       }
       $id = $attribute->getId();
       $content = $attribute->get();
+      $definition_attribute_names = array_map(static fn(\ReflectionAttribute $reflection_attribute) => $reflection_attribute->getName(), $attributes);
+      $property_attributes = $this->parsePropertyAttributes($reflection_class, $definition_attribute_names);
     }
-    return ['id' => $id, 'content' => $content, 'dependencies' => $dependencies ?? NULL];
+    return [
+      'id' => $id,
+      'content' => $content,
+      'dependencies' => $dependencies ?? NULL,
+      'property_attributes' => $property_attributes,
+    ];
+  }
+
+  /**
+   * Parses the attributes that may set additional properties on a definition.
+   *
+   * @param \ReflectionClass $reflection_class
+   *   Plugin class reflection object.
+   * @param list<class-string> $definition_attribute_names
+   *   The names of the attributes that provide the plugin definition itself.
+   *   These are skipped.
+   *
+   * @return list<PropertyAttribute>
+   *   A list of associative arrays with the following keys:
+   *   - class: The attribute class name.
+   *   - arguments: The arguments the attribute was declared with.
+   */
+  protected function parsePropertyAttributes(\ReflectionClass $reflection_class, array $definition_attribute_names): array {
+    $property_attributes = [];
+    foreach ($reflection_class->getAttributes() as $reflection_attribute) {
+      $name = $reflection_attribute->getName();
+      if (in_array($name, $definition_attribute_names, TRUE)) {
+        continue;
+      }
+      $property_attributes[] = [
+        'class' => $name,
+        'arguments' => $reflection_attribute->getArguments(),
+      ];
+    }
+    return $property_attributes;
+  }
+
+  /**
+   * Applies the available property attributes to a plugin definition.
+   *
+   * @param string $id
+   *   The plugin ID.
+   * @param array|object $definition
+   *   The plugin definition.
+   * @param list<PropertyAttribute> $property_attributes
+   *   The unresolved property attributes, as returned by
+   *   ::parsePropertyAttributes().
+   *
+   * @return array|object
+   *   The plugin definition, with the properties of all available attributes
+   *   added. Attributes provided by modules that are not installed are ignored.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  protected function addPropertiesToDefinition(string $id, array|object $definition, array $property_attributes): array|object {
+    foreach ($property_attributes as ['class' => $class, 'arguments' => $arguments]) {
+      // Only attempt to load classes in namespaces that are scanned for
+      // plugins. Anything else either belongs to a module that is not
+      // installed, or is not a Drupal class at all, such as \Attribute. This
+      // avoids autoloading a class that is known not to exist on every
+      // request.
+      if (!in_array($this->getTwoLevelNamespace($class), $this->rootTwoLevelNamespaces, TRUE)) {
+        continue;
+      }
+      if (!is_a($class, PluginPropertyInterface::class, TRUE)) {
+        continue;
+      }
+      /** @var \Drupal\Component\Plugin\Attribute\PluginPropertyInterface $attribute */
+      $attribute = new $class(...$arguments);
+      $definition = $attribute->addToDefinition($id, $definition);
+    }
+    return $definition;
   }
 
   /**
