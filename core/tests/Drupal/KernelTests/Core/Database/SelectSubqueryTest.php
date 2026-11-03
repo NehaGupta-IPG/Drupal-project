@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Expression;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -11,14 +14,23 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Select query builder.
  */
 #[Group('Database')]
+#[Group('DatabaseAbstractSelect')]
 #[RunTestsInSeparateProcesses]
 class SelectSubqueryTest extends DatabaseTestBase {
+
+  use SelectPropertyResetTrait;
 
   /**
    * Tests that we can use a subquery in a FROM clause.
    */
   public function testFromSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
+    $abstractSubquery = DatabaseAbstractSelect::build('test_task', 'tt')
+      ->column('tt', 'pid', 'pid')
+      ->column('tt', 'task', 'task')
+      ->condition('priority', '=', 1);
+    $hydratedSubquery = $this->connection->select($abstractSubquery);
+
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->addField('tt', 'task', 'task');
@@ -27,6 +39,16 @@ class SelectSubqueryTest extends DatabaseTestBase {
     for ($i = 0; $i < 2; $i++) {
       // Create another query that joins against the virtual table resulting
       // from the subquery.
+      $selectWithHydratedSubquery = $this->connection->select($hydratedSubquery, 'tt2');
+      $selectWithHydratedSubquery->join('test', 't', '[t].[id] = [tt2].[pid]');
+      $selectWithHydratedSubquery->addField('t', 'name');
+      if ($i) {
+        // Use a different number of conditions here to confuse the subquery
+        // placeholder counter, testing https://www.drupal.org/node/1112854.
+        $selectWithHydratedSubquery->condition('name', 'John');
+      }
+      $selectWithHydratedSubquery->condition('task', 'code');
+
       $select = $this->connection->select($subquery, 'tt2');
       $select->join('test', 't', '[t].[id] = [tt2].[pid]');
       $select->addField('t', 'name');
@@ -46,6 +68,8 @@ class SelectSubqueryTest extends DatabaseTestBase {
       // @endcode
       $people = $select->execute()->fetchCol();
 
+      $this->assertEquals($people, $selectWithHydratedSubquery->execute()->fetchCol());
+
       $this->assertCount(1, $people, 'Returned the correct number of rows.');
     }
   }
@@ -54,18 +78,34 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * Tests that we can use a subquery in a FROM clause with a LIMIT.
    */
   public function testFromSubquerySelectWithLimit(): void {
+    $abstractSelect = DatabaseAbstractSelect::build(
+        DatabaseAbstractSelect::build('test_task', 'tt')
+          ->column('tt', 'pid', 'pid')
+          ->column('tt', 'task', 'task')
+          ->orderBy('priority', Order::Desc)
+          ->range(0, 1),
+        'tt2',
+      )
+      ->join('test', 't', '[t].[id] = [tt2].[pid]')
+      ->column('t', 'name');
+
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->addField('tt', 'task', 'task');
     $subquery->orderBy('priority', 'DESC');
     $subquery->range(0, 1);
-
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select($subquery, 'tt2');
     $select->join('test', 't', '[t].[id] = [tt2].[pid]');
     $select->addField('t', 'name');
+
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
 
     // The resulting query should be equivalent to:
     // @code
@@ -75,6 +115,8 @@ class SelectSubqueryTest extends DatabaseTestBase {
     // @endcode
     $people = $select->execute()->fetchCol();
 
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertCount(1, $people, 'Returned the correct number of rows.');
   }
 
@@ -82,22 +124,40 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * Tests that we can use a subquery with an IN operator in a WHERE clause.
    */
   public function testConditionSubquerySelect(): void {
+    $abstractSelect = DatabaseAbstractSelect::build('test_task', 'tt2')
+      ->column('tt2', 'task')
+      ->condition(
+        'tt2.pid',
+        'IN',
+        DatabaseAbstractSelect::build('test_task', 'tt')
+          ->column('tt', 'pid', 'pid')
+          ->condition('tt.priority', '=', 1),
+      );
+
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->condition('tt.priority', 1);
-
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select('test_task', 'tt2');
     $select->addField('tt2', 'task');
     $select->condition('tt2.pid', $subquery, 'IN');
 
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
+
     // The resulting query should be equivalent to:
     // SELECT tt2.name
     // FROM test tt2
     // WHERE tt2.pid IN (SELECT tt.pid AS pid FROM test_task tt WHERE tt.priority=1)
     $people = $select->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertCount(5, $people, 'Returned the correct number of rows.');
   }
 
@@ -126,25 +186,43 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * Tests we can use 2 subqueries with a relational operator in a WHERE clause.
    */
   public function testConditionSubquerySelect3(): void {
+    $abstractSelect = DatabaseAbstractSelect::build('test', 't')
+      ->column('t', 'name')
+      ->condition(
+        DatabaseAbstractSelect::build('test_task', 'tt')
+          ->expression('AVG([tt].[priority])')
+          ->where(new Expression('[tt].[pid] = [t].[id]')),
+        '>',
+        DatabaseAbstractSelect::build('test_task', 'tt2')
+          ->expression('AVG([tt2].[priority])'),
+      );
+
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
     $subquery1->where('[tt].[pid] = [t].[id]');
-
     // Create subquery 2, which is just a normal query object.
     $subquery2 = $this->connection->select('test_task', 'tt2');
     $subquery2->addExpression('AVG([tt2].[priority])');
-
     // Create another query that adds a clause using the subqueries.
     $select = $this->connection->select('test', 't');
     $select->addField('t', 'name');
     $select->condition($subquery1, $subquery2, '>');
+
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
 
     // The resulting query should be equivalent to:
     // SELECT t.name
     // FROM test t
     // WHERE (SELECT AVG(tt.priority) FROM test_task tt WHERE tt.pid = t.id) > (SELECT AVG(tt2.priority) FROM test_task tt2)
     $people = $select->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertEqualsCanonicalizing(['John'], $people, 'Returned John.');
   }
 
@@ -156,25 +234,45 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * to the limited amount of data and tables. 'Valid' use cases do exist :)
    */
   public function testConditionSubquerySelect4(): void {
+    $abstractSelect = DatabaseAbstractSelect::build('test', 't')
+      ->column('t', 'name')
+      ->condition(
+        DatabaseAbstractSelect::build('test_task', 'tt')
+          ->expression('AVG([tt].[priority])')
+          ->where(new Expression('[tt].[pid] = [t].[id]')),
+        'BETWEEN',
+        [
+          DatabaseAbstractSelect::build('test_task', 'tt2')
+            ->expression('MIN([tt2].[priority])')
+            ->where(new Expression('[tt2].[pid] <> [t].[id]')),
+          DatabaseAbstractSelect::build('test_task', 'tt3')
+            ->expression('AVG([tt3].[priority])')
+            ->where(new Expression('[tt3].[pid] <> [t].[id]')),
+        ],
+      );
+
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
     $subquery1->where('[tt].[pid] = [t].[id]');
-
     // Create subquery 2, which is just a normal query object.
     $subquery2 = $this->connection->select('test_task', 'tt2');
     $subquery2->addExpression('MIN([tt2].[priority])');
     $subquery2->where('[tt2].[pid] <> [t].[id]');
-
     // Create subquery 3, which is just a normal query object.
     $subquery3 = $this->connection->select('test_task', 'tt3');
     $subquery3->addExpression('AVG([tt3].[priority])');
     $subquery3->where('[tt3].[pid] <> [t].[id]');
-
     // Create another query that adds a clause using the subqueries.
     $select = $this->connection->select('test', 't');
     $select->addField('t', 'name');
     $select->condition($subquery1, [$subquery2, $subquery3], 'BETWEEN');
+
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
 
     // The resulting query should be equivalent to:
     // @code
@@ -185,6 +283,9 @@ class SelectSubqueryTest extends DatabaseTestBase {
     //       AND (SELECT AVG(tt3.priority) AS expression FROM {test_task} tt3 WHERE (tt3.pid <> t.id));
     // @endcode
     $people = $select->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
+
     $this->assertEqualsCanonicalizing(['George', 'Paul'], $people, 'Returned George and Paul.');
   }
 
@@ -192,16 +293,31 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * Tests that we can use a subquery in a JOIN clause.
    */
   public function testJoinSubquerySelect(): void {
+    $abstractSelect = DatabaseAbstractSelect::build('test', 't')
+      ->join(
+        DatabaseAbstractSelect::build('test_task', 'tt')
+          ->column('tt', 'pid', 'pid')
+          ->condition('priority', '=', 1),
+        'tt',
+        '[t].[id] = [tt].[pid]',
+      )
+      ->column('t', 'name');
+
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
     $subquery->condition('priority', 1);
-
     // Create another query that joins against the virtual table resulting
     // from the subquery.
     $select = $this->connection->select('test', 't');
     $select->join($subquery, 'tt', '[t].[id] = [tt].[pid]');
     $select->addField('t', 'name');
+
+    $hydratedSelect = $this->connection->select($abstractSelect);
+
+    $this->resetProperties($select);
+    $this->resetProperties($hydratedSelect);
+    $this->assertEquals($select, $hydratedSelect);
 
     // The resulting query should be equivalent to:
     // @code
@@ -210,6 +326,8 @@ class SelectSubqueryTest extends DatabaseTestBase {
     //   INNER JOIN (SELECT tt.pid AS pid FROM test_task tt WHERE priority=1) tt ON t.id=tt.pid
     // @endcode
     $people = $select->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedSelect->execute()->fetchCol());
 
     $this->assertCount(2, $people, 'Returned the correct number of rows.');
   }
@@ -229,6 +347,14 @@ class SelectSubqueryTest extends DatabaseTestBase {
         'job' => 'Singer',
       ])
       ->execute();
+
+    $abstractQuery = DatabaseAbstractSelect::build('test', 't')
+      ->columns('t', ['name'])
+      ->exists(DatabaseAbstractSelect::build('test_people', 'tp')
+        ->columns('tp', ['name'])
+        ->where(new Expression('[tp].[age] = [t].[age]'))
+      );
+
     // Base query to {test}.
     $query = $this->connection->select('test', 't')
       ->fields('t', ['name']);
@@ -237,10 +363,21 @@ class SelectSubqueryTest extends DatabaseTestBase {
       ->fields('tp', ['name'])
       ->where('[tp].[age] = [t].[age]');
     $query->exists($subquery);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     $result = $query->execute();
+    $hydratedResult = $hydratedQuery->execute();
 
     // Ensure that we got the right record.
     $record = $result->fetch();
+
+    $this->assertEquals($record, $hydratedResult->fetch());
+
     $this->assertEquals('George', $record->name, 'Fetched name is correct using EXISTS query.');
   }
 
@@ -260,6 +397,13 @@ class SelectSubqueryTest extends DatabaseTestBase {
       ])
       ->execute();
 
+    $abstractQuery = DatabaseAbstractSelect::build('test', 't')
+      ->columns('t', ['name'])
+      ->notExists(DatabaseAbstractSelect::build('test_people', 'tp')
+        ->columns('tp', ['name'])
+        ->where(new Expression('[tp].[age] = [t].[age]'))
+      );
+
     // Base query to {test}.
     $query = $this->connection->select('test', 't')
       ->fields('t', ['name']);
@@ -269,8 +413,17 @@ class SelectSubqueryTest extends DatabaseTestBase {
       ->where('[tp].[age] = [t].[age]');
     $query->notExists($subquery);
 
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetProperties($query);
+    $this->resetProperties($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
     // Ensure that we got the right number of records.
     $people = $query->execute()->fetchCol();
+
+    $this->assertEquals($people, $hydratedQuery->execute()->fetchCol());
+
     $this->assertCount(3, $people, 'NOT EXISTS query returned the correct results.');
   }
 

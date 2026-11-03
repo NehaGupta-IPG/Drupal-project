@@ -1,0 +1,843 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Core\Database\Query\DatabaseAbstract;
+
+use Drupal\Core\Database\Expression;
+
+/**
+ * Database abstract query builder for SELECT statements.
+ *
+ * @phpstan-type TableEntry array{
+ *     'join type':JoinType,
+ *     'table':string|Select,
+ *     'alias':string,
+ *     'condition':string|Condition|null,
+ *     'arguments':array,
+ *     'all_fields'?:bool,
+ *   }
+ * @phpstan-type ColumnEntry array{
+ *     'name':string,
+ *     'table':string,
+ *     'alias':string,
+ *   }
+ *
+ * @property-read list<string> $comments
+ * @property-read array<string,TableEntry> $tables
+ * @property-read array<string,ColumnEntry> $columns
+ * @property-read array<string,AliasedExpression> $expressions
+ * @property-read array<string,Order> $orderBy
+ * @property-read array<string,string> $groupBy
+ * @property-read ?array{'start':int,'length':?int} $range
+ * @property-read list<array{'type':UnionType,'query':Select}> $union
+ * @property-read array<string,mixed> $alterMetadata
+ * @property-read array<string,1> $alterTags
+ */
+final class Select {
+
+  /**
+   * An array of comments that can be prepended to a query.
+   *
+   * @var list<string>
+   */
+  private array $comments = [];
+
+  /**
+   * The condition object for this query.
+   */
+  public private(set) ?Condition $condition = NULL;
+
+  /**
+   * The columns to SELECT.
+   *
+   * @var array<string,ColumnEntry>
+   */
+  private array $columns = [];
+
+  /**
+   * The expressions to SELECT as virtual columns.
+   *
+   * @var array<string,AliasedExpression>
+   */
+  private array $expressions = [];
+
+  /**
+   * The tables against which to JOIN.
+   *
+   * @var array<string,TableEntry>
+   * This property is a nested array. Each entry is an array representing
+   * a single table against which to join. The structure of each entry is:
+   *
+   * @code
+   * [
+   *   'join type' => a case of JoinType. ::BaseTable, ::Inner or ::Left.
+   *   'table' => $table,
+   *   'alias' => $alias_of_the_table,
+   *   'condition' => $join_condition (a string, a Condition object, or NULL),
+   *   'arguments' => $array of arguments for placeholders in the condition.
+   *   'all_fields' => TRUE to SELECT $alias.*, FALSE or NULL otherwise.
+   * ]
+   * @endcode
+   * If $table is a string, it is taken as the name of a table. If it is
+   * a Select query object, it is taken as a subquery.
+   *
+   * If $join_condition is a Condition object, any arguments should be
+   * incorporated into the object; a separate array of arguments does not
+   * need to be provided.
+   */
+  private array $tables = [];
+
+  /**
+   * The columns by which to order this query.
+   *
+   * This is an associative array. The keys are the columns to order, and the
+   * value is the direction to order, Order::Asc or Order::Desc.
+   *
+   * @var array<string,Order>
+   */
+  private array $orderBy = [];
+
+  /**
+   * The columns by which to group.
+   *
+   * @var array<string,string>
+   */
+  private array $groupBy = [];
+
+  /**
+   * The conditional object for the HAVING clause.
+   */
+  public private(set) ?Condition $having = NULL;
+
+  /**
+   * Whether or not this query should be DISTINCT.
+   */
+  public private(set) bool $distinct = FALSE;
+
+  /**
+   * The range limiters for this query.
+   *
+   * @var ?array{'start':int,'length':?int}
+   */
+  private ?array $range = NULL;
+
+  /**
+   * An array whose elements specify a query to UNION, and the UNION type.
+   *
+   * The 'type' key is a case of UnionType. ::Distinct or ::All.
+   *
+   * All entries in this array will be applied from front to back, with the
+   * first query to union on the right of the original query, the second union
+   * to the right of the first, etc.
+   *
+   * @var list<array{'type':UnionType,'query':Select}>
+   */
+  private array $union = [];
+
+  /**
+   * The FOR UPDATE status.
+   */
+  public private(set) bool $forUpdate = FALSE;
+
+  /**
+   * The query metadata for alter purposes.
+   *
+   * @var array<string,mixed>
+   */
+  private array $alterMetadata = [];
+
+  /**
+   * The query tags.
+   *
+   * @var array<string,1>
+   */
+  private array $alterTags = [];
+
+  /**
+   * Constructs a Select object.
+   *
+   * The object should be instantiated through the static ::build() method, not
+   * directly.
+   *
+   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
+   *   The table name or subquery that is being queried.
+   * @param string $alias
+   *   The alias for the table, or NULL to let an automatic alias.
+   * @param Conjunction $conjunction
+   *   The default conjunction that will be applied to arrays of conditions.
+   */
+  private function __construct(
+    string|Select $table,
+    ?string $alias,
+    public readonly Conjunction $conjunction,
+  ) {
+    $this->addJoin(JoinType::BaseTable, $table, $alias);
+  }
+
+  /**
+   * Builds a Select object.
+   *
+   * @param string|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
+   *   The table name or subquery that is being queried.
+   * @param string $alias
+   *   (optional) The alias for the table.
+   * @param Conjunction $conjunction
+   *   (optional) The default conjunction that will be applied to arrays of
+   *   conditions. By default, conditions are ANDed together.
+   */
+  public static function build(
+    string|Select $table,
+    ?string $alias = NULL,
+    Conjunction $conjunction = Conjunction::And,
+  ): static {
+    return new static($table, $alias, $conjunction);
+  }
+
+  /**
+   * Adds a comment to the query.
+   *
+   * @param string $comment
+   *   The comment string to be inserted into the query.
+   */
+  public function comment(string $comment): static {
+    $this->comments[] = $comment;
+    return $this;
+  }
+
+  /**
+   * Adds a tag to a query.
+   *
+   * @param string $tag
+   *   The tag to add.
+   *
+   * @see \Drupal\Core\Database\Query\AlterableInterface
+   */
+  public function addTag(string $tag): static {
+    $this->alterTags[$tag] = 1;
+    return $this;
+  }
+
+  /**
+   * Adds additional metadata to the query.
+   *
+   * @param string $key
+   *   The unique identifier for this piece of metadata.
+   * @param mixed $object
+   *   The additional data to add to the query. May be any valid PHP variable.
+   *
+   * @see \Drupal\Core\Database\Query\AlterableInterface
+   */
+  public function addMetadata(string $key, mixed $object): static {
+    $this->alterMetadata[$key] = $object;
+    return $this;
+  }
+
+  /**
+   * Adds an arbitrary HAVING clause to the query.
+   *
+   * @param Expression $expression
+   *   A portion of a HAVING clause.
+   */
+  public function having(Expression $expression): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
+    $this->having->where($expression);
+    return $this;
+  }
+
+  /**
+   * Sets a HAVING condition that the specified column be NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or the Condition to check.
+   */
+  public function havingIsNull(string|Condition $variable): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
+    $this->having->isNull($variable);
+    return $this;
+  }
+
+  /**
+   * Sets a HAVING condition that the specified column be NOT NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or the Condition to check.
+   */
+  public function havingIsNotNull(string|Condition $variable): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
+    $this->having->isNotNull($variable);
+    return $this;
+  }
+
+  /**
+   * Sets a HAVING condition that the specified subquery returns values.
+   *
+   * @param Select $select
+   *   The subquery that must contain results.
+   */
+  public function havingExists(Select $select): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
+    $this->having->exists($select);
+    return $this;
+  }
+
+  /**
+   * Sets a HAVING condition that the specified subquery returns no values.
+   *
+   * @param Select $select
+   *   The subquery that must not contain results.
+   */
+  public function havingNotExists(Select $select): static {
+    if (!isset($this->having)) {
+      $this->having = new Condition($this->conjunction);
+    }
+    $this->having->notExists($select);
+    return $this;
+  }
+
+  /**
+   * Add FOR UPDATE to the query.
+   *
+   * @param bool $set
+   *   IF TRUE, FOR UPDATE will be added to the query, if FALSE then it won't.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::forUpdate()
+   */
+  public function forUpdate(bool $set = TRUE): static {
+    $this->forUpdate = $set;
+    return $this;
+  }
+
+  /**
+   * Resets the orderBy array.
+   */
+  private function resetOrderBy(): static {
+    $this->orderBy = [];
+    return $this;
+  }
+
+  /**
+   * Sets this query to be DISTINCT.
+   *
+   * @param bool $distinct
+   *   TRUE to flag this query DISTINCT, FALSE to disable it.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::distinct()
+   */
+  public function distinct(bool $distinct = TRUE): static {
+    $this->distinct = $distinct;
+    return $this;
+  }
+
+  /**
+   * Adds a column to the list to be SELECTed.
+   *
+   * @param string $tableAlias
+   *   The name of the table from which the column comes, as an alias.
+   * @param string $column
+   *   The name of the column.
+   * @param string $alias
+   *   The alias for this column. If not specified, one will be generated
+   *   automatically based on the $table_alias and $column. The alias will be
+   *   checked for uniqueness, so the requested alias may not be the alias
+   *   that is assigned in all cases.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addField()
+   */
+  public function column(string $tableAlias, string $column, ?string $alias = NULL): static {
+    // If no alias is specified, first try the column name itself.
+    if (empty($alias)) {
+      $alias = $column;
+    }
+
+    // If that's already in use, try the table name and column name.
+    if (!empty($this->columns[$alias])) {
+      $alias = $tableAlias . '_' . $column;
+    }
+
+    // If that is already used, just add a counter until we find an unused
+    // alias.
+    $alias_candidate = $alias;
+    $count = 2;
+    while (!empty($this->columns[$alias_candidate])) {
+      $alias_candidate = $alias . '_' . $count++;
+    }
+    $alias = $alias_candidate;
+
+    $this->columns[$alias] = [
+      'name' => $column,
+      'table' => $tableAlias,
+      'alias' => $alias,
+    ];
+
+    return $this;
+  }
+
+  /**
+   * Add multiple columns from the same table to be SELECTed.
+   *
+   * @param string $tableAlias
+   *   The name of the table from which the column comes, as an alias.
+   *   Generally you will want to use the return value of join() here to ensure
+   *   that it is valid.
+   * @param list<string> $columns
+   *   An indexed array of columns present in the specified table that should
+   *   be included in this query. If not specified, $tableAlias.* will be
+   *   generated without any aliases.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::fields()
+   */
+  public function columns(string $tableAlias, array $columns = []): static {
+    if ($columns) {
+      foreach ($columns as $column) {
+        // We don't care what alias was assigned.
+        $this->column($tableAlias, $column);
+      }
+    }
+    else {
+      // We want all columns from this table.
+      $this->tables[$tableAlias]['all_fields'] = TRUE;
+    }
+
+    return $this;
+  }
+
+  /**
+   * Adds an expression to the list of "columns" to be SELECTed.
+   *
+   * @param string $expression
+   *   The expression string. May contain placeholders.
+   * @param string $alias
+   *   The alias for this expression. If not specified, one will be generated
+   *   automatically in the form "expression_#". The alias will be checked for
+   *   uniqueness, so the requested alias may not be the alias that is assigned
+   *   in all cases.
+   * @param array<string,string|int|float|bool> $arguments
+   *   Any placeholder arguments needed for this expression.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addExpression()
+   */
+  public function expression(string $expression, ?string $alias = NULL, array $arguments = []): static {
+    if (empty($alias)) {
+      $alias = 'expression';
+    }
+
+    $alias_candidate = $alias;
+    $count = 2;
+    while (!empty($this->expressions[$alias_candidate])) {
+      $alias_candidate = $alias . '_' . $count++;
+    }
+    $alias = $alias_candidate;
+
+    $this->expressions[$alias] = new AliasedExpression($expression, $arguments, $alias);
+
+    return $this;
+  }
+
+  /**
+   * Default join against another table in the database.
+   *
+   * @param Select|string $table
+   *   The table against which to join. May be a string or another Select
+   *   object. If a query object is passed, it will be used as a subselect.
+   * @param string|null $alias
+   *   The alias for the table. In most cases this should be the first letter
+   *   of the table, or the first letter of each "word" in the table.
+   * @param string|Condition|Expression|null $condition
+   *   The condition on which to join this table. If the join requires values,
+   *   this clause should use a named placeholder and the value or values to
+   *   insert should be passed in the 4th parameter. For the first table joined
+   *   on a query, this value is ignored as the first table is taken as the base
+   *   table. The token %alias can be used in this string to be replaced with
+   *   the actual alias. This is useful when $alias is modified by the database
+   *   system, for example, when joining the same table more than once.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::join()
+   */
+  public function join(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
+    return $this->addJoin(JoinType::Inner, $table, $alias, $condition, $arguments);
+  }
+
+  /**
+   * Left outer join against another table in the database.
+   *
+   * @param Select|string $table
+   *   The table against which to join.
+   * @param string|null $alias
+   *   The alias for the table.
+   * @param string|null $condition
+   *   The condition on which to join this table.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see ::join()
+   */
+  public function leftJoin(string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
+    return $this->addJoin(JoinType::Left, $table, $alias, $condition, $arguments);
+  }
+
+  /**
+   * Join against another table in the database.
+   *
+   * @param JoinType $type
+   *   The type of join.
+   * @param Select|string $table
+   *   The table against which to join. May be a string or another Select
+   *   object. If a query object is passed, it will be used as a subselect.
+   * @param ?string $alias
+   *   The alias for the table.
+   * @param string|Condition|Expression|null $condition
+   *   The condition on which to join this table.
+   * @param array $arguments
+   *   An array of arguments to replace into the $condition of this join.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJoin()
+   */
+  private function addJoin(JoinType $type, string|Select $table, ?string $alias = NULL, string|Condition|Expression|null $condition = NULL, array $arguments = []): static {
+    if (empty($alias)) {
+      if ($table instanceof self) {
+        $alias = 'subquery';
+      }
+      else {
+        $alias = $table;
+      }
+    }
+
+    $alias_candidate = $alias;
+    $count = 2;
+    while (!empty($this->tables[$alias_candidate])) {
+      $alias_candidate = $alias . '_' . $count++;
+    }
+    $alias = $alias_candidate;
+
+    if ($condition instanceof Expression) {
+      $tmp = new Condition(Conjunction::And);
+      $where = str_replace('%alias', $alias, $condition->expression);
+      $tmp->where(new Expression($where, $condition->arguments));
+      $condition = $tmp;
+    }
+    elseif (is_string($condition)) {
+      $condition = str_replace('%alias', $alias, $condition);
+    }
+
+    $this->tables[$alias] = [
+      'join type' => $type,
+      'table' => $table,
+      'alias' => $alias,
+      'condition' => $condition,
+      'arguments' => $arguments,
+    ];
+
+    return $this;
+  }
+
+  /**
+   * Orders the result set by a given column.
+   *
+   * @param string $column
+   *   The column on which to order.
+   * @param Order $direction
+   *   The direction to sort.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::orderBy()
+   */
+  public function orderBy(string $column, Order $direction = Order::Asc): static {
+    $this->orderBy[$column] = $direction;
+    return $this;
+  }
+
+  /**
+   * Orders the result set by a random value.
+   *
+   * @param string $alias
+   *   A column alias to use for the random value order.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::orderRandom()
+   */
+  public function orderRandom(string $alias): static {
+    $this->expression('RAND()', $alias);
+    $this->orderBy($alias);
+    return $this;
+  }
+
+  /**
+   * Restricts a query to a given range in the result set.
+   *
+   * If this method is called with no parameters, will remove any range
+   * directives that have been set.
+   *
+   * @param int|null $start
+   *   The first record from the result set to return. If NULL, removes any
+   *   range directives that are set.
+   * @param int|null $length
+   *   The number of records to return from the result set.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::range()
+   */
+  public function range(?int $start = NULL, ?int $length = NULL): static {
+    $this->range = $start !== NULL ? ['start' => $start, 'length' => $length] : NULL;
+    return $this;
+  }
+
+  /**
+   * Add another Select query to UNION to this one.
+   *
+   * Union queries consist of two or more queries whose results are effectively
+   * concatenated together. Queries will be UNIONed in the order they are
+   * specified, with this object's query coming first. Duplicate columns will
+   * be discarded.
+   *
+   * Note: All queries UNIONed together must have the same column structure, in
+   * the same order. It is up to the caller to ensure that they match properly.
+   *
+   * @param Select $query
+   *   The query to UNION to this query.
+   * @param UnionType $type
+   *   The type of UNION to add to the query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::union()
+   */
+  public function union(Select $query, UnionType $type = UnionType::Distinct): static {
+    $this->union[] = [
+      'type' => $type,
+      'query' => $query,
+    ];
+    return $this;
+  }
+
+  /**
+   * Groups the result set by the specified column.
+   *
+   * @param string $column
+   *   The column on which to group. This should be the column as aliased.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::groupBy()
+   */
+  public function groupBy(string $column): static {
+    $this->groupBy[$column] = $column;
+    return $this;
+  }
+
+  /**
+   * Get the equivalent COUNT query of this query as a new query object.
+   *
+   * @return Select
+   *   A new Select object with no columns or expressions besides COUNT(*).
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::countQuery()
+   */
+  public function countQuery(): static {
+    $count = $this->prepareCountQuery();
+
+    $query = static::build($count)
+      ->expression('COUNT(*)');
+
+    return $query;
+  }
+
+  /**
+   * Prepares a count query from the current query object.
+   *
+   * @return Select
+   *   A new query object ready to have COUNT(*) performed on it.
+   */
+  private function prepareCountQuery(): Select {
+    // Create our new query object that we will mutate into a count query.
+    $count = clone($this);
+
+    $group_by = $count->groupBy;
+    $having = isset($this->having) ? $count->having?->conditions : NULL;
+
+    if (!$count->distinct && !isset($having[0])) {
+      // When not executing a distinct query, we can zero-out existing columns
+      // and expressions that are not used by a GROUP BY or HAVING. columns
+      // listed in a GROUP BY or HAVING clause need to be present in the
+      // query.
+      foreach (array_keys($count->columns) as $column) {
+        if (empty($count->groupBy[$column])) {
+          unset($count->columns[$column]);
+        }
+      }
+      foreach (array_keys($count->expressions) as $column) {
+        if (empty($count->groupBy[$column])) {
+          unset($count->expressions[$column]);
+        }
+      }
+
+      // Also remove 'all_fields' statements, which are expanded into
+      // tablename.* when the query is executed.
+      foreach ($count->tables as &$table) {
+        unset($table['all_fields']);
+      }
+    }
+
+    // If we've just removed all columns from the query, make sure there is at
+    // least one so that the query still runs.
+    $count->expression('1');
+
+    // Ordering a count query is a waste of cycles, and breaks on some
+    // databases anyway.
+    $count->resetOrderBy();
+
+    if ($count->distinct && !empty($group_by)) {
+      // If the query is distinct and contains a GROUP BY, we need to remove the
+      // distinct because SQL99 does not support counting on distinct multiple
+      // columns.
+      $count->distinct = FALSE;
+    }
+
+    // If there are any dependent queries to UNION, prepare each of those for
+    // the count query also.
+    foreach ($count->union as &$union) {
+      $union['query'] = $union['query']->prepareCountQuery();
+    }
+
+    return $count;
+  }
+
+  /**
+   * Builds the most common conditional clauses.
+   *
+   * @param string|Condition|Select|null $variable
+   *   The name of the column to check. This can also be a Condition in itself
+   *   or a Select object.
+   * @param Operator|string $operator
+   *   The operator to use:
+   *   - The comparison operators =, <>, <, <=, >, >=.
+   *   - The operators (NOT) BETWEEN, (NOT) IN, (NOT) EXISTS, (NOT) LIKE,
+   *     (NOT) REGEXP.
+   * @param string|int|bool|float|array|Select|null $value
+   *   The value to test the field against. In most cases, and depending on the
+   *   operator, this will be a scalar or an array. As SQL accepts select
+   *   queries on any place where a scalar value or set is expected, $value may
+   *   also be a Select or an array of Select. If $operator is a unary
+   *   operator, e.g. IS NULL, $value will be ignored and should be null. If
+   *   the operator requires a subquery, e.g. EXISTS, the $variable will be
+   *   ignored and $value should be a Select object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If passed invalid arguments, such as an empty array as $value.
+   */
+  public function condition(string|Condition|Select|null $variable, Operator|string $operator = Operator::Equal, string|int|bool|float|array|Select|null $value = NULL): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->condition($variable, $operator, $value);
+    return $this;
+  }
+
+  /**
+   * Sets a condition that the specified column be NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
+   */
+  public function isNull(string|Condition $variable): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->isNull($variable);
+    return $this;
+  }
+
+  /**
+   * Sets a condition that the specified column be NOT NULL.
+   *
+   * @param string|Condition $variable
+   *   The name of the column or a condition to check.
+   */
+  public function isNotNull(string|Condition $variable): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->isNotNull($variable);
+    return $this;
+  }
+
+  /**
+   * Sets a condition that the specified subquery returns values.
+   *
+   * @param Select $select
+   *   The subquery that must contain results.
+   */
+  public function exists(Select $select): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->exists($select);
+    return $this;
+  }
+
+  /**
+   * Sets a condition that the specified subquery returns no values.
+   *
+   * @param Select $select
+   *   The subquery that must not contain results.
+   */
+  public function notExists(Select $select): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->notExists($select);
+    return $this;
+  }
+
+  /**
+   * Sets a condition that is always false.
+   */
+  public function alwaysFalse(): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->alwaysFalse();
+    return $this;
+  }
+
+  /**
+   * Adds an arbitrary WHERE clause to the query.
+   *
+   * @param Expression $expression
+   *   A portion of a WHERE clause as a prepared statement.
+   */
+  public function where(Expression $expression): static {
+    if (!isset($this->condition)) {
+      $this->condition = new Condition($this->conjunction);
+    }
+    $this->condition->where($expression);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __serialize(): array {
+    if ($this->alterMetadata !== []) {
+      throw new \LogicException(__CLASS__ . ' objects containing alter metadata cannot be serialized');
+    }
+    if ($this->alterTags !== []) {
+      throw new \LogicException(__CLASS__ . ' objects containing alter tags cannot be serialized');
+    }
+    return get_object_vars($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __get(string $name): mixed {
+    if (in_array($name, array_keys(get_object_vars($this)), TRUE) && (is_array($this->{$name}) || is_null($this->{$name}))) {
+      return $this->{$name};
+    }
+    throw new \LogicException('Unavailable property $' . $name . ' for ' . __CLASS__);
+  }
+
+}

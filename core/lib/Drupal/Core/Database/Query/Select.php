@@ -3,6 +3,15 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Expression;
+use Drupal\Core\Database\Query\DatabaseAbstract\Condition as DatabaseAbstractCondition;
+use Drupal\Core\Database\Query\DatabaseAbstract\Conjunction;
+use Drupal\Core\Database\Query\DatabaseAbstract\JoinType;
+use Drupal\Core\Database\Query\DatabaseAbstract\Order;
+use Drupal\Core\Database\Query\DatabaseAbstract\UnionType;
+use Drupal\Core\Database\Query\DatabaseAbstract\Select as DatabaseAbstractSelect;
+
+// cspell:ignore mglaman
 
 /**
  * Query builder for SELECT statements.
@@ -134,7 +143,7 @@ class Select extends Query implements SelectInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   Database connection object.
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $table
+   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstract\Select $table
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
@@ -146,7 +155,158 @@ class Select extends Query implements SelectInterface {
     $conjunction = $options['conjunction'] ?? 'AND';
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);
+    if ($table instanceof DatabaseAbstractSelect) {
+      $this->hydrateAbstractSelect($table);
+      return;
+    }
     $this->addJoin(NULL, $table, $alias);
+  }
+
+  /**
+   * Converts a DatabaseAbstractSelect object for the current connection.
+   *
+   * Loads the objects' properties from a database abstracts select object.
+   * Will recursively convert any nested DatabaseAbstractSelect too.
+   *
+   * @param \Drupal\Core\Database\Query\DatabaseAbstract\Select $abstractSelect
+   *   The database abstract select.
+   */
+  final protected function hydrateAbstractSelect(DatabaseAbstractSelect $abstractSelect): void {
+    $this->comments = $abstractSelect->comments;
+
+    if ($abstractSelect->alterTags !== []) {
+      $this->alterTags = $abstractSelect->alterTags;
+    }
+
+    if ($abstractSelect->alterMetadata !== []) {
+      $this->alterMetaData = $abstractSelect->alterMetadata;
+    }
+
+    foreach ($abstractSelect->tables as $key => $table) {
+      $this->tables[$key] = $table;
+      $this->tables[$key]['join type'] = match ($this->tables[$key]['join type']) {
+        JoinType::BaseTable => NULL,
+        JoinType::Inner => 'INNER',
+        JoinType::Left => 'LEFT OUTER',
+      };
+      if ($table['table'] instanceof DatabaseAbstractSelect) {
+        $this->tables[$key]['table'] = $this->connection->select($table['table']);
+      }
+      if ($table['condition'] instanceof DatabaseAbstractCondition) {
+        $this->tables[$key]['condition'] = $this->hydrateAbstractCondition($table['condition']);
+      }
+    }
+
+    foreach ($abstractSelect->columns as $key => $column) {
+      $this->fields[$key] = [
+        'field' => $column['name'],
+        'table' => $column['table'],
+        'alias' => $column['alias'],
+      ];
+    }
+
+    foreach ($abstractSelect->expressions as $key => $expression) {
+      $this->expressions[$key] = [
+        'expression' => $expression->expression,
+        'arguments' => $expression->arguments,
+        'alias' => $expression->alias,
+      ];
+    }
+
+    if ($abstractSelect->condition) {
+      $this->condition = $this->hydrateAbstractCondition($abstractSelect->condition);
+    }
+
+    if ($abstractSelect->having) {
+      $this->having = $this->hydrateAbstractCondition($abstractSelect->having);
+    }
+
+    foreach ($abstractSelect->orderBy as $key => $orderBy) {
+      $order = match ($orderBy) {
+        Order::Asc => 'ASC',
+        Order::Desc => 'DESC',
+      };
+      $this->order[$key] = $order;
+    }
+
+    $this->group = $abstractSelect->groupBy;
+
+    foreach ($abstractSelect->union as $union) {
+      $unionType = match ($union['type']) {
+        UnionType::Distinct => 'DISTINCT',
+        UnionType::All => 'ALL',
+      };
+      $this->union($this->connection->select($union['query']), $unionType);
+    }
+
+    $range = $abstractSelect->range;
+    if ($range !== []) {
+      $this->range($range['start'] ?? NULL, $range['length'] ?? NULL);
+    }
+    else {
+      // @todo the ignore below seems to surface a bug of mglaman/phpstan-drupal.
+      // @phpstan-ignore drupal.entityStoragePropertyAssignment
+      $this->range = $range;
+    }
+
+    $this->distinct = $abstractSelect->distinct;
+
+    $this->forUpdate = $abstractSelect->forUpdate;
+  }
+
+  /**
+   * Converts a DatabaseAbstractCondition object for the current connection.
+   *
+   * Loads the objects' properties from a database abstracts connection object.
+   * Will recursively convert any nested DatabaseAbstractCondition too.
+   *
+   * @param \Drupal\Core\Database\Query\DatabaseAbstract\Condition $abstractCondition
+   *   The database abstract select.
+   */
+  final protected function hydrateAbstractCondition(DatabaseAbstractCondition $abstractCondition): ConditionInterface {
+    $conditions = $abstractCondition->conditions;
+    $conjunction = match ($abstractCondition->conjunction) {
+      Conjunction::And => 'AND',
+      Conjunction::Or => 'OR',
+    };
+    $hydratedCondition = $this->connection->condition($conjunction);
+    foreach ($conditions as $tmp) {
+      if ($tmp instanceof Expression) {
+        $hydratedCondition->where($tmp->expression, $tmp->arguments);
+        continue;
+      }
+      if ($tmp['variable'] instanceof DatabaseAbstractCondition) {
+        $variable = $this->hydrateAbstractCondition($tmp['variable']);
+      }
+      elseif ($tmp['variable'] instanceof DatabaseAbstractSelect) {
+        $variable = $this->connection->select($tmp['variable']);
+      }
+      elseif ($tmp['variable'] === NULL) {
+        $variable = '';
+      }
+      else {
+        $variable = $tmp['variable'];
+      }
+      if ($tmp['value'] instanceof DatabaseAbstractSelect) {
+        $value = $this->connection->select($tmp['value']);
+      }
+      elseif (is_array($tmp['value'])) {
+        $t = [];
+        foreach ($tmp['value'] as $k => $v) {
+          if ($v instanceof DatabaseAbstractSelect) {
+            $t[$k] = $this->connection->select($v);
+            continue;
+          }
+          $t[$k] = $v;
+        }
+        $value = $t;
+      }
+      else {
+        $value = $tmp['value'];
+      }
+      $hydratedCondition->condition($variable, $value, $tmp['operator']->value);
+    }
+    return $hydratedCondition;
   }
 
   /**
