@@ -3,8 +3,10 @@
 namespace Drupal\Core\Breadcrumb;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a breadcrumb manager.
@@ -17,13 +19,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
  * @see \Drupal\Core\DependencyInjection\Compiler\RegisterBreadcrumbBuilderPass
  */
 class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
-
-  /**
-   * The module handler to invoke the alter hook.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * Holds arrays of breadcrumb builders, keyed by priority.
@@ -41,14 +36,19 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    */
   protected $sortedBuilders;
 
-  /**
-   * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler) {
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ?MemoryCacheInterface $memoryCache = NULL,
+    protected ?RequestStack $requestStack = NULL,
+  ) {
+    if (!$this->memoryCache) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memoryCache argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675', E_USER_DEPRECATED);
+      $this->memoryCache = \Drupal::service('cache.memory');
+    }
+    if (!$this->requestStack) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3630675', E_USER_DEPRECATED);
+      $this->requestStack = \Drupal::requestStack();
+    }
   }
 
   /**
@@ -71,6 +71,20 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    * {@inheritdoc}
    */
   public function build(RouteMatchInterface $route_match) {
+    $request = $this->requestStack->getCurrentRequest();
+    $route_name = $route_match->getRouteName();
+    $cid = NULL;
+    if ($request && $route_name !== NULL) {
+      $raw_parameters = $route_match->getRawParameters()?->all() ?? [];
+      $cid = 'breadcrumb:' . $route_name . ':' . hash('xxh64', serialize($raw_parameters));
+    }
+    // Breadcrumbs can depend on more than the route match, for example the
+    // negotiated language, so only reuse a breadcrumb built for this request.
+    if ($cid && ($cache = $this->memoryCache->get($cid)) && $cache->data['request']->get() === $request) {
+      // Return a copy so that callers cannot alter the cached breadcrumb.
+      return clone $cache->data['breadcrumb'];
+    }
+
     $cacheable_metadata = new CacheableMetadata();
     $breadcrumb = new Breadcrumb();
     $context = ['builder' => NULL];
@@ -97,6 +111,14 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
 
     // Allow modules to alter the breadcrumb.
     $this->moduleHandler->alter('system_breadcrumb', $breadcrumb, $route_match, $context);
+
+    if ($cid) {
+      $data = [
+        'request' => \WeakReference::create($request),
+        'breadcrumb' => clone $breadcrumb,
+      ];
+      $this->memoryCache->set($cid, $data, MemoryCacheInterface::CACHE_PERMANENT, $breadcrumb->getCacheTags());
+    }
 
     return $breadcrumb;
   }
