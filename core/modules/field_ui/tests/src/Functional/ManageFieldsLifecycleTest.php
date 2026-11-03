@@ -335,6 +335,36 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $this->drupalGet('admin/reports/fields');
     $this->assertSession()->pageTextContains($this->fieldName);
     $this->assertSession()->linkByHrefExists('admin/structure/types/manage/' . $this->contentType . '/fields');
+
+    // Check that select list options with test type of field and entity are exist.
+    $this->assertSession()->optionExists('edit-entity-type', 'entity_test');
+    $this->assertSession()->optionExists('edit-entity-type', 'node');
+    $this->assertSession()->optionExists('edit-field-type', 'test_field');
+
+    // Check filtering with out results.
+    $edit = ['field_type' => 'test_field', 'entity_type' => 'entity_test'];
+    $this->drupalGet('admin/reports/fields');
+    $this->submitForm($edit, 'Filter');
+    $this->assertSession()->pageTextNotContains($this->fieldName);
+    $this->assertSession()->pageTextContains('There are no field storages yet.');
+
+    // Check filtering by field type select list form filter.
+    $edit = ['field_type' => 'test_field', 'entity_type' => ''];
+    $this->drupalGet('admin/reports/fields');
+    $this->submitForm($edit, 'Filter');
+
+    // Test field exist on page.
+    $this->assertSession()->pageTextContains($this->fieldName);
+
+    // Check filtering by both select list form filters.
+    $edit = ['field_type' => 'test_field', 'entity_type' => 'node'];
+    $this->drupalGet('admin/reports/fields');
+    $this->submitForm($edit, 'Filter');
+
+    // Test field exist on page.
+    $this->assertSession()->pageTextContains($this->fieldName);
+
+    $this->assertSession()->linkByHrefExists('admin/structure/types/manage/' . $this->contentType . '/fields');
   }
 
 }
