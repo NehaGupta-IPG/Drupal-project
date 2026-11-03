@@ -14,13 +14,6 @@ use Drupal\Component\EventDispatcher\Event;
 class BlockContentGetDependencyEvent extends Event {
 
   /**
-   * The block content entity.
-   *
-   * @var \Drupal\block_content\BlockContentInterface
-   */
-  protected $blockContent;
-
-  /**
    * The dependency.
    *
    * @var \Drupal\Core\Access\AccessibleInterface
@@ -28,14 +21,18 @@ class BlockContentGetDependencyEvent extends Event {
   protected $accessDependency;
 
   /**
-   * BlockContentGetDependencyEvent constructor.
+   * Constructs a new BlockContentGetDependencyEvent object.
    *
    * @param \Drupal\block_content\BlockContentInterface $blockContent
    *   The block content entity.
+   * @param string $operation
+   *   The access operation for which to load the block content dependency.
+   *   Defaults to 'view'.
    */
-  public function __construct(BlockContentInterface $blockContent) {
-    $this->blockContent = $blockContent;
-  }
+  public function __construct(
+    protected BlockContentInterface $blockContent,
+    protected readonly string $operation = 'view',
+  ) {}
 
   /**
    * Gets the block content entity.
@@ -45,6 +42,16 @@ class BlockContentGetDependencyEvent extends Event {
    */
   public function getBlockContentEntity() {
     return $this->blockContent;
+  }
+
+  /**
+   * Gets the access operation for this dependency event.
+   *
+   * @return string
+   *   The access operation.
+   */
+  public function getOperation(): string {
+    return $this->operation;
   }
 
   /**
