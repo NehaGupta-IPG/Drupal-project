@@ -21,7 +21,7 @@ use Drupal\media\Plugin\media\Source\OEmbedInterface;
 #[FieldWidget(
   id: 'oembed_textfield',
   label: new TranslatableMarkup('oEmbed URL'),
-  field_types: ['string'],
+  field_types: ['string', 'oembed_uri'],
 )]
 class OEmbedWidget extends StringTextfieldWidget {
 

@@ -764,6 +764,28 @@ field.value.uri:
       type: string
       label: 'Value'
 
+# Schema for the configuration of the OEmbed URI field type.
+# This field type has no field instance settings, so no specific config schema type.
+# @see `type: field.field_settings.*`
+field.storage_settings.oembed_uri:
+  type: field.storage_settings.string
+  label: 'OEmbed URI settings'
+  mapping:
+    max_length:
+      type: integer
+      label: 'Maximum length'
+    case_sensitive:
+      type: boolean
+      label: 'Case sensitive'
+
+field.value.oembed_uri:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    value:
+      type: string
+      label: 'Value'
+
 # Schema for the configuration of the Created field type.
 # This field type has no field storage settings, so no specific config schema type.
 # @see `type: field.storage_settings.*`

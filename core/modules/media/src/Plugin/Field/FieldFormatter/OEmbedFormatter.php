@@ -19,6 +19,7 @@ use Drupal\media\OEmbed\Resource;
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolverInterface;
+use Drupal\media\Plugin\Field\FieldType\OEmbedUriItem;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;
 
 /**
@@ -35,6 +36,7 @@ use Drupal\media\Plugin\media\Source\OEmbedInterface;
     'link',
     'string',
     'string_long',
+    'oembed_uri',
   ],
 )]
 class OEmbedFormatter extends FormatterBase {
