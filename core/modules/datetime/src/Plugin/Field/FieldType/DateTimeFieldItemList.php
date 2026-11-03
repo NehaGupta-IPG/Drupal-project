@@ -92,16 +92,20 @@ class DateTimeFieldItemList extends FieldItemList {
     $default_value = parent::processDefaultValue($default_value, $entity, $definition);
 
     if (isset($default_value[0]['default_date_type'])) {
+      // Resolve the relative date against the time service rather than calling
+      // PHP's clock directly, so that the current time can be controlled for
+      // testing.
+      $timestamp = strtotime($default_value[0]['default_date'], \Drupal::time()->getCurrentTime());
       if ($definition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
         // A default date only value should be in the format used for date
         // storage but in the user's local timezone.
-        $date = new DrupalDateTime($default_value[0]['default_date'], date_default_timezone_get());
+        $date = DrupalDateTime::createFromTimestamp($timestamp, date_default_timezone_get());
         $format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
       }
       else {
         // A default date+time value should be in the format and timezone used
         // for date storage.
-        $date = new DrupalDateTime($default_value[0]['default_date'], DateTimeItemInterface::STORAGE_TIMEZONE);
+        $date = DrupalDateTime::createFromTimestamp($timestamp, DateTimeItemInterface::STORAGE_TIMEZONE);
         $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
       }
       $value = $date->format($format);

@@ -110,15 +110,20 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
       $storage_format = $definition->getSetting('datetime_type') == DateRangeItem::DATETIME_TYPE_DATE ? DateTimeItemInterface::DATE_STORAGE_FORMAT : DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
       $default_values = [[]];
 
+      // Resolve the relative dates against the time service rather than calling
+      // PHP's clock directly, so that the current time can be controlled for
+      // testing.
+      $now = \Drupal::time()->getCurrentTime();
+
       if (!empty($default_value[0]['default_date_type'])) {
-        $start_date = new DrupalDateTime($default_value[0]['default_date'], DateTimeItemInterface::STORAGE_TIMEZONE);
+        $start_date = DrupalDateTime::createFromTimestamp(strtotime($default_value[0]['default_date'], $now), DateTimeItemInterface::STORAGE_TIMEZONE);
         $start_value = $start_date->format($storage_format);
         $default_values[0]['value'] = $start_value;
         $default_values[0]['start_date'] = $start_date;
       }
 
       if (!empty($default_value[0]['default_end_date_type'])) {
-        $end_date = new DrupalDateTime($default_value[0]['default_end_date'], DateTimeItemInterface::STORAGE_TIMEZONE);
+        $end_date = DrupalDateTime::createFromTimestamp(strtotime($default_value[0]['default_end_date'], $now), DateTimeItemInterface::STORAGE_TIMEZONE);
         $end_value = $end_date->format($storage_format);
         $default_values[0]['end_value'] = $end_value;
         $default_values[0]['end_date'] = $end_date;
