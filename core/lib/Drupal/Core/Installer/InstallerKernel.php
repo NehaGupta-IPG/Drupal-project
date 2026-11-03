@@ -29,12 +29,9 @@ class InstallerKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function initializeContainer() {
-    // Ensure the InstallerKernel's container is not dumped.
-    $this->allowDumping = FALSE;
-
     // During installation, initializeContainer() can be called multiple times
-    // without any module changes in between. Since allowDumping is FALSE, no
-    // cached container exists, so the parent will always recompile.
+    // without any module changes in between; reuse the existing container in
+    // that case instead of recompiling.
     $extensions = $this->getExtensions();
     if (isset($this->container)
       && count($extensions['module'] ?? []) === count($this->compiledExtensions['module'] ?? [])
@@ -45,11 +42,22 @@ class InstallerKernel extends DrupalKernel {
       $this->containerNeedsRebuild = FALSE;
       return $this->container;
     }
-    else {
+    // When dumping is not allowed (the early installer, which may have no
+    // database), or the extension set changed since the last compilation,
+    // force a fresh compile. Otherwise (fresh boot with dumping allowed) let
+    // the parent try the dumped container from the previous request first.
+    if (isset($this->container) || !$this->allowDumping) {
       $this->containerNeedsRebuild = TRUE;
-      $this->compiledExtensions = $extensions;
-      return parent::initializeContainer();
     }
+    $this->compiledExtensions = $extensions;
+    $container = parent::initializeContainer();
+    // A container loaded from the dump skips service provider discovery, which
+    // is where the module and theme lists are normally populated. But the
+    // installer needs them later in the request, for example to look up the
+    // install theme in ::updateThemes().
+    $this->moduleList ??= $extensions['module'] ?? [];
+    $this->themeList ??= $extensions['theme'] ?? [];
+    return $container;
   }
 
   /**

@@ -437,7 +437,11 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
   // already initialized.
-  $kernel = new InstallerKernel($environment, $class_loader, FALSE);
+  // Allow the container to be dumped once the base system is installed: from
+  // that point on the database is guaranteed to exist, and the container can
+  // be cached across the many requests of the later installer (batches). The
+  // early installer keeps compiling per request, as it may have no database.
+  $kernel = new InstallerKernel($environment, $class_loader, $install_state['base_system_verified']);
   $kernel::bootEnvironment();
 
   // Add list of all available profiles to the installation state.
