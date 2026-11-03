@@ -58,6 +58,13 @@ display:
     display_title: Page
     id: page_1
     position: 0
+  embed_1:
+    display_options:
+      exposed_block: true
+    display_plugin: embed
+    display_title: Embedded
+    id: embed_1
+    position: 1
   block_1:
     display_plugin: block
     id: block_1
