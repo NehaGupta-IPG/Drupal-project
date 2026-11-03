@@ -26,6 +26,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     'content_moderation',
     'locale',
     'content_translation',
+    'content_moderation_test',
   ];
 
   /**
@@ -558,6 +559,47 @@ class ModerationFormTest extends ModerationStateTestBase {
       $this->assertSession()->statusCodeEquals(200);
       $this->assertSession()->pageTextContains($messages[$type]);
     }
+  }
+
+  /**
+   * Tests that concurrent edits of the same draft are not allowed.
+   */
+  public function testConcurrentDraftEdit() {
+    // Create new moderated content in published status.
+    $this->drupalGet('node/add/moderated_content');
+    $title = 'Some moderated content';
+    $edit = [
+      'title[0][value]' => $title,
+      'body[0][value]' => 'First version of the content.',
+      'moderation_state[0][state]' => 'published',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    $node = $this->drupalGetNodeByTitle($title);
+    $this->drupalGet($node->toUrl('edit-form'));
+
+    // Create a draft.
+    $edit = [
+      'body[0][value]' => 'Second version of the content.',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->submitForm($edit, 'Save');
+    /** @var \Drupal\node\NodeStorageInterface $node_storage */
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $revision_id = $node_storage->getLatestRevisionId($node->id());
+
+    // Simulate a concurrent draft post: we expect to see a validation error in
+    // this case.
+    \Drupal::state()->set('content_moderation_test.concurrent_edit', 1);
+    $edit = [
+      'body[0][value]' => 'Third version of the content.',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $this->drupalGet($node->toUrl('edit-form'));
+    $this->submitForm($edit, t('Save'));
+    $this->assertEquals($revision_id, $node_storage->getLatestRevisionId($node->id()));
+    $this->assertSession()
+      ->responseContains('A new revision of this content has been created by another user, or you have already submitted modifications. As a result, your changes cannot be saved.');
   }
 
 }

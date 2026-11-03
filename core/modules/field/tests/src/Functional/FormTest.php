@@ -610,23 +610,24 @@ class FormTest extends FieldTestBase {
     $this->drupalLogin($user);
 
     // Ensure that the 'bar' bundle exists, to avoid config validation errors.
-    EntityTestHelper::createBundle('bar', entity_type: 'entity_test_base_field_display');
+    $entity_type_id = 'entity_test_base_field_display';
+    EntityTestHelper::createBundle('bar', entity_type: $entity_type_id);
 
     FieldStorageConfig::create([
-      'entity_type' => 'entity_test_base_field_display',
+      'entity_type' => $entity_type_id,
       'field_name' => 'foo',
       'type' => 'text',
       'cardinality' => FieldStorageConfig::CARDINALITY_UNLIMITED,
     ])->save();
     FieldConfig::create([
-      'entity_type' => 'entity_test_base_field_display',
+      'entity_type' => $entity_type_id,
       'bundle' => 'bar',
       'field_name' => 'foo',
       // Set a dangerous label to test XSS filtering.
       'label' => "<script>alert('a configurable field');</script>",
     ])->save();
     EntityFormDisplay::create([
-      'targetEntityType' => 'entity_test_base_field_display',
+      'targetEntityType' => $entity_type_id,
       'bundle' => 'bar',
       'mode' => 'default',
     ])->setComponent('foo', ['type' => 'text_textfield'])->enable()->save();
@@ -634,7 +635,7 @@ class FormTest extends FieldTestBase {
     $entity = EntityTestBaseFieldDisplay::create(['type' => 'bar']);
     $entity->save();
 
-    $this->drupalGet('entity_test_base_field_display/manage/' . $entity->id());
+    $this->drupalGet($entity_type_id . '/manage/' . $entity->id());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('A field with multiple values');
     // Test if labels were XSS filtered.

@@ -1,0 +1,8 @@
+name: 'Content moderation test'
+type: module
+description: 'Provides a testing module for Content Moderation.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:content_moderation
+  - drupal:node

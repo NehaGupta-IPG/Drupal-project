@@ -5,6 +5,7 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Plugin\Validation\Constraint\SequentialEntityRevisionCreationConstraint;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -126,6 +127,8 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
       $this->addRevisionableFormFields($form);
     }
 
+    $this->addLatestRevisionIdFormField($form);
+
     $form['footer'] = [
       '#type' => 'container',
       '#weight' => 99,
@@ -136,6 +139,35 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     ];
 
     return $form;
+  }
+
+  /**
+   * Adds a hidden input field storing the (current) latest revision ID.
+   *
+   * @param array $form
+   *   A form array reference.
+   *
+   * @internal This widget and the related property should be considered
+   *   internal. This will be revisited once https://www.drupal.org/node/2784201
+   *   is committed.
+   */
+  protected function addLatestRevisionIdFormField(array &$form) {
+    // Store the latest revision ID at the time the form is built, so it can be
+    // used later to perform checks on concurrent edits.
+    $has_sequential_revision_constraint = (bool) array_filter(
+      $this->entity->getTypedData()->getConstraints(),
+      function ($constraint) {
+        return $constraint instanceof SequentialEntityRevisionCreationConstraint;
+      }
+    );
+    if ($has_sequential_revision_constraint) {
+      /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+      $storage = $this->entityTypeManager->getStorage($this->entity->getEntityTypeId());
+      $form['original_latest_revision_id'] = [
+        '#type' => 'hidden',
+        '#default_value' => $storage->getLatestRevisionId($this->entity->id()),
+      ];
+    }
   }
 
   /**
@@ -153,6 +185,13 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   public function buildEntity(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
+
+    // Ensure the original latest revision ID is available for validators.
+    $original_latest_revision_id = $form_state->getValue('original_latest_revision_id');
+    if ($original_latest_revision_id) {
+      // @todo Revisit this once https://www.drupal.org/node/2784201 lands.
+      $entity->original_latest_revision_id = $original_latest_revision_id;
+    }
 
     // Mark the entity as requiring validation.
     $entity->setValidationRequired(!$form_state->getTemporaryValue('entity_validated'));

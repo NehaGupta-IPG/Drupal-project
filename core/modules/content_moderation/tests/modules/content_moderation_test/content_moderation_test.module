@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Test module for Content Moderation.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function content_moderation_test_form_node_moderated_content_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (\Drupal::state()->get('content_moderation_test.concurrent_edit')) {
+    /** @var \Drupal\Core\Entity\ContentEntityFormInterface $form_object */
+    $form_object = $form_state->getFormObject();
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $form_object->getEntity();
+    // We simulate a concurrent edit by setting the revision ID at the time the
+    // form is instantiated to the previous revision ID.
+    $form['original_latest_revision_id']['#default_value'] = $entity->getRevisionId() - 1;
+  }
+}
