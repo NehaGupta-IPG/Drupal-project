@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -35,6 +36,7 @@ class ExposedFormTest extends ViewTestBase {
   public static $testViews = [
     'test_exposed_form_buttons',
     'test_exposed_block',
+    'test_exposed_form_action',
     'test_exposed_form_sort_items_per_page',
     'test_exposed_form_pager',
     'test_remember_selected',
@@ -332,6 +334,40 @@ class ExposedFormTest extends ViewTestBase {
     }
     $element->findButton('Reset')->click();
     $this->assertNodesExist($arguments['All']);
+  }
+
+  /**
+   * Tests exposed form actions for an unrouted display with a linked route.
+   */
+  public function testExposedFormActionForUnroutedDisplay(): void {
+    $node = $this->nodes[0];
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_form_action-block_1');
+    $view = Views::getView('test_exposed_form_action');
+    $view->setDisplay('block_1');
+
+    $this->drupalGet('node/' . $node->id());
+    $form_id = $this->getExpectedExposedFormId($view);
+    $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
+    $action = $form->getAttribute('action');
+
+    $this->assertSame(Url::fromUserInput('/test-exposed-form-action-feed')->toString(), $action);
+  }
+
+  /**
+   * Tests exposed forms without a link display use the current route.
+   */
+  public function testExposedFormActionFallsBackToCurrentRoute(): void {
+    $node = $this->nodes[0];
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_form_action-block_2');
+    $view = Views::getView('test_exposed_form_action');
+    $view->setDisplay('block_2');
+
+    $this->drupalGet('node/' . $node->id());
+    $form_id = $this->getExpectedExposedFormId($view);
+    $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
+    $action = $form->getAttribute('action');
+
+    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
   }
 
   /**

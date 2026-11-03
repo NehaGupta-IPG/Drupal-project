@@ -77,3 +77,17 @@ function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void 
     return $view_config_updater->needsMinMaxLabelUpdate($view);
   });
 }
+
+/**
+ * Backfills link_display for unrouted displays.
+ */
+function views_post_update_unrouted_display_link_display(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  // Only run in a post-update to avoid altering freshly imported config and
+  // changing the fallback behavior for unrouted displays.
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsUnroutedLinkDisplayUpdate($view);
+  });
+}

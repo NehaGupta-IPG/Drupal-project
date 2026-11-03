@@ -7,6 +7,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -124,6 +125,103 @@ class ViewsConfigUpdater {
           }
         }
       }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Checks for unrouted displays missing link_display.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view needed updates.
+   */
+  public function needsUnroutedLinkDisplayUpdate(ViewEntityInterface $view): bool {
+    return $this->processUnroutedLinkDisplayUpdate($view);
+  }
+
+  /**
+   * Updates unrouted displays to set link_display when a routed display exists.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view was updated.
+   */
+  public function processUnroutedLinkDisplayUpdate(ViewEntityInterface $view): bool {
+    $displays = $view->get('display');
+    $changed = FALSE;
+
+    $executable = $view->getExecutable();
+    foreach ($displays as $display_id => $display) {
+      if ($display_id === 'default') {
+        // Default display is inherited by others and does not need backfilling.
+        continue;
+      }
+
+      if (!$executable || !$executable->setDisplay($display_id)) {
+        // Skip invalid or non-loadable displays.
+        continue;
+      }
+
+      $display_handler = $executable->display_handler;
+      if (!$display_handler || $display_handler instanceof DisplayRouterInterface) {
+        // Routed displays already have a stable URL.
+        continue;
+      }
+
+      $linked_display_id = $display_handler->getOption('link_display');
+      if ($linked_display_id === 'custom_url') {
+        // Keep explicit custom URLs as-is.
+        continue;
+      }
+      if (!empty($linked_display_id) && $executable->displayHandlers->has($linked_display_id)) {
+        $linked_display = $executable->displayHandlers->get($linked_display_id);
+        if ($linked_display instanceof DisplayRouterInterface) {
+          // Keep explicit routed link displays as-is.
+          continue;
+        }
+      }
+
+      // Reproduce the previous fallback once during the update so existing
+      // behavior is preserved as explicit configuration. Runtime resolution
+      // no longer guesses based on display order.
+      $guessed_display_id = NULL;
+      foreach ($executable->displayHandlers as $candidate_display_id => $candidate_display) {
+        if (!empty($candidate_display) && $candidate_display->hasPath()) {
+          $guessed_display_id = $candidate_display_id;
+          break;
+        }
+      }
+      if (empty($guessed_display_id) || $guessed_display_id === 'custom_url' || !$executable->displayHandlers->has($guessed_display_id)) {
+        // No prior routed guess to preserve.
+        continue;
+      }
+
+      $guessed_display = $executable->displayHandlers->get($guessed_display_id);
+      if (!$guessed_display instanceof DisplayRouterInterface) {
+        // Only persist guesses that resolve to routed displays.
+        continue;
+      }
+
+      if (empty($displays[$display_id]['display_options'])) {
+        $displays[$display_id]['display_options'] = [];
+      }
+      if (empty($displays[$display_id]['display_options']['defaults'])) {
+        $displays[$display_id]['display_options']['defaults'] = [];
+      }
+
+      $displays[$display_id]['display_options']['link_display'] = $guessed_display_id;
+      $displays[$display_id]['display_options']['defaults']['link_display'] = FALSE;
+      $changed = TRUE;
     }
 
     if ($changed) {

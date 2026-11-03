@@ -18,6 +18,8 @@ display:
     position: 0
     display_options:
       title: test_taxonomy_glossary
+      link_display: page_1
+      link_url: ''
       fields:
         name:
           id: name

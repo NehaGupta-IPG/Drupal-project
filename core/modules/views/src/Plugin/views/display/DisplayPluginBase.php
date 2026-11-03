@@ -709,18 +709,13 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       return $display_id;
     }
 
-    // If unknown, pick the first one.
-    if (empty($display_id) || !$this->view->displayHandlers->has($display_id)) {
-      foreach ($this->view->displayHandlers as $display_id => $display) {
-        if (!empty($display) && $display->hasPath()) {
-          return $display_id;
-        }
-      }
-    }
-    else {
+    // Return the explicitly configured display if it still exists.
+    if (!empty($display_id) && $this->view->displayHandlers->has($display_id)) {
       return $display_id;
     }
+
     // Fall-through returns NULL.
+    return NULL;
   }
 
   /**

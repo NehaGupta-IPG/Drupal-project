@@ -121,18 +121,23 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    if (!$view->hasUrl()) {
-      // On any non views.ajax route, use the current route for the form action.
-      if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
-        $form_action = $view->display_handler->getPath() ?: Url::fromRoute('<current>')->toString();
-      }
-      else {
-        // On the views.ajax route, set the action to the page we were on.
-        $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
-      }
+    // Custom URLs do not have a route, so handle them separately.
+    $custom_url = $view->display_handler->getOption('link_display') === 'custom_url'
+      ? $view->display_handler->getPath()
+      : NULL;
+
+    if ($view->hasUrl()) {
+      $form_action = $view->getUrl()->toString();
+    }
+    elseif ($custom_url) {
+      $form_action = $custom_url;
+    }
+    elseif ($this->getRouteMatch()->getRouteName() === 'views.ajax') {
+      // On the views.ajax route, set the action to the page we were on.
+      $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
     }
     else {
-      $form_action = $view->getUrl()->toString();
+      $form_action = Url::fromRoute('<current>')->toString();
     }
 
     $form['#action'] = $form_action;

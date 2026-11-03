@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Core\Url;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,7 +20,7 @@ class ViewsFormTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['action_bulk_test'];
+  protected static $modules = ['action_bulk_test', 'block'];
 
   /**
    * {@inheritdoc}
@@ -42,6 +44,84 @@ class ViewsFormTest extends ViewTestBase {
     // Ensure there's no form.
     $xpath = $this->cssSelect('.views-form form');
     $this->assertCount(0, $xpath);
+  }
+
+  /**
+   * Tests Views forms without a link display use the current route.
+   */
+  public function testFormActionFallsBackToCurrentRoute(): void {
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article']);
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', ['region' => 'content']);
+
+    $this->drupalGet('node/' . $node->id());
+    $form = $this->assertSession()->elementExists('css', '.views-form form');
+    $action = $form->getAttribute('action');
+
+    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+  }
+
+  /**
+   * Tests Views form actions honor a custom link display URL.
+   */
+  public function testFormActionUsesCustomLinkDisplayPath(): void {
+    $view = View::load('test_bulk_form');
+    $displays = $view->get('display');
+    $displays['block_1']['display_options']['link_display'] = 'custom_url';
+    $displays['block_1']['display_options']['link_url'] = '/custom-bulk-form';
+    $displays['block_1']['display_options']['defaults']['link_display'] = FALSE;
+    $displays['block_1']['display_options']['defaults']['link_url'] = FALSE;
+    $view->set('display', $displays);
+    $view->save();
+
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article']);
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', ['region' => 'content']);
+
+    $this->drupalGet('node/' . $node->id());
+    $form = $this->assertSession()->elementExists('css', '.views-form form');
+    $action = $form->getAttribute('action');
+
+    $this->assertSame('/custom-bulk-form', $action);
+  }
+
+  /**
+   * Tests a Views form submits on a display with a custom link display URL.
+   */
+  public function testFormSubmitWithCustomLinkDisplayPath(): void {
+    // Link the block to the view's page display, as a "more" link would.
+    $view = View::load('test_bulk_form');
+    $displays = $view->get('display');
+    $displays['block_1']['display_options']['link_display'] = 'custom_url';
+    $displays['block_1']['display_options']['link_url'] = '/test_bulk_form';
+    $displays['block_1']['display_options']['defaults']['link_display'] = FALSE;
+    $displays['block_1']['display_options']['defaults']['link_url'] = FALSE;
+    $view->set('display', $displays);
+    $view->save();
+
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article', 'sticky' => FALSE]);
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer nodes',
+      'edit any article content',
+    ]));
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', [
+      'region' => 'content',
+      'visibility' => [
+        'request_path' => [
+          'pages' => '/node/*',
+        ],
+      ],
+    ]);
+
+    $this->drupalGet('node/' . $node->id());
+    $this->submitForm([
+      'node_bulk_form[0]' => TRUE,
+      'action' => 'node_make_sticky_action',
+    ], 'Apply to selected items');
+
+    $this->assertSession()->pageTextContains('Make content sticky was applied to 1 item.');
+    $this->assertTrue($this->container->get('entity_type.manager')->getStorage('node')->loadUnchanged($node->id())->isSticky());
   }
 
 }

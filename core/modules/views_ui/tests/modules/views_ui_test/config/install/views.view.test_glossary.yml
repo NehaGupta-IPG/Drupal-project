@@ -370,6 +370,8 @@ display:
           plugin_id: standard
           required: false
       use_ajax: true
+      link_display: page_1
+      link_url: ''
       header: {  }
       footer: {  }
       display_extenders: {  }
