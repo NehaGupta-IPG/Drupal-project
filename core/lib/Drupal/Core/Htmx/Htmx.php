@@ -724,6 +724,8 @@ class Htmx {
    * This attribute instructs HTMX to react to events with inline scripts
    * on elements.
    *
+   * The inline scripts run as-is, so must never contain untrusted input.
+   *
    * `data-hx-on` supports two forms:
    *
    * Single event, action pair:
