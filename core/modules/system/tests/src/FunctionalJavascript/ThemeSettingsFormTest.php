@@ -61,7 +61,7 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
     $file = current($this->getTestFiles('image'));
     $image_file_path = \Drupal::service('file_system')->realpath($file->uri);
     $page->attachFileToField('files[custom_logo]', $image_file_path);
-    $assert_session->waitForButton('custom_logo_remove_button');
+    $this->assertNotNull($assert_session->waitForButton('custom_logo_remove_button'));
 
     // Assert the new file is uploaded as temporary. This file should not be
     // saved as permanent if settings are not submitted.
@@ -70,6 +70,7 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
     $this->assertFalse($file->isPermanent());
 
     $page->pressButton('Save configuration');
+    $assert_session->statusMessageContainsAfterWait('The configuration options have been saved.');
     \Drupal::entityTypeManager()->getStorage('file')->resetCache();
 
     // Assert the uploaded file is saved as permanent.
