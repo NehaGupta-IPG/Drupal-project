@@ -37,6 +37,12 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
     $session->statusCodeEquals(200);
     $messages = $this->getMessages();
     $this->assertCount(4, $messages);
+    $this->assertSession()->pageTextContains('Last imported');
+
+    foreach ($messages as $message) {
+      $this->assertArrayHasKey('last_imported', $message);
+      $this->assertNotSame('', $message['last_imported'], 'last_imported should not be empty');
+    }
 
     // Set the filter to match each of the two filter-type attributes and
     // confirm the correct number of entries are displayed.
@@ -81,6 +87,7 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
    *   - msg_id: (string) A message id.
    *   - severity: (int) The MigrationInterface error level.
    *   - message: (string) The migration message.
+   *   - last_imported: (string) The formatted last imported date or 'Not available'.
    */
   protected function getMessages(): array {
     $levels = [
@@ -93,11 +100,12 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
     $table = $this->getNodeElementsByXpath('.//table[@id="admin-migrate-msg"]/tbody/tr');
     foreach ($table as $row) {
       $cells = $row->findAll('css', 'td');
-      if (count($cells) === 3) {
+      if (count($cells) === 4) {
         $entries[] = [
           'msg_id' => $cells[0]->getText(),
           'severity' => $levels[$cells[1]->getText()],
           'message' => $cells[2]->getText(),
+          'last_imported' => $cells[3]->getText(),
         ];
       }
     }

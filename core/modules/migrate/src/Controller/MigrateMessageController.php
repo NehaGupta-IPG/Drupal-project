@@ -7,6 +7,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseConnectionRefusedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -32,11 +33,14 @@ class MigrateMessageController extends ControllerBase {
    *   The form builder service.
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
    *   The migration plugin manager.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   *   The date formatter service.
    */
   public function __construct(
     protected Connection $database,
     FormBuilderInterface $formBuilder,
     protected MigrationPluginManagerInterface $migrationPluginManager,
+    protected DateFormatterInterface $dateFormatter,
   ) {
     $this->formBuilder = $formBuilder;
   }
@@ -174,6 +178,10 @@ class MigrateMessageController extends ControllerBase {
       'data' => $this->t('Message'),
       'field' => 'message',
     ];
+    $header[] = [
+      'data' => $this->t('Last imported'),
+      'field' => 'last_imported',
+    ];
 
     $levels = [
       MigrationInterface::MESSAGE_ERROR => $this->t('Error'),
@@ -212,6 +220,10 @@ class MigrateMessageController extends ControllerBase {
       }
       $new_row['level'] = $levels[$message_row->level];
       $new_row['message'] = $message_row->message;
+      $timestamp = $message_row->last_imported ?? NULL;
+      $new_row['last_imported'] = $timestamp
+        ? $this->dateFormatter->format($timestamp, 'short')
+        : $this->t('Not available');
       $rows[] = $new_row;
     }
 
