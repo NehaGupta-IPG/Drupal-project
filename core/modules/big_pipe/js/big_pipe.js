@@ -133,25 +133,47 @@
 
   const observer = new MutationObserver(processMutations);
 
-  // Attach behaviors early, if possible.
-  Drupal.attachBehaviors(document);
+  /**
+   * Calls callback when document ready.
+   *
+   * @param {function} callback
+   *   The function to be called on document ready.
+   */
+  const domReady = (callback) => {
+    const listener = () => {
+      callback();
+      document.removeEventListener('DOMContentLoaded', listener);
+    };
+    if (document.readyState !== 'loading') {
+      setTimeout(callback, 0);
+    } else {
+      document.addEventListener('DOMContentLoaded', listener);
+    }
+  };
 
-  // If loaded asynchronously there might already be replacement elements
-  // in the DOM before the mutation observer is started.
-  document.querySelectorAll(replacementsSelector).forEach(processReplacement);
+  
+  domReady(() => {
 
-  // Start observing the body element for new children and for new changes in
-  // Text nodes of elements. We need to track Text nodes because content
-  // of the node can be too large, browser will receive not fully loaded chunk
-  // and render it as is. At this moment json inside script will be invalid and
-  // we need to track new changes to that json (Text node), once it will be
-  // fully loaded it will be processed.
-  // @ingroup large_chunk
-  observer.observe(document.body, {
-    childList: true,
-    // Without this options characterData will not be triggered inside child nodes.
-    subtree: true,
-    characterData: true,
+    // Attach behaviors early, if possible.
+    Drupal.attachBehaviors(document, drupalSettings);
+
+    // If loaded asynchronously there might already be replacement elements
+    // in the DOM before the mutation observer is started.
+    document.querySelectorAll(replacementsSelector).forEach(processReplacement);
+
+    // Start observing the body element for new children and for new changes in
+    // Text nodes of elements. We need to track Text nodes because content
+    // of the node can be too large, browser will receive not fully loaded chunk
+    // and render it as is. At this moment json inside script will be invalid and
+    // we need to track new changes to that json (Text node), once it will be
+    // fully loaded it will be processed.
+    // @ingroup large_chunk
+    observer.observe(document.body, {
+      childList: true,
+      // Without this options characterData will not be triggered inside child nodes.
+      subtree: true,
+      characterData: true,
+    });
   });
 
   // As soon as the document is loaded, no more replacements will be added.
@@ -163,4 +185,4 @@
       processMutations(mutations);
     }
   });
-})(Drupal, drupalSettings);
+})(Drupal, window.drupalSettings);
