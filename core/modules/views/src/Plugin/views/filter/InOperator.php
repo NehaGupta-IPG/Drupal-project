@@ -92,6 +92,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   public function defaultExposeOptions() {
     parent::defaultExposeOptions();
     $this->options['expose']['reduce'] = FALSE;
+    $this->options['expose']['limit'] = FALSE;
   }
 
   /**
@@ -106,6 +107,18 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       // Safety.
       '#default_value' => !empty($this->options['expose']['reduce']),
     ];
+    $form['expose']['limit'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Filter by selected items'),
+      '#description' => $this->t('If checked, this view will be automatically filtered by the selected items by default.'),
+      '#default_value' => !empty($this->options['expose']['limit']),
+      '#states' => [
+        // Only show this field when the 'reduce' checkbox is enabled.
+        'visible' => [
+          ':input[name="options[expose][reduce]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -117,6 +130,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     $options['operator']['default'] = 'in';
     $options['value']['default'] = [];
     $options['expose']['contains']['reduce'] = ['default' => FALSE];
+    $options['expose']['contains']['limit'] = ['default' => FALSE];
 
     return $options;
   }
@@ -320,8 +334,9 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // The "All" state for this type of filter could have a default value. If
     // this is a non-multiple and non-required option, then this filter will
-    // participate by using the default settings *if* 'limit' is true.
-    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['limit'])) {
+    // participate by using the default settings if 'reduce' and 'limit'
+    // are enabled.
+    if (empty($this->options['expose']['multiple']) && empty($this->options['expose']['required']) && !empty($this->options['expose']['reduce']) && !empty($this->options['expose']['limit'])) {
       $identifier = $this->options['expose']['identifier'];
       if ($input[$identifier] == 'All') {
         return TRUE;
@@ -345,6 +360,39 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // instead.
 
     $form_state->setValue(['options', 'value'], $form['value']['#value']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitExposeForm($form, FormStateInterface $form_state) {
+    $reduce = $form_state->getValue(['options', 'expose', 'reduce']);
+    $limit = $form_state->getValue(['options', 'expose', 'limit']);
+    // Limit is an optional key, so unset the option if either limit or reduce
+    // are unchecked.
+    if (!$reduce || !$limit) {
+      $form_state->unsetValue(['options', 'expose', 'limit']);
+      unset($this->options['expose']['limit']);
+    }
+    parent::submitExposeForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitFormCalculateOptions(array $options, array $form_state_options) {
+    // \Drupal\views_ui\Form\Ajax\ConfigHandler::submitForm() builds a fresh
+    // handler and init()s it before calling this method, which always
+    // repopulates 'expose.limit' with its FALSE default. That default has to
+    // be dropped again here, on $this->options directly, because the merged
+    // array this method returns is only ever used to overlay known keys onto
+    // storage, never to delete stale ones from it.
+    $reduce = $form_state_options['expose']['reduce'] ?? $options['expose']['reduce'] ?? FALSE;
+    $limit = $form_state_options['expose']['limit'] ?? $options['expose']['limit'] ?? FALSE;
+    if (!$reduce || !$limit) {
+      unset($this->options['expose']['limit']);
+    }
+    return parent::submitFormCalculateOptions($options, $form_state_options);
   }
 
   /**

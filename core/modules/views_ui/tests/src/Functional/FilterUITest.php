@@ -67,6 +67,43 @@ class FilterUITest extends UITestBase {
   }
 
   /**
+   * Tests that unchecking 'limit' removes the stale value from storage.
+   */
+  public function testFilterInOperatorLimitUi(): void {
+    $admin_user = $this->drupalCreateUser([
+      'administer views',
+      'administer site configuration',
+    ]);
+    $this->drupalLogin($admin_user);
+
+    $path = 'admin/structure/views/nojs/handler/test_filter_in_operator_ui/default/filter/type';
+
+    // Enable both "Limit list to selected items" and "Filter by selected
+    // items" so the 'limit' option is stored as TRUE.
+    $this->drupalGet($path);
+    $this->submitForm([
+      'options[expose][reduce]' => TRUE,
+      'options[expose][limit]' => TRUE,
+    ], 'Apply');
+    $this->submitForm([], 'Save');
+
+    $filters = $this->config('views.view.test_filter_in_operator_ui')->get('display.default.display_options.filters');
+    $this->assertTrue($filters['type']['expose']['limit']);
+
+    // Uncheck "Filter by selected items" while leaving "Limit list to
+    // selected items" enabled. The stale TRUE value must not survive.
+    $this->drupalGet($path);
+    $this->submitForm([
+      'options[expose][reduce]' => TRUE,
+      'options[expose][limit]' => FALSE,
+    ], 'Apply');
+    $this->submitForm([], 'Save');
+
+    $filters = $this->config('views.view.test_filter_in_operator_ui')->get('display.default.display_options.filters');
+    $this->assertArrayNotHasKey('limit', $filters['type']['expose']);
+  }
+
+  /**
    * Tests the filters from the UI.
    */
   public function testFiltersUI(): void {
