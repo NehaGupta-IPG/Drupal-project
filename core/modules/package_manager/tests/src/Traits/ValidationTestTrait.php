@@ -126,7 +126,7 @@ trait ValidationTestTrait {
       }
 
       return [
-        'severity' => $result->severity,
+        'severity' => $result->severityEnum->value,
         'messages' => $messages,
         'summary' => $summary,
       ];

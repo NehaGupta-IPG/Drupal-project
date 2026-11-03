@@ -33,7 +33,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
   public function getResults(?int $severity = NULL): array {
     if ($severity !== NULL) {
       return array_filter($this->results, function ($result) use ($severity) {
-        return $result->severity === $severity;
+        return $result->severityEnum->value === $severity;
       });
     }
     return $this->results;
@@ -75,7 +75,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
    */
   public function addResult(ValidationResult $result): void {
     // Only errors are allowed for this event.
-    if ($result->severity !== RequirementSeverity::Error->value) {
+    if ($result->severityEnum !== RequirementSeverity::Error) {
       throw new \InvalidArgumentException('Only errors are allowed.');
     }
     $this->results[] = $result;
