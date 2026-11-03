@@ -147,6 +147,19 @@ class DevelopmentSettingsForm extends FormBase {
 
     if ($invalidate_container || $disable_rendered_output_cache_bins_previous !== $disable_rendered_output_cache_bins) {
       $this->kernel->invalidateContainer();
+
+      if (!$disable_rendered_output_cache_bins) {
+        $cache_bins = ['page', 'dynamic_page_cache', 'render'];
+        $container = $this->kernel->getContainer();
+        foreach ($cache_bins as $cache_bin) {
+          if ($container->has($cache_bin)) {
+            $container->get($cache_bin)>deleteAll();
+          }
+        }
+      }
+      if (!$twig_development['twig_cache_disable']) {
+        $this->kernel->getContainer()->get('twig')->invalidate();
+      }
     }
 
     $this->messenger()->addStatus($this->t('The settings have been saved.'));
