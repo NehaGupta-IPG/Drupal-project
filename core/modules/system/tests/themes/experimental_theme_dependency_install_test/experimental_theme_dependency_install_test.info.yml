@@ -1,0 +1,6 @@
+name: 'Experimental dependency install test'
+type: theme
+description: 'Experimental dependency install test theme'
+version: VERSION
+base theme: experimental_theme_dependency_test
+lifecycle: experimental
