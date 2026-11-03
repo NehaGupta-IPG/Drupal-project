@@ -13,6 +13,7 @@ use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -625,9 +626,20 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The message to display when there are no allowed media types.
    */
   protected function getNoMediaTypesAvailableMessage() {
-    $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
-
     $default_message = $this->t('There are no allowed media types configured for this field. Contact the site administrator.');
+
+    // For base fields: or there are no media types, or the base fields don't
+    // have the necessary settings, so only can be fixed via code.
+    if (!$this->fieldDefinition instanceof FieldConfigInterface) {
+      if ($this->currentUser->hasPermission('administer media types')) {
+        $url = Url::fromRoute('entity.media_type.add_form');
+        return $this->t('There are no allowed media types configured for this field. You might want to <a href=":url">create one</a>.', [
+          ':url' => $url->toString(),
+        ]);
+      }
+      return $default_message;
+    }
+    $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
 
     // Show the default message if the user does not have the permissions to
     // configure the fields for the entity type.
