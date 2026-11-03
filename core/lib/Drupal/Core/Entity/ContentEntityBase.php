@@ -733,9 +733,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
-  public function toArray() {
+  public function toArray($include_computed = TRUE) {
     $values = [];
-    foreach ($this->getFields() as $name => $property) {
+    foreach ($this->getFields($include_computed) as $name => $property) {
       $values[$name] = $property->getValue();
     }
     return $values;
