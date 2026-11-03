@@ -126,7 +126,9 @@ class ImageUrlFormatter extends ImageFormatterBase {
     /** @var \Drupal\file\FileInterface[] $images */
     foreach ($images as $delta => $image) {
       $image_uri = $image->getFileUri();
-      $url = $image_style ? $file_url_generator->transformRelative($image_style->buildUrl($image_uri)) : $file_url_generator->generateString($image_uri);
+      // If the image style supports this type of image generate the derivative,
+      // otherwise fall back to just the path to the original file.
+      $url = $image_style && $image_style->supportsUri($image_uri) ? $file_url_generator->transformRelative($image_style->buildUrl($image_uri)) : $file_url_generator->generateString($image_uri);
 
       // Add cacheability metadata from the image and image style.
       $cacheability = CacheableMetadata::createFromObject($image);
