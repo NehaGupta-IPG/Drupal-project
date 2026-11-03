@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Controller;
 
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\MainContent\AjaxRenderer;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -64,6 +66,38 @@ class AjaxRendererTest extends UnitTestCase {
       });
 
     $this->ajaxRenderer = new AjaxRenderer($element_info_manager, $renderer);
+  }
+
+  /**
+   * Tests renderResponse() when the render array has no #attached key.
+   */
+  public function testRenderWithoutAttached(): void {
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
+    $renderer = $this->createStub(RendererInterface::class);
+    $renderer->method('renderRoot')
+      ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
+        if (isset($elements['#markup'])) {
+          return $elements['#markup'];
+        }
+        elseif (isset($elements['#type'])) {
+          return $elements['#type'];
+        }
+        else {
+          return 'Markup';
+        }
+      });
+
+    $ajax_renderer = new AjaxRenderer($element_info_manager, $renderer);
+    $main_content = ['#markup' => 'example content'];
+    $request = new Request();
+    $route_match = $this->createStub(RouteMatchInterface::class);
+
+    $result = $ajax_renderer->renderResponse($main_content, $request, $route_match);
+
+    $this->assertInstanceOf('Drupal\Core\Ajax\AjaxResponse', $result);
+    $commands = $result->getCommands();
+    $this->assertEquals('insert', $commands[0]['command']);
+    $this->assertEquals('example content', $commands[0]['data']);
   }
 
   /**
