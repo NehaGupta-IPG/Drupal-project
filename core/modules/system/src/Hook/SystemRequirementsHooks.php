@@ -657,17 +657,16 @@ class SystemRequirementsHooks {
         // Check for the string which was added to the recommended .htaccess
         // file in the latest security update.
         if (!file_exists($htaccess_file) || !($contents = @file_get_contents($htaccess_file)) || !str_contains($contents, 'Drupal_Security_Do_Not_Remove_See_SA_2013_003')) {
-          $url = 'https://www.drupal.org/SA-CORE-2013-003';
           $requirements[$htaccess_file] = [
             // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
             'title' => new TranslatableMarkup($protected_dir->getTitle()),
             'value' => $this->t('Not fully protected'),
             'severity' => RequirementSeverity::Error,
-            'description' => $this->t('See <a href=":url">@url</a> for information about the recommended .htaccess file which should be added to the %directory directory to help protect against arbitrary code execution.',
+            'description' => $this->t('<a href=":doc">@doc</a> to the %directory to protect against arbitrary code execution.',
               [
-                ':url' => $url,
-                '@url' => $url,
-                '%directory' => $protected_dir->getPath(),
+                ':doc' => 'https://www.drupal.org/node/3259608',
+                '@doc' => $this->t('Add the recommended .htaccess file'),
+                '%directory' => strtolower($protected_dir->getTitle()),
               ]
             ),
           ];
