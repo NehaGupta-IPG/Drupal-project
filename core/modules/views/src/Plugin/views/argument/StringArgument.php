@@ -3,6 +3,7 @@
 namespace Drupal\views\Plugin\views\argument;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\views\Attribute\ViewsArgument;
@@ -55,6 +56,7 @@ class StringArgument extends ArgumentPluginBase {
     $options['path_case'] = ['default' => 'none'];
     $options['transform_dash'] = ['default' => FALSE];
     $options['break_phrase'] = ['default' => FALSE];
+    $options['include_null'] = ['default' => FALSE];
 
     if (!empty($this->definition['many to one'])) {
       $options['add_table'] = ['default' => FALSE];
@@ -152,6 +154,15 @@ class StringArgument extends ArgumentPluginBase {
       '#description' => $this->t('If selected, users can enter multiple values in the form of 1+2+3 (for OR) or 1,2,3 (for AND).'),
       '#default_value' => !empty($this->options['break_phrase']),
       '#group' => 'options][more',
+    ];
+
+    $form['include_null'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include NULL values for this field as well as matches'),
+      '#description' => $this->t('If selected, items that do not have any value for the field being filtered on will also be included in the results.'),
+      '#default_value' => !empty($this->options['include_null']),
+      '#fieldset' => 'argument_present',
+      '#states' => ['visible' => ['input[name="options[glossary]"]' => ['checked' => FALSE]]],
     ];
   }
 
@@ -273,7 +284,16 @@ class StringArgument extends ArgumentPluginBase {
       $this->query->addWhereExpression(0, $field, $placeholders);
     }
     else {
-      $this->query->addWhere(0, $field, $argument, $operator);
+      if (!empty($this->options['include_null'])) {
+        $condition = new Condition('OR');
+        $condition
+          ->condition($field, $argument, $operator)
+          ->condition($field, NULL, 'IS NULL');
+        $this->query->addWhere(0, $condition);
+      }
+      else {
+        $this->query->addWhere(0, $field, $argument, $operator);
+      }
     }
   }
 

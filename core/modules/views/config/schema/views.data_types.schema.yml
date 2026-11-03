@@ -433,6 +433,9 @@ views_argument:
     validate_options:
       type: views.argument_validator.[%parent.validate.type]
       label: 'Validate options'
+    include_null:
+      type: boolean
+      label: 'Include NULL values as well as matches'
     glossary:
       type: boolean
       label: 'Glossary mode'

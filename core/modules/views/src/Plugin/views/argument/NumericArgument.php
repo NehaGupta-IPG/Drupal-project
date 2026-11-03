@@ -33,6 +33,7 @@ class NumericArgument extends ArgumentPluginBase {
 
     $options['break_phrase'] = ['default' => FALSE];
     $options['not'] = ['default' => FALSE];
+    $options['include_null'] = ['default' => FALSE];
 
     return $options;
   }
@@ -57,6 +58,15 @@ class NumericArgument extends ArgumentPluginBase {
       '#title' => $this->t('Exclude'),
       '#description' => $this->t('If selected, the numbers entered for the filter will be excluded rather than limiting the view.'),
       '#default_value' => !empty($this->options['not']),
+      '#group' => 'options][more',
+    ];
+
+    $form['include_null'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include NULL values for this field as well as matches'),
+      '#description' => $this->t('If selected, items that do not have any value for the field being filtered on will also be included in the results.'),
+      '#default_value' => !empty($this->options['include_null']),
+      '#fieldset' => 'argument_present',
       '#group' => 'options][more',
     ];
   }
@@ -116,7 +126,7 @@ class NumericArgument extends ArgumentPluginBase {
     }
 
     $placeholder = $this->placeholder();
-    $null_check = empty($this->options['not']) ? '' : " OR $this->tableAlias.$this->realField IS NULL";
+    $null_check = !empty($this->options['not']) || !empty($this->options['include_null']) ? " OR $this->tableAlias.$this->realField IS NULL" : '';
 
     if (count($this->value) > 1) {
       $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
