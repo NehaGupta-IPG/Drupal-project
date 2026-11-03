@@ -98,9 +98,14 @@
     showSidebar: () => {
       const chooseStorage =
         window.innerWidth < breakpoint ? storageMobile : storageDesktop;
-      const hideLabel = Drupal.t('Hide sidebar panel');
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
       if (sidebarTrigger) {
+        const hideLabel = Drupal.t('Hide sidebar panel@error_text', {
+          '@error_text': sidebarTrigger.classList.contains('has-error')
+            ? ' (sidebar contains error)'
+            : ''
+          });
+        sidebarTrigger.classList.contains('has-error')
         sidebarTrigger.querySelector('span').innerHTML = hideLabel;
         sidebarTrigger.setAttribute('title', hideLabel);
         if (sidebarTrigger.nextSibling) {
@@ -124,9 +129,13 @@
     collapseSidebar: () => {
       const chooseStorage =
         window.innerWidth < breakpoint ? storageMobile : storageDesktop;
-      const showLabel = Drupal.t('Show sidebar panel');
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
       if (sidebarTrigger) {
+        const showLabel = Drupal.t('Show sidebar panel@error_text', {
+          '@error_text': sidebarTrigger.classList.contains('has-error')
+            ? ' (sidebar contains error)'
+            : ''
+          });
         sidebarTrigger.querySelector('span').innerHTML = showLabel;
         sidebarTrigger.setAttribute('title', showLabel);
         if (sidebarTrigger.nextSibling) {
