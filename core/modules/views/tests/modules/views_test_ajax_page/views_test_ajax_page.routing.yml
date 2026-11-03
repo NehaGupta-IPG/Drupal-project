@@ -1,0 +1,7 @@
+views_test_ajax_page.parse_query_string:
+  path: '/views_test_ajax_page/parse_query_string'
+  defaults:
+    _title: 'Views Ajax parseQueryString test page'
+    _controller: '\Drupal\views_test_ajax_page\Controller\ViewsTestAjaxPageController::parseQueryStringPage'
+  requirements:
+    _access: 'TRUE'

@@ -1,0 +1,7 @@
+name: 'Views Ajax Page Test'
+type: module
+description: 'Provides a page that attaches the views.ajax library, for testing Drupal.Views JS behavior.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:views
