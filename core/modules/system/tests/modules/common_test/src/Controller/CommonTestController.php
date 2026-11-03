@@ -57,6 +57,62 @@ class CommonTestController {
           'set_active_class' => TRUE,
         ],
       ],
+      'with_other_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with another query string'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'bar' => 'baz',
+            'three' => 'four',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_other_value' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with another value for a current parameter'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'foo' => 'baz',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_array_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with array query value'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'f' => ['1', '2'],
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_zero_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with zero query value'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'count' => '0',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_empty_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with empty query value'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'status' => '',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
     ];
   }
 
