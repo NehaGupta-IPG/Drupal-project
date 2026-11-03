@@ -400,6 +400,8 @@ description_toggle:
       css/components/description-toggle.css: { }
   js:
     migration/js/description_toggle.js: { minified: false }
+  dependencies:
+    - core/drupal
 
 escape_admin:
   js:
