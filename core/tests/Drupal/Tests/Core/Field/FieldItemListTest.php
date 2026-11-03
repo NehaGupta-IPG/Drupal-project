@@ -161,6 +161,20 @@ class FieldItemListTest extends UnitTestCase {
     $datasets[] = [FALSE, $field_item_j, $field_item_l];
     $datasets[] = [FALSE, $field_item_j, $field_item_m];
 
+    // Test fields with similar but strictly different values.
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_n */
+    $field_item_n = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_n->setValue(['0' => 1]);
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_o */
+    $field_item_o = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_o->setValue(['0' => '01']);
+    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_p */
+    $field_item_p = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_p->setValue(['0' => '1.0']);
+
+    $datasets[] = [FALSE, $field_item_n, $field_item_o];
+    $datasets[] = [FALSE, $field_item_n, $field_item_p];
+
     return $datasets;
   }
 

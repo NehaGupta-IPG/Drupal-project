@@ -434,13 +434,22 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
           return $property !== NULL;
         });
 
+        array_walk_recursive($value, function (&$item) {
+          if (is_bool($item)) {
+            $item = (int) $item;
+          }
+          if (is_numeric($item)) {
+            $item = (string) $item;
+          }
+        });
+
         ksort($value);
       }
     };
     array_walk($value1, $callback);
     array_walk($value2, $callback);
 
-    return $value1 == $value2;
+    return $value1 === $value2;
   }
 
   /**
