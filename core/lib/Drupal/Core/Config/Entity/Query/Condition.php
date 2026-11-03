@@ -35,7 +35,7 @@ class Condition extends ConditionBase {
           if (is_array($condition['value'])) {
             $condition['value'] = array_map('mb_strtolower', $condition['value']);
           }
-          elseif (!is_bool($condition['value'])) {
+          elseif (is_string($condition['value'])) {
             $condition['value'] = mb_strtolower($condition['value']);
           }
         }
@@ -170,7 +170,7 @@ class Condition extends ConditionBase {
 
     if (isset($value)) {
       // We always want a case-insensitive match.
-      if (!is_bool($value)) {
+      if (is_string($value)) {
         $value = mb_strtolower($value);
       }
 
