@@ -69,6 +69,7 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
   ],
   constraints: [
     'MenuTreeHierarchy' => [],
+    'CircularLink' => [],
   ],
   revision_metadata_keys: [
     'revision_user' => 'revision_user',
