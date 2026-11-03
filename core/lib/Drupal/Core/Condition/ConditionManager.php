@@ -72,7 +72,10 @@ class ConditionManager extends DefaultPluginManager implements ExecutableManager
    * {@inheritdoc}
    */
   public function execute(ExecutableInterface $condition) {
-    if ($condition instanceof ConditionInterface) {
+    if ($condition instanceof NegatableConditionInterface) {
+      return $condition->evaluate();
+    }
+    elseif ($condition instanceof ConditionInterface) {
       $result = $condition->evaluate();
       return $condition->isNegated() ? !$result : $result;
     }

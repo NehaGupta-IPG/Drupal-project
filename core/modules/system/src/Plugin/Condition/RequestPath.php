@@ -3,7 +3,7 @@
 namespace Drupal\system\Plugin\Condition;
 
 use Drupal\Core\Condition\Attribute\Condition;
-use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Condition\NegatableConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
   id: "request_path",
   label: new TranslatableMarkup("Request Path"),
 )]
-class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+class RequestPath extends NegatableConditionPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * An alias manager to find the alias for the current system path.
@@ -157,17 +157,20 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
     // with different case. Ex: /Page, /page, /PAGE.
     $pages = mb_strtolower($this->configuration['pages']);
     if (!$pages) {
-      return TRUE;
+      $result = TRUE;
+    }
+    else {
+      $request = $this->requestStack->getCurrentRequest();
+      // Compare the lowercase path alias (if any) and internal path.
+      $path = $this->currentPath->getPath($request);
+      // Do not trim a trailing slash if that is the complete path.
+      $path = $path === '/' ? $path : rtrim($path, '/');
+      $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
+
+      $result = $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath($path, $pages));
     }
 
-    $request = $this->requestStack->getCurrentRequest();
-    // Compare the lowercase path alias (if any) and internal path.
-    $path = $this->currentPath->getPath($request);
-    // Do not trim a trailing slash if that is the complete path.
-    $path = $path === '/' ? $path : rtrim($path, '/');
-    $path_alias = mb_strtolower($this->aliasManager->getAliasByPath($path));
-
-    return $this->pathMatcher->matchPath($path_alias, $pages) || (($path != $path_alias) && $this->pathMatcher->matchPath($path, $pages));
+    return $this->evaluateNegate($result);
   }
 
   /**

@@ -49,6 +49,9 @@ interface ConditionInterface extends ExecutableInterface, PluginFormInterface, C
   /**
    * Determines whether condition result will be negated.
    *
+   * Condition negation is an internal implementation detail and should not be
+   * accessed externally.
+   *
    * @return bool
    *   Whether the condition result will be negated.
    */

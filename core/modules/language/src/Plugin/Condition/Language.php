@@ -3,7 +3,7 @@
 namespace Drupal\language\Plugin\Condition;
 
 use Drupal\Core\Condition\Attribute\Condition;
-use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Condition\NegatableConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
     ),
   ]
 )]
-class Language extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+class Language extends NegatableConditionPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The Language manager.
@@ -136,13 +136,14 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function evaluate() {
-    if (empty($this->configuration['langcodes']) && !$this->isNegated()) {
+    if (empty($this->configuration['langcodes'])) {
       return TRUE;
     }
 
     $language = $this->getContextValue('language');
     // Language visibility settings.
-    return !empty($this->configuration['langcodes'][$language->getId()]);
+    $result = !empty($this->configuration['langcodes'][$language->getId()]);
+    return $this->evaluateNegate($result);
   }
 
   /**

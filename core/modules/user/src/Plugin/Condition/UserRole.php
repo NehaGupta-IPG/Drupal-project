@@ -4,7 +4,7 @@ namespace Drupal\user\Plugin\Condition;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Condition\Attribute\Condition;
-use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Condition\NegatableConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -24,7 +24,7 @@ use Drupal\user\RoleInterface;
     ),
   ],
 )]
-class UserRole extends ConditionPluginBase {
+class UserRole extends NegatableConditionPluginBase {
 
   /**
    * {@inheritdoc}
@@ -82,11 +82,12 @@ class UserRole extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function evaluate() {
-    if (empty($this->configuration['roles']) && !$this->isNegated()) {
+    if (empty($this->configuration['roles'])) {
       return TRUE;
     }
     $user = $this->getContextValue('user');
-    return (bool) array_intersect($this->configuration['roles'], $user->getRoles());
+    $result = (bool) array_intersect($this->configuration['roles'], $user->getRoles());
+    return $this->evaluateNegate($result);
   }
 
   /**

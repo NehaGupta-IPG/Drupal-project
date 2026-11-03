@@ -3,7 +3,7 @@
 namespace Drupal\system\Plugin\Condition;
 
 use Drupal\Core\Condition\Attribute\Condition;
-use Drupal\Core\Condition\ConditionPluginBase;
+use Drupal\Core\Condition\NegatableConditionPluginBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -17,7 +17,7 @@ use Drupal\Core\Theme\ThemeManagerInterface;
   id: "current_theme",
   label: new TranslatableMarkup("Current Theme"),
 )]
-class CurrentThemeCondition extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+class CurrentThemeCondition extends NegatableConditionPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The theme manager.
@@ -91,7 +91,8 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
       return TRUE;
     }
 
-    return $this->themeManager->getActiveTheme()->getName() == $this->configuration['theme'];
+    $result = $this->themeManager->getActiveTheme()->getName() == $this->configuration['theme'];
+    return $this->evaluateNegate($result);
   }
 
   /**
