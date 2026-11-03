@@ -72,6 +72,11 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
           if ($negotiated_language) {
             $langcode = $negotiated_language->getId();
           }
+
+          // Handle empty path prefix:
+          if ($negotiated_language === FALSE && (($no_prefix_langcode = array_search('', $config['prefixes'])) !== FALSE)) {
+            $langcode = $no_prefix_langcode;
+          }
           break;
 
         case LanguageNegotiationUrl::CONFIG_DOMAIN:
