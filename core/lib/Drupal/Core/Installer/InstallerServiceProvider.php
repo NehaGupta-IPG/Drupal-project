@@ -47,6 +47,13 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
     $definition = $container->getDefinition('router.builder.yaml');
     $definition->clearTag('event_subscriber');
 
+    // Replace the session_manager with an implementation that does not use the
+    // database.
+    $container->getDefinition('session_manager')
+      ->setClass('Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage')
+      ->setArguments([])
+      ->setMethodCalls();
+
     parent::register($container);
   }
 
