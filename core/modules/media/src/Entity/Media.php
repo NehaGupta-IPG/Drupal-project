@@ -361,9 +361,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *   TRUE if the thumbnail should be updated, FALSE otherwise.
    */
   protected function shouldUpdateThumbnail($is_new = FALSE) {
-    // Update thumbnail if we don't have a thumbnail yet or when the source
-    // field value changes.
-    return !$this->get('thumbnail')->entity || $is_new || $this->hasSourceFieldChanged();
+    return $this->getSource()->shouldUpdateThumbnail($this, $is_new);
   }
 
   /**

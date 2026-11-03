@@ -166,4 +166,42 @@ class Image extends File {
     $display->setComponent($field_name, $component);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
+    if (parent::shouldUpdateThumbnail($media, $is_new)) {
+      return TRUE;
+    }
+    $original = $media->getOriginal();
+    return $original && $this->hasAltTextChanged($media, $original);
+  }
+
+  /**
+   * Checks if the image's alt text value has changed.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The updated media entity.
+   * @param \Drupal\media\MediaInterface $original
+   *   The original media entity.
+   *
+   * @return bool
+   *   TRUE if the alt text changed, FALSE otherwise.
+   */
+  protected function hasAltTextChanged(MediaInterface $media, MediaInterface $original): bool {
+    $source_field = $this->configuration['source_field'] ?? NULL;
+    if (!$source_field || !$media->hasField($source_field) || !$original->hasField($source_field)) {
+      return FALSE;
+    }
+
+    $item = $media->get($source_field)->first();
+    $original_item = $original->get($source_field)->first();
+
+    if (!$item || !$original_item || $item->isEmpty() || $original_item->isEmpty()) {
+      return FALSE;
+    }
+
+    return $item->alt !== $original_item->alt;
+  }
+
 }

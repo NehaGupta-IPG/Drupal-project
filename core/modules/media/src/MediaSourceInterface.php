@@ -207,4 +207,20 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
    */
   public function getSourceFieldValue(MediaInterface $media);
 
+  /**
+   * Determines if the thumbnail should be updated for a media item.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   A media item.
+   * @param bool $is_new
+   *   Specifies whether the media item is new.
+   *
+   * @return bool
+   *   TRUE if the thumbnail should be updated, FALSE otherwise.
+   *
+   * @throws \RuntimeException
+   *   If the source field for the media source is not defined.
+   */
+  public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool;
+
 }

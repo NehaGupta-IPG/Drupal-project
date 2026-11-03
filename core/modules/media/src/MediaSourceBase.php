@@ -348,6 +348,16 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
   /**
    * {@inheritdoc}
    */
+  public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
+    if (!$media->get('thumbnail')->entity || $is_new) {
+      return TRUE;
+    }
+    return $media->getOriginal() && $this->getSourceFieldValue($media) !== $this->getSourceFieldValue($media->getOriginal());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function prepareViewDisplay(MediaTypeInterface $type, EntityViewDisplayInterface $display) {
     $display->setComponent($this->getSourceFieldDefinition($type)->getName(), [
       'label' => 'visually_hidden',
