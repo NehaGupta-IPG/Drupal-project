@@ -54,9 +54,23 @@ class ToolkitSetupFormTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('image_toolkit', 'gd');
 
     // Test changing the jpeg image quality.
-    $edit = ['gd[image_jpeg_quality]' => '70'];
+    $edit = ['gd[jpeg_quality_wrapper][image_jpeg_quality]' => '70'];
     $this->submitForm($edit, 'Save configuration');
     $this->assertEquals('70', $this->config('system.image.gd')->get('jpeg_quality'));
+
+    // Test changing the webp image quality with lossy compression.
+    $edit = [
+      'gd[webp_quality_wrapper][image_webp_lossless]' => 0,
+      'gd[webp_quality_wrapper][image_webp_quality]' => '80',
+    ];
+    $this->submitForm($edit, 'Save configuration');
+    $this->assertEquals('80', $this->config('system.image.gd')->get('webp_quality'));
+    $this->assertEquals(FALSE, $this->config('system.image.gd')->get('webp_lossless'));
+
+    // Test changing to lossless compression.
+    $edit = ['gd[webp_quality_wrapper][image_webp_lossless]' => 1];
+    $this->submitForm($edit, 'Save configuration');
+    $this->assertEquals(TRUE, $this->config('system.image.gd')->get('webp_lossless'));
 
     // Test changing the toolkit.
     $edit = ['image_toolkit' => 'test'];
