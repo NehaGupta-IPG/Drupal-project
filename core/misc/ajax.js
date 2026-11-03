@@ -648,6 +648,18 @@
           }),
         );
       }
+
+      if (
+        $(ajax.element).attr('type') === 'submit' &&
+        !$(ajax.element).attr('formnovalidate')
+      ) {
+        const formValidationEvent = $.Event('drupalAjaxFormValidate');
+        $(event.target).trigger(formValidationEvent);
+        if (formValidationEvent.result === false) {
+          event.preventDefault();
+          return false;
+        }
+      }
       return ajax.eventResponse(this, event);
     });
 
@@ -1912,4 +1924,18 @@
       },
     },
   });
+
+  Drupal.behaviors.clientSideValidationAjax = {
+    attach(context) {
+      $(context).on('drupalAjaxFormValidate', (event) => {
+        const form = $(event.target).closest('form')[0];
+        if (typeof form !== 'undefined' && !form.checkValidity()) {
+          // This is the magic function that displays the validation errors to the user
+          form.reportValidity();
+          return false;
+        }
+        return true;
+      });
+    },
+  };
 })(jQuery, window, Drupal, drupalSettings, loadjs, window.tabbable);
