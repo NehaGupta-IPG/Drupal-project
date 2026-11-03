@@ -79,7 +79,7 @@ class PathAdminTest extends PathTestBase {
 
     // Filter by the first alias.
     $edit = [
-      'filter' => $alias1,
+      'alias' => $alias1,
     ];
     $this->submitForm($edit, 'Filter');
     $this->assertSession()->linkByHrefExists($alias1);
@@ -91,7 +91,7 @@ class PathAdminTest extends PathTestBase {
 
     // Filter by the second alias.
     $edit = [
-      'filter' => $alias2,
+      'alias' => $alias2,
     ];
     $this->submitForm($edit, 'Filter');
     $this->assertSession()->linkByHrefNotExists($alias1);
@@ -103,7 +103,7 @@ class PathAdminTest extends PathTestBase {
 
     // Filter by the third alias which has a slash.
     $edit = [
-      'filter' => $alias3,
+      'alias' => $alias3,
     ];
     $this->submitForm($edit, 'Filter');
     $this->assertSession()->linkByHrefNotExists($alias1);
@@ -115,7 +115,7 @@ class PathAdminTest extends PathTestBase {
 
     // Filter by a random string with a different length.
     $edit = [
-      'filter' => $this->randomMachineName(10),
+      'alias' => $this->randomMachineName(10),
     ];
     $this->submitForm($edit, 'Filter');
     $this->assertSession()->linkByHrefNotExists($alias1);
@@ -130,6 +130,16 @@ class PathAdminTest extends PathTestBase {
     $this->assertSession()->linkByHrefExists($alias2);
     $this->assertSession()->linkByHrefExists($path1);
     $this->assertSession()->linkByHrefExists($path2);
+
+    // Perform the search with system path and alias both.
+    $edit = [
+      'path' => $path1,
+    ];
+    $this->submitForm($edit, 'Filter');
+    $this->assertSession()->linkByHrefExists($path1);
+    $this->assertSession()->linkByHrefExists($alias1);
+    $this->assertSession()->linkByHrefNotExists($path2);
+    $this->assertSession()->linkByHrefNotExists($alias2);
   }
 
 }

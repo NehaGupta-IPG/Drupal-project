@@ -124,8 +124,8 @@ class PathLanguageUiTest extends PathTestBase {
     $this->submitForm([], 'Save');
 
     $this->drupalGet('admin/config/search/path');
-    $this->assertSession()->pageTextContains('None');
-    $this->assertSession()->pageTextNotContains('English');
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', 'None');
+    $this->assertSession()->elementTextNotContains('css', 'table tbody tr:nth-child(1)', 'English');
 
     // Create another node, with no alias, to ensure non-language specific
     // aliases are loaded correctly.
