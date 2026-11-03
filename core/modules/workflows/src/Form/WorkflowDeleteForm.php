@@ -2,16 +2,15 @@
 
 namespace Drupal\workflows\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Builds the form to delete Workflow entities.
  *
  * @internal
  */
-class WorkflowDeleteForm extends EntityConfirmFormBase {
+class WorkflowDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}
@@ -31,20 +30,6 @@ class WorkflowDeleteForm extends EntityConfirmFormBase {
    */
   public function getQuestion() {
     return $this->t('Are you sure you want to delete %name?', ['%name' => $this->entity->label()]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('entity.workflow.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
   }
 
   /**
