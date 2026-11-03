@@ -9,6 +9,7 @@ use Drupal\Core\File\MimeType\MimeTypeMapInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Template\Attribute;
 use Drupal\image\Entity\ImageStyle;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Provides methods related to building responsive image source attributes.
@@ -20,6 +21,8 @@ class ResponsiveImageBuilder {
     protected MimeTypeMapInterface $mimeTypeMap,
     protected ImageFactory $imageFactory,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
+    #[AutowireServiceClosure('logger.responsive_image')]
+    protected \Closure $loggerClosure,
   ) {
 
   }
@@ -197,13 +200,21 @@ class ResponsiveImageBuilder {
             // this breakpoint should be merged into one srcset and the sizes
             // attribute should be merged as well.
             if (is_null($dimensions['width'])) {
-              throw new \LogicException("Could not determine image width for '{$variables['uri']}' using image style with ID: $image_style_name. This image style can not be used for a responsive image style mapping using the 'sizes' attribute.");
+              ($this->loggerClosure)()->error(
+                "Could not determine image width for '@uri' using image style with ID: @image_style_name. This image style can not be used for a responsive image style mapping using the 'sizes' attribute.",
+                [
+                  '@uri' => $variables['uri'],
+                  '@image_style_name' => $image_style_name,
+                ]
+              );
             }
-            // Use the image width as key so we can sort the array later on.
-            // Images within a srcset should be sorted from small to large,
-            // since the first matching source will be used.
-            $srcset[intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
-            $sizes = array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
+            else {
+              // Use the image width as key so we can sort the array later on.
+              // Images within a srcset should be sorted from small to large,
+              // since the first matching source will be used.
+              $srcset[intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
+              $sizes = array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
+            }
           }
           break;
 
