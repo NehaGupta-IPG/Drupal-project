@@ -343,6 +343,55 @@ td {
   }
 }
 
+.field--type-link .field-multiple-table td {
+  & > .form-item:has(> .form-item__description) {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--admin-space-s);
+  }
+
+  & > .form-item:has(> .form-item__description) > .form-item__label {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  & > .form-item:has(> .form-item__description) > .form-item__description {
+    grid-row: 2;
+    grid-column: 2;
+    margin-block-start: var(--admin-space-s);
+  }
+}
+
+@media (max-width: 48rem) {
+  .field--type-link .field-multiple-table td {
+    & > .form-item:has(> .form-item__description) {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: stretch;
+    }
+
+    & > .form-item:has(> .form-item__description) > .form-item__label,
+    & > .form-item:has(> .form-item__description) > .admin-autocomplete,
+    & > .form-item:has(> .form-item__description) > .form-element {
+      grid-column: 1;
+    }
+
+    & > .form-item:has(> .form-item__description) > .form-item__label {
+      grid-row: 1;
+    }
+
+    & > .form-item:has(> .form-item__description) > .admin-autocomplete,
+    & > .form-item:has(> .form-item__description) > .form-element {
+      grid-row: 2;
+    }
+
+    & > .form-item:has(> .form-item__description) > .form-item__description {
+      grid-row: 3;
+      grid-column: 1;
+    }
+  }
+}
+
 /* Win over table-file-multiple-widget. */
 th.is-disabled.is-disabled {
   color: var(--admin-color-text-disabled);
