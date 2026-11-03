@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\jsonapi\FunctionalJavascript;
+namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
-use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use Drupal\FunctionalTests\PerformanceTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,12 +51,10 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
     $user->addRole('administrator');
     $user->save();
     $this->drupalLogin($user);
-    sleep(2);
 
     // Request the front page to ensure all cache collectors are fully
-    // warmed, wait one second to ensure that the request finished processing.
+    // warmed.
     $this->drupalGet('');
-    sleep(2);
 
     $url = Url::fromRoute('jsonapi.node--article.individual', ['entity' => $node->uuid()])->toString();
     $performance_data = $this->collectPerformanceData(function () use ($url): void {
@@ -65,8 +63,6 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
 
     $this->assertQueriesByName('jsonapi_individual_cool_cache', $performance_data->getQueries());
     $this->assertMetricsByName('jsonapi_individual_cool_cache', $performance_data);
-
-    sleep(2);
 
     $url = Url::fromRoute('jsonapi.node--article.individual', ['entity' => $node->uuid()])->toString();
     $performance_data = $this->collectPerformanceData(function () use ($url): void {
