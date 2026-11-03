@@ -36,6 +36,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\MimeTypes;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Link;
 
 /**
  * Provides a media source plugin for oEmbed resources.
@@ -259,7 +261,22 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       $resource = $this->resourceFetcher->fetchResource($resource_url);
     }
     catch (ResourceException $e) {
-      $this->messenger->addError($e->getMessage());
+      if (
+        $media->id() &&
+        $media->access('update')
+      ) {
+        $link = Link::createFromRoute($this->t('edit'), 'entity.media.edit_form', ['media' => $media->id()]);
+        $this->messenger->addError(Markup::create($e->getMessage() . " Update media entity: " . $link->toString()));
+      }
+      $this->logger->error(
+       'An error occurred while fetching an oEmbed resource for Media ID: %media_id, Embed URL: %media_url, oEmbed Resource URL: %resource_url. Error: @error',
+        [
+          '%resource_url' => !empty($resource_url) ? $resource_url : 'unknown',
+          '%media_url' => $media_url,
+          '%media_id' => $media->id(),
+          '@error' => $e->getMessage(),
+        ]
+      );
       return NULL;
     }
 
