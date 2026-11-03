@@ -112,10 +112,7 @@ abstract class Database {
    *
    * @see \Drupal\Core\Database\Log
    */
-  final public static function startLog(string $logging_key, string|int $key = 'default'): Log {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function startLog(string $logging_key, string $key = 'default'): Log {
     if (empty(self::$logs[$key])) {
       self::$logs[$key] = new Log((string) $key);
 
@@ -152,10 +149,7 @@ abstract class Database {
    *
    * @see \Drupal\Core\Database\Log
    */
-  final public static function getLog(string $logging_key, string|int $key = 'default'): array {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function getLog(string $logging_key, string $key = 'default'): array {
     if (empty(self::$logs[$key])) {
       return [];
     }
@@ -177,13 +171,7 @@ abstract class Database {
    * @return \Drupal\Core\Database\Connection
    *   The corresponding connection object.
    */
-  final public static function getConnection(string|int $target = 'default', string|int|null $key = NULL): Connection {
-    if (is_int($target)) {
-      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if ($key !== NULL && is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function getConnection(string $target = 'default', ?string $key = NULL): Connection {
     if (!isset($key)) {
       // By default, we want the active connection, set in setActiveConnection.
       $key = self::$activeKey;
@@ -229,10 +217,7 @@ abstract class Database {
    *   The previous database connection key, or NULL if no connection was
    *   previously active.
    */
-  final public static function setActiveConnection(string|int $key = 'default'): string|int|null {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function setActiveConnection(string $key = 'default'): ?string {
     if (!empty(self::$databaseInfo[$key])) {
       $old_key = self::$activeKey;
       self::$activeKey = $key;
@@ -339,13 +324,7 @@ abstract class Database {
    *
    * @see \Drupal\Core\Database\Database::setActiveConnection
    */
-  final public static function addConnectionInfo(string|int $key, string|int $target, array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if (is_int($target)) {
-      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function addConnectionInfo(string $key, string $target, array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): void {
     if (empty(self::$databaseInfo[$key][$target])) {
       $connection_info = self::parseConnectionInfo($info);
       self::$databaseInfo[$key][$target] = $connection_info;
@@ -382,10 +361,7 @@ abstract class Database {
    *   An associative array of database information, keyed by target. Defaults
    *   to an empty array.
    */
-  final public static function getConnectionInfo(string|int $key = 'default'): array {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function getConnectionInfo(string $key = 'default'): array {
     if (!empty(self::$databaseInfo[$key])) {
       return self::$databaseInfo[$key];
     }
@@ -434,13 +410,7 @@ abstract class Database {
    * @return bool
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public static function renameConnection(string|int $old_key, string|int $new_key): bool {
-    if (is_int($old_key)) {
-      @trigger_error('Passing an integer value to the $old_key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if (is_int($new_key)) {
-      @trigger_error('Passing an integer value to the $new_key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function renameConnection(string $old_key, string $new_key): bool {
     if (!empty(self::$databaseInfo[$old_key]) && empty(self::$databaseInfo[$new_key])) {
       // Migrate the database connection information.
       self::$databaseInfo[$new_key] = self::$databaseInfo[$old_key];
@@ -466,10 +436,7 @@ abstract class Database {
    * @return bool
    *   TRUE in case of success, FALSE otherwise.
    */
-  final public static function removeConnection(string|int $key): bool {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final public static function removeConnection(string $key): bool {
     if (isset(self::$databaseInfo[$key])) {
       self::closeConnection(NULL, $key);
       unset(self::$databaseInfo[$key]);
@@ -492,13 +459,7 @@ abstract class Database {
    * @return \Drupal\Core\Database\Connection
    *   The opened database connection.
    */
-  final protected static function openConnection(string|int $key, string|int $target): Connection {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if (is_int($target)) {
-      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  final protected static function openConnection(string $key, string $target): Connection {
     // If the requested database does not exist then it is an unrecoverable
     // error.
     if (!isset(self::$databaseInfo[$key])) {
@@ -536,13 +497,7 @@ abstract class Database {
    *   (optional) The database connection key. Defaults to NULL which means the
    *   active key.
    */
-  public static function closeConnection(string|int|null $target = NULL, string|int|null $key = NULL): void {
-    if ($target !== NULL && is_int($target)) {
-      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if ($key !== NULL && is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  public static function closeConnection(?string $target = NULL, ?string $key = NULL): void {
     // Gets the active connection by default.
     if (!isset($key)) {
       $key = self::$activeKey;
@@ -584,13 +539,7 @@ abstract class Database {
    * @param string $target
    *   The target of the specified key to ignore.
    */
-  public static function ignoreTarget(string|int $key, string|int $target): void {
-    if (is_int($key)) {
-      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
-    if (is_int($target)) {
-      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
-    }
+  public static function ignoreTarget(string $key, string $target): void {
     self::$ignoreTargets[$key][$target] = TRUE;
   }
 
