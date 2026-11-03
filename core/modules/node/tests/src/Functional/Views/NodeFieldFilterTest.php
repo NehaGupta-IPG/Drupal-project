@@ -128,4 +128,15 @@ class NodeFieldFilterTest extends NodeTestBase {
     }
   }
 
+  /**
+   * Tests grouped nid filter.
+   */
+  public function testNodeIdGroupedFilter(): void {
+    // The page should not break when access without array of nid[] parameters
+    // test-id-grouped-filter?nid=1
+    $this->drupalGet('test-id-grouped-filter', ['query' => ['nid' => '1']]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Food in Paris');
+  }
+
 }

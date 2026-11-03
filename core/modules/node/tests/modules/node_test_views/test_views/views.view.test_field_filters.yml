@@ -373,3 +373,107 @@ display:
       title: 'Test title filter'
       defaults:
         title: false
+  page_id_grouped:
+    id: page_id_grouped
+    display_title: 'ID grouped filter'
+    display_plugin: page
+    position: 5
+    display_options:
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+          group: 1
+          expose:
+            operator: ''
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: nid
+          plugin_id: numeric
+          operator: '='
+          value:
+            min: ''
+            max: ''
+            value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: nid_op
+            label: ID
+            description: null
+            use_operator: false
+            operator: nid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: nid
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+            min_placeholder: null
+            max_placeholder: null
+            placeholder: null
+          is_grouped: true
+          group_info:
+            label: ID
+            description: ''
+            identifier: nid
+            optional: true
+            widget: select
+            multiple: true
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: 'Group 1'
+                operator: '='
+                value:
+                  min: ''
+                  max: ''
+                  value: '1'
+              2:
+                title: 'Group 2'
+                operator: '='
+                value:
+                  min: ''
+                  max: ''
+                  value: '2'
+              3:
+                title: ''
+                operator: '='
+                value:
+                  min: ''
+                  max: ''
+                  value: ''
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+      defaults:
+        filters: false
+        filter_groups: false
+      display_description: ''
+      display_extenders: {  }
+      path: test-id-grouped-filter
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
