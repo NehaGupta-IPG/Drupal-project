@@ -133,23 +133,11 @@ class BatchStorage implements BatchStorageInterface {
    * {@inheritdoc}
    */
   public function getId(): int {
-    $try_again = FALSE;
-    try {
-      // The batch table might not yet exist.
-      return $this->doInsertBatchRecord();
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing table,
-        // propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the table has been created, try again if necessary.
-    if ($try_again) {
-      return $this->doInsertBatchRecord();
-    }
+    return $this->connection->executeAndCreateTableIfNeeded(
+      static::TABLE_NAME,
+      $this->schemaDefinition(),
+      fn() => $this->doInsertBatchRecord(),
+    );
   }
 
   /**
@@ -170,8 +158,15 @@ class BatchStorage implements BatchStorageInterface {
 
   /**
    * Check if the table exists and create it if not.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
     }

@@ -94,15 +94,11 @@ class MatcherDumper implements MatcherDumperInterface {
       $transaction = $this->connection->startTransaction();
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
-      try {
-        $this->connection->delete($this->tableName)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        if (!$this->ensureTableExists()) {
-          throw $e;
-        }
-      }
+      $this->connection->executeAndCreateTableIfNeeded(
+        $this->tableName,
+        $this->schemaDefinition(),
+        fn() => $this->connection->delete($this->tableName)->execute(),
+      );
 
       // Split the routes into chunks to avoid big INSERT queries.
       $route_chunks = array_chunk($this->routes->all(), 50, TRUE);
@@ -195,8 +191,15 @@ class MatcherDumper implements MatcherDumperInterface {
    *
    * @return bool
    *   TRUE if the table was created, FALSE otherwise.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition());
     }

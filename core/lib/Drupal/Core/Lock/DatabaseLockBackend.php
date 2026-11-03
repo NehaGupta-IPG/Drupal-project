@@ -68,13 +68,17 @@ class DatabaseLockBackend extends LockBackendAbstract {
       // We always want to do this code at least once.
       do {
         try {
-          $this->database->insert('semaphore')
-            ->fields([
-              'name' => $name,
-              'value' => $this->getLockId(),
-              'expire' => $expire,
-            ])
-            ->execute();
+          $this->database->executeAndCreateTableIfNeeded(
+            static::TABLE_NAME,
+            $this->schemaDefinition(),
+            fn() => $this->database->insert('semaphore')
+              ->fields([
+                'name' => $name,
+                'value' => $this->getLockId(),
+                'expire' => $expire,
+              ])
+              ->execute(),
+          );
           // We track all acquired locks in the global variable.
           $this->locks[$name] = TRUE;
           // We never need to try again.
@@ -87,16 +91,6 @@ class DatabaseLockBackend extends LockBackendAbstract {
           // whether to retry by checking lockMayBeAvailable(). This will clear
           // the offending row from the database table in case it has expired.
           $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
-        }
-        catch (\Exception $e) {
-          // Create the semaphore table if it does not exist and retry.
-          if ($this->ensureTableExists()) {
-            // Retry only once.
-            $retry = !$retry;
-          }
-          else {
-            throw $e;
-          }
         }
         // We only retry in case the first attempt failed, but we then broke
         // an expired lock.
@@ -180,8 +174,15 @@ class DatabaseLockBackend extends LockBackendAbstract {
 
   /**
    * Check if the semaphore table exists and create it if not.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->database->schema();
       $schema_definition = $this->schemaDefinition();

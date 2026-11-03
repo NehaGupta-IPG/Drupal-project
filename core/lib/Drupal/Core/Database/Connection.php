@@ -11,6 +11,7 @@ use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
@@ -1232,6 +1233,119 @@ abstract class Connection {
    */
   public function supportsTransactionalDDL() {
     return $this->transactionalDDLSupport;
+  }
+
+  /**
+   * Executes an operation, creating its table if necessary.
+   *
+   * Attempts the operation optimistically and retries it once if it fails
+   * because the specified table is missing. Other exceptions are propagated
+   * unchanged. Drivers where a failed statement aborts a transaction override
+   * this method to check for the table first. Operations may handle a missing
+   * table themselves when an empty result or a no-op is appropriate.
+   *
+   * @param string $table_name
+   *   The unprefixed table name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
+   *   A schema definition containing the named table. Only that table is
+   *   created.
+   *   A legacy table definition array, as accepted by Schema::createTable(), is
+   *   also supported.
+   * @param callable $operation
+   *   The operation. It may be called twice and must be safe to retry after a
+   *   missing-table failure. Start any transaction before calling this method,
+   *   not inside the callback, so drivers can check for the table first.
+   *
+   * @return mixed
+   *   The result of the operation.
+   */
+  public function executeAndCreateTableIfNeeded(string $table_name, SchemaDefinition|array $table_schema, callable $operation): mixed {
+    try {
+      return $operation();
+    }
+    catch (DatabaseException $e) {
+      if (!$this->isMissingTableException($e)) {
+        throw $e;
+      }
+    }
+    // Another process may have created the table after the operation failed,
+    // in which case only the retry is needed.
+    $this->createTableIfNotExists($table_name, $table_schema);
+    return $operation();
+  }
+
+  /**
+   * Creates a table if it does not exist yet.
+   *
+   * Losing a creation race against another process is not an error. Prefer
+   * ::executeAndCreateTableIfNeeded() when the table is created for an
+   * operation, as that avoids checking for the table on every call.
+   *
+   * @param string $table_name
+   *   The unprefixed table name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|array $table_schema
+   *   A schema definition containing the named table. Only that table is
+   *   created.
+   *   A legacy table definition array, as accepted by Schema::createTable(), is
+   *   also supported.
+   */
+  public function createTableIfNotExists(string $table_name, SchemaDefinition|array $table_schema): void {
+    if ($this->schema()->tableExists($table_name)) {
+      return;
+    }
+    try {
+      if ($table_schema instanceof SchemaDefinition) {
+        $this->schema()->createTableFromDefinition($table_schema->type, $table_schema->name, $table_schema->getTableDefinition($table_name));
+      }
+      else {
+        $this->schema()->createTable($table_name, $table_schema);
+      }
+    }
+    catch (DatabaseException $e) {
+      // Recover only if another process created the table concurrently.
+      if (!$this->schema()->tableExists($table_name) || !$this->isTableCreationRace($e)) {
+        throw $e;
+      }
+    }
+  }
+
+  /**
+   * Determines whether an operation failed because a table was missing.
+   *
+   * @param \Throwable $exception
+   *   The operation exception.
+   *
+   * @return bool
+   *   TRUE for missing table errors, FALSE for unrelated database errors.
+   */
+  protected function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      return $state === '42S02';
+    }
+    return FALSE;
+  }
+
+  /**
+   * Determines whether table creation failed because another creator won.
+   *
+   * @param \Throwable $exception
+   *   The table creation exception.
+   *
+   * @return bool
+   *   TRUE for duplicate table errors, FALSE for unrelated schema errors.
+   */
+  protected function isTableCreationRace(\Throwable $exception): bool {
+    if ($exception instanceof SchemaObjectExistsException) {
+      return TRUE;
+    }
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      return $state === '42S01';
+    }
+    return FALSE;
   }
 
   /**

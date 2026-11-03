@@ -64,10 +64,11 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   public function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool {
-    $try_again = FALSE;
     $request = $this->requestStack->getCurrentRequest();
-    $doWrite = fn() =>
-      $this->connection->upsert('sessions')
+    $this->connection->executeAndCreateTableIfNeeded(
+      'sessions',
+      $this->schemaDefinition(),
+      fn() => $this->connection->upsert('sessions')
         ->key('sid')
         ->fields([
           'sid' => Crypt::hashBase64($sessionId),
@@ -76,23 +77,8 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
           'session' => $data,
           'timestamp' => $this->time->getRequestTime(),
         ])
-        ->execute();
-    try {
-      $doWrite();
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing
-        // table, propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the bin has been created, try again if necessary.
-    if ($try_again) {
-      $doWrite();
-    }
-
+        ->execute(),
+    );
     return TRUE;
   }
 
@@ -222,8 +208,15 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *
    * @return bool
    *   TRUE if the table already exists or was created, FALSE if creation fails.
+   *
+   * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeAndCreateTableIfNeeded()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists(): bool {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \\Drupal\\Core\\Database\\Connection::executeAndCreateTableIfNeeded() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();
