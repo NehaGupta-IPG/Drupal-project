@@ -14,12 +14,11 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\Plugin\JsonSchemaDefinitionValidatorTrait;
 use Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException;
 use Drupal\Core\Theme\Icon\IconCollector;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
 use Drupal\Core\Theme\Icon\IconExtractorPluginManager;
-use JsonSchema\Constraints\Constraint;
-use JsonSchema\Validator;
 
 /**
  * Defines an icon pack plugin manager to deal with icons.
@@ -145,16 +144,9 @@ use JsonSchema\Validator;
  */
 class IconPackManager extends DefaultPluginManager implements IconPackManagerInterface {
 
-  private const SCHEMA_VALIDATE = 'core/assets/schemas/v1/icon_pack.schema.json';
+  use JsonSchemaDefinitionValidatorTrait;
 
-  /**
-   * The schema validator.
-   *
-   * This property will only be set if the validator library is available.
-   *
-   * @var \JsonSchema\Validator|null
-   */
-  private ?Validator $validator = NULL;
+  private const SCHEMA_VALIDATE = 'core/assets/schemas/v1/icon_pack.schema.json';
 
   /**
    * Constructs the IconPackPluginManager object.
@@ -184,22 +176,6 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
     $this->factory = new ContainerFactory($this);
     $this->alterInfo('icon_pack');
     $this->setCacheBackend($cacheBackend, 'icon_pack', ['icon_pack_plugin', 'icon_pack_collector']);
-  }
-
-  /**
-   * Sets the validator service if available.
-   *
-   * @param \JsonSchema\Validator|null $validator
-   *   The JSON Validator class.
-   */
-  public function setValidator(?Validator $validator = NULL): void {
-    if (NULL !== $validator) {
-      $this->validator = $validator;
-      return;
-    }
-    if (class_exists(Validator::class)) {
-      $this->validator = new Validator();
-    }
   }
 
   /**
@@ -389,53 +365,17 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
   }
 
   /**
-   * Validates a definition against the JSON schema specification.
-   *
-   * @param array $definition
-   *   The definition to check.
-   *
-   * @return bool
-   *   FALSE if the response failed validation, otherwise TRUE.
-   *
-   * @throws \Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException
-   *   Thrown when the definition is not valid.
+   * {@inheritdoc}
    */
-  private function validateDefinition(array $definition): bool {
-    // If the validator isn't set, then the validation library is not installed.
-    if (!$this->validator) {
-      return TRUE;
-    }
+  protected function getDefinitionSchemaPath(): string {
+    return $this->appRoot . '/' . self::SCHEMA_VALIDATE;
+  }
 
-    $schema_ref = sprintf(
-      'file://%s/%s',
-      $this->appRoot,
-      self::SCHEMA_VALIDATE
-    );
-    $schema = (object) ['$ref' => $schema_ref];
-
-    $definition_object = Validator::arrayToObjectRecursive($definition);
-
-    $this->validator->validate($definition_object, $schema, Constraint::CHECK_MODE_COERCE_TYPES);
-
-    if ($this->validator->isValid()) {
-      return TRUE;
-    }
-
-    $message_parts = array_map(
-      static fn (array $error): string => sprintf("[%s] %s", $error['property'], $error['message']),
-      $this->validator->getErrors()
-    );
-    $message = implode(", ", $message_parts);
-
-    throw new IconPackConfigErrorException(
-      sprintf(
-        '%s:%s Error in definition `%s`:%s',
-        $definition['provider'],
-        $definition['id'],
-        $definition_object->id,
-        $message
-      )
-    );
+  /**
+   * {@inheritdoc}
+   */
+  protected function createInvalidDefinitionException(string $message): \Exception {
+    return new IconPackConfigErrorException($message);
   }
 
 }
