@@ -50,10 +50,55 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     source: author
  * @endcode
  *
- * The value of 'migration' can be a list of migration IDs. When using multiple
- * migrations it is possible each use different source identifiers. In this
- * case one can use source_ids which is an array keyed by the migration IDs
- * and the value is a list of source properties. See example below.
+ * If the lookup migration has multiple source IDs, these may be specified using
+ * the 'source_ids' property. This is an array keyed by the migration ID, whose
+ * value is a list of source properties. In this case, 'source' is ignored, and
+ * the incoming value (if this process plugin is part of a process chain) is
+ * also ignored. If 'source_ids' is a numeric array, the values they are matched
+ * up to source IDs in the order defined, and surplus source IDs defined in
+ * the migration source plugin's getIds() method are ignored:
+ * @code
+ * process:
+ *   uid:
+ *     plugin: migration_lookup
+ *     migration: users
+ *       source_ids:
+ *         users:
+ *           - author
+ * @endcode
+ *
+ * Alternatively, if 'source_ids' is an associative array, the keys are taken as
+ * the names of the source IDs defined in getIds():
+ * @code
+ * process:
+ *   uid:
+ *     plugin: migration_lookup
+ *     migration: users
+ *       source_ids:
+ *         users:
+ *           key3: author
+ * @endcode
+ *
+ * The value of 'migration' can be a list of migration IDs, in which case each
+ * migration will be tried in turn until the lookup succeeds.
+ *
+ * The source IDs for each migration can be specified by using 'source_ids'
+ * instead of 'source', with different IDs specified for each migration:
+ * @code
+ * process:
+ *   uid:
+ *     plugin: migration_lookup
+ *     migration: users
+ *       source_ids:
+ *         users:
+ *           key3: author
+ * @endcode
+ *
+ * The value of 'migration' can be a list of migration IDs, in which case each
+ * migration will be tried in turn until the lookup succeeds.
+ *
+ * The source IDs for each migration can be specified by using 'source_ids'
+ * instead of 'source', with different IDs specified for each migration:
  * @code
  * process:
  *   uid:
@@ -65,7 +110,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *       users:
  *         - author
  *       members:
- *         - id
+ *         key3: id
+ *         key1: name
  * @endcode
  *
  * It's not required to describe source identifiers for each migration. If the
@@ -199,7 +245,21 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         $self = TRUE;
       }
       if (isset($this->configuration['source_ids'][$lookup_migration_id])) {
-        $lookup_value = array_values($row->getMultiple($this->configuration['source_ids'][$lookup_migration_id]));
+        $lookup_value = [];
+        $source_map = $this->configuration['source_ids'][$lookup_migration_id];
+        $row_values = $row->getMultiple($this->configuration['source_ids'][$lookup_migration_id]);
+
+        if (array_is_list($this->configuration['source_ids'][$lookup_migration_id])) {
+          // If the source IDs are specified without keys, we assume they are
+          // the first source IDs in order.
+          $lookup_value = array_values($row_values);
+        }
+        else {
+          foreach ($source_map as $key => $source) {
+            // If the source IDs are specified with keys, use the keys.
+            $lookup_value[$key] = $row_values[$source];
+          }
+        }
       }
       $lookup_value = (array) $lookup_value;
       $this->skipInvalid($lookup_value);
