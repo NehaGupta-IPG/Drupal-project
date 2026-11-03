@@ -55,6 +55,10 @@ media.type.*:
       sequence:
         type: string
 
+field.formatter.settings.media_responsive_thumbnail:
+  type: field.formatter.settings.responsive_image
+  label: 'Media responsive thumbnail field display format settings'
+
 field.formatter.settings.media_thumbnail:
   type: field.formatter.settings.image
   label: 'Media thumbnail field display format settings'
