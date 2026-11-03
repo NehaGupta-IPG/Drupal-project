@@ -52,7 +52,9 @@ interface AccessPolicyInterface {
    *
    * This should only be used to revoke permissions. If you wish to add
    * permissions, you should write another access policy that uses the
-   * calculatePermissions method instead.
+   * calculatePermissions method instead. alterPermissions may be used to add
+   * permissions if your access policy needs to check the account's existing
+   * permissions.
    *
    * Keep in mind that there are many ways to alter access policy results.
    * Because each access policy itself is a service, the best way to get rid of
