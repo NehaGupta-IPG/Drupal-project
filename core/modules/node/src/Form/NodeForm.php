@@ -323,6 +323,8 @@ class NodeForm extends ContentEntityForm {
       \Drupal::logger('node')->error('%type saving node form: @message in %function (line %line of %file) @backtrace_string.', Error::decodeException($e));
       $form_state->setRebuild();
     }
+
+    return $insert ? SAVED_NEW : SAVED_UPDATED;
   }
 
 }

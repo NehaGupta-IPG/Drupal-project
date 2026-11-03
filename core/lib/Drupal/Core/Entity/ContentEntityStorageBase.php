@@ -821,9 +821,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $return = SAVED_NEW;
     }
     else {
-      // @todo Consider returning a different value when saving a non-default
-      //   entity revision. See https://www.drupal.org/node/2509360.
-      $return = $entity->isDefaultRevision() ? SAVED_UPDATED : FALSE;
+      $return = SAVED_UPDATED;
     }
 
     $this->populateAffectedRevisionTranslations($entity);
