@@ -289,11 +289,19 @@ class MenuForm extends EntityForm {
       ],
     ];
 
-    $form['links']['#empty'] = $this->t('There are no menu links yet. <a href=":url">Add link</a>.', [
-      ':url' => Url::fromRoute('entity.menu.add_link_form', ['menu' => $this->entity->id()], [
-        'query' => ['destination' => $this->entity->toUrl('edit-form')->toString()],
-      ])->toString(),
-    ]);
+    // Check if current user has permission to create menu link.
+    $menu_link_access_handler = $this->entityTypeManager
+      ->getAccessControlHandler('menu_link_content');
+    if ($menu_link_access_handler->createAccess()) {
+      $form['links']['#empty'] = $this->t('There are no menu links yet. <a href=":url">Add link</a>.', [
+        ':url' => Url::fromRoute('entity.menu.add_link_form', ['menu' => $this->entity->id()], [
+          'query' => ['destination' => $this->entity->toUrl('edit-form')->toString()],
+        ])->toString(),
+      ]);
+    }
+    else {
+      $form['links']['links']['#empty'] = $this->t('There are no menu links yet.');
+    }
     $links = $this->buildOverviewTreeForm($tree, $delta);
 
     // Get the menu links which have pending revisions, and disable the
