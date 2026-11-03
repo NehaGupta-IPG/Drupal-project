@@ -12,6 +12,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
+use Drupal\Tests\RandomGeneratorTrait;
 
 /**
  * Provides test methods for user creation and authentication.
@@ -19,6 +20,8 @@ use Drupal\user\UserInterface;
  * This trait is meant to be used only by test classes.
  */
 trait UserCreationTrait {
+
+  use RandomGeneratorTrait;
 
   /**
    * Creates a random user account and sets it as current user.
