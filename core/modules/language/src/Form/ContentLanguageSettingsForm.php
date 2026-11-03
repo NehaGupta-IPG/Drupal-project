@@ -161,10 +161,26 @@ class ContentLanguageSettingsForm extends FormBase {
         ],
       ];
 
+      // Count how often each bundle label is used so that duplicate labels can
+      // be disambiguated with their machine name below.
+      $label_counts = array_count_values(array_map(function ($bundle_info) {
+        return (string) $bundle_info['label'];
+      }, $bundles[$entity_type_id]));
+
       foreach ($bundles[$entity_type_id] as $bundle => $bundle_info) {
+        // When multiple bundles share the same label, append the machine name
+        // so administrators can tell them apart.
+        $bundle_label = $bundle_info['label'];
+        if ($label_counts[(string) $bundle_info['label']] > 1) {
+          $bundle_label = $this->t('@label (@machine_name)', [
+            '@label' => $bundle_info['label'],
+            '@machine_name' => $bundle,
+          ]);
+        }
+
         $form['settings'][$entity_type_id][$bundle]['settings'] = [
           '#type' => 'item',
-          '#label' => $bundle_info['label'],
+          '#label' => $bundle_label,
           'language' => [
             '#type' => 'language_configuration',
             '#entity_information' => [
