@@ -93,6 +93,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('entity_test');
     $this->installEntitySchema($this->revEntityTypeId);
     $this->installEntitySchema('entity_test_no_bundle');
     $this->installEntitySchema('entity_test_mulrevpub');
@@ -101,6 +102,7 @@ class ContentModerationStateTest extends KernelTestBase {
     $this->installEntitySchema('file');
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('content_moderation_state');
+    $this->installEntitySchema('action');
     $this->installConfig('content_moderation');
     $this->installSchema('file', 'file_usage');
     $this->installConfig(['field', 'file', 'filter', 'image', 'media', 'node']);
@@ -687,8 +689,7 @@ class ContentModerationStateTest extends KernelTestBase {
     EntityTestHelper::createBundle('test_bundle');
 
     $workflow = $this->createEditorialWorkflow();
-    $workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test', 'test_bundle');
-    $workflow->save();
+    $this->addEntityTypeAndBundleToWorkflow($workflow, 'entity_test', 'test_bundle');
 
     // Ensure the bundle is correctly added to the workflow.
     $this->assertEquals([
@@ -804,8 +805,7 @@ class ContentModerationStateTest extends KernelTestBase {
 
     if ($create_workflow) {
       $workflow = $this->createEditorialWorkflow();
-      $workflow->getTypePlugin()->addEntityTypeAndBundle($entity_type_id, $bundle_id);
-      $workflow->save();
+      $this->addEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $bundle_id);
     }
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */

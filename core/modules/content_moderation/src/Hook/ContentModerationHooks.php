@@ -344,6 +344,11 @@ class ContentModerationHooks {
     if (\Drupal::moduleHandler()->moduleExists('views')) {
       Views::viewsData()->clear();
     }
+
+    // Create actions for changing the moderation state.
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation' && !$entity->isSyncing()) {
+      $this->saveWorkflowActions($entity);
+    }
   }
 
   /**
@@ -360,6 +365,34 @@ class ContentModerationHooks {
     if (\Drupal::moduleHandler()->moduleExists('views')) {
       Views::viewsData()->clear();
     }
+
+    // Create/update actions for changing the moderation state.
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation' && !$entity->isSyncing()) {
+      $this->saveWorkflowActions($entity);
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete().
+   */
+  #[Hook('workflow_delete')]
+  public function workflowDelete(WorkflowInterface $entity): void {
+    if ($entity->getTypePlugin()->getPluginId() !== 'content_moderation' || $entity->isSyncing()) {
+      return;
+    }
+
+    // Delete actions for changing moderation state.
+    $workflow_base_action_id = 'content_moderation_' . $entity->id();
+    $entity_types = $entity->getTypePlugin()->getEntityTypes();
+    foreach ($entity_types as $entity_type_id) {
+      foreach ($entity->getTypePlugin()->getStates() as $state_id => $state) {
+        $action_id = $workflow_base_action_id . $entity_type_id . '_change_to_' . $state_id;
+        $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
+        if ($action) {
+          $action->delete();
+        }
+      }
+    }
   }
 
   /**
@@ -373,6 +406,56 @@ class ContentModerationHooks {
       if (str_starts_with($id, 'moderation_state') && $filter instanceof Broken) {
         $view->result = [];
         break;
+      }
+    }
+  }
+
+  /**
+   * Save workflow actions.
+   *
+   * @param \Drupal\workflows\WorkflowInterface $workflow
+   *   The workflow being saved.
+   */
+  protected function saveWorkflowActions(WorkflowInterface $workflow) : void {
+    $workflow_base_action_id = 'content_moderation_' . $workflow->id();
+    $entity_types = $workflow->getTypePlugin()->getEntityTypes();
+    foreach ($entity_types as $entity_type_id) {
+      // Omit unsupported entity types.
+      $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+      if (!\Drupal::service('content_moderation.moderation_information')->canModerateEntitiesOfEntityType($entity_type)) {
+        continue;
+      }
+      foreach ($workflow->getTypePlugin()->getStates() as $state_id => $state) {
+        $action_id = $workflow_base_action_id . '_' . $entity_type_id . '_change_to_' . $state_id;
+        $action = \Drupal::entityTypeManager()->getStorage('action')->load($action_id);
+        if (!$action) {
+          $action = \Drupal::entityTypeManager()->getStorage('action')->create([
+            'id' => $action_id,
+            'type' => $entity_type_id,
+            'label' => $this->t('Change moderation state to @state', ['@state' => $state->label()]),
+            'configuration' => [
+              'workflow' => $workflow->id(),
+              'state' => $state_id,
+              'revision_log_message' => $this->t('Change moderation state to @state', ['@state' => $state->label()]),
+            ],
+            'plugin' => 'moderation_state_change:' . $entity_type_id,
+            'dependencies' => [
+              'config' => ['workflows.workflow.' . $workflow->id()],
+            ],
+          ]);
+        }
+        else {
+          $action->set('label', $this->t('Change moderation state to @state', ['@state' => $state->label()]));
+          $action->set('configuration', [
+            'workflow' => $workflow->id(),
+            'state' => $state_id,
+            'revision_log_message' => $this->t('Change moderation state to @state', ['@state' => $state->label()]),
+          ]);
+          $action->set('dependencies', [
+            'config' => ['workflows.workflow.' . $workflow->id()],
+          ]);
+        }
+        $action->save();
       }
     }
   }
