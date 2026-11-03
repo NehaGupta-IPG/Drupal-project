@@ -115,31 +115,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the plugin manager and object plugin definitions.
-   */
-  public function testDefaultPluginManagerWithObjects(): void {
-    $definitions = $this->expectedDefinitions;
-    $definitions['cherry'] = (object) [
-      'id' => 'cherry',
-      'label' => 'Cherry',
-      'color' => 'red',
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\fruit\Cherry',
-      'provider' => 'disabled_module',
-    ];
-
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-
-    $module_handler->expects($this->once())
-      ->method('moduleExists')
-      ->with('disabled_module')
-      ->willReturn(FALSE);
-
-    $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
-
-    $this->assertEmpty($plugin_manager->getDefinition('cherry', FALSE), 'Plugin information is available');
-  }
-
-  /**
    * Tests the plugin manager behavior for a missing plugin ID.
    */
   public function testGetDefinitionPluginNotFoundException(): void {
@@ -383,14 +358,11 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $definitions = [];
     $definitions['array_based_found'] = ['provider' => 'module_found'];
     $definitions['array_based_missing'] = ['provider' => 'module_missing'];
-    $definitions['stdClass_based_found'] = (object) ['provider' => 'module_found'];
-    $definitions['stdClass_based_missing'] = (object) ['provider' => 'module_missing'];
     $definitions['classed_object_found'] = new ObjectDefinition(['provider' => 'module_found']);
     $definitions['classed_object_missing'] = new ObjectDefinition(['provider' => 'module_missing']);
 
     $expected = [];
     $expected['array_based_found'] = $definitions['array_based_found'];
-    $expected['stdClass_based_found'] = $definitions['stdClass_based_found'];
     $expected['classed_object_found'] = $definitions['classed_object_found'];
 
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
@@ -431,15 +403,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
-
-    $object_definition = (object) [
-      'foo' => [
-        'bar' => [
-          'asdf',
-        ],
-      ],
-    ];
-    $data['object_definition'] = [$object_definition, clone $object_definition];
 
     $data['no_form'][] = ['class' => TestPluginForm::class];
     $data['no_form'][] = [

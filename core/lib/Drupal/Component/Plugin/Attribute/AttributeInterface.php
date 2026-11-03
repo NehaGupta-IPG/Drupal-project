@@ -2,15 +2,25 @@
 
 namespace Drupal\Component\Plugin\Attribute;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
+
 /**
  * Defines a common interface for classed attributes.
  */
 interface AttributeInterface {
 
   /**
-   * Gets the value of an attribute.
+   * Gets the plugin definition.
+   *
+   * @return array|\Drupal\Component\Plugin\Definition\PluginDefinitionInterface
+   *   The plugin definition.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. The
+   *   return type will be narrowed to
+   *   array|\Drupal\Component\Plugin\Definition\PluginDefinitionInterface.
+   *   Implementations returning any other type must be updated.
    */
-  public function get(): mixed;
+  public function get(): array|PluginDefinitionInterface;
 
   /**
    * Gets the name of the provider of the attribute class.
