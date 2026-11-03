@@ -68,7 +68,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
   protected $activeFieldStorageDefinitions;
 
   /**
-   * Static cache of base field overrides per entity type and bundle.
+   * Static cache of base field overrides per language, entity type and bundle.
    *
    * @var array
    */
@@ -425,15 +425,22 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     // overrides of base fields.
     $bundle_field_definitions = $class::bundleFieldDefinitions($entity_type, $bundle, $base_field_definitions);
 
-    if (!isset($this->baseFieldOverrides)) {
-      $this->baseFieldOverrides = [];
+    // Make sure base field overrides and also configurable fields are loaded in
+    // the correct language.
+    $language = $this->languageManager->getCurrentLanguage();
+    $langcode = $language->getId();
+    $overrideLanguage = $this->languageManager->getConfigOverrideLanguage();
+    $this->languageManager->setConfigOverrideLanguage($language);
+
+    if (!isset($this->baseFieldOverrides[$langcode])) {
+      $this->baseFieldOverrides[$langcode] = [];
       $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple();
       foreach ($base_field_overrides as $override) {
-        $this->baseFieldOverrides[$override->getTargetEntityTypeId()][$override->getTargetBundle()][] = $override;
+        $this->baseFieldOverrides[$langcode][$override->getTargetEntityTypeId()][$override->getTargetBundle()][] = $override;
       }
     }
 
-    foreach ($this->baseFieldOverrides[$entity_type_id][$bundle] ?? [] as $base_field_override) {
+    foreach ($this->baseFieldOverrides[$langcode][$entity_type_id][$bundle] ?? [] as $base_field_override) {
       /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $base_field_override */
       // Base field definitions can be removed.
       if (isset($base_field_definitions[$base_field_override->getName()])) {
@@ -468,6 +475,9 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
         }
       }
     );
+
+    // Revert to the previous config override language.
+    $this->languageManager->setConfigOverrideLanguage($overrideLanguage);
 
     // Automatically set the field name, target entity type and bundle
     // for non-configurable fields.
