@@ -684,13 +684,13 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $values = &$form_state->getValue('content_translation', []);
 
     $metadata = $this->manager->getTranslationMetadata($entity);
-    if (isset($form['content_translation']['uid']) && $form['content_translation']['uid']['#access']) {
+    if (isset($form['content_translation']['uid']) && Element::isVisibleElement($form['content_translation']['uid']['#access'])) {
       $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
     }
-    if (isset($form['content_translation']['status']) && $form['content_translation']['status']['#access']) {
+    if (isset($form['content_translation']['status']) && Element::isVisibleElement($form['content_translation']['status']['#access'])) {
       $metadata->setPublished(!empty($values['status']));
     }
-    if (isset($form['content_translation']['created']) && $form['content_translation']['created']['#access']) {
+    if (isset($form['content_translation']['created']) && Element::isVisibleElement($form['content_translation']['created']['#access'])) {
       $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
     }
 
