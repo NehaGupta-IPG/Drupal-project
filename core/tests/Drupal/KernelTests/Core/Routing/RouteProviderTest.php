@@ -782,6 +782,48 @@ class RouteProviderTest extends KernelTestBase {
     self::assertArrayHasKey('language.negotiation_url', $routes);
   }
 
+  /**
+   * Tests the possibility to pass a forward slash as part of the parameters.
+   */
+  #[DataProvider('providerTestParameterInfiniteParts')]
+  public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes): void {
+    $connection = Database::getConnection();
+    $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, $this->cache, 'test_routes');
+
+    $this->fixtures->createTables($connection);
+    $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
+    $collection = new RouteCollection();
+    $route = new Route($route_path);
+    $route->setRequirement($parameter, $route_requirement);
+    $collection->add('unlimited_parts', $route);
+    $dumper->addRoutes($collection);
+    $dumper->dump();
+    $request = Request::create($request_path, 'GET');
+    $routes = $provider->getRouteCollectionForRequest($request);
+    $this->assertCount($expected_routes, $routes);
+  }
+
+  /**
+   * Provides data for RouteCompilerTest::testParameterInfiniteParts()
+   *
+   * @return array
+   *   An array of test cases, each containing the route path, the parameter with a requirement, the requirement, the
+   *   path that is requested, and the expected routes that match the request.
+   */
+  public static function providerTestParameterInfiniteParts() {
+    return [
+      ['/some/param/{with_unlimited_parts}', 'with_unlimited_parts', '.*', '/some/param/hello/world', 1],
+      ['/some/param/{with_unlimited_parts}', 'with_unlimited_parts', '.+', '/some/param/hello/world', 1],
+      ['/some/param/{no_infinite_cardinality}', 'no_infinite_cardinality', '\d+', '/some/param/hello/world', 0],
+      ['/some/{param}/{no_infinite_cardinality}', 'no_infinite_cardinality', '\d+', '/some/param/hello/world', 0],
+      ['/some/{param}/{with_unlimited_parts}', 'param', '.*', '/some/param/hello/world', 1],
+      // Not supported.
+      ['/some/{param}', 'param', '[dor/]+', '/some/dor/dro', 0],
+      // Not in path.
+      ['/some/{param}', 'random_var', '.+', '/some/dor/dro', 0],
+    ];
+  }
+
 }
 
 /**

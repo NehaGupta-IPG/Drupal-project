@@ -12,6 +12,21 @@ use Symfony\Component\Routing\RouteCompiler as SymfonyRouteCompiler;
 class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterface {
 
   /**
+   * Value for a route's $num_parts indicating an unlimited number of parts.
+   *
+   * This is a positive integer rather than a special value (such as -1) so that
+   * the query in \Drupal\Core\Routing\RouteProvider does not need to use an OR
+   * condition when matching parts. Having an OR in the condition would degrade
+   * performance.
+   *
+   * Any number of parts in a request will effectively match a route defined as
+   * having this number of parts, because the {routing} table's 'path' field is
+   * stored as a varchar(255). It's therefore impossible to have a route with
+   * this many actual parts.
+   */
+  protected const int NUM_PARTS_UNLIMITED = 256;
+
+  /**
    * Compiles the current route instance.
    *
    * Because so much of the parent class is private, we need to call the parent
@@ -37,7 +52,22 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     $pattern_outline = static::getPatternOutline($stripped_path);
     // We count the number of parts including any optional trailing parts. This
     // allows the RouteProvider to filter candidate routes more efficiently.
-    $num_parts = count(explode('/', trim($route->getPath(), '/')));
+    $parts = explode('/', trim($route->getPath(), '/'));
+    $num_parts = count($parts);
+
+    $unlimited_requirements = array_filter($route->getRequirements(), function ($it, $key) use ($parts) {
+      if ($it !== '.*' && $it !== '.+') {
+        return FALSE;
+      }
+
+      // Only consider requirements matching parameters in the path.
+      $needle = "{{$key}}";
+      return in_array($needle, $parts, TRUE);
+    }, ARRAY_FILTER_USE_BOTH);
+
+    if (count($unlimited_requirements) > 0) {
+      $num_parts = self::NUM_PARTS_UNLIMITED;
+    }
 
     return new CompiledRoute(
       $fit,
