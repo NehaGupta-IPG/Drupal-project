@@ -491,6 +491,15 @@ class FilterKernelTest extends KernelTestBase {
       '<drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media>' => [
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
+      // Ensure existing <br> tags are detected and not duplicated, including
+      // those with attributes or a closing slash.
+      'aaa<br>
+      bbb<br class="ccc" />
+      ddd<br/>' => [
+        "<p>aaa<br>\n" => TRUE,
+        "bbb<br class=\"ccc\" />\n" => TRUE,
+        "ddd</p>" => TRUE,
+      ],
     ];
     // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     // cSpell:enable
