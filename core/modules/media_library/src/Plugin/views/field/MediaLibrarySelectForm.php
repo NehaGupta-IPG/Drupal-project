@@ -155,21 +155,36 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
   public static function updateWidget(array &$form, FormStateInterface $form_state, Request $request) {
     $field_id = $form_state->getTriggeringElement()['#field_id'];
     $selected_ids = $form_state->getValue($field_id);
-    $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
-
+    $selected_ids = empty($selected_ids) ? [] : array_filter(explode(',', $selected_ids));
     // Allow the opener service to handle the selection.
     $state = MediaLibraryState::fromRequest($request);
 
     $current_selection = $form_state->getValue('media_library_select_form_selection');
     $available_slots = $state->getAvailableSlots();
     $selected_count = count(explode(',', $current_selection));
-    if ($available_slots > 0 && $selected_count > $available_slots) {
+
+    $maximum_limit_reached = $available_slots > 0 && $selected_count > $available_slots;
+
+    if ($maximum_limit_reached || $form_state->hasAnyErrors()) {
+      // Avoid duplicate
+      \Drupal::messenger()->deleteByType('error');
+    }
+
+    if ($maximum_limit_reached) {
       $response = new AjaxResponse();
       $error = \Drupal::translation()->formatPlural($selected_count - $available_slots, 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count item from the selection.', 'There are currently @total items selected. The maximum number of items for the field is @max. Remove @count items from the selection.', [
         '@total' => $selected_count,
         '@max' => $available_slots,
       ]);
       $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
+      return $response;
+    }
+
+    if ($form_state->hasAnyErrors()) {
+      $response = new AjaxResponse();
+      foreach ($form_state->getErrors() as $error) {
+        $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error']));
+      }
       return $response;
     }
 
@@ -183,7 +198,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    * {@inheritdoc}
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
+    $selected = array_filter($form_state->getValue($this->options['id'], []));
     if (empty($selected)) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }

@@ -145,6 +145,16 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       'query' => $this->getMediaLibraryState($form_state)->all(),
     ])->toString();
 
+    // Display messages after the input field but before the Views select form
+    // is displayed in the modal.
+    $form['media_library_messages'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'id' => 'media-library-messages',
+      ],
+      '#weight' => 999,
+    ];
+
     // The form is posted via AJAX. When there are messages set during the
     // validation or submission of the form, the messages need to be shown to
     // the user.
