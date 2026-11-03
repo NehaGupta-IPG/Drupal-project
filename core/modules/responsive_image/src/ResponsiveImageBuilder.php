@@ -202,7 +202,9 @@ class ResponsiveImageBuilder {
             // Use the image width as key so we can sort the array later on.
             // Images within a srcset should be sorted from small to large,
             // since the first matching source will be used.
-            $srcset[intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
+            $w = intval($dimensions['width']);
+            $srcset[$w] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
+            $sizes_dimensions_map[$w] = $dimensions;
             $sizes = array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
           }
           break;
@@ -236,6 +238,14 @@ class ResponsiveImageBuilder {
     }
     if (!empty($sizes)) {
       $source_attributes->setAttribute('sizes', implode(',', array_unique($sizes)));
+    }
+    // If sizes were used, choose the largest width descriptor's transformed
+    // dimensions to populate width/height on the source tag. This provides a
+    // stable intrinsic ratio and aligns the <img> attribute copy when an <img>
+    // is emitted instead of <picture>.
+    if (!empty($sizes_dimensions_map)) {
+      ksort($sizes_dimensions_map);
+      $dimensions = end($sizes_dimensions_map);
     }
     // The images used in a particular srcset attribute should all have the same
     // aspect ratio. The sizes attribute paired with the srcset attribute
@@ -273,7 +283,7 @@ class ResponsiveImageBuilder {
    *   pixels.
    */
   public function getImageDimensions(string $image_style_name, array $dimensions, string $uri): array {
-    // Determine the dimensions of the styled image.
+    // Determine the dimensions of the image style.
     if ($image_style_name == ResponsiveImageStyleInterface::EMPTY_IMAGE) {
       $dimensions = [
         'width' => 1,
