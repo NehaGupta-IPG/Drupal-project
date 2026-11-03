@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Functional;
 
 use Drupal\file\Entity\File;
+use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     getTestFiles as drupalGetTestFiles;
     compareFiles as drupalCompareFiles;
   }
+  use ContentModerationTestTrait;
 
   /**
    * {@inheritdoc}
@@ -78,6 +80,10 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // Add a second and third language.
     static::createLanguageFromLangcode('fr');
     static::createLanguageFromLangcode('nl');
+
+    // Adding languages requires a container rebuild in the test running
+    // environment so that multilingual services are used.
+    $this->rebuildContainer();
   }
 
   /**
@@ -242,6 +248,167 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     $file = File::load($replaced_second_fid);
     $this->assertTrue($file->isTemporary());
+  }
+
+  /**
+   * Tests synced file fields on translated nodes.
+   */
+  public function testSyncedImagesWithTranslatableProperties(): void {
+    // Enable translation for "Basic page" nodes.
+    $edit = [
+      'entity_types[node]' => 1,
+      'settings[node][basic_page][translatable]' => 1,
+      "settings[node][basic_page][fields][$this->fieldName]" => 1,
+      "settings[node][basic_page][columns][$this->fieldName][file]" => FALSE,
+      // Enable alt and title.
+      "settings[node][basic_page][columns][$this->fieldName][alt]" => 1,
+      "settings[node][basic_page][columns][$this->fieldName][title]" => 1,
+    ];
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->submitForm($edit, 'Save configuration');
+
+    // Verify that the image field on the "Basic page" node type is
+    // translatable.
+    $definitions = $this->container->get('entity_field.manager')->getFieldDefinitions('node', 'basic_page');
+    $this->assertTrue($definitions[$this->fieldName]->isTranslatable(), 'Node image field is translatable.');
+
+    // Create a default language node.
+    $default_language_node = $this->drupalCreateNode(['type' => 'basic_page', 'title' => 'Lost in translation']);
+
+    // Edit the node to upload a file.
+    $edit = [];
+    $name = 'files[' . $this->fieldName . '_0]';
+    $edit[$name] = $this->container->get('file_system')->realpath($this->drupalGetTestFiles('image')[0]->uri);
+    $this->drupalGet('node/' . $default_language_node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Lost in translation image',
+      $this->fieldName . '[0][title]' => 'Lost in translation image title',
+    ];
+    $this->submitForm($edit, 'Save');
+    $first_fid = $this->getLastFileId();
+
+    // Translate the node into French.
+    $this->drupalGet('node/' . $default_language_node->id() . '/translations/add/en/fr');
+
+    // Translate the properties of the file.
+    $edit = [];
+    $edit['title[0][value]'] = 'Scarlett Johansson';
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Scarlett Johansson image title',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+    // This inspects the HTML after the translation is posted. The image should
+    // be displayed on the original node.
+    $this->drupalGet('node/' . $default_language_node->id());
+    $this->assertSession()->responseContains('alt="Lost in translation image"');
+    $this->assertSession()->responseContains('title="Lost in translation image title"');
+    $second_fid = $this->getLastFileId();
+
+    // View the translated node.
+    $this->drupalGet('fr/node/' . $default_language_node->id());
+    $this->assertSession()->responseContains('alt="Scarlett Johansson image"');
+    $this->assertSession()->responseContains('title="Scarlett Johansson image title"');
+
+    \Drupal::entityTypeManager()->getStorage('file')->resetCache();
+
+    // Ensure the file status of the first file is permanent.
+    $file = File::load($first_fid);
+    $this->assertTrue($file->isPermanent());
+
+    // Ensure the file status of the second file is permanent.
+    $file = File::load($second_fid);
+    $this->assertTrue($file->isPermanent());
+  }
+
+  /**
+   * Tests synced file fields on translated nodes with content moderation.
+   */
+  public function testSyncedImagesWithTranslatablePropertiesAndContentModeration(): void {
+    // Enable translation for "Basic page" nodes.
+    $edit = [
+      'entity_types[node]' => 1,
+      'settings[node][basic_page][translatable]' => 1,
+      "settings[node][basic_page][fields][$this->fieldName]" => 1,
+      "settings[node][basic_page][columns][$this->fieldName][file]" => FALSE,
+      // Enable alt and title.
+      "settings[node][basic_page][columns][$this->fieldName][alt]" => 1,
+      "settings[node][basic_page][columns][$this->fieldName][title]" => 1,
+    ];
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->submitForm($edit, 'Save configuration');
+
+    // Verify that the image field on the "Basic page" node type is
+    // translatable.
+    $definitions = $this->container->get('entity_field.manager')->getFieldDefinitions('node', 'basic_page');
+    $this->assertTrue($definitions[$this->fieldName]->isTranslatable(), 'Node image field is translatable.');
+
+    // Create a default language node.
+    $default_language_node = $this->drupalCreateNode(['type' => 'basic_page', 'title' => 'Lost in translation']);
+
+    // Edit the node to upload a file.
+    $edit = [];
+    $name = 'files[' . $this->fieldName . '_0]';
+    $edit[$name] = $this->container->get('file_system')->realpath($this->drupalGetTestFiles('image')[0]->uri);
+    $this->drupalGet('node/' . $default_language_node->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Lost in translation image',
+      $this->fieldName . '[0][title]' => 'Lost in translation image title',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Translate the node into French.
+    $this->drupalGet('node/' . $default_language_node->id() . '/translations/add/en/fr');
+    // Translate the properties of the file.
+    $edit = [];
+    $edit['title[0][value]'] = 'Scarlett Johansson';
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Scarlett Johansson image title',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // This inspects the HTML after the translation is posted. The image should
+    // be displayed on the original node.
+    $this->drupalGet('node/' . $default_language_node->id());
+    $this->assertSession()->responseContains('alt="Lost in translation image"');
+    $this->assertSession()->responseContains('title="Lost in translation image title"');
+
+    // View the translated node.
+    $this->drupalGet('fr/node/' . $default_language_node->id());
+    $this->assertSession()->responseContains('alt="Scarlett Johansson image"');
+    $this->assertSession()->responseContains('title="Scarlett Johansson image title"');
+
+    // Install Content Moderation and enable moderation on Basic Page node type.
+    $this->container->get('module_installer')->install(['content_moderation']);
+    $this->rebuildContainer();
+    $workflow = $this->createEditorialWorkflow();
+    $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'basic_page');
+    $workflow->save();
+
+    // Create an admin user to test image translations on a moderated node.
+    // (Access control is not under test.)
+    $cm_admin_user = $this->drupalCreateUser([], NULL, TRUE);
+    $this->drupalLogin($cm_admin_user);
+
+    // Edit the node in French with workflow enabled.
+    $this->drupalGet('fr/node/' . $default_language_node->id() . '/edit');
+
+    // Translate the properties of a file with moderation.
+    $edit = [];
+    $edit['title[0][value]'] = 'Moderate Scarlett Johansson';
+    $edit = [
+      $this->fieldName . '[0][alt]' => 'Moderate Scarlett Johansson image',
+      $this->fieldName . '[0][title]' => 'Moderate Scarlett Johansson image title',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // View the translated node.
+    $this->drupalGet('fr/node/' . $default_language_node->id());
+    $this->assertSession()->responseContains('alt="Moderate Scarlett Johansson image"');
+    $this->assertSession()->responseContains('title="Moderate Scarlett Johansson image title"');
   }
 
 }
