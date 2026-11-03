@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\Core\Url;
 
 /**
@@ -40,7 +41,6 @@ trait UpdatePathTestTrait {
     if (!$update_url) {
       $update_url = Url::fromRoute('system.db_update');
     }
-    require_once $this->root . '/core/includes/update.inc';
     // The site might be broken at the time so logging in using the UI might
     // not work, so we use the API itself.
     $this->writeSettings([
@@ -73,7 +73,7 @@ trait UpdatePathTestTrait {
         switch ($update_type) {
           case 'update':
             drupal_load_updates();
-            $all_updates = update_get_update_list();
+            $all_updates = \Drupal::service(DatabaseUpdate::class)->getUpdateList();
             break;
 
           case 'post_update':

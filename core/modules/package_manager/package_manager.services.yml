@@ -67,6 +67,7 @@ services:
     arguments:
       - '%app.root%'
       - '@update.post_update_registry'
+      - '@Drupal\Core\Update\DatabaseUpdate'
     autowire: false
   Drupal\package_manager\Validator\LockFileValidator:
     arguments:

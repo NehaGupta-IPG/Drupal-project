@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
+use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,14 +32,6 @@ class DependencyOrderingTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    require_once $this->root . '/core/includes/update.inc';
-  }
-
-  /**
    * Tests that updates within a single module run in the correct order.
    */
   public function testUpdateOrderingSingleModule(): void {
@@ -50,7 +43,7 @@ class DependencyOrderingTest extends BrowserTestBase {
       'update_test_1_update_8002',
       'update_test_1_update_8003',
     ];
-    $actual_updates = array_keys(update_resolve_dependencies($starting_updates));
+    $actual_updates = array_keys(\Drupal::service(DatabaseUpdate::class)->resolveDependencies($starting_updates));
     $this->assertEquals($expected_updates, $actual_updates, 'Updates within a single module run in the correct order.');
   }
 
@@ -62,7 +55,7 @@ class DependencyOrderingTest extends BrowserTestBase {
       'update_test_2' => 8001,
       'update_test_3' => 8001,
     ];
-    $update_order = array_keys(update_resolve_dependencies($starting_updates));
+    $update_order = array_keys(\Drupal::service(DatabaseUpdate::class)->resolveDependencies($starting_updates));
     // Make sure that each dependency is satisfied.
     $first_dependency_satisfied = array_search('update_test_2_update_8001', $update_order) < array_search('update_test_3_update_8001', $update_order);
     $this->assertTrue($first_dependency_satisfied, 'The dependency of the second module on the first module is respected by the update function order.');
