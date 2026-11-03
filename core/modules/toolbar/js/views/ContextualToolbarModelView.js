@@ -3,7 +3,7 @@
     constructor(options) {
       this.strings = options.strings;
       this.isVisible = false;
-      this._contextualCount = Drupal.contextual.instances.count;
+      this._contextualCount = Drupal.contextual.instances.length;
       this.tabbingContext = null;
       this._isViewing =
         localStorage.getItem('Drupal.contextualToolbar.isViewing') !== 'false';
@@ -13,7 +13,7 @@
         this.lockNewContextualLinks(),
       );
       window.addEventListener('contextual-instances-removed', () => {
-        this.contextualCount = Drupal.contextual.instances.count;
+        this.contextualCount = Drupal.contextual.instances.length;
       });
 
       this.$el.on({
@@ -57,18 +57,23 @@
      * Updates the rendered representation of the current toolbar model view.
      */
     render() {
-      this.$el[0].classList.toggle('hidden', this.isVisible);
+      this.updateVisibility();
       const button = this.$el[0].querySelector('button');
       button.classList.toggle('is-active', !this.isViewing);
       button.setAttribute('aria-pressed', !this.isViewing);
-      this.contextualCount = Drupal.contextual.instances.count;
+      this.contextualCount = Drupal.contextual.instances.length;
     }
 
     /**
      * Automatically updates visibility of the view/edit mode toggle.
      */
     updateVisibility() {
-      this.isVisible = this.get('contextualCount') > 0;
+      const isVisible = this.contextualCount > 0;
+      this.$el[0].classList.toggle('hidden', !isVisible);
+      if (isVisible !== this.isVisible) {
+        this.isVisible = isVisible;
+        this.manageTabbing();
+      }
     }
 
     /**
@@ -78,7 +83,7 @@
       Drupal.contextual.instances.forEach((model) => {
         model.isLocked = !this.isViewing;
       });
-      this.contextualCount = Drupal.contextual.instances.count;
+      this.contextualCount = Drupal.contextual.instances.length;
     }
 
     /**
@@ -97,8 +102,9 @@
         tabbingContext.release();
         this.tabbingContext = null;
       }
-      // Create a new tabbing context when edit mode is enabled.
-      if (!this.isViewing) {
+      // Create a new tabbing context when edit mode is enabled and the page has
+      // contextual links.
+      if (!this.isViewing && this.isVisible) {
         tabbingContext = Drupal.tabbingManager.constrain(
           $('.contextual-toolbar-tab, .contextual'),
         );
