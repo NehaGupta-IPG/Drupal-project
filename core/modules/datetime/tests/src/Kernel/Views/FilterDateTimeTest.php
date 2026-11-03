@@ -149,6 +149,50 @@ class FilterDateTimeTest extends DateTimeHandlerTestBase {
     $this->assertIdenticalResultset($view, $expected_result, $this->map);
     $view->destroy();
 
+    // Test between with just min, one second after node 1 in the site
+    // timezone (2001-10-10T12:12:12 UTC is 05:12:12 in America/Vancouver).
+    $view->initHandlers();
+    $view->filter[$field]->operator = 'between';
+    $view->filter[$field]->value['min'] = '2001-10-10T05:12:13';
+    $view->filter[$field]->value['max'] = '';
+    $view->setDisplay('default');
+    $this->executeView($view);
+    $expected_result = [
+      ['nid' => $this->nodes[2]->id()],
+      ['nid' => $this->nodes[3]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test between with just max, set to the date of node 1 in the site
+    // timezone to test the range border.
+    $view->initHandlers();
+    $view->filter[$field]->operator = 'between';
+    $view->filter[$field]->value['min'] = '';
+    $view->filter[$field]->value['max'] = '2001-10-10T05:12:12';
+    $view->setDisplay('default');
+    $this->executeView($view);
+    $expected_result = [
+      ['nid' => $this->nodes[0]->id()],
+      ['nid' => $this->nodes[1]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
+    // Test not between with just min, set to the date of node 1 in the site
+    // timezone.
+    $view->initHandlers();
+    $view->filter[$field]->operator = 'not between';
+    $view->filter[$field]->value['min'] = '2001-10-10T05:12:12';
+    $view->filter[$field]->value['max'] = '';
+    $view->setDisplay('default');
+    $this->executeView($view);
+    $expected_result = [
+      ['nid' => $this->nodes[0]->id()],
+    ];
+    $this->assertIdenticalResultset($view, $expected_result, $this->map);
+    $view->destroy();
+
     // Test not between with min and max.
     $view->initHandlers();
     $view->filter[$field]->operator = 'not between';

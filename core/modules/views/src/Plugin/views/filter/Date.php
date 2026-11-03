@@ -201,11 +201,13 @@ class Date extends NumericFilter {
         // If the filter was not submitted but has default offset values,
         // apply them so backends receive resolved dates.
         if ((!empty($this->options['value']['min']) || !empty($this->options['value']['max'])) && $this->options['value']['type'] === 'offset') {
-          $this->value['min'] = $this->options['value']['min'];
-          $this->value['max'] = $this->options['value']['max'];
+          $this->value['min'] = $this->value['min'] ?: $this->options['value']['min'];
+          $this->value['max'] = $this->value['max'] ?: $this->options['value']['max'];
           $this->value['type'] = 'offset';
           return TRUE;
         }
+      }
+      if ($this->value['min'] == '' && $this->value['max'] == '') {
         return FALSE;
       }
     }
@@ -217,20 +219,53 @@ class Date extends NumericFilter {
    * {@inheritdoc}
    */
   protected function opBetween($field) {
-    $a = intval(strtotime($this->value['min'], 0));
-    $b = intval(strtotime($this->value['max'], 0));
-
-    if ($this->value['type'] == 'offset') {
-      // Keep sign.
-      $a = '***CURRENT_TIME***' . sprintf('%+d', $a);
-      // Keep sign.
-      $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
+    if (empty($this->value['min']) && empty($this->value['max'])) {
+      return;
     }
+
+    // A missing 'min' or 'max' leaves the range open on that side.
+    $values = [];
+    foreach (['min', 'max'] as $key) {
+      if (!empty($this->value[$key])) {
+        $values[$key] = intval(strtotime($this->value[$key], 0));
+        if ($this->value['type'] === 'offset') {
+          // Keep sign.
+          $values[$key] = '***CURRENT_TIME***' . sprintf('%+d', $values[$key]);
+        }
+      }
+    }
+
     // This is safe because we are manually scrubbing the values. It is
-    // necessary to do it this way because $a and $b are formulas when using an
-    // offset.
-    $operator = strtoupper($this->operator);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    // necessary to do it this way because the values are formulas when using
+    // an offset.
+    $operator = count($values) === 2 ? strtoupper($this->operator) : $this->getOpenRangeOperator(array_key_first($values));
+
+    $this->query->addWhereExpression($this->options['group'], "$field $operator " . implode(' AND ', $values));
+  }
+
+  /**
+   * Gets the comparison operator for a range with only one bound set.
+   *
+   * @param string $key
+   *   The bound that is set, either 'min' or 'max'.
+   *
+   * @return string
+   *   The comparison operator to use instead of BETWEEN or NOT BETWEEN.
+   *
+   * @throws \InvalidArgumentException
+   *   When $key is neither 'min' nor 'max', or the filter operator is neither
+   *   'between' nor 'not between'.
+   */
+  protected function getOpenRangeOperator(string $key): string {
+    $operators = [
+      'between' => ['min' => '>=', 'max' => '<='],
+      'not between' => ['min' => '<', 'max' => '>'],
+    ];
+    if (!isset($operators[$this->operator][$key])) {
+      throw new \InvalidArgumentException(sprintf('Cannot build an open range for bound "%s" with operator "%s".', $key, $this->operator));
+    }
+
+    return $operators[$this->operator][$key];
   }
 
   /**

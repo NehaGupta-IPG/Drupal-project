@@ -139,24 +139,34 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
    * Override parent method, which deals with dates as integers.
    */
   protected function opBetween($field) {
-    $timezone = $this->getTimezone();
-    $origin_offset = $this->getOffset($this->value['min'], $timezone);
+    if (empty($this->value['min']) && empty($this->value['max'])) {
+      return;
+    }
 
-    // Although both 'min' and 'max' values are required, default empty 'min'
-    // value as UNIX timestamp 0.
-    $min = (!empty($this->value['min'])) ? $this->value['min'] : '@0';
+    $timezone = $this->getTimezone();
+    $origin_offset = $this->getOffset($this->value['min'] ?: $this->value['max'], $timezone);
 
     // Convert to ISO format and format for query. UTC timezone is used since
-    // dates are stored in UTC.
-    $a = new DateTimePlus($min, new \DateTimeZone($timezone));
-    $a = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($a->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $b = new DateTimePlus($this->value['max'], new \DateTimeZone($timezone));
-    $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+    // dates are stored in UTC. A missing 'min' or 'max' leaves the range open
+    // on that side.
+    $values = [];
+    foreach (['min', 'max'] as $key) {
+      if (!empty($this->value[$key])) {
+        $date = new DateTimePlus($this->value[$key], new \DateTimeZone($timezone));
+        $values[$key] = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($date->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
+      }
+    }
 
-    // This is safe because we are manually scrubbing the values.
-    $operator = strtoupper($this->operator);
+    // This is safe because we are manually scrubbing the values. It is
+    // necessary to do it this way because the values are formulas when using
+    // an offset.
+    $operator = count($values) === 2 ? strtoupper($this->operator) : $this->getOpenRangeOperator(array_key_first($values));
+
+    // Format the field the same way as the values, so that all comparisons use
+    // the same timezone offset and granularity.
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+
+    $this->query->addWhereExpression($this->options['group'], "$field $operator " . implode(' AND ', $values));
   }
 
   /**
