@@ -1378,10 +1378,7 @@ class Sql extends QueryPluginBase {
     // Assemble the groupby clause, if any.
     $this->hasAggregate = FALSE;
     $non_aggregates = $this->getNonAggregates();
-    if (count($this->having)) {
-      $this->hasAggregate = TRUE;
-    }
-    elseif (!$this->hasAggregate) {
+    if (!$this->hasAggregate) {
       // Allow 'GROUP BY' even no aggregation function has been set.
       $this->hasAggregate = $this->view->display_handler->getOption('group_by');
     }
