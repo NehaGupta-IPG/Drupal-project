@@ -99,15 +99,10 @@ class FilterAutoP extends FilterBase {
         $chunk = preg_replace('|<p>\s*</p>\n?|', '', $chunk);
         $chunk = preg_replace('!<p>\s*(</?' . $block . '[^>]*>)!', "$1", $chunk);
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*</p>!', "$1", $chunk);
-        // Make line breaks.
-        $chunk = preg_replace_callback('|(<br[^>]*>)?\s*\n|', function ($matches) {
-          // Preserve existing break tags with attributes.
-          if (isset($matches[1])) {
-            return $matches[1] . "\n";
-          }
-          // Otherwise create new break tag.
-          return "<br>\n";
-        }, $chunk);
+        // Make line breaks. A line that already ends in a break tag, in any
+        // form (e.g. <br />, <br/> or <br class="foo">), keeps that tag as-is;
+        // every other line gets a <br>.
+        $chunk = preg_replace_callback('|(<br[^>]*>)?\s*\n|', fn (array $matches): string => ($matches[1] ?? '<br>') . "\n", $chunk);
         $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br[^>]*>!', "$1", $chunk);
         $chunk = preg_replace('!<br[^>]*>(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)>)!', '$1', $chunk);
         $chunk = preg_replace('/&([^#])(?![A-Za-z0-9]{1,8};)/', '&amp;$1', $chunk);
