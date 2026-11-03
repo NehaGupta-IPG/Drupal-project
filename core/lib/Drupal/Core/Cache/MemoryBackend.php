@@ -30,6 +30,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   protected $cache = [];
 
   /**
+   * Whether any cache items in the backend have cache tags.
+   */
+  protected bool $hasCacheTags = FALSE;
+
+  /**
    * Constructs a MemoryBackend object.
    *
    * @param \Drupal\Component\Datetime\TimeInterface $time
@@ -113,9 +118,12 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
     assert(Inspector::assertAllStrings($tags), 'Cache Tags must be strings.');
-    $tags = array_unique($tags);
-    // Sort the cache tags so that they are stored consistently in the database.
-    sort($tags);
+    if ($tags) {
+      $tags = array_unique($tags);
+      // Sort the cache tags so that they are stored consistently.
+      sort($tags);
+      $this->hasCacheTags = TRUE;
+    }
     $this->cache[$cid] = (object) [
       'cid' => $cid,
       'data' => serialize($data),
@@ -178,8 +186,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    * {@inheritdoc}
    */
   public function invalidateTags(array $tags) {
+    if (!$this->hasCacheTags) {
+      return;
+    }
     foreach ($this->cache as $cid => $item) {
-      if (array_intersect($tags, $item->tags)) {
+      if ($item->tags && array_intersect($tags, $item->tags)) {
         $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
       }
     }
