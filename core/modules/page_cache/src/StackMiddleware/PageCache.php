@@ -344,7 +344,15 @@ class PageCache implements HttpKernelInterface {
    */
   protected function set(Request $request, Response $response, $expire, array $tags) {
     $cid = $this->getCacheId($request);
-    $this->cache->set($cid, $response, $expire, $tags);
+    // Store only the data that is needed to serve the response from the cache,
+    // to avoid storing and unserializing attachments and cacheability metadata
+    // on every cache hit.
+    $cached_response = new Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+    $cached_response->setProtocolVersion($response->getProtocolVersion());
+    if ($charset = $response->getCharset()) {
+      $cached_response->setCharset($charset);
+    }
+    $this->cache->set($cid, $cached_response, $expire, $tags);
   }
 
   /**

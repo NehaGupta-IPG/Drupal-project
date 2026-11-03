@@ -15,6 +15,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Response;
 
 // cspell:ignore curlopt returntransfer
 /**
@@ -78,6 +79,8 @@ class PageCacheTest extends BrowserTestBase {
       'system_test_cache_tags_page',
     ];
     $this->assertSame($expected_tags, $cache_entry->tags);
+    // Only a plain response is stored, without attachments or cacheability.
+    $this->assertSame(Response::class, get_class($cache_entry->data));
 
     Cache::invalidateTags($tags);
     $this->drupalGet($path);
