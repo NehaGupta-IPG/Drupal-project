@@ -6,7 +6,6 @@ namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
-use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -67,7 +66,7 @@ class EntityTestMulChanged extends EntityTestMul implements EntityChangedInterfa
     $fields = parent::baseFieldDefinitions($entity_type);
 
     // Show the created field in the edit form.
-    assert($fields['created'] instanceof FieldDefinition);
+    assert($fields['created'] instanceof BaseFieldDefinition);
     $fields['created']->setDisplayOptions('form', [
       'type' => 'datetime_timestamp',
       'weight' => 10,
