@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\path\Plugin\Validation\Constraint\PathAliasConstraint;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -243,6 +244,100 @@ class PathItemTest extends KernelTestBase {
     $path_field->generateSampleItems();
     $node->save();
     $this->assertStringStartsWith('/', $node->get('path')->alias);
+  }
+
+  /**
+   * Tests that a supplied pid cannot target another entity's path alias.
+   */
+  public function testCrossEntityAliasProtection(): void {
+    $alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+
+    // A first node with its own alias.
+    $first_node = Node::create([
+      'title' => 'First',
+      'type' => 'foo',
+      'path' => ['alias' => '/first-page'],
+    ]);
+    $first_node->save();
+    $first_internal_path = '/' . $first_node->toUrl()->getInternalPath();
+    /** @var \Drupal\path_alias\PathAliasInterface $first_alias */
+    $first_alias = current($alias_storage->loadByProperties(['path' => $first_internal_path]));
+    $first_pid = (int) $first_alias->id();
+
+    // A second, unrelated node.
+    $second_node = Node::create([
+      'title' => 'Second',
+      'type' => 'foo',
+      'path' => ['alias' => '/second-page'],
+    ]);
+    $second_node->save();
+
+    // Point the second node's pid at the first node's alias and change the
+    // alias value.
+    $second_node->get('path')->alias = '/second-alias';
+    $second_node->get('path')->pid = $first_pid;
+    $second_node->save();
+
+    $alias_storage->resetCache();
+    $reloaded_first_alias = $alias_storage->load($first_pid);
+    $this->assertEquals('/first-page', $reloaded_first_alias->getAlias());
+    $this->assertEquals($first_internal_path, $reloaded_first_alias->getPath());
+    // The second node's alias points to the second node, not the first.
+    $second_alias = current($alias_storage->loadByProperties([
+      'path' => '/' . $second_node->toUrl()->getInternalPath(),
+      'alias' => '/second-alias',
+    ]));
+    $this->assertNotFalse($second_alias);
+    $this->assertNotEquals($first_pid, (int) $second_alias->id());
+
+    // An empty alias combined with the first node's pid must not delete the
+    // first node's alias.
+    $second_node->get('path')->alias = '';
+    $second_node->get('path')->pid = $first_pid;
+    $second_node->save();
+
+    $alias_storage->resetCache();
+    $this->assertNotNull($alias_storage->load($first_pid));
+    $this->assertEquals('/first-page', $alias_storage->load($first_pid)->getAlias());
+
+    // A newly created entity supplying another entity's pid must not touch
+    // that alias; a fresh alias is minted for the new entity instead.
+    $third_node = Node::create([
+      'title' => 'Third',
+      'type' => 'foo',
+      'path' => ['alias' => '/third-alias', 'pid' => $first_pid],
+    ]);
+    $third_node->save();
+
+    $alias_storage->resetCache();
+    $this->assertEquals('/first-page', $alias_storage->load($first_pid)->getAlias());
+    $third_alias = current($alias_storage->loadByProperties([
+      'path' => '/' . $third_node->toUrl()->getInternalPath(),
+      'alias' => '/third-alias',
+    ]));
+    $this->assertNotFalse($third_alias);
+    $this->assertNotEquals($first_pid, (int) $third_alias->id());
+
+    // The validation constraint rejects a mismatched pid outright, giving
+    // JSON:API and other validated write paths a proper violation.
+    $pid_message = (string) (new PathAliasConstraint())->pidMessage;
+    $second_node->get('path')->alias = '/second-alias-again';
+    $second_node->get('path')->pid = $first_pid;
+    $violations = $second_node->get('path')->validate();
+    $this->assertGreaterThan(0, $violations->count());
+    $messages = array_map(
+      fn ($violation) => (string) $violation->getMessage(),
+      iterator_to_array($violations),
+    );
+    $this->assertContains($pid_message, $messages);
+
+    // A matching pid (the entity's own alias) validates and saves normally.
+    $second_node->get('path')->alias = '/legitimate';
+    $second_node->get('path')->pid = (int) $second_alias->id();
+    $this->assertEquals(0, $second_node->get('path')->validate()->count());
+    $second_node->save();
+    $alias_storage->resetCache();
+    $this->assertEquals('/legitimate', $alias_storage->load($second_alias->id())->getAlias());
   }
 
 }
