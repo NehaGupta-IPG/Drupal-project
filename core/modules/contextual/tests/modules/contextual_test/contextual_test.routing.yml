@@ -11,3 +11,10 @@ contextual_test.duplicate_links:
     _controller: '\Drupal\contextual_test\Controller\TestController::duplicateContextualLinks'
   requirements:
     _access: 'TRUE'
+
+contextual_test.relocated_links:
+  path: '/contextual-tests/relocated-links'
+  defaults:
+    _controller: '\Drupal\contextual_test\Controller\TestController::relocatedContextualLinks'
+  requirements:
+    _access: 'TRUE'

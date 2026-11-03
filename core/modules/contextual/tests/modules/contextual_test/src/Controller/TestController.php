@@ -56,4 +56,13 @@ class TestController implements ContainerInjectionInterface {
     return $build;
   }
 
+  /**
+   * Renders duplicate contextual links, one of which gets moved out of the DOM.
+   */
+  public function relocatedContextualLinks(): array {
+    $build = $this->duplicateContextualLinks();
+    $build['#attached']['library'][] = 'contextual_test/relocate';
+    return $build;
+  }
+
 }
