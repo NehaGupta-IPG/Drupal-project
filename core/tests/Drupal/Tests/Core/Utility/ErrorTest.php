@@ -54,6 +54,20 @@ class ErrorTest extends UnitTestCase {
     $two_items[] = self::createBacktraceItem('test_function_two', 'TestClass');
     $data[] = [$two_items, self::createBacktraceItem('TestClass->test_function_two()')];
 
+    // Test with an item without a class or function.
+    $no_class_or_function = $single_item;
+    $no_class_or_function[] =
+      [
+        'line' => 98,
+        'file' => 'test_file',
+      ];
+    $expected = [
+      'file' => 'test_file',
+      'line' => 10,
+      'function' => 'test_function',
+      'args' => [],
+    ];
+    $data[] = [$no_class_or_function, $expected];
     // Add ignored functions to backtrace. They should get removed.
     foreach (['debug', '_drupal_error_handler', '_drupal_exception_handler'] as $function) {
       $two_items = $single_item;

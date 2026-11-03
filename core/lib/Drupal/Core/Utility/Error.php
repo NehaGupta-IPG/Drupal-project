@@ -146,7 +146,7 @@ class Error {
       if (isset($backtrace[1]['class'])) {
         $call['function'] = $backtrace[1]['class'] . $backtrace[1]['type'] . $backtrace[1]['function'] . '()';
       }
-      else {
+      elseif (isset($backtrace[1]['function'])) {
         $call['function'] = $backtrace[1]['function'] . '()';
       }
     }
