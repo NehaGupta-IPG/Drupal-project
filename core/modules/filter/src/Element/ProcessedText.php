@@ -29,6 +29,7 @@ class ProcessedText extends RenderElementBase {
       '#pre_render' => [
         [static::class, 'preRenderText'],
       ],
+      '#accept_attributes' => FALSE,
     ];
   }
 

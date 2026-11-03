@@ -15,6 +15,7 @@ use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
@@ -63,6 +64,7 @@ class FiberPlaceholderTest extends UnitTestCase {
           'theme',
         ],
       ],
+      $this->prophesize(StylePluginManagerInterface::class)->reveal(),
     );
 
     $session = $this->prophesize(SessionInterface::class);

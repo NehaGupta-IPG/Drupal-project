@@ -11,6 +11,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeArray;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Template\Loader\StringLoader;
+use Drupal\Core\Theme\Style\StyleDefinitionInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -218,6 +219,32 @@ class AttributeTest extends UnitTestCase {
   }
 
   /**
+   * Tests adding style.
+   *
+   * @legacy-covers ::addStyle
+   */
+  public function testAddStyle(): void {
+    $attribute = new Attribute();
+
+    $definition = $this->createMock(StyleDefinitionInterface::class);
+    $definition->expects($this->once())
+      ->method('applyOrBubbleOnAttribute')
+      ->with('option_1', $attribute);
+
+    $attribute->addStyle($definition, 'option_1');
+  }
+
+  /**
+   * Tests adding a NULL style is a no-op.
+   *
+   * @legacy-covers ::addStyle
+   */
+  public function testAddStyleNull(): void {
+    $attribute = new Attribute();
+    $this->assertSame($attribute, $attribute->addStyle(NULL, 'option_1'));
+  }
+
+  /**
    * Tests removing class attributes with the AttributeArray helper method.
    */
   public function testRemoveClasses(): void {
@@ -375,6 +402,26 @@ class AttributeTest extends UnitTestCase {
     $this->assertNoID('example-id2', $html);
 
     $this->assertStringContainsString('enabled', $html);
+  }
+
+  /**
+   * Tests that casting an attribute to a string never touches the renderer.
+   *
+   * Attachments only bubble when an Attribute object is printed from within
+   * a Twig template, via \Drupal\Core\Template\TwigExtension::escapeFilter().
+   * Direct PHP stringification, exercised here, must remain safe outside of
+   * any render context and must not attempt to process attachments.
+   *
+   * @see \Drupal\Tests\Core\Template\TwigExtensionTest::testEscapeWithAttribute()
+   */
+  public function testPrintWithAttachments(): void {
+    $attribute = new Attribute(['class' => ['example-class']]);
+    $attribute->setAttachments(['library' => ['core/drupal.ajax']]);
+
+    $content = $this->randomMachineName();
+    $html = '<div' . (string) $attribute . '>' . $content . '</div>';
+    $this->assertClass('example-class', $html);
+    $this->assertNoClass('example-class2', $html);
   }
 
   /**
@@ -580,6 +627,120 @@ class AttributeTest extends UnitTestCase {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');
+  }
+
+  /**
+   * Tests merge with attachments.
+   *
+   * @legacy-covers ::merge
+   */
+  public function testMergeWithAttachments(): void {
+    $attribute1 = new Attribute();
+    $attribute1->addAttachments([
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+
+    $attribute2 = new Attribute();
+    $attribute2->addAttachments([
+      'library' => [
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option_2',
+        'my_style_2' => 'my_option',
+      ],
+    ]);
+
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+        'my_style_2' => 'my_option',
+      ],
+    ];
+
+    $attribute1->merge($attribute2);
+    $this->assertEquals($expected, $attribute1->getAttachments());
+  }
+
+  /**
+   * Tests setting attachments.
+   *
+   * @legacy-covers ::setAttachments
+   */
+  public function testSetAttachments(): void {
+    $attribute = new Attribute();
+
+    $this->assertEmpty($attribute->getAttachments());
+
+    $attribute->setAttachments(['foo' => 'bar']);
+    $this->assertEquals(['foo' => 'bar'], $attribute->getAttachments());
+
+    $attribute->setAttachments(['foo2' => 'bar']);
+    $this->assertEquals(['foo2' => 'bar'], $attribute->getAttachments());
+  }
+
+  /**
+   * Tests adding attachments.
+   *
+   * @legacy-covers ::addAttachments
+   */
+  public function testAddAttachments(): void {
+    $attribute = new Attribute();
+    $this->assertEmpty($attribute->getAttachments());
+
+    // First addition.
+    $attribute->addAttachments([
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ];
+    $this->assertEquals($expected, $attribute->getAttachments());
+
+    // Second addition, test merging.
+    $attribute->addAttachments([
+      'library' => [
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option_2',
+        'my_style_2' => 'my_option',
+      ],
+    ]);
+    $expected = [
+      'library' => [
+        'my_module/my_library',
+        'my_module/my_library',
+        'my_module_2/my_library',
+      ],
+      'styles' => [
+        'my_style' => 'my_option',
+        'my_style_2' => 'my_option',
+      ],
+    ];
+    $this->assertEquals($expected, $attribute->getAttachments());
   }
 
 }

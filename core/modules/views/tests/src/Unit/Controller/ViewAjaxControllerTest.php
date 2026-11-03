@@ -15,6 +15,7 @@ use Drupal\Core\Render\Renderer;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
@@ -155,7 +156,8 @@ class ViewAjaxControllerTest extends UnitTestCase {
           'languages:language_interface',
           'theme',
         ],
-      ]
+      ],
+      $this->createStub(StylePluginManagerInterface::class),
     );
     $container = new ContainerBuilder();
     $container->set('renderer', $this->renderer);

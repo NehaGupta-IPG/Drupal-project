@@ -36,6 +36,7 @@ class InlineTemplate extends RenderElementBase {
       ],
       '#template' => '',
       '#context' => [],
+      '#accept_attributes' => FALSE,
     ];
   }
 
