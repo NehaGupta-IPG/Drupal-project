@@ -18,7 +18,7 @@ internal.backbone:
     - core/internal.underscore
 
 ckeditor5:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -35,7 +35,7 @@ ckeditor5:
     - core/ckeditor5.translations
 
 ckeditor5.editorClassic:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -47,7 +47,7 @@ ckeditor5.editorClassic:
     - core/ckeditor5
 
 ckeditor5.editorDecoupled:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -60,7 +60,7 @@ ckeditor5.editorDecoupled:
     - core/ckeditor5.htmlSupport
 
 ckeditor5.essentials:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -73,7 +73,7 @@ ckeditor5.essentials:
     - core/ckeditor5.heading
 
 ckeditor5.heading:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -86,7 +86,7 @@ ckeditor5.heading:
     - core/ckeditor5.translations
 
 ckeditor5.basic:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -99,7 +99,7 @@ ckeditor5.basic:
     - core/ckeditor5.translations
 
 ckeditor5.specialCharacters:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -112,7 +112,7 @@ ckeditor5.specialCharacters:
     - core/ckeditor5.translations
 
 ckeditor5.blockquote:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -125,7 +125,7 @@ ckeditor5.blockquote:
     - core/ckeditor5.translations
 
 ckeditor5.image:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -138,7 +138,7 @@ ckeditor5.image:
     - core/ckeditor5.translations
 
 ckeditor5.link:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -151,7 +151,7 @@ ckeditor5.link:
     - core/ckeditor5.translations
 
 ckeditor5.list:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -164,7 +164,7 @@ ckeditor5.list:
     - core/ckeditor5.translations
 
 ckeditor5.horizontalLine:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -177,7 +177,7 @@ ckeditor5.horizontalLine:
     - core/ckeditor5.translations
 
 ckeditor5.htmlSupport:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -190,7 +190,7 @@ ckeditor5.htmlSupport:
     - core/ckeditor5.translations
 
 ckeditor5.alignment:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -203,7 +203,7 @@ ckeditor5.alignment:
     - core/ckeditor5.translations
 
 ckeditor5.removeFormat:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -216,7 +216,7 @@ ckeditor5.removeFormat:
     - core/ckeditor5.translations
 
 ckeditor5.pasteFromOffice:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -228,7 +228,7 @@ ckeditor5.pasteFromOffice:
     - core/ckeditor5
 
 ckeditor5.indent:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -241,7 +241,7 @@ ckeditor5.indent:
     - core/ckeditor5.translations
 
 ckeditor5.sourceEditing:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -254,7 +254,7 @@ ckeditor5.sourceEditing:
     - core/ckeditor5.translations
 
 ckeditor5.table:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -267,7 +267,7 @@ ckeditor5.table:
     - core/ckeditor5.translations
 
 ckeditor5.language:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -280,7 +280,7 @@ ckeditor5.language:
     - core/ckeditor5.translations
 
 ckeditor5.codeBlock:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -293,7 +293,7 @@ ckeditor5.codeBlock:
     - core/ckeditor5.translations
 
 ckeditor5.showBlocks:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -306,7 +306,7 @@ ckeditor5.showBlocks:
     - core/ckeditor5.translations
 
 ckeditor5.style:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -328,7 +328,7 @@ ckeditor5.translations:
     assets/vendor/ckeditor5/translation.js: {}
 
 ckeditor5.autoformat:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
@@ -340,7 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 ckeditor5.fullscreen:
-  remote: https://github.com/ckeditor/ckeditor5
+  remote: https://github.com/drupal-ckeditor/ckeditor5
   version: "47.6.3-drupal.1"
   license:
     name: GPL-2.0-or-later
