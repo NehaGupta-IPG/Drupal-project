@@ -24,6 +24,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests Drupal\Core\Asset\AssetResolver.
@@ -91,6 +93,13 @@ class AssetResolverTest extends UnitTestCase {
    * An array of library definitions.
    */
   protected array $libraries = [];
+
+  /**
+   * The mocked request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $requestStack;
 
   /**
    * {@inheritdoc}
@@ -203,7 +212,15 @@ class AssetResolverTest extends UnitTestCase {
 
     $this->themeHandler = $this->createStub(ThemeHandlerInterface::class);
 
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler);
+    $request = $this->createStub(Request::class);
+    $request
+      ->method('getBasePath')
+      ->willReturn('');
+    $this->requestStack = $this->createStub(RequestStack::class);
+    $this->requestStack
+      ->method('getCurrentRequest')
+      ->willReturn($request);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->requestStack);
   }
 
   /**
