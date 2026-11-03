@@ -1,2 +1,5 @@
 action.configuration.test_action:
   type: mapping
+
+action.configuration.test_processed_count_action:
+  type: mapping

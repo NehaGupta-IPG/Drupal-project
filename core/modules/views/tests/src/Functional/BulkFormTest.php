@@ -245,6 +245,32 @@ class BulkFormTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that actions can report how many items they actually processed.
+   */
+  public function testProcessedCountAction(): void {
+    $this->drupalCreateNode(['title' => 'Process', 'created' => \Drupal::time()->getRequestTime()]);
+    $this->drupalCreateNode(['title' => 'Skip', 'created' => \Drupal::time()->getRequestTime() - 1]);
+    $this->drupalCreateNode(['title' => 'Skip', 'created' => \Drupal::time()->getRequestTime() - 2]);
+
+    $this->drupalGet('test_bulk_form');
+    $this->submitForm([
+      'node_bulk_form[0]' => TRUE,
+      'node_bulk_form[1]' => TRUE,
+      'node_bulk_form[2]' => TRUE,
+      'action' => 'test_processed_count_action',
+    ], 'Apply to selected items');
+    $this->assertSession()->pageTextContains('Test processed count action was applied to 1 item.');
+
+    // Selecting only skipped items shows no status message.
+    $this->submitForm([
+      'node_bulk_form[1]' => TRUE,
+      'node_bulk_form[2]' => TRUE,
+      'action' => 'test_processed_count_action',
+    ], 'Apply to selected items');
+    $this->assertSession()->pageTextNotContains('was applied to');
+  }
+
+  /**
    * Tests that route parameters are passed to the confirmation form route.
    */
   public function testConfirmRouteWithParameters(): void {
