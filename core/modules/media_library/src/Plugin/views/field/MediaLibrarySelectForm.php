@@ -153,6 +153,20 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    *   A command to send the selection to the current field widget.
    */
   public static function updateWidget(array &$form, FormStateInterface $form_state, Request $request) {
+    if ($form_state->getErrors()) {
+      $all_messages = \Drupal::messenger()->all();
+      $response = new AjaxResponse();
+      foreach ($all_messages as $type => $messages) {
+        foreach ($messages as $message) {
+          $response->addCommand(new MessageCommand($message, '#media-library-messages', ['type' => $type]));
+        }
+      }
+      // Clear the messages to prevent duplication.
+      \Drupal::messenger()->deleteAll();
+
+      return $response;
+    }
+
     $field_id = $form_state->getTriggeringElement()['#field_id'];
     $selected_ids = $form_state->getValue($field_id);
     $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
@@ -183,8 +197,9 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    * {@inheritdoc}
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = array_filter($form_state->getValue($this->options['id']));
-    if (empty($selected)) {
+    $selected = array_filter($form_state->getValue($this->options['id'], []));
+    $current_selection = $form_state->getValue('media_library_select_form_selection');
+    if (empty($selected) && empty($current_selection)) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }
   }

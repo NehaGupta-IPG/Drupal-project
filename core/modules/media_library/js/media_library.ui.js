@@ -200,7 +200,7 @@
         // Override the AJAX success callback to announce the updated content
         // to screen readers.
         if (displayAnnouncement || focusSelector) {
-          const success = ajaxObject.success;
+          const { success } = ajaxObject;
           ajaxObject.success = function (response, status) {
             success.bind(this)(response, status);
             // The AJAX link replaces the whole view, including the clicked
@@ -225,6 +225,21 @@
           Drupal.announce(loadingAnnouncement);
         }
       });
+      // Whenever we are filtering the results in media library widget, the
+      // value of "media_library_modal_selection" element is not setting.
+      // Value of "current_selection" input field is retained. So we are setting
+      // this value from the value of "current_selection" input field.
+      // See https://www.drupal.org/project/drupal/issues/3340973
+      const { currentSelection } = Drupal.MediaLibrary;
+      const mediaLibraryModalSelection = document.querySelector(
+        '#media-library-modal-selection',
+      );
+
+      if (mediaLibraryModalSelection && !mediaLibraryModalSelection.value) {
+        // Set the selection in the hidden form element.
+        mediaLibraryModalSelection.value = currentSelection.join();
+        $(mediaLibraryModalSelection).trigger('change');
+      }
     },
   };
 
@@ -242,7 +257,7 @@
         '.js-media-library-views-form, .js-media-library-add-form',
         context,
       );
-      const currentSelection = Drupal.MediaLibrary.currentSelection;
+      const { currentSelection } = Drupal.MediaLibrary;
 
       if (!$form.length) {
         return;
