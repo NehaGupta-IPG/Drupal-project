@@ -64,7 +64,7 @@ class TableSort {
         // or grid are sorted in ascending or descending order. See
         // https://www.w3.org/TR/wai-aria/states_and_properties#aria-sort
         $cell_attributes['aria-sort'] = ($context['sort'] == self::ASC) ? 'ascending' : 'descending';
-        $context['sort'] = (($context['sort'] == self::ASC) ? self::DESC : self::ASC);
+        $context['sort'] = (($context['sort'] == self::ASC) ? self::ASC : self::DESC);
         $cell_attributes['class'][] = 'is-active';
         $tablesort_indicator = [
           '#theme' => 'tablesort_indicator',
