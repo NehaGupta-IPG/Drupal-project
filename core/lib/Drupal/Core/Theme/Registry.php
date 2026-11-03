@@ -754,7 +754,8 @@ class Registry implements DestructableInterface {
     Cache::invalidateTags(['local_task']);
 
     $cids = ['theme_registry:build:modules'];
-    foreach ($this->themeHandler->listInfo() as $theme_name => $info) {
+    $theme_names = ['core', ...array_keys($this->themeHandler->listInfo())];
+    foreach ($theme_names as $theme_name) {
       $cids[] = 'theme_registry:' . $theme_name;
       $cids[] = 'theme_registry:runtime:' . $theme_name;
     }
