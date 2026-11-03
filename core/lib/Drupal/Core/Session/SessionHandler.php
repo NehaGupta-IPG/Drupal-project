@@ -17,6 +17,14 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
 
   use DependencySerializationTrait;
 
+
+  /**
+   * A query to execute on close that updates the timestamp.
+   *
+   * @var \Drupal\Core\Database\Query\Update
+   */
+  protected $executeUpdateOnClose = NULL;
+
   /**
    * Constructs a new SessionHandler instance.
    *
@@ -48,6 +56,9 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     $data = '';
     if (!empty($sessionId)) {
       try {
+        $this->executeUpdateOnClose = $this->connection->update('sessions')
+          ->condition('sid', Crypt::hashBase64($sid))
+          ->fields(['timestamp' => $this->time->getRequestTime()]);
         // Read the session data from the database.
         $query = $this->connection
           ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
@@ -100,6 +111,9 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    * {@inheritdoc}
    */
   public function close(): bool {
+    if (!empty($this->executeUpdateOnClose)) {
+      $this->executeUpdateOnClose->execute();
+    }
     return TRUE;
   }
 
