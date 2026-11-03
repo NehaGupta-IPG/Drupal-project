@@ -81,6 +81,11 @@ class DrupalDialogEvent extends Event {
       // Trigger a global event to allow scripts to bind events to the dialog.
       const event = new DrupalDialogEvent('beforecreate', dialog, settings);
       domElement.dispatchEvent(event);
+      // Normalize after beforecreate listeners have had a chance
+      // to change options.
+      event.settings.autoResize = [true, 'true'].includes(
+        event.settings.autoResize,
+      );
       $element.dialog(event.settings);
       dialog.open = true;
 

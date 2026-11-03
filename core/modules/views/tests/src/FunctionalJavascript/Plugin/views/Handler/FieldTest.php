@@ -94,12 +94,14 @@ class FieldTest extends WebDriverTestBase {
     // Open the 'Add fields dialog'.
     $page->clickLink('views-add-field');
     $web_assert->waitForField('name[views.nothing]');
+    $web_assert->assertVisibleInViewport('css', '.ui-dialog-title');
     // Select the custom text field.
     $page->checkField('name[views.nothing]');
     $page->find('css', '.ui-dialog .ui-dialog-buttonset')->pressButton('Add and configure fields');
     $web_assert->waitForField('options[alter][text]');
+    $web_assert->assertVisibleInViewport('css', '.ui-dialog-title');
     $page->fillField('options[alter][text]', "{{ attach_library(\"core/drupal.dialog.ajax\") }}
-<p><a class=\"use-ajax\" data-dialog-type=\"modal\" href=\"$base_path/admin/content\">Content link</a></p>");
+<p><a class=\"use-ajax\" data-dialog-type=\"modal\" data-dialog-options='{\"maxHeight\":400}' href=\"$base_path/admin/content\">Content link</a></p>");
     $page->find('css', '.ui-dialog .ui-dialog-buttonset')->pressButton('Apply');
     $web_assert->waitForText('Content: body (exposed)');
     $web_assert->waitForButton('Save');
@@ -112,6 +114,7 @@ class FieldTest extends WebDriverTestBase {
     $page->clickLink('Content link');
     // Verify the modal title.
     $web_assert->assertWaitOnAjaxRequest();
+    $this->assertGreaterThan(0, $this->getSession()->evaluateScript('window.scrollY'));
     $this->assertEquals('Content', $web_assert->waitForElementVisible('css', '.ui-dialog-title')->getText());
   }
 

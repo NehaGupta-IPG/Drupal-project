@@ -71,8 +71,7 @@ class DialogTest extends WebDriverTestBase {
     $close_button->press();
 
     // Tests a modal with a dialog-option.
-    // Link 2 is similar to Link 1, except it submits additional width
-    // information which must be echoed in the resulting  DOM update.
+    // Link 2 submits an explicit width.
     $this->getSession()->getPage()->clickLink('Link 2 (modal)');
     $dialog = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
     $this->assertNotNull($dialog, 'Link was used to open a dialog ( non-modal, with options )');
@@ -87,11 +86,12 @@ class DialogTest extends WebDriverTestBase {
     $non_modal_dialog = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
     $this->assertNull($non_modal_dialog->getAttribute('aria-modal'), 'Dialog modal has no aria-modal attribute');
     $this->assertNotNull($non_modal_dialog, 'Link opens a non-modal dialog.');
+    $this->assertStringContainsString('width: 800px;', $non_modal_dialog->getAttribute('style'));
     $non_modal_dialog_title = $non_modal_dialog->find('css', "h2.ui-dialog-title:contains('AJAX Dialog & contents')");
     $this->assertNotNull($non_modal_dialog_title);
 
     // Tests the dialog contains a target element specified in the AJAX request.
-    $non_modal_dialog->find('css', 'div#ajax-test-dialog-wrapper-1');
+    $this->assertNotNull($non_modal_dialog->find('css', 'div#ajax-test-dialog-wrapper-1'));
     $this->assertSession()->responseContains($dialog_contents);
 
     // Reset: Return to the dialog links page.

@@ -182,3 +182,10 @@ ajax_test.property_link:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::propertyLink'
   requirements:
     _access: 'TRUE'
+
+ajax_test.dialog_sizes:
+  path: '/ajax-test/dialog-sizes'
+  defaults:
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::dialogSizes'
+  requirements:
+    _access: 'TRUE'

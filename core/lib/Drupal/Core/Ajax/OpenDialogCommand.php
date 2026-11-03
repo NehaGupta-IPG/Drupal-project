@@ -68,6 +68,16 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    * @param array $dialog_options
    *   (optional) Options to be passed to the dialog implementation. Any
    *   jQuery UI option can be used. See http://api.jqueryui.com/dialog.
+   *   Pixel sizes accept numbers, or strings with an optional "px" suffix.
+   *   The height, minHeight, and maxHeight options also accept percentages of
+   *   the available viewport height. The height option also accepts "auto".
+   *   The following defaults can be overridden globally in
+   *   drupalSettings.dialog or for this dialog in $dialog_options:
+   *   - width: 300.
+   *   - height: "auto".
+   *   - minWidth and minHeight: 150.
+   *   - maxWidth: NULL (unlimited).
+   *   - maxHeight: "95%" of the available viewport height.
    * @param array|null $settings
    *   (optional) Custom settings that will be passed to the Drupal behaviors
    *   on the content of the dialog. If left empty, the settings will be
