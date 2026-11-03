@@ -8,6 +8,7 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableTrait;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginElementsSubsetInterface;
+use Drupal\Core\Cache\CacheTagsChecksumInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
@@ -169,9 +170,13 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
     if ($this->getConfiguration()['allow_view_mode_override']) {
       $dynamic_plugin_config['drupalMedia']['toolbar'][] = $toolbar_configuration;
     }
+    $cache_tags_checksum = \Drupal::service(CacheTagsChecksumInterface::class);
     $dynamic_plugin_config['drupalMedia']['metadataUrl'] = self::getUrlWithReplacedCsrfTokenPlaceholder(
       Url::fromRoute('ckeditor5.media_entity_metadata')
         ->setRouteParameter('editor', $editor->id())
+        ->setOption('query', [
+          'v' => $cache_tags_checksum->getCurrentChecksum(['media_list']),
+        ])
     );
     $dynamic_plugin_config['drupalMedia']['previewCsrfToken'] = \Drupal::csrfToken()->get('X-Drupal-MediaPreview-CSRF-Token');
     return $dynamic_plugin_config;
