@@ -144,6 +144,7 @@ class ViewsOperations {
         }
       }
     }
+    unset($table_info);
 
     // JOINs must be in order. i.e, any tables you mention in the ON clause of a
     // JOIN must appear prior to that JOIN. Since we're modifying a JOIN in
@@ -168,10 +169,17 @@ class ViewsOperations {
       }
     }
 
-    // Go through and look to see if we have to modify fields and filters.
+    // Build a list of all relationships that might be for our table.
+    $relationships = [];
+    foreach ($query->relationships as $relationship => $info) {
+      if ($info['base'] == $base_entity_table) {
+        $relationships[] = $relationship;
+      }
+    }
+
+    // Go through and look to see if we have to modify fields.
     foreach ($query->fields as &$field_info) {
-      // Some fields don't actually have tables, meaning they're formulae and
-      // whatnot. At this time we are going to ignore those.
+      // Formula fields do not identify a single table and column.
       if (empty($field_info['table'])) {
         continue;
       }
@@ -187,14 +195,7 @@ class ViewsOperations {
         }
       }
     }
-
-    $relationships = [];
-    // Build a list of all relationships that might be for our table.
-    foreach ($query->relationships as $relationship => $info) {
-      if ($info['base'] == $base_entity_table) {
-        $relationships[] = $relationship;
-      }
-    }
+    unset($field_info);
 
     // Now we have to go through our where clauses and modify any of our fields.
     foreach ($query->where as &$clauses) {
@@ -215,8 +216,46 @@ class ViewsOperations {
       }
     }
 
-    // @todo Handle $query->orderby, $query->groupBy, $query->having and
-    //   $query->count_field in https://www.drupal.org/node/2968165.
+    unset($where_info, $clauses);
+
+    // GROUP BY clauses for the selected fields are built later from field
+    // aliases, so they follow the field rewrite above. Only Sql::addGroupBy()
+    // calls end up here. Core passes only aliases, but contrib can pass a
+    // '<table>.<column>' clause, so rewrite those.
+    foreach ($query->groupby as &$group_field) {
+      foreach ($relationships as $relationship) {
+        foreach ($revisionable_fields as $field) {
+          if ($group_field === "$relationship.$field") {
+            $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+            if ($alias) {
+              $group_field = "$alias.$field";
+            }
+          }
+        }
+      }
+    }
+    unset($group_field);
+
+    // ORDER BY usually references a field alias, which follows the rewrites
+    // above. A click sort references the column directly (e.g.
+    // node_field_data.changed), so rewrite it too, or it won't match the
+    // SELECT list under DISTINCT.
+    foreach ($query->orderby as &$order) {
+      foreach ($relationships as $relationship) {
+        foreach ($revisionable_fields as $field) {
+          if ($order['field'] === "$relationship.$field") {
+            $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+            if ($alias) {
+              $order['field'] = "$alias.$field";
+            }
+          }
+        }
+      }
+    }
+    unset($order);
+
+    // @todo Handle expressions and HAVING clauses in
+    //   https://www.drupal.org/node/3622522.
   }
 
   /**
