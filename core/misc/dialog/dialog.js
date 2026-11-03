@@ -81,6 +81,11 @@ class DrupalDialogEvent extends Event {
       // Trigger a global event to allow scripts to bind events to the dialog.
       const event = new DrupalDialogEvent('beforecreate', dialog, settings);
       domElement.dispatchEvent(event);
+      // Allow clicking non-interactive content to focus the scroll container so
+      // that it can be scrolled with the keyboard.
+      if (!domElement.hasAttribute('tabindex')) {
+        domElement.setAttribute('tabindex', '-1');
+      }
       $element.dialog(event.settings);
       dialog.open = true;
 

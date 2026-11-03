@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Dialog;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -55,6 +56,50 @@ class DialogPositionTest extends WebDriverTestBase {
     // javascript errors the test will fail on that.
     $session->resizeWindow(625, 625);
     usleep(5000);
+  }
+
+  /**
+   * Tests keyboard scrolling after clicking non-interactive dialog content.
+   */
+  #[DataProvider('keyboardScrollKeys')]
+  public function testDialogKeyboardScrolling(string $key): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer blocks']));
+    $this->drupalGet('admin/structure/block');
+    $session = $this->getSession();
+    $page = $session->getPage();
+    $page->clickLink('Place block');
+    $dialog = $this->assertSession()->waitForElementVisible('css', '.ui-dialog-content');
+    $this->assertNotNull($dialog);
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    $this->assertTrue($session->wait(1000, 'document.querySelector(".ui-dialog-content").scrollHeight > document.querySelector(".ui-dialog-content").clientHeight'));
+    $dialog->find('css', 'th')->click();
+
+    // Send real browser key events: synthetic events do not perform scrolling.
+    $before = $session->evaluateScript('document.querySelector(".ui-dialog-content").scrollTop');
+    $session->getDriver()->getWebDriverSession()->postActions([
+      'actions' => [[
+        'type' => 'key',
+        'id' => 'keyboard',
+        'actions' => [
+          ['type' => 'keyDown', 'value' => $key],
+          ['type' => 'keyUp', 'value' => $key],
+        ],
+      ],
+      ],
+    ]);
+    $this->assertTrue($session->wait(1000, "document.querySelector('.ui-dialog-content').scrollTop > $before"), 'The keyboard scrolls the dialog.');
+    $this->assertTrue($session->evaluateScript('document.activeElement === document.querySelector(".ui-dialog-content")'));
+  }
+
+  /**
+   * Provides keys which scroll dialog content.
+   */
+  public static function keyboardScrollKeys(): array {
+    return [
+      'Arrow down' => ["\u{E015}"],
+      'Page down' => ["\u{E00F}"],
+    ];
   }
 
 }
