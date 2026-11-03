@@ -26,6 +26,11 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 class RecipeFinderTest extends KernelTestBase {
 
   /**
+   * A directory created by the test, which is removed in tearDown().
+   */
+  private ?string $temporaryDirectory = NULL;
+
+  /**
    * Tests that the finder yields Recipe objects.
    */
   public function testFinderYieldsRecipes(): void {
@@ -123,7 +128,7 @@ class RecipeFinderTest extends KernelTestBase {
    * Tests that the Composer recipe directory is read correctly.
    */
   public function testComposerRecipeDirectory(): void {
-    $temp_dir = FileSystem::getOsTemporaryDirectory() . '/test';
+    $temp_dir = $this->createTemporaryDirectory();
     mkdir($temp_dir . '/recipes/test', recursive: TRUE);
 
     $contents = Json::encode([
@@ -143,8 +148,6 @@ class RecipeFinderTest extends KernelTestBase {
     $this->assertContains('Test!', $names);
     // Core recipes should be discovered too, by default.
     $this->assertContains('Administrator role', $names);
-
-    (new SymfonyFilesystem())->remove($temp_dir);
   }
 
   /**
@@ -183,18 +186,39 @@ class RecipeFinderTest extends KernelTestBase {
    * Tests that the recipe finder follows symlinks.
    */
   public function testDiscoveryFollowsSymlinks(): void {
-    $cookbook_dir = FileSystem::getOsTemporaryDirectory();
-    $link_name = uniqid($cookbook_dir . '/recipe_link');
+    $cookbook_dir = $this->createTemporaryDirectory();
     $target = $this->root . '/core/recipes/administrator_role';
-
-    $file_system = new SymfonyFilesystem();
-    $file_system->symlink($target, $link_name);
+    (new SymfonyFilesystem())->symlink($target, $cookbook_dir . '/recipe_link');
 
     $recipes = iterator_to_array(new Finder($cookbook_dir));
     $this->assertCount(1, $recipes);
     $this->assertSame('Administrator role', reset($recipes)->name);
+  }
 
-    $file_system->remove($link_name);
+  /**
+   * Creates a directory that is removed when the test ends.
+   *
+   * Tests can run concurrently, so a directory that is shared with other
+   * processes, like the OS temporary directory, must not be scanned directly.
+   *
+   * @return string
+   *   The path of the new directory.
+   */
+  private function createTemporaryDirectory(): string {
+    $directory = FileSystem::getOsTemporaryDirectory() . '/recipe_finder_test' . $this->databasePrefix;
+    $this->assertTrue(mkdir($directory));
+    $this->temporaryDirectory = $directory;
+    return $directory;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    if ($this->temporaryDirectory) {
+      (new SymfonyFilesystem())->remove($this->temporaryDirectory);
+    }
+    parent::tearDown();
   }
 
 }
