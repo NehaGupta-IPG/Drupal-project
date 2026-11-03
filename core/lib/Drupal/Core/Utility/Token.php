@@ -242,6 +242,11 @@ class Token {
 
     $replacements = [];
     foreach ($text_tokens as $type => $tokens) {
+      // Token::scan() can return numeric token types (for example when the
+      // text contains "[123]"), which PHP casts to integer array keys. Cast
+      // the type back to a string so that hook_tokens() implementations with
+      // a strict string type hint do not throw a TypeError.
+      $type = (string) $type;
       $replacements += $this->generate($type, $tokens, $data, $options, $bubbleable_metadata);
       if (!empty($options['clear'])) {
         $replacements += array_fill_keys($tokens, '');
