@@ -28,6 +28,22 @@ class LoggerChannel implements LoggerChannelInterface {
   const MAX_CALL_DEPTH = 5;
 
   /**
+   * Map of PSR3 log constants to RFC 5424 log constants.
+   *
+   * @var array
+   */
+  const LEVEL_TRANSLATION = [
+    LogLevel::EMERGENCY => RfcLogLevel::EMERGENCY,
+    LogLevel::ALERT => RfcLogLevel::ALERT,
+    LogLevel::CRITICAL => RfcLogLevel::CRITICAL,
+    LogLevel::ERROR => RfcLogLevel::ERROR,
+    LogLevel::WARNING => RfcLogLevel::WARNING,
+    LogLevel::NOTICE => RfcLogLevel::NOTICE,
+    LogLevel::INFO => RfcLogLevel::INFO,
+    LogLevel::DEBUG => RfcLogLevel::DEBUG,
+  ];
+
+  /**
    * Number of times LoggerChannel::log() has been called for a single message.
    *
    * @var int
@@ -44,18 +60,14 @@ class LoggerChannel implements LoggerChannelInterface {
   /**
    * Map of PSR3 log constants to RFC 5424 log constants.
    *
+   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use the
+   *   'Drupal\Core\Logger\LoggerChannel::LEVEL_TRANSLATION' constant instead.
+   *
+   * @see https://www.drupal.org/node/3432890
+   *
    * @var array
    */
-  protected $levelTranslation = [
-    LogLevel::EMERGENCY => RfcLogLevel::EMERGENCY,
-    LogLevel::ALERT => RfcLogLevel::ALERT,
-    LogLevel::CRITICAL => RfcLogLevel::CRITICAL,
-    LogLevel::ERROR => RfcLogLevel::ERROR,
-    LogLevel::WARNING => RfcLogLevel::WARNING,
-    LogLevel::NOTICE => RfcLogLevel::NOTICE,
-    LogLevel::INFO => RfcLogLevel::INFO,
-    LogLevel::DEBUG => RfcLogLevel::DEBUG,
-  ];
+  protected $levelTranslation = self::LEVEL_TRANSLATION;
 
   /**
    * An array of arrays of \Psr\Log\LoggerInterface keyed by priority.
@@ -120,7 +132,7 @@ class LoggerChannel implements LoggerChannelInterface {
 
     if (is_string($level)) {
       // Convert to integer equivalent for consistency with RFC 5424.
-      $level = $this->levelTranslation[$level];
+      $level = static::LEVEL_TRANSLATION[$level];
     }
     // Call all available loggers.
     foreach ($this->sortLoggers() as $logger) {
