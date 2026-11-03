@@ -151,7 +151,7 @@ class InstallerKernel extends DrupalKernel {
       // list removes its hooks while it is still rendering the remaining
       // installer pages. Keep it registered until the installation is done.
       // @see \Drupal\Core\Hook\ThemeHookCollectorPass
-      // @see _drupal_maintenance_theme()
+      // @see \Drupal\Core\Site\MaintenanceMode::setTheme()
       foreach ($this->getInstallThemes($this->installGetProfile()) as $theme) {
         if (isset($register_themes[$theme])) {
           continue;

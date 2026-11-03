@@ -40,4 +40,17 @@ interface MaintenanceModeInterface {
    */
   public function getSiteMaintenanceMessage();
 
+  /**
+   * Sets up the theming system for maintenance page.
+   *
+   * Used for site installs, updates and when the site is in maintenance mode.
+   * It also applies when the database is unavailable or bootstrap was not
+   * complete. The admin theme is always used for the initial install and update
+   * operations, but this can be overridden by setting a "maintenance_theme" key
+   * in the $settings variable in settings.php.
+   *
+   * @see \Drupal\Core\Installer\InstallerKernel::INSTALL_THEME
+   */
+  public function setTheme(): void;
+
 }

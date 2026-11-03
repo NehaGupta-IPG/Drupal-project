@@ -30,7 +30,11 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly MaintenanceModeInterface $maintenanceMode,
+    /**
+     * @var \Closure(): \Drupal\Core\Site\MaintenanceModeInterface
+     */
+    #[AutowireServiceClosure(MaintenanceModeInterface::class)]
+    protected readonly \Closure $maintenanceModeClosure,
     protected readonly ConfigFactoryInterface $configFactory,
     TranslationInterface $translation,
     protected readonly UrlGeneratorInterface $urlGenerator,
@@ -54,11 +58,11 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   public function onKernelRequestMaintenance(RequestEvent $event) {
     $request = $event->getRequest();
     $route_match = RouteMatch::createFromRequest($request);
-    if ($this->maintenanceMode->applies($route_match)) {
+    if (($this->maintenanceModeClosure)()->applies($route_match)) {
       // Don't cache maintenance mode pages.
       \Drupal::service('page_cache_kill_switch')->trigger();
 
-      if (!$this->maintenanceMode->exempt($this->account)) {
+      if (!($this->maintenanceModeClosure)()->exempt($this->account)) {
         // When the account is not exempt, other subscribers handle request.
         $this->eventDispatcher->dispatch($event, MaintenanceModeEvents::MAINTENANCE_MODE_REQUEST);
       }
@@ -95,13 +99,13 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   public function onMaintenanceModeRequest(RequestEvent $event) {
     $request = $event->getRequest();
     if ($request->getRequestFormat() !== 'html') {
-      $response = new Response($this->maintenanceMode->getSiteMaintenanceMessage(), 503, ['Content-Type' => 'text/plain']);
+      $response = new Response(($this->maintenanceModeClosure)()->getSiteMaintenanceMessage(), 503, ['Content-Type' => 'text/plain']);
       // Calling RequestEvent::setResponse() also stops propagation of event.
       $event->setResponse($response);
       return;
     }
     drupal_maintenance_theme();
-    $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $this->maintenanceMode->getSiteMaintenanceMessage()], $this->t('Site under maintenance'), 'maintenance_page');
+    $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => ($this->maintenanceModeClosure)()->getSiteMaintenanceMessage()], $this->t('Site under maintenance'), 'maintenance_page');
     $response->setStatusCode(503);
     // Calling RequestEvent::setResponse() also stops propagation of the event.
     $event->setResponse($response);

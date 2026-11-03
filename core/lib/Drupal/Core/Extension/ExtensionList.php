@@ -270,7 +270,7 @@ abstract class ExtensionList {
    * @param bool $skip_cache
    *   Whether to skip the extension list cache.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return \Drupal\Core\Extension\Extension[]|\Drupal\Core\Extension\Theme[]
    *   Processed extension objects, keyed by machine name.
    */
   public function getList(bool $skip_cache = FALSE) {

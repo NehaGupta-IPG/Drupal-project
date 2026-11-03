@@ -309,9 +309,9 @@ class UpdateRegistry implements EventSubscriberInterface {
     if ($config->getName() === 'core.extension') {
       // Build the old extension configuration list from configuration rather
       // than using $this->enabledExtensions. This ensures that if the
-      // UpdateRegistry is constructed after _drupal_maintenance_theme() has
-      // added a theme to the theme handler it will not be considered as already
-      // installed.
+      // UpdateRegistry is constructed after
+      // \Drupal\Core\Site\MaintenanceMode::setTheme() has added a theme to the
+      // theme handler it will not be considered as already installed.
       $old_extension_list = array_keys($config->getOriginal('module') ?? []);
       $new_extension_list = array_keys($config->get('module'));
       if ($this->includeThemes()) {
