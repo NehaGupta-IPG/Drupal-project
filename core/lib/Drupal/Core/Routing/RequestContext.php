@@ -38,7 +38,10 @@ class RequestContext extends SymfonyRequestContext {
       $this->setCompleteBaseUrl($GLOBALS['base_url']);
     }
 
-    return parent::fromRequest($request);
+    parent::fromRequest($request);
+    // Do not copy a percent-encoded front controller into generated URLs.
+    $this->setBaseUrl(RequestHelper::getGeneratedBaseUrl($request));
+    return $this;
   }
 
   /**

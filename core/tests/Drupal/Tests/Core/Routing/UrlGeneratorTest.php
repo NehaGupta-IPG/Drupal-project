@@ -657,4 +657,46 @@ class UrlGeneratorTest extends UnitTestCase {
     $this->assertGenerateFromRoute('test_1', ['node' => 1], $options, '/hello/world?node=1', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
   }
 
+  /**
+   * Tests that an encoded front controller is not copied into generated URLs.
+   */
+  public function testGenerateFromEncodedFrontController(): void {
+    $request = new Request([], [], [], [], [], [
+      'REQUEST_URI' => '/index%2Ephp/some/path',
+      'SCRIPT_NAME' => '/index.php',
+      'SCRIPT_FILENAME' => $this->root . '/index.php',
+      'PHP_SELF' => '/index.php/some/path',
+      'REQUEST_METHOD' => 'GET',
+      'HTTP_HOST' => 'example.com',
+      'SERVER_NAME' => 'example.com',
+      'SERVER_PORT' => '80',
+    ]);
+    $this->requestStack->pop();
+    $this->requestStack->push($request);
+    $this->context->fromRequest($request);
+
+    $this->assertSame('/hello/world', $this->generator->generate('test_1'));
+  }
+
+  /**
+   * Tests that literal unclean URLs still include the front controller.
+   */
+  public function testGenerateFromLiteralUncleanUrl(): void {
+    $request = new Request([], [], [], [], [], [
+      'REQUEST_URI' => '/index.php/some/path',
+      'SCRIPT_NAME' => '/index.php',
+      'SCRIPT_FILENAME' => $this->root . '/index.php',
+      'PHP_SELF' => '/index.php/some/path',
+      'REQUEST_METHOD' => 'GET',
+      'HTTP_HOST' => 'example.com',
+      'SERVER_NAME' => 'example.com',
+      'SERVER_PORT' => '80',
+    ]);
+    $this->requestStack->pop();
+    $this->requestStack->push($request);
+    $this->context->fromRequest($request);
+
+    $this->assertSame('/index.php/hello/world', $this->generator->generate('test_1'));
+  }
+
 }
