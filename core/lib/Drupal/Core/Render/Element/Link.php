@@ -99,6 +99,11 @@ class Link extends RenderElementBase {
 
     if (!empty($element['#url']) && $element['#url'] instanceof CoreUrl) {
       $options = NestedArray::mergeDeep($element['#url']->getOptions(), $element['#options']);
+      if (!empty($options['attributes']['data-dialog-type'])) {
+        if (empty($element['#attached']['library']) || !in_array('core/drupal.dialog.ajax', $element['#attached']['library'])) {
+          $element['#attached']['library'][] = 'core/drupal.dialog.ajax';
+        }
+      }
       /** @var \Drupal\Core\Utility\LinkGenerator $link_generator */
       $link_generator = \Drupal::service('link_generator');
       $generated_link = $link_generator->generate($element['#title'], $element['#url']->setOptions($options));

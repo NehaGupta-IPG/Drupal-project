@@ -171,9 +171,21 @@ class Link implements RenderableInterface {
   public function toRenderable() {
     return [
       '#type' => 'link',
-      '#url' => $this->url,
       '#title' => $this->text,
+      '#url' => $this->url,
     ];
+  }
+
+  /**
+   * Helper function to access \Drupal\Core\Url::openInRenderer().
+   *
+   * @see \Drupal\Core\Url::openInRenderer()
+   *
+   * @return $this
+   */
+  public function openInRenderer($renderer, array $options = []) {
+    $this->getUrl()->openInRenderer($renderer, $options);
+    return $this;
   }
 
   /**
