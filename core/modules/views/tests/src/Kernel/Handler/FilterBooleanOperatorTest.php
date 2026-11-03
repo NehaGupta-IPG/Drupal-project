@@ -133,6 +133,84 @@ class FilterBooleanOperatorTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests the BooleanOperator filter with the accept_null option enabled.
+   */
+  public function testAcceptNullFilterBooleanOperator(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    // With accept_null enabled, a FALSE filter also matches NULL values.
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'status' => [
+        'id' => 'status',
+        'field' => 'status',
+        'table' => 'views_test_data',
+        'value' => 0,
+        'accept_null' => TRUE,
+      ],
+    ]);
+    $this->executeView($view);
+
+    $expected_result = [
+      ['id' => 2],
+      ['id' => 4],
+      ['id' => 6],
+    ];
+
+    $this->assertCount(3, $view->result);
+    $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
+
+    $view->destroy();
+    $view->setDisplay();
+
+    // With accept_null enabled, a "not FALSE" filter still excludes NULL
+    // values.
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'status' => [
+        'id' => 'status',
+        'field' => 'status',
+        'table' => 'views_test_data',
+        'value' => 0,
+        'operator' => '!=',
+        'accept_null' => TRUE,
+      ],
+    ]);
+    $this->executeView($view);
+
+    $expected_result = [
+      ['id' => 1],
+      ['id' => 3],
+      ['id' => 5],
+    ];
+
+    $this->assertCount(3, $view->result);
+    $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
+
+    $view->destroy();
+    $view->setDisplay();
+
+    // Without accept_null, a FALSE filter excludes NULL values.
+    $view->displayHandlers->get('default')->overrideOption('filters', [
+      'status' => [
+        'id' => 'status',
+        'field' => 'status',
+        'table' => 'views_test_data',
+        'value' => 0,
+        'accept_null' => FALSE,
+      ],
+    ]);
+    $this->executeView($view);
+
+    $expected_result = [
+      ['id' => 2],
+      ['id' => 4],
+    ];
+
+    $this->assertCount(2, $view->result);
+    $this->assertIdenticalResultset($view, $expected_result, $this->columnMap);
+  }
+
+  /**
    * Tests the BooleanOperator empty/not empty filters.
    */
   public function testEmptyFilterBooleanOperator(): void {

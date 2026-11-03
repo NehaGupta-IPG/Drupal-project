@@ -134,7 +134,10 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       $this->value_value = $this->definition['title'];
     }
 
-    if (isset($this->definition['accept null'])) {
+    if (array_key_exists('accept_null', $options)) {
+      $this->accept_null = (bool) $options['accept_null'];
+    }
+    elseif (isset($this->definition['accept null'])) {
       $this->accept_null = (bool) $this->definition['accept null'];
     }
     elseif (isset($this->definition['accept_null'])) {
@@ -185,6 +188,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     $options = parent::defineOptions();
 
     $options['value']['default'] = FALSE;
+    $options['accept_null']['default'] = FALSE;
 
     return $options;
   }
@@ -246,6 +250,20 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
         }
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
+    parent::buildOptionsForm($form, $form_state);
+    $form['accept_null'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Treat a NULL value as %false-label', ['%false-label' => $this->getValueOptions()[0] ?? $this->t('false')]),
+      '#default_value' => $this->accept_null,
+      // Show and hide at the same time as the value form.
+      '#states' => $form['value']['#states'] ?? [],
+    ];
   }
 
   /**
