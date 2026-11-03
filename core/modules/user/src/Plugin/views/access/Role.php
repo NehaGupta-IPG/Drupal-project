@@ -145,10 +145,8 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
 
-    foreach (array_keys($this->options['role']) as $rid) {
-      if ($role = $this->roleStorage->load($rid)) {
-        $dependencies[$role->getConfigDependencyKey()][] = $role->getConfigDependencyName();
-      }
+    foreach ($this->roleStorage->loadMultiple(array_keys($this->options['role'])) as $role) {
+      $dependencies[$role->getConfigDependencyKey()][] = $role->getConfigDependencyName();
     }
 
     return $dependencies;

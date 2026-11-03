@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Views;
 
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -61,6 +62,23 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
     $this->assertSame($expected, $view->getDependencies());
     $this->executeView($view, [$this->term1->id(), $this->term2->id()]);
     $this->assertIdenticalResultset($view, $expected_result, $column_map);
+
+    // Missing vocabularies do not discard dependencies on existing vocabularies.
+    Vocabulary::create(['vid' => 'other', 'name' => 'Other'])->save();
+    $this->config('views.view.test_taxonomy_node_term_data')
+      ->set('display.default.display_options.relationships.term_node_tid.vids', [
+        'views_testing_tags',
+        'missing',
+        'other',
+      ])
+      ->save();
+    $expected['config'] = [
+      'core.entity_view_mode.node.teaser',
+      'taxonomy.vocabulary.other',
+      'taxonomy.vocabulary.views_testing_tags',
+    ];
+    $view = Views::getView('test_taxonomy_node_term_data');
+    $this->assertSame($expected, $view->getDependencies());
   }
 
   /**
