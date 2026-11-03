@@ -62,7 +62,7 @@ function locale_uninstall(): void {
 
   // Clear variables.
   \Drupal::state()->delete('system.javascript_parsed');
-  \Drupal::state()->delete('locale.translation.plurals');
+  \Drupal::state()->delete('locale.translation.formulae');
   \Drupal::state()->delete('locale.translation.javascript');
 }
 
