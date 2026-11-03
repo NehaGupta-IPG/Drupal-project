@@ -19,6 +19,7 @@ use Drupal\Core\Url;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Element\Table;
 use Drupal\dblog\DbLogFilters;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -109,23 +110,23 @@ class DbLogController extends ControllerBase {
       [
         'data' => $this->t('Type'),
         'field' => 'w.type',
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ],
       [
         'data' => $this->t('Date'),
         'field' => 'w.wid',
         'sort' => 'desc',
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       $this->t('Message'),
       [
         'data' => $this->t('User'),
         'field' => 'ufd.name',
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ],
       [
         'data' => $this->t('Operations'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
     ];
 

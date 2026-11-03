@@ -112,6 +112,23 @@ use Drupal\Component\Utility\Html as HtmlUtility;
 class Table extends FormElementBase {
 
   /**
+   * A responsive table class; hide table cell on narrow devices.
+   *
+   * Indicates that a column has medium priority and thus can be hidden on
+   * narrow width devices and shown on medium+ width devices (i.e. tablets and
+   * desktops).
+   */
+  public const string RESPONSIVE_PRIORITY_MEDIUM = 'priority-medium';
+
+  /**
+   * A responsive table class; only show table cell on wide devices.
+   *
+   * Indicates that a column has low priority and thus can be hidden on narrow
+   * and medium viewports and shown on wide devices (i.e. desktops).
+   */
+  public const string RESPONSIVE_PRIORITY_LOW = 'priority-low';
+
+  /**
    * The cache ID used for the tableDrag instance counter.
    */
   protected const string TABLE_DRAG_CACHE_ID = 'tabledrag:instance_counter';
@@ -439,8 +456,8 @@ class Table extends FormElementBase {
     }
     // If the table has headers and it should react responsively to columns
     // hidden with the classes represented by the constants
-    // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
-    // tableresponsive behaviors.
+    // static::RESPONSIVE_PRIORITY_MEDIUM and static::RESPONSIVE_PRIORITY_LOW,
+    // add the tableresponsive behaviors.
     if (count($element['#header']) && $element['#responsive']) {
       $element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.

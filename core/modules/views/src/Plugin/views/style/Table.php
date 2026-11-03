@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Table as ElementTable;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsStyle;
 use Drupal\views\Plugin\views\wizard\WizardInterface;
@@ -389,8 +390,8 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
         '#default_value' => $this->options['info'][$field]['responsive'] ?? '',
         '#options' => [
           '' => $this->t('High'),
-          RESPONSIVE_PRIORITY_MEDIUM => $this->t('Medium'),
-          RESPONSIVE_PRIORITY_LOW => $this->t('Low'),
+          ElementTable::RESPONSIVE_PRIORITY_MEDIUM => $this->t('Medium'),
+          ElementTable::RESPONSIVE_PRIORITY_LOW => $this->t('Low'),
         ],
         '#states' => [
           'visible' => [

@@ -134,7 +134,10 @@ class ThemeCommonElements {
       ],
       'mark' => [
         'variables' => [
+          // @phpstan-ignore constant.deprecated
           'status' => MARK_NEW,
+          // @todo when this is removed, remove all mark.html.twig templates.
+          'deprecated' => 'The "mark" template is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3632395',
         ],
       ],
       'item_list' => [

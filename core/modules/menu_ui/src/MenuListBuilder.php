@@ -5,6 +5,7 @@ namespace Drupal\menu_ui;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Url;
 
 /**
@@ -27,7 +28,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
     $header['title'] = $this->t('Title');
     $header['description'] = [
       'data' => $this->t('Description'),
-      'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
   }

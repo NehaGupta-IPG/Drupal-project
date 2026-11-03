@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Element\Table;
 
 /**
  * Defines a class to build a listing of fields.
@@ -98,7 +99,7 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
     $header['entity_type'] = $this->t('Entity type');
     $header['type'] = [
       'data' => $this->t('Field type'),
-      'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+      'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
     ];
     $header['usage'] = $this->t('Used in');
     $header['settings_summary'] = $this->t('Summary');

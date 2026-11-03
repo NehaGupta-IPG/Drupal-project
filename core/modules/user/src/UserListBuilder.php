@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\user\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -91,24 +92,24 @@ class UserListBuilder extends EntityListBuilder {
         'data' => $this->t('Status'),
         'field' => 'status',
         'specifier' => 'status',
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'roles' => [
         'data' => $this->t('Roles'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'created' => [
         'data' => $this->t('Member for'),
         'field' => 'created',
         'specifier' => 'created',
         'sort' => 'desc',
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'access' => [
         'data' => $this->t('Last access'),
         'field' => 'access',
         'specifier' => 'access',
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
     ];
     return $header + parent::buildHeader();

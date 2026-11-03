@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Render\Element\Table;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -64,22 +65,22 @@ class NodeListBuilder extends EntityListBuilder {
       'title' => $this->t('Title'),
       'type' => [
         'data' => $this->t('Content type'),
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+        'class' => [Table::RESPONSIVE_PRIORITY_MEDIUM],
       ],
       'author' => [
         'data' => $this->t('Author'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
       'status' => $this->t('Status'),
       'changed' => [
         'data' => $this->t('Updated'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ],
     ];
     if (\Drupal::languageManager()->isMultilingual()) {
       $header['language_name'] = [
         'data' => $this->t('Language'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
+        'class' => [Table::RESPONSIVE_PRIORITY_LOW],
       ];
     }
     return $header + parent::buildHeader();
