@@ -219,6 +219,14 @@ interface FieldableEntityInterface extends EntityInterface {
   public function validate();
 
   /**
+   * Checks whether entity validation is currently running.
+   *
+   * @return bool
+   *   TRUE if the validation is running, FALSE if not.
+   */
+  public function isValidationRunning(): bool;
+
+  /**
    * Checks whether entity validation is required before saving the entity.
    *
    * @return bool

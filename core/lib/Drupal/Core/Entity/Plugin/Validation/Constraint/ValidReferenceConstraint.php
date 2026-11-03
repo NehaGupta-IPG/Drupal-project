@@ -24,6 +24,7 @@ class ValidReferenceConstraint extends SymfonyConstraint {
     public $nullMessage = 'This value should not be null.',
     ?array $groups = NULL,
     mixed $payload = NULL,
+    public $invalidNewEntity = 'This entity (%type: %label) cannot be created. Reason(s): "%reason".',
   ) {
     parent::__construct(groups: $groups, payload: $payload);
   }

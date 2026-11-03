@@ -101,13 +101,31 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->term->save();
 
     NodeType::create([
-      'type' => $this->randomMachineName(),
+      'type' => 'node',
       'name' => $this->randomString(),
     ])->save();
     CommentType::create([
       'id' => $this->randomMachineName(),
       'label' => $this->randomString(),
       'target_entity_type_id' => 'node',
+    ])->save();
+    CommentType::create([
+      'id' => 'comment',
+      'label' => 'Comment',
+      'target_entity_type_id' => 'entity_test',
+    ])->save();
+
+    FieldStorageConfig::create([
+      'field_name' => 'field_comments',
+      'entity_type' => 'entity_test',
+      'type' => 'comment',
+      'settings' => ['comment_type' => 'comment'],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_comments',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Comments',
     ])->save();
 
     $this->entityStringId = EntityTestStringId::create([
@@ -541,6 +559,7 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
       'subject' => $title,
       'comment_type' => 'comment',
       'status' => 0,
+      'field_name' => 'field_comments',
     ]);
 
     $entity = EntityTest::create([
@@ -548,6 +567,10 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
         'entity' => $comment,
       ],
     ]);
+
+    // Supply the required back-reference before validating the new comment.
+    $comment->set('entity_id', ['entity' => $entity]);
+    $comment->set('entity_type', $entity->getEntityTypeId());
 
     $errors = $entity->validate();
     $this->assertCount(1, $errors);
@@ -560,10 +583,11 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $this->assertCount(0, $errors);
 
     // Test with an inactive and unsaved user.
-    $name = $this->randomString();
+    $name = 'test user';
     $user = User::create([
       'name' => $name,
       'status' => 0,
+      'mail' => 'user@example.com',
     ]);
 
     $entity = EntityTest::create([

@@ -310,6 +310,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
       'defaultLangcodeKey',
       'revisionTranslationAffectedKey',
       'validated',
+      'validationRunning',
       'validationRequired',
       'entityTypeId',
       'typedData',
