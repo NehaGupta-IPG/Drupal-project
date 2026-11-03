@@ -3,8 +3,8 @@
 namespace Drupal\filter\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Template\Attribute;
 use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
@@ -102,15 +102,15 @@ class FilterThemeHooks {
    *
    * @param array $variables
    *   An associative array containing:
-   *   - tips: An array containing descriptions and a CSS ID in the form of
-   *     'module-name/filter-id' for each filter in one or more text formats.
-   *     Example:
+   *   - tips: An array containing descriptions and the filter ID for each
+   *     filter in one or more text formats, keyed by format label and filter
+   *     ID. Example:
    *     @code
    *       [
    *         'Full HTML' => [
-   *           0 => [
-   *             'tip' => 'Web page addresses and email addresses turn into links automatically.',
-   *             'id' => 'filter/2',
+   *           'filter_url' => [
+   *             'tip' => ['#markup' => 'Web page addresses and email addresses turn into links automatically.'],
+   *             'id' => 'filter_url',
    *           ],
    *         ],
    *       ];
