@@ -1014,7 +1014,7 @@
           Drupal.elementIsHidden(row) &&
           Drupal.elementIsHidden($row.prev('tr')[0])
         ) {
-          $row = $row.prev('tr:first-of-type');
+          $row = $row.prev('tr');
           row = $row.get(0);
         }
         return row;
@@ -1061,9 +1061,9 @@
     }
     // Siblings are easy, check previous and next rows.
     else if (rowSettings.relationship === 'sibling') {
-      $previousRow = $changedRow.prev('tr:first-of-type');
+      $previousRow = $changedRow.prev('tr');
       previousRow = $previousRow.get(0);
-      const $nextRow = $changedRow.next('tr:first-of-type');
+      const $nextRow = $changedRow.next('tr');
       const nextRow = $nextRow.get(0);
       sourceRow = changedRow;
       if (
@@ -1118,7 +1118,7 @@
         // Use the first row in the table as source, because it's guaranteed to
         // be at the root level. Find the first item, then compare this row
         // against it as a sibling.
-        sourceRow = $(this.table).find('tr.draggable:first-of-type').get(0);
+        sourceRow = $(this.table).find('tr.draggable').get(0);
         if (sourceRow === this.rowObject.element) {
           sourceRow = $(this.rowObject.group[this.rowObject.group.length - 1])
             .next('tr.draggable')
