@@ -2,11 +2,11 @@
 
 namespace Drupal\help\Controller;
 
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\help\HelpTopicPluginManagerInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -69,7 +69,7 @@ class HelpTopicPluginController extends ControllerBase {
     }
 
     if (count($links)) {
-      uasort($links, [SortArray::class, 'sortByTitleElement']);
+      NaturalSort::sortByKeyString($links, 'title');
       $build['#related'] = [
         '#theme' => 'links__related',
         '#heading' => [

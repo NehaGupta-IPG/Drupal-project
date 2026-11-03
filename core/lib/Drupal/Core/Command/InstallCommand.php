@@ -12,6 +12,7 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParserDynamic;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -297,7 +298,7 @@ class InstallCommand extends Command {
     }
     // Display alphabetically by human-readable name, but always put the core
     // profiles first (if they are present in the filesystem).
-    natcasesort($profiles);
+    NaturalSort::natcasesort($profiles);
     if (isset($profiles['minimal'])) {
       // If the expert ("Minimal") core profile is present, put it in front of
       // any non-core profiles rather than including it with them

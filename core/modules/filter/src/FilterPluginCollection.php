@@ -4,6 +4,7 @@ namespace Drupal\filter;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * A collection of filters.
@@ -98,7 +99,7 @@ class FilterPluginCollection extends DefaultLazyPluginCollection {
       return $a->weight <=> $b->weight;
     }
     if ($a->provider != $b->provider) {
-      return strnatcasecmp($a->provider, $b->provider);
+      return NaturalSort::strnatcasecmp($a->provider, $b->provider);
     }
     return parent::sortHelper($aID, $bID);
   }

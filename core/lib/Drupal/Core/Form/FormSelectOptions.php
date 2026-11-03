@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Form;
 
+use Drupal\Core\Utility\NaturalSort;
+
 /**
  * Provides common functionality for form element options.
  *
@@ -98,9 +100,7 @@ final class FormSelectOptions {
     if ($sort_options) {
       $unsorted = array_slice($options, 0, $sort_start);
       $sorted = array_slice($options, $sort_start);
-      uasort($sorted, function ($a, $b) {
-        return strcmp((string) $a['label'], (string) $b['label']);
-      });
+      NaturalSort::sortByKeyString($sorted, 'label');
       $options = array_merge($unsorted, $sorted);
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Test;
 
 use Drupal\Core\Test\Exception\MissingGroupException;
+use Drupal\Core\Utility\NaturalSort;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Framework\DataProviderTestSuite;
@@ -140,9 +141,9 @@ class PhpUnitTestDiscovery {
       $this->getTestListLimitedToDirectory($phpUnitTestSuite, $extension, $testSuites, $testGroups);
 
     // Sort the groups and tests within the groups by name.
-    uksort($list, 'strnatcasecmp');
+    uksort($list, [NaturalSort::class, 'strnatcasecmp']);
     foreach ($list as &$tests) {
-      uksort($tests, 'strnatcasecmp');
+      uksort($tests, [NaturalSort::class, 'strnatcasecmp']);
     }
 
     return $list;

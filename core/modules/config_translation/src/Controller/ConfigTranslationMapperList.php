@@ -4,6 +4,7 @@ namespace Drupal\config_translation\Controller;
 
 use Drupal\config_translation\ConfigMapperInterface;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Utility\NaturalSort;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -63,11 +64,7 @@ class ConfigTranslationMapperList extends ControllerBase {
     // Group by mapper weight and sort by label.
     ksort($mappers);
     foreach ($mappers as $weight => $mapper) {
-      usort($mapper, function ($a, $b) {
-        $a_title = (isset($a['label'])) ? $a['label'] : '';
-        $b_title = (isset($b['label'])) ? $b['label'] : '';
-        return strnatcasecmp($a_title, $b_title);
-      });
+      NaturalSort::sortByKeyString($mapper, 'label');
       $mappers[$weight] = $mapper;
     }
 

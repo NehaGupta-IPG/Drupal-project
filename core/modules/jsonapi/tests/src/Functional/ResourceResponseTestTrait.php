@@ -13,6 +13,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\jsonapi\CacheableResourceResponse;
 use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
@@ -641,9 +642,7 @@ trait ResourceResponseTestTrait {
   protected static function sortOmittedLinks(array &$omitted) {
     $help = $omitted['links']['help'];
     $links = array_diff_key($omitted['links'], array_flip(['help']));
-    uasort($links, function (array $a, array $b): int {
-      return strcmp($a['href'], $b['href']);
-    });
+    NaturalSort::sortByKeyString($links, 'href');
     $omitted['links'] = ['help' => $help] + $links;
   }
 

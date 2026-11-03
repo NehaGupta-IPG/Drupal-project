@@ -8,6 +8,7 @@ use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\user\ModulePermissionsLinkHelper;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Controller for admin section.
@@ -50,7 +51,7 @@ class AdminController extends ControllerBase {
       }
       if (!empty($admin_tasks)) {
         // Sort links by title.
-        uasort($admin_tasks, ['\Drupal\Component\Utility\SortArray', 'sortByTitleElement']);
+        NaturalSort::sortByKeyString($admin_tasks, 'title');
         // Move 'Configure permissions' links to the bottom of each section.
         $permission_key = "user.admin_permissions.$module";
         if (isset($admin_tasks[$permission_key])) {

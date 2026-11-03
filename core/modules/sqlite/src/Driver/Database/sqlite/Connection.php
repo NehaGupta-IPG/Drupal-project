@@ -3,7 +3,6 @@
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
 use Drupal\Component\Utility\FilterArray;
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
@@ -11,6 +10,7 @@ use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
@@ -136,7 +136,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $sqlite->createFunction('glob', self::sqlFunctionLikeBinary(...));
 
     // Create a user-space case-insensitive collation with UTF-8 support.
-    $sqlite->createCollation('NOCASE_UTF8', Unicode::strcasecmp(...));
+    $sqlite->createCollation('NOCASE_UTF8', NaturalSort::strnatcasecmp(...));
 
     // Set SQLite init_commands if not already defined. Enable the Write-Ahead
     // Logging (WAL) for SQLite. See https://www.drupal.org/node/2348137 and

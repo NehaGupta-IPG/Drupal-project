@@ -7,6 +7,7 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Utility\NaturalSort;
 
 /**
  * Provides the default workspace tree lookup operations.
@@ -64,7 +65,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       // First, sort everything alphabetically.
       uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
         assert(Inspector::assertStringable($a->label()) && Inspector::assertStringable($b->label()), 'Workspace labels are expected to be a string.');
-        return strnatcasecmp($a->label(), $b->label());
+        return NaturalSort::strnatcasecmp($a->label(), $b->label());
       });
 
       $tree_children = [];

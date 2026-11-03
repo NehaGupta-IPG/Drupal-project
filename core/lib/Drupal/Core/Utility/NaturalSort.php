@@ -64,4 +64,47 @@ final class NaturalSort {
     return self::$collators[$langcode]->compare($string1, $string2);
   }
 
+  /**
+   * Sorts array using a language-aware "natural order" algorithm.
+   *
+   * This method is a drop-in replacement for natcasesort() using
+   * NaturalSort::strnatcasecmp().
+   *
+   * @param string[]|Drupal\Core\StringTranslation\TranslatableMarkup[] $array
+   *   The input array.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
+   *
+   * @return true
+   *   Always returns true.
+   */
+  public static function natcasesort(array &$array, ?string $langcode = NULL): true {
+    return uasort($array, function ($a, $b) use ($langcode) {
+      return self::strnatcasecmp((string) $a, (string) $b, $langcode);
+    });
+  }
+
+  /**
+   * Sorts a string array item by an arbitrary key.
+   *
+   * @param array $array
+   *   The input array.
+   * @param string $key
+   *   The key to use in the comparison.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
+   *
+   * @return true
+   *   Always returns true.
+   */
+  public static function sortByKeyString(array &$array, string $key, ?string $langcode = NULL): true {
+    return uasort($array, function ($a, $b) use ($langcode, $key) {
+      $a_title = (is_array($a) && isset($a[$key])) ? $a[$key] : '';
+      $b_title = (is_array($b) && isset($b[$key])) ? $b[$key] : '';
+      return self::strnatcasecmp((string) $a_title, (string) $b_title, $langcode);
+    });
+  }
+
 }

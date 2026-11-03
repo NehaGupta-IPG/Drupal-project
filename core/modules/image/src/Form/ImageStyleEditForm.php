@@ -2,10 +2,10 @@
 
 namespace Drupal\image\Form;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\image\ConfigurableImageEffectInterface;
 use Drupal\image\ImageEffectManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -145,9 +145,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     // Build the new image effect addition form and add it to the effect list.
     $new_effect_options = [];
     $effects = $this->imageEffectManager->getDefinitions();
-    uasort($effects, function ($a, $b) {
-      return Unicode::strcasecmp($a['label'], $b['label']);
-    });
+    NaturalSort::sortByKeyString($effects, 'label');
     foreach ($effects as $effect => $definition) {
       $new_effect_options[$effect] = $definition['label'];
     }

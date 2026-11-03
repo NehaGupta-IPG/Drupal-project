@@ -217,7 +217,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
       return $element->getText();
     }, $sort_by->findAll('xpath', 'option'));
     for ($i = count($labels) - 1, $sorted = TRUE; $i > 0; --$i) {
-      if ($labels[$i - 1] > $labels[$i]) {
+      if (strnatcasecmp($labels[$i - 1], $labels[$i]) >= 1) {
         $sorted = FALSE;
         break;
       }

@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\NaturalSort;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
@@ -88,7 +89,7 @@ class TranslationStatusForm extends FormBase {
       }
       // Sort the table data on language name.
       uasort($options, function ($a, $b) {
-        return strcasecmp($a['title']['data']['#title'], $b['title']['data']['#title']);
+        return NaturalSort::strnatcasecmp($a['title']['data']['#title'], $b['title']['data']['#title']);
       });
       $languages_not_found = array_diff($languages_not_found, $languages_update);
     }
