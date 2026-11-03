@@ -4,17 +4,17 @@ CacheGetCountByBin:
   page: 1
   config: 34
   bootstrap: 12
-  discovery: 67
+  discovery: 65
   data: 6
-  entity: 21
+  entity: 20
   dynamic_page_cache: 1
   routes: 5
-  render: 17
+  render: 20
   default: 3
-CacheSetCount: 41
+CacheSetCount: 43
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 19
+CacheTagLookupQueryCount: 20
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -60,9 +60,9 @@ CacheTagGroupedLookups:
   -
     - 'media:3'
   -
-    - 'config:core.entity_view_display.node.recipe.full'
-    - 'config:filter.format.basic_html'
     - 'node:1'
+  -
+    - 'config:filter.format.basic_html'
     - 'taxonomy_term:13'
     - 'taxonomy_term:22'
     - 'taxonomy_term:31'
