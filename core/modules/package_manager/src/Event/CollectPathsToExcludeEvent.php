@@ -106,6 +106,26 @@ final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListI
   }
 
   /**
+   * Finds all paths in the project root matching the given name.
+   *
+   * @param string $name
+   *   A name to match.
+   *
+   * @return string[]
+   *   All discovered absolute paths matching the given name.
+   */
+  public function scanForPathsByName(string $name): array {
+    $flags = \FilesystemIterator::UNIX_PATHS;
+    $flags |= \FilesystemIterator::CURRENT_AS_SELF;
+    $paths_tree = new \RecursiveDirectoryIterator($this->pathLocator->getProjectRoot(), $flags);
+    $filtered_paths = new \RecursiveIteratorIterator($paths_tree, \RecursiveIteratorIterator::SELF_FIRST);
+    $matched_paths = new \CallbackFilterIterator($filtered_paths,
+      fn (\RecursiveDirectoryIterator $current) => $current->getFilename() === $name
+    );
+    return array_keys(iterator_to_array($matched_paths));
+  }
+
+  /**
    * Finds all directories in the project root matching the given name.
    *
    * @param string $directory_name

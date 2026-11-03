@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager\PathExcluder;
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
 use Drupal\package_manager\PathLocator;
@@ -22,6 +23,7 @@ final class GitExcluder implements EventSubscriberInterface {
   public function __construct(
     private readonly PathLocator $pathLocator,
     private readonly ComposerInspector $composerInspector,
+    protected FileSystemInterface $fileSystem,
   ) {}
 
   /**
@@ -57,17 +59,17 @@ final class GitExcluder implements EventSubscriberInterface {
     // @see \Drupal\package_manager\StatusCheckTrait::runStatusCheck()
     $this->composerInspector->validate($project_root);
 
-    $paths_to_exclude = [];
+    $paths_to_exclude = $gitmodules = [];
 
     $installed_paths = [];
     // Collect the paths of every installed package.
     $installed_packages = $this->composerInspector->getInstalledPackagesList($project_root);
     foreach ($installed_packages as $package) {
       if (!empty($package->path)) {
-        $installed_paths[] = $package->path;
+        $installed_paths[] = $this->fileSystem->realpath($package->path);
       }
     }
-    $paths = $event->scanForDirectoriesByName('.git');
+    $paths = $event->scanForPathsByName('.git');
     foreach ($paths as $git_directory) {
       // Don't exclude any `.git` directory that is directly under an installed
       // package's path, since it means Composer probably installed that package
@@ -76,6 +78,12 @@ final class GitExcluder implements EventSubscriberInterface {
       if (!in_array(dirname($git_directory), $installed_paths, TRUE)) {
         $paths_to_exclude[] = $git_directory;
       }
+      elseif (is_file($git_directory)) {
+        $gitmodules[] = $git_directory;
+      }
+    }
+    if (!empty($gitmodules)) {
+      $paths_to_exclude = array_diff($paths_to_exclude, ["$project_root/.git"]);
     }
     $event->addPathsRelativeToProjectRoot($paths_to_exclude);
   }
