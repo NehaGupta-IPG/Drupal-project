@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Hook\ViewsThemeHooks;
 use Drupal\views\Plugin\views\row\Fields;
 use Drupal\views\ResultRow;
 use Drupal\views\Views;
@@ -278,6 +279,225 @@ class StyleTest extends ViewsKernelTestBase {
       $no_colon_expected[$job] = $data;
     }
     $this->assertEquals($no_colon_expected, $sets_new_rendered);
+  }
+
+  /**
+   * Tests that views_view_grouping is used for all grouping levels.
+   */
+  public function testGroupingPreprocessInvoked(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $view->initStyle();
+
+    // Configure a single grouping level.
+    $view->style_plugin->options['grouping'] = [
+      ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => FALSE],
+    ];
+
+    $fields = [
+      'name' => [
+        'id' => 'name',
+        'table' => 'views_test_data',
+        'field' => 'name',
+        'relationship' => 'none',
+      ],
+      'job' => [
+        'id' => 'job',
+        'table' => 'views_test_data',
+        'field' => 'job',
+        'relationship' => 'none',
+        'label' => 'Job',
+        'element_label_colon' => TRUE,
+      ],
+    ];
+    $view->displayHandlers->get('default')->overrideOption('fields', $fields);
+    $view->displayHandlers->get('default')->overrideOption('pager', [
+      'type' => 'some',
+      'options' => ['items_per_page' => 3],
+    ]);
+
+    $this->executeView($view);
+
+    $sets = $view->style_plugin->renderGrouping(
+      $view->result,
+      $view->style_plugin->options['grouping'],
+      TRUE,
+    );
+    $output = $view->style_plugin->renderGroupingSets($sets);
+
+    // With a single grouping level, every set must use the views_view_grouping
+    // theme so that hook_preprocess_views_view_grouping() is invoked.
+    // @see \Drupal\views\Plugin\views\style\StylePluginBase::renderGroupingSets()
+    foreach ($output as $set) {
+      $this->assertNotEmpty($set['#theme'], 'Grouping set has a #theme key.');
+      $themes = (array) $set['#theme'];
+      $this->assertStringStartsWith(
+        'views_view_grouping',
+        reset($themes),
+        'Single-level grouping set uses views_view_grouping theme.',
+      );
+    }
+
+    // Verify that preprocessViewsViewGrouping produces an indexed array for
+    // $variables['content'] at the leaf level, consistent with the nested-sets
+    // case, so that {% for item in content %} works in templates.
+    $first_set = reset($sets);
+    $variables = [
+      'view' => $view,
+      'grouping' => $view->style_plugin->options['grouping'][0],
+      'grouping_level' => 0,
+      'rows' => $first_set['rows'],
+      'title' => $first_set['group'],
+    ];
+    // Manually trigger the initial preprocess.
+    (new ViewsThemeHooks(
+      $this->container->get('module_handler'),
+      $this->container->get('extension.list.module'),
+      $this->container->get('path.current'),
+      $this->container->get('router.route_provider'),
+      $this->container->get('request_stack'),
+      $this->container->get('config.factory'),
+      $this->container->get('renderer'),
+      $this->container->get('pager.manager'),
+      $this->container->get('language_manager'),
+      $this->container->get('datetime.time'),
+    ))->preprocessViewsViewGrouping($variables);
+
+    // Content must be an indexed array (not a bare render array) so that
+    // templates can iterate over it with {% for item in content %}.
+    $this->assertIsArray($variables['content']);
+    $this->assertArrayHasKey(0, $variables['content'],
+      'Content is an indexed array with at least one element.',
+    );
+    $this->assertArrayHasKey('#theme', $variables['content'][0],
+      'First content element is a render array.',
+    );
+
+    // Now verify with 2 grouping levels: the hook must fire for both levels.
+    $view->destroy();
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $view->initStyle();
+    $view->style_plugin->options['grouping'] = [
+      ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => FALSE],
+      ['field' => 'age', 'rendered' => TRUE, 'rendered_strip' => FALSE],
+    ];
+    $fields['age'] = [
+      'id' => 'age',
+      'table' => 'views_test_data',
+      'field' => 'age',
+      'relationship' => 'none',
+      'label' => 'Age',
+      'element_label_colon' => TRUE,
+    ];
+    $view->displayHandlers->get('default')->overrideOption('fields', $fields);
+    $view->displayHandlers->get('default')->overrideOption('pager', [
+      'type' => 'some',
+      'options' => ['items_per_page' => 3],
+    ]);
+    $this->executeView($view);
+
+    $sets = $view->style_plugin->renderGrouping(
+      $view->result,
+      $view->style_plugin->options['grouping'],
+      TRUE,
+    );
+    $output = $view->style_plugin->renderGroupingSets($sets);
+
+    // Level 0 (outer): rows are nested grouping sets, so views_view_grouping
+    // is used.
+    foreach ($output as $outer_set) {
+      $themes = (array) $outer_set['#theme'];
+      $this->assertStringStartsWith(
+        'views_view_grouping',
+        reset($themes),
+        'Outer level of 2-level grouping uses views_view_grouping theme.',
+      );
+    }
+  }
+
+  /**
+   * Tests that renderGroupingSets uses renderRowGroup when no grouping is set.
+   *
+   * When $this->options['grouping'] is empty, the else branch must still fall
+   * back to renderRowGroup() (no regression).
+   */
+  public function testNoGroupingUsesRenderRowGroup(): void {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $view->initStyle();
+
+    // No grouping configured.
+    $view->style_plugin->options['grouping'] = [];
+    $this->executeView($view);
+
+    // renderGrouping() with no grouping returns a single set with all rows.
+    $sets = $view->style_plugin->renderGrouping($view->result, [], TRUE);
+    $output = $view->style_plugin->renderGroupingSets($sets);
+
+    // Without grouping, the style's own theme must be used, not
+    // views_view_grouping.
+    foreach ($output as $set) {
+      $themes = (array) $set['#theme'];
+      $this->assertStringNotContainsString(
+        'views_view_grouping',
+        reset($themes),
+        'Without grouping, the style theme is used (not views_view_grouping).',
+      );
+    }
+  }
+
+  /**
+   * Tests that preprocessViewsViewGrouping sets content correctly.
+   *
+   * Verifies both the nested-sets path (recursive renderGroupingSets call) and
+   * the leaf-rows path (rows already rendered by the row plugin).
+   */
+  public function testGroupingPreprocessContentPopulated(): void {
+    $renderer = $this->container->get('renderer');
+
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $view->initStyle();
+    $view->style_plugin->options['grouping'] = [
+      ['field' => 'job', 'rendered' => TRUE, 'rendered_strip' => FALSE],
+    ];
+    $fields = [
+      'name' => [
+        'id' => 'name',
+        'table' => 'views_test_data',
+        'field' => 'name',
+        'relationship' => 'none',
+      ],
+      'job' => [
+        'id' => 'job',
+        'table' => 'views_test_data',
+        'field' => 'job',
+        'relationship' => 'none',
+        'label' => 'Job',
+        'element_label_colon' => TRUE,
+      ],
+    ];
+    $view->displayHandlers->get('default')->overrideOption('fields', $fields);
+    $view->displayHandlers->get('default')->overrideOption('pager', [
+      'type' => 'some',
+      'options' => ['items_per_page' => 3],
+    ]);
+    $this->executeView($view);
+
+    $output = $view->preview();
+    $html = (string) $renderer->renderRoot($output);
+
+    // The rendered output must contain data from the view result, confirming
+    // that preprocessViewsViewGrouping correctly populated $variables['content']
+    // for the leaf level and the content was rendered.
+    $this->assertStringContainsString('John', $html);
+    $this->assertStringContainsString('George', $html);
+    $this->assertStringContainsString('Ringo', $html);
+
+    // Group titles must also appear in the output.
+    $this->assertStringContainsString('Singer', $html);
+    $this->assertStringContainsString('Drummer', $html);
   }
 
   /**

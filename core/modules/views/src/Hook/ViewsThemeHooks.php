@@ -12,6 +12,7 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -383,17 +384,53 @@ class ViewsThemeHooks {
    *
    * Default template: views-view-grouping.html.twig.
    *
+   * Sets $variables['content'] from $variables['rows']:
+   * - If rows are nested grouping sets (multi-level grouping, non-leaf level),
+   *   renderGroupingSets() is called recursively to produce the content.
+   * - If rows are already rendered by the row plugin (leaf level, including
+   *   single-level grouping), they are wrapped with the style's own theme
+   *   function.
+   *
    * @param array $variables
    *   An associative array containing:
    *   - view: The view object.
-   *   - rows: The rows returned from the view.
+   *   - rows: Either nested grouping sets (arrays with a 'group' key) or
+   *     row render arrays already rendered by the row plugin.
    *   - grouping_level: Integer indicating the hierarchical level of the
    *     grouping.
-   *   - content: The content to be grouped.
-   *   - title: The group heading.
+   *   - content: An indexed array of render arrays representing the grouped
+   *     content. Set by this function. Each element is either a
+   *     views_view_grouping render array (for non-leaf levels) or the style's
+   *     own render array (for the leaf level). Always an indexed array so that
+   *     templates can iterate over it consistently.
+   *   - title: The group heading. Converted to a Markup object by this
+   *     function so that Twig does not double-escape the already-HTML-escaped
+   *     rendered field value.
    */
   public function preprocessViewsViewGrouping(array &$variables): void {
-    $variables['content'] = $variables['view']->style_plugin->renderGroupingSets($variables['rows'], $variables['grouping_level']);
+    // The group title is built by concatenating a plain-text label with an
+    // already-HTML-escaped rendered field value, so the result is a plain PHP
+    // string that contains HTML entities. Mark it as safe to prevent Twig from
+    // double-escaping it.
+    $variables['title'] = Markup::create((string) $variables['title']);
+
+    $rows = $variables['rows'];
+    $first = reset($rows);
+    if (!empty($rows) && is_array($first) && isset($first['group'])) {
+      // Nested grouping sets: recurse to render each inner group.
+      $variables['content'] = $variables['view']->style_plugin->renderGroupingSets($rows);
+    }
+    else {
+      // Leaf level: rows already rendered by the row plugin. Wrap in an
+      // indexed array to keep the same structure as the nested case.
+      $variables['content'] = [
+        [
+          '#theme' => $variables['view']->style_plugin->themeFunctions(),
+          '#view' => $variables['view'],
+          '#rows' => $rows,
+        ],
+      ];
+    }
   }
 
   /**

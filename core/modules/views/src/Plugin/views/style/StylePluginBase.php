@@ -501,7 +501,7 @@ abstract class StylePluginBase extends PluginBase {
         $single_output = [
           '#theme' => $theme_functions,
           '#view' => $this->view,
-          '#grouping' => $this->options['grouping'][$level],
+          '#grouping' => $this->options['grouping'][$level] ?? [],
           '#rows' => $set['rows'],
         ];
       }
@@ -514,7 +514,19 @@ abstract class StylePluginBase extends PluginBase {
           }
         }
 
-        $single_output = $this->renderRowGroup($set['rows']);
+        // When grouping is configured, use views_view_grouping so that
+        // hook_preprocess_views_view_grouping() is invoked at every level.
+        if (!empty($this->options['grouping'])) {
+          $single_output = [
+            '#theme' => $theme_functions,
+            '#view' => $this->view,
+            '#grouping' => $this->options['grouping'][$level] ?? [],
+            '#rows' => $set['rows'],
+          ];
+        }
+        else {
+          $single_output = $this->renderRowGroup($set['rows']);
+        }
       }
 
       $single_output['#grouping_level'] = $level;
