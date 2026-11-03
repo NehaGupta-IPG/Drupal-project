@@ -1,0 +1,6 @@
+services:
+  logger.layout_builder_logger_test:
+    class: Drupal\layout_builder_logger_test\Logger\TestLogger
+    arguments: ['@cache_tags.invalidator']
+    tags:
+      - { name: logger }
