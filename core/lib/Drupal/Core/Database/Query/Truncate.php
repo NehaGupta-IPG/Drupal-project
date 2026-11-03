@@ -40,6 +40,17 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
    * PostgreSQL also locks the entire table for a TRUNCATE strongly reducing
    * the concurrency with other transactions.
    *
+   * Emptying a table resets its serial ID, which only TRUNCATE does here. The
+   * reset_serial_id option states what is to happen to the serial ID, and
+   * decides the statement on its own:
+   * - TRUE resets the serial ID, so TRUNCATE runs inside a transaction too,
+   *   and the implicit COMMIT comes with it.
+   * - FALSE leaves the serial ID alone, so DELETE runs outside a transaction
+   *   too.
+   * - Leaving the option out states nothing, so the statement stays the one
+   *   the transaction calls for. A table emptied inside a transaction then
+   *   keeps its serial ID, as it did before the option existed.
+   *
    * @see https://learnsql.com/blog/difference-between-truncate-delete-and-drop-table-in-sql
    */
   public function execute(): void {
@@ -62,9 +73,18 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    // The statement actually built depends on whether a transaction is active.
+    // If no explicit directive was provided about the serial ID, we need to
+    // check whether a transaction is active, in which case we cannot rely on
+    // TRUNCATE, as that would automatically commit the transaction.
     // @see ::execute()
-    if ($this->connection->inTransaction()) {
+    $resetSerialId = $this->queryOptions['reset_serial_id'] ?? NULL;
+    if (isset($resetSerialId)) {
+      $truncate = $resetSerialId;
+    }
+    else {
+      $truncate = !$this->connection->inTransaction();
+    }
+    if (!$truncate) {
       return $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '}';
     }
     else {
