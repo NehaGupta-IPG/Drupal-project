@@ -162,6 +162,20 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
+    $form['radios_required_when_checkbox_trigger_checked'] = [
+      '#type' => 'radios',
+      '#title' => 'Radios required when checkbox trigger checked',
+      '#options' => [
+        '_none' => '- None -',
+        'value1' => 'Value 1',
+        'value2' => 'Value 2',
+      ],
+      '#states' => [
+        'required' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     $form['textfield_readonly_when_checkbox_trigger_checked'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield readonly when checkbox trigger checked',

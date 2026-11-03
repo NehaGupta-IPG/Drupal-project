@@ -106,6 +106,7 @@ class FormTest extends BrowserTestBase {
         $this->randomMachineName(),
         $this->randomMachineName(),
       ],
+      '#required' => TRUE,
     ];
     $elements['radios']['empty_values'] = $empty_arrays;
 

@@ -716,6 +716,58 @@
 
   $document.on('state:required', (e) => {
     if (e.trigger) {
+      const $radios = $(e.target).find('input[type="radio"]');
+
+      if ($radios.length) {
+        const $wrapper = $(e.target).closest('.js-form-item, .js-form-wrapper');
+        const $legendLabel = $wrapper
+          .find('legend .fieldset__label, legend span')
+          .first();
+        // @todo Find empty _none options by data attribute instead.
+        const $emptyRadio = $radios.filter('[value="_none"]');
+        const $emptyItem = $emptyRadio.closest('.js-form-item, .form-item');
+        const $firstOption = $radios.not($emptyRadio).first();
+
+        if (e.value) {
+          $radios.attr({ required: 'required' });
+          if (!$legendLabel.hasClass('js-form-required')) {
+            $legendLabel.addClass('js-form-required form-required');
+          }
+
+          if ($emptyRadio.length) {
+            // Changing required state must not change the selected value.
+            $emptyItem.hide();
+          }
+        } else {
+          $radios.removeAttr('required');
+          $legendLabel.removeClass('js-form-required form-required');
+
+          if ($emptyRadio.length) {
+            $emptyItem.show();
+          }
+        }
+
+        if ($emptyRadio.length && $firstOption.length) {
+          const message = Drupal.t('Select an option.');
+          const updateValidity = () => {
+            const option = $firstOption[0];
+            // A hidden, checked _none still satisfies native radio validation.
+            // Make a visible option invalid without changing the selection.
+            if (option.required && $emptyRadio[0].checked) {
+              option.setCustomValidity(message);
+            } else if (option.validationMessage === message) {
+              option.setCustomValidity('');
+            }
+          };
+          $(once('states-required-radios-validity', $radios)).on(
+            'change',
+            updateValidity,
+          );
+          updateValidity();
+        }
+        return;
+      }
+
       if (e.value) {
         const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
         const $label = $(e.target)
@@ -723,14 +775,14 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find(label);
         // Avoids duplicate required markers on initialization.
-        if (!$label.hasClass('js-form-required').length) {
+        if (!$label.hasClass('js-form-required')) {
           $label.addClass('js-form-required form-required');
         }
       } else {
         $(e.target)
           .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
-          .find('label.js-form-required')
+          .find('label.js-form-required, legend .js-form-required')
           .removeClass('js-form-required form-required');
       }
     }
