@@ -193,7 +193,7 @@ class SiteConfigureForm extends ConfigFormBase {
       '#type' => 'fieldset',
       '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Update notifications'),
-      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
+      '#description' => $this->t('When checking for updates, your site sends a hashed site key and the list of installed modules and themes to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
       '#access' => empty($install_state['config_install_path']),
     ];
     $form['update_notifications']['enable_update_status_module'] = [
@@ -206,6 +206,32 @@ class SiteConfigureForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Receive email notifications'),
       '#default_value' => 1,
+      '#states' => [
+        'visible' => [
+          'input[name="enable_update_status_module"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#access' => empty($install_state['config_install_path']),
+    ];
+    // Mirrors \Drupal\update\DataSharing::DEFAULT_DOMAIN and
+    // ::DEFAULT_SITE_MAIL; the module is not installed yet, so its constants
+    // are not loadable here. InstallerSiteConfigProfileTest asserts the two
+    // stay equal.
+    $form['update_notifications']['share_domain'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site domain name with Drupal.org'),
+      '#default_value' => TRUE,
+      '#states' => [
+        'visible' => [
+          'input[name="enable_update_status_module"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#access' => empty($install_state['config_install_path']),
+    ];
+    $form['update_notifications']['share_site_mail'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site email address with the Drupal Association'),
+      '#default_value' => FALSE,
       '#states' => [
         'visible' => [
           'input[name="enable_update_status_module"]' => ['checked' => TRUE],
@@ -262,13 +288,24 @@ class SiteConfigureForm extends ConfigFormBase {
       // properties dependent on the container need to be reset.
       $this->resetPropertiesFromContainer();
 
+      $update_settings = $this->config('update.settings');
       // Add the site maintenance account's email address to the list of
       // addresses to be notified when updates are available, if selected.
-      $email_update_status_emails = $form_state->getValue('enable_update_status_emails');
-      if ($email_update_status_emails) {
-        // Reset the configuration so it is updated with the new module.
-        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
+      if ($form_state->getValue('enable_update_status_emails')) {
+        $update_settings->set('notification.emails', [$account_values['mail']]);
       }
+      $supplied = $install_state['forms']['install_configure_form'] ?? [];
+      foreach (['share_domain' => 'data_sharing.domain', 'share_site_mail' => 'data_sharing.site_mail'] as $element => $key) {
+        // An interactive install records the choice the person saw. An
+        // automated install submits this form with the checkbox defaults,
+        // which nobody saw, so it records a value only when the caller
+        // supplied one; otherwise the site starts undecided and Update Status
+        // prompts for the choice.
+        if ($install_state['interactive'] || array_key_exists($element, $supplied)) {
+          $update_settings->set($key, (bool) $form_state->getValue($element));
+        }
+      }
+      $update_settings->save();
     }
 
     // We created user 1 with placeholder values. Let's save the real values.

@@ -24,6 +24,13 @@ class UpdateProcessor implements UpdateProcessorInterface {
   protected $updateSettings;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The UpdateFetcher service.
    *
    * @var \Drupal\update\UpdateFetcherInterface
@@ -116,6 +123,7 @@ class UpdateProcessor implements UpdateProcessorInterface {
   ) {
     $this->updateFetcher = $update_fetcher;
     $this->updateSettings = $config_factory->get('update.settings');
+    $this->configFactory = $config_factory;
     $this->fetchQueue = $queue_factory->get('update_fetch_tasks');
     $this->tempStore = $key_value_expirable_factory->get('update');
     $this->fetchTaskStore = $key_value_factory->get('update_fetch_task');
@@ -181,6 +189,16 @@ class UpdateProcessor implements UpdateProcessorInterface {
 
     if (empty($this->failed[$fetch_url_base]) || $this->failed[$fetch_url_base] < $max_fetch_attempts) {
       $data = $this->updateFetcher->fetchProjectData($project, $site_key);
+      if ($project_name === 'drupal') {
+        $share_domain = DataSharing::effectiveValue('domain', $this->updateSettings, $this->stateStore, $this->time);
+        $share_mail = DataSharing::effectiveValue('site_mail', $this->updateSettings, $this->stateStore, $this->time);
+        $this->updateFetcher->sendSiteData(
+          $project,
+          $site_key,
+          $share_domain === TRUE ? DataSharing::hostname($base_url) : NULL,
+          $share_mail === TRUE ? $this->configFactory->get('system.site')->get('mail') : NULL,
+        );
+      }
     }
     if (!empty($data)) {
       $available = $this->parseXml($data);

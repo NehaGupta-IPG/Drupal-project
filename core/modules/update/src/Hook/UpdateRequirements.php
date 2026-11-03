@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\update\Hook;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\update\DataSharing;
 use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
 use Drupal\update\UpdateFetcherInterface;
@@ -27,6 +32,10 @@ class UpdateRequirements {
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
     protected readonly UpdateManagerInterface $updateManager,
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly StateInterface $state,
+    protected readonly TimeInterface $time,
+    protected readonly DateFormatterInterface $dateFormatter,
   ) {}
 
   /**
@@ -90,6 +99,26 @@ class UpdateRequirements {
       $requirements['update_core']['severity'] = RequirementSeverity::Warning;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
       $requirements['update_core']['description'] = $this->noData();
+    }
+    if (DataSharing::isUndecided($this->configFactory->get('update.settings'))) {
+      $ends = DataSharing::noticeEndsAt($this->state);
+      $arguments = [
+        ':url' => Url::fromRoute('update.settings')->toString(),
+        '@date' => $ends ? $this->dateFormatter->format($ends, 'custom', 'Y-M-d') : '',
+      ];
+      $requirements['update_data_sharing']['title'] = $this->t('Data sharing with Drupal.org');
+      if (DataSharing::noticeEnded($this->state, $this->time)) {
+        $requirements['update_data_sharing']['value'] = $this->t('Recommended settings in effect since @date', $arguments);
+        $requirements['update_data_sharing']['severity'] = RequirementSeverity::Info;
+        $requirements['update_data_sharing']['description'] = $this->t('No choice has been saved. Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', $arguments);
+      }
+      else {
+        $requirements['update_data_sharing']['value'] = $this->t('Not yet reviewed');
+        $requirements['update_data_sharing']['severity'] = RequirementSeverity::Warning;
+        $requirements['update_data_sharing']['description'] = $ends
+          ? $this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page before @date, when the recommended settings apply.', $arguments)
+          : $this->t('Choose what this site shares with Drupal.org on the <a href=":url">Update Status settings</a> page.', $arguments);
+      }
     }
     return $requirements;
   }

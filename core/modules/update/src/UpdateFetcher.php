@@ -23,6 +23,11 @@ class UpdateFetcher implements UpdateFetcherInterface {
   const UPDATE_DEFAULT_URL = 'https://updates.drupal.org/release-history';
 
   /**
+   * URL to send the site data the site owner chose to share.
+   */
+  const SITE_DATA_URL = 'https://updates.drupal.org/site-data';
+
+  /**
    * The fetch URL configured in the update settings.
    *
    * @var string
@@ -37,13 +42,13 @@ class UpdateFetcher implements UpdateFetcherInterface {
   protected $updateSettings;
 
   public function __construct(
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     protected ClientInterface $httpClient,
     #[Autowire(service: 'logger.channel.update')]
     protected LoggerInterface $logger,
   ) {
-    $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
-    $this->updateSettings = $config_factory->get('update.settings');
+    $this->fetchUrl = $this->configFactory->get('update.settings')->get('fetch.url');
+    $this->updateSettings = $this->configFactory->get('update.settings');
   }
 
   /**
@@ -52,6 +57,30 @@ class UpdateFetcher implements UpdateFetcherInterface {
   public function fetchProjectData(array $project, $site_key = '') {
     $url = $this->buildFetchUrl($project, $site_key);
     return $this->doRequest($url, ['headers' => ['Accept' => 'text/xml']]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sendSiteData(array $project, string $site_key, ?string $domain, ?string $site_mail): void {
+    if ($this->getFetchBaseUrl($project) !== static::UPDATE_DEFAULT_URL) {
+      return;
+    }
+    $query = array_filter(['domain' => $domain, 'site_mail' => $site_mail]);
+    if (!$query) {
+      return;
+    }
+    $url = static::SITE_DATA_URL . '?' . http_build_query(['site_key' => $site_key] + $query);
+    try {
+      $response = $this->httpClient->get($url, ['http_errors' => FALSE]);
+      if ($response->getStatusCode() >= 400) {
+        $this->logger->notice('Sharing site data with Drupal.org failed with HTTP @status.', ['@status' => $response->getStatusCode()]);
+      }
+    }
+    catch (ClientExceptionInterface $e) {
+      // Network failures are not actionable by the site owner.
+      $this->logger->notice('Sharing site data with Drupal.org failed: @message', ['@message' => $e->getMessage()]);
+    }
   }
 
   /**

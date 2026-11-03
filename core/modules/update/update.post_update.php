@@ -6,6 +6,9 @@
  */
 
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\update\DataSharing;
 
 /**
  * Implements hook_removed_post_updates().
@@ -37,4 +40,25 @@ function update_post_update_clear_disk_cache_again(): void {
       \Drupal::service('file_system')->deleteRecursive($directory);
     }
   }
+}
+
+/**
+ * Adds the data_sharing settings to update.settings.
+ */
+function update_post_update_add_data_sharing_settings(): ?TranslatableMarkup {
+  $config = \Drupal::configFactory()->getEditable('update.settings');
+  $data_sharing = ($config->get('data_sharing') ?? []) + [
+    'domain' => NULL,
+    'site_mail' => NULL,
+  ];
+  $config->set('data_sharing', $data_sharing)->save();
+  if ($data_sharing['domain'] === NULL || $data_sharing['site_mail'] === NULL) {
+    $start = \Drupal::time()->getRequestTime();
+    \Drupal::state()->set(DataSharing::NOTICE_START_STATE_KEY, $start);
+    return t('Choose what this site shares with Drupal.org at @url before @date, when the recommended settings apply.', [
+      '@url' => Url::fromRoute('update.settings')->toString(),
+      '@date' => \Drupal::service('date.formatter')->format($start + DataSharing::NOTICE_PERIOD, 'custom', 'Y-M-d'),
+    ]);
+  }
+  return NULL;
 }

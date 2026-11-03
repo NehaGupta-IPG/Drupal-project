@@ -7,6 +7,7 @@ namespace Drupal\Tests\update\Functional;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\update\DataSharing;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -103,6 +104,41 @@ class UpdateSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_ERROR);
     $this->assertSame([], $this->config('update.settings')->get('notification.emails'));
 
+  }
+
+  /**
+   * Tests the data sharing settings.
+   */
+  public function testDataSharing(): void {
+    $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
+    $this->drupalGet('admin/reports/updates/settings');
+    $this->assertSession()->checkboxChecked('update_share_domain');
+    $this->assertSession()->checkboxNotChecked('update_share_site_mail');
+    $this->assertSession()->elementTextContains('css', '#edit-update-share-domain--description', parse_url($this->baseUrl, PHP_URL_HOST));
+    $this->assertSession()->elementTextContains('css', '#edit-update-share-site-mail--description', 'simpletest@example.com');
+
+    $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/config/system/site-information');
+    $this->assertSession()->statusMessageContains('Choose what this site shares with Drupal.org', MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Data sharing with Drupal.org');
+    $this->assertSession()->pageTextContains('Not yet reviewed');
+
+    \Drupal::state()->set(DataSharing::NOTICE_START_STATE_KEY, time() - DataSharing::NOTICE_PERIOD - 1);
+    $this->drupalGet('admin/config/system/site-information');
+    $this->assertSession()->statusMessageNotExists(MessengerInterface::TYPE_WARNING);
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Recommended settings in effect since');
+
+    $this->drupalGet('admin/reports/updates/settings');
+    $this->assertSession()->pageTextContains('The settings shown have applied since');
+    $fieldset = $this->assertSession()->elementExists('css', '#edit-data-sharing')->getHtml();
+    $this->assertLessThan(strpos($fieldset, 'edit-update-share-domain'), strpos($fieldset, 'edit-data-sharing--description'));
+    $this->submitForm([], 'Save configuration');
+    $this->assertTrue($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertFalse($this->config('update.settings')->get('data_sharing.site_mail'));
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextNotContains('Recommended settings in effect since');
   }
 
 }

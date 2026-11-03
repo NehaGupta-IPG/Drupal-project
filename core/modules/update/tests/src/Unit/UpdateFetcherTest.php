@@ -9,9 +9,11 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\update\UpdateFetcher;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -157,10 +159,10 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * Mocks the HTTP client.
    *
-   * @param \GuzzleHttp\Psr7\Response ...$responses
-   *   Variable number of Response objects that the mocked client should return.
+   * @param \GuzzleHttp\Psr7\Response|\Throwable ...$responses
+   *   Responses or exceptions that the mocked client should return.
    */
-  protected function mockClient(Response ...$responses): void {
+  protected function mockClient(Response|\Throwable ...$responses): void {
     // Create a mock and queue responses.
     $mock_handler = new MockHandler($responses);
     $handler_stack = HandlerStack::create($mock_handler);
@@ -196,6 +198,77 @@ class UpdateFetcherTest extends UnitTestCase {
     $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
       return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
+  }
+
+  /**
+   * Tests sending the site data the site owner chose to share.
+   */
+  #[DataProvider('providerTestSendSiteData')]
+  public function testSendSiteData(array $project, ?string $domain, ?string $site_mail, ?string $expected): void {
+    $this->mockClient(new Response(200));
+    $update_fetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
+
+    $update_fetcher->sendSiteData($project, 'site_key', $domain, $site_mail);
+    if ($expected === NULL) {
+      $this->assertCount(0, $this->history);
+    }
+    else {
+      $this->assertCount(1, $this->history);
+      $this->assertSame($expected, (string) $this->history[0]['request']->getUri());
+    }
+  }
+
+  /**
+   * Provides test data for testSendSiteData().
+   */
+  public static function providerTestSendSiteData(): array {
+    $project = [
+      'name' => 'drupal',
+      'project_type' => '',
+      'info' => ['version' => '12.0-dev'],
+      'includes' => ['system' => 'System'],
+    ];
+    $other_server = $project;
+    $other_server['info']['project status url'] = 'https://www.example.com';
+    $url = 'https://updates.drupal.org/site-data?site_key=site_key';
+    return [
+      'domain only' => [$project, 'example.com', NULL, "$url&domain=example.com"],
+      'site mail only' => [$project, NULL, 'admin@example.com', "$url&site_mail=admin%40example.com"],
+      'domain and site mail' => [
+        $project,
+        'example.com',
+        'admin@example.com',
+        "$url&domain=example.com&site_mail=admin%40example.com",
+      ],
+      'nothing shared' => [$project, NULL, NULL, NULL],
+      'non-default update server' => [$other_server, 'example.com', 'admin@example.com', NULL],
+    ];
+  }
+
+  /**
+   * Tests that a failed site data request is logged as a notice.
+   */
+  #[DataProvider('providerTestSendSiteDataFailure')]
+  public function testSendSiteDataFailure(Response|ConnectException $result): void {
+    $this->mockClient($result);
+    $update_fetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $this->logger);
+
+    $update_fetcher->sendSiteData(['name' => 'drupal', 'info' => []], 'site_key', 'example.com', NULL);
+    $this->assertCount(1, $this->history);
+    $this->assertTrue($this->logger->hasNoticeRecords());
+    $this->assertFalse($this->logger->hasErrorRecords());
+  }
+
+  /**
+   * Provides test data for testSendSiteDataFailure().
+   */
+  public static function providerTestSendSiteDataFailure(): array {
+    return [
+      'HTTP 404' => [new Response(404)],
+      'network failure' => [
+        new ConnectException('Connection refused', new Request('GET', UpdateFetcher::SITE_DATA_URL)),
+      ],
+    ];
   }
 
 }

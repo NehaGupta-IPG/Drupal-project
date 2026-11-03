@@ -2,11 +2,17 @@
 
 namespace Drupal\update;
 
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure update settings for this site.
@@ -14,6 +20,29 @@ use Drupal\Core\Form\FormStateInterface;
  * @internal
  */
 class UpdateSettingsForm extends ConfigFormBase {
+
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected StateInterface $state,
+    protected TimeInterface $time,
+    protected DateFormatterInterface $dateFormatter,
+    TypedConfigManagerInterface $typedConfigManager,
+  ) {
+    parent::__construct($config_factory, $typedConfigManager);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('state'),
+      $container->get('datetime.time'),
+      $container->get('date.formatter'),
+      $container->get('config.typed'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -51,6 +80,39 @@ class UpdateSettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Check for updates of uninstalled modules and themes'),
       '#config_target' => 'update.settings:check.disabled_extensions',
+    ];
+
+    $form['data_sharing'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Data sharing with Drupal.org'),
+      '#description_display' => 'before',
+    ];
+    $ends = DataSharing::noticeEndsAt($this->state);
+    if ($ends && DataSharing::isUndecided($this->config('update.settings'))) {
+      $date = $this->dateFormatter->format($ends, 'custom', 'Y-M-d');
+      $form['data_sharing']['#description'] = DataSharing::noticeEnded($this->state, $this->time)
+        ? $this->t('No choice has been saved. The settings shown have applied since @date.', ['@date' => $date])
+        : $this->t('No choice has been saved. The settings shown apply from @date.', ['@date' => $date]);
+    }
+    $form['data_sharing']['update_share_domain'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site domain name with Drupal.org'),
+      '#description' => $this->t('The value that would be shared: @hostname', ['@hostname' => $this->getRequest()->getHost()]),
+      '#config_target' => new ConfigTarget(
+        'update.settings',
+        'data_sharing.domain',
+        fromConfig: fn (?bool $value): bool => $value ?? DataSharing::DEFAULT_DOMAIN,
+      ),
+    ];
+    $form['data_sharing']['update_share_site_mail'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Share the site email address with the Drupal Association'),
+      '#description' => $this->t('The value that would be shared: @mail', ['@mail' => $this->config('system.site')->get('mail')]),
+      '#config_target' => new ConfigTarget(
+        'update.settings',
+        'data_sharing.site_mail',
+        fromConfig: fn (?bool $value): bool => $value ?? DataSharing::DEFAULT_SITE_MAIL,
+      ),
     ];
 
     $form['update_notify_emails'] = [

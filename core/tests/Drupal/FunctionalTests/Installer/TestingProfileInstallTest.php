@@ -30,6 +30,8 @@ class TestingProfileInstallTest extends BrowserTestBase {
    */
   public function testUpdateModuleInstall(): void {
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
+    $this->assertFalse($this->config('update.settings')->get('data_sharing.domain'));
+    $this->assertNull($this->config('update.settings')->get('data_sharing.site_mail'));
   }
 
   /**
@@ -38,6 +40,8 @@ class TestingProfileInstallTest extends BrowserTestBase {
   protected function installParameters(): array {
     $params = parent::installParameters();
     $params['forms']['install_configure_form']['enable_update_status_module'] = TRUE;
+    // NULL unchecks a checkbox in a programmatic form submission.
+    $params['forms']['install_configure_form']['share_domain'] = NULL;
     return $params;
   }
 
