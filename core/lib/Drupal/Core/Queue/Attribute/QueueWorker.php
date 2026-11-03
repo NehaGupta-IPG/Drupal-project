@@ -49,12 +49,18 @@ class QueueWorker extends Plugin {
    *   \Drupal\Core\Queue\QueueWorkerManager::processDefinition().
    * @param class-string|null $deriver
    *   (optional) The deriver class.
+   * @param class-string|string $queue_reliable_service
+   *   (optional) The service name which handles the defined reliable queue.
+   * @param class-string|string $queue_service
+   *   (optional) The service name which handles the defined queue.
    */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $title = NULL,
     public readonly ?array $cron = NULL,
     public readonly ?string $deriver = NULL,
+    public readonly ?string $queue_reliable_service = NULL,
+    public readonly ?string $queue_service = NULL,
   ) {}
 
 }

@@ -65,4 +65,14 @@ class QueueWorker extends Plugin {
    */
   public $cron;
 
+  /**
+   * The service name which handles the defined reliable queue.
+   */
+  public string $queue_reliable_service;
+
+  /**
+   * The service name which handles the defined queue.
+   */
+  public string $queue_service;
+
 }

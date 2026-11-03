@@ -32,13 +32,20 @@ class QueueFactory {
    *   The site settings.
    * @param \Psr\Container\ContainerInterface $container
    *   A service locator that contains the queue services.
+   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface|null $queueManager
+   *   The Queue Worker Manager service.
    */
   public function __construct(
     Settings $settings,
     #[AutowireLocator('queue_factory')]
     protected ContainerInterface $container,
+    protected ?QueueWorkerManagerInterface $queueManager = NULL,
   ) {
     $this->settings = $settings;
+    if ($this->queueManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3338022', E_USER_DEPRECATED);
+      $this->queueManager = \Drupal::service('plugin.manager.queue_worker');
+    }
   }
 
   /**
@@ -56,14 +63,29 @@ class QueueFactory {
    */
   public function get($name, $reliable = FALSE) {
     if (!isset($this->queues[$name])) {
+      $service_name = NULL;
       // If it is a reliable queue, check the specific settings first.
       if ($reliable) {
         $service_name = $this->settings->get('queue_reliable_service_' . $name);
       }
       // If no reliable queue was defined, check the service and global
-      // settings, fall back to queue.database.
-      if (empty($service_name)) {
-        $service_name = $this->settings->get('queue_service_' . $name, $this->settings->get('queue_default', 'queue.database'));
+      // settings.
+      if ($service_name === NULL) {
+        $service_name = $this->settings->get('queue_service_' . $name);
+      }
+      if ($service_name === NULL) {
+        $definition = $this->queueManager->getDefinition($name, FALSE);
+        // If service name still not found, check the queue worker definition.
+        if ($reliable && isset($definition['queue_reliable_service'])) {
+          $service_name = $definition['queue_reliable_service'];
+        }
+        elseif (isset($definition['queue_service'])) {
+          $service_name = $definition['queue_service'];
+        }
+      }
+      // Fall back to queue.database.
+      if ($service_name === NULL) {
+        $service_name = $this->settings::get('queue_default', 'queue.database');
       }
       $factory = $this->container->get($service_name);
       $this->queues[$name] = $factory->get($name);
