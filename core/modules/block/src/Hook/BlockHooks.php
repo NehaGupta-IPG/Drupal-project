@@ -77,24 +77,28 @@ class BlockHooks {
   }
 
   /**
-   * Prepares variables for block templates.
+   * Prepares block configuration, content, and attributes for the template.
    *
    * Default template: block.html.twig.
-   *
-   * Prepares the values passed to the theme_block function to be passed
-   * into a pluggable template engine. Uses block properties to generate a
-   * series of template file suggestions. If none are found, the default
-   * block.html.twig is used.
    *
    * Most themes use their own copy of block.html.twig. The default is located
    * inside "core/modules/block/templates/block.html.twig". Look in there for
    * the full list of available variables.
    *
    * @param array $variables
-   *   An associative array containing:
-   *   - elements: An associative array containing the properties of the
-   *     element. Properties used: #block, #configuration, #children,
-   *     and #plugin_id.
+   *   An associative array of template variables. Keys used:
+   *   - elements: The block render array, containing:
+   *     - content: A content render array. Its optional #title property takes
+   *       precedence over the configured label.
+   *     - #configuration: A plugin configuration array. label is the fallback;
+   *       label_display controls whether a label is shown at all.
+   *     - #plugin_id: The full plugin ID.
+   *     - #base_plugin_id: The base plugin ID.
+   *     - #derivative_plugin_id: The derivative ID, or NULL if none.
+   *     - #id: (optional) Identifier used to generate a unique wrapper ID.
+   *     - #in_preview: (optional) Preview status; defaults to FALSE.
+   *   - attributes: HTML attributes for the block wrapper.
+   *   - title_attributes: HTML attributes for the block title.
    */
   public function preprocessBlock(&$variables): void {
     $variables['configuration'] = $variables['elements']['#configuration'];
