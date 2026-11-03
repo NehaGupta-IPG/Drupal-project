@@ -20,7 +20,6 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\Test\KernelTestDrupalKernel;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
@@ -182,13 +181,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    * @var list<string>|null
    */
   private ?array $environmentTables = NULL;
-
-  /**
-   * The key value factory of the container that booted the test method.
-   *
-   * It is not refreshed when the container is rebuilt during the test method.
-   */
-  protected KeyValueFactoryInterface $keyValue;
 
   /**
    * Set to TRUE to strict check all configuration saved.
@@ -486,7 +478,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
 
     $this->container = $kernel->getContainer();
-    $this->keyValue = $this->container->get('keyvalue');
     $kernel->preHandle($request);
 
     // Run database tasks and check for errors.
@@ -1374,6 +1365,23 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    */
   public function __sleep(): array {
     return [];
+  }
+
+  /**
+   * Magic getter.
+   *
+   * @param string $name
+   *   The property name.
+   *
+   * @return mixed
+   *   The property value.
+   */
+  public function __get(string $name): mixed {
+    if ($name === 'keyValue') {
+      @trigger_error('Accessing the keyValue property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'keyvalue\') instead. See https://www.drupal.org/node/3629745', E_USER_DEPRECATED);
+      return $this->container?->get('keyvalue');
+    }
+    return NULL;
   }
 
 }

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Client\ClientExceptionInterface;
 
@@ -337,6 +339,18 @@ class KernelTestBaseTest extends KernelTestBase {
 
     // Test that the module that is providing the database driver is enabled.
     $this->assertSame(1, \Drupal::service('extension.list.module')->get($module)->status);
+  }
+
+  /**
+   * Tests the deprecation of accessing the keyValue property directly.
+   */
+  #[IgnoreDeprecations]
+  public function testGetKeyValuePropertyDeprecation(): void {
+    $this->expectUserDeprecationMessage('Accessing the keyValue property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'keyvalue\') instead. See https://www.drupal.org/node/3629745');
+    // We purposely test accessing an undefined property here. We need to tell
+    // PHPStan to ignore that.
+    // @phpstan-ignore-next-line
+    $this->assertInstanceOf(KeyValueFactoryInterface::class, $this->keyValue);
   }
 
 }
