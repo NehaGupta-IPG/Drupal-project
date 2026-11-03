@@ -10,6 +10,8 @@
 
 use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Config\Config;
+use Drupal\Core\Theme\TemplateFinder;
+use Drupal\Core\Theme\ThemeSuggestions;
 
 /**
  * @defgroup content_flags Content markers
@@ -77,102 +79,15 @@ function _system_default_theme_features() {
  *   The extension that these templates will have.
  * @param string $path
  *   The path to search.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(TemplateFinder::class)->scan() instead.
+ *
+ * @see https://www.drupal.org/node/3632286
  */
 function drupal_find_theme_templates($cache, $extension, $path): array {
-  $implementations = [];
-
-  // Collect paths to all sub-themes grouped by base themes. These will be
-  // used for filtering. This allows base themes to have sub-themes in its
-  // folder hierarchy without affecting the base themes template discovery.
-  $theme_paths = [];
-  foreach (\Drupal::service('theme_handler')->listInfo() as $theme_info) {
-    if (!empty($theme_info->base_theme)) {
-      $theme_paths[$theme_info->base_theme][$theme_info->getName()] = $theme_info->getPath();
-    }
-  }
-  foreach ($theme_paths as $base_theme => $subthemes) {
-    foreach ($subthemes as $subtheme => $subtheme_path) {
-      if (isset($theme_paths[$subtheme])) {
-        $theme_paths[$base_theme] = array_merge($theme_paths[$base_theme], $theme_paths[$subtheme]);
-      }
-    }
-  }
-  $theme = \Drupal::theme()->getActiveTheme()->getName();
-  $subtheme_paths = $theme_paths[$theme] ?? [];
-
-  // Escape the periods in the extension.
-  $regex = '/' . str_replace('.', '\.', $extension) . '$/';
-  // Get a listing of all template files in the path to search.
-  $files = [];
-  if (is_dir($path)) {
-    $files = \Drupal::service('file_system')->scanDirectory($path, $regex, ['key' => 'filename']);
-  }
-
-  // Find templates that implement registered theme hooks and include that in
-  // what is returned so that the registry knows that the theme has this
-  // implementation.
-  foreach ($files as $template => $file) {
-    // Ignore sub-theme templates for the current theme.
-    if (!str_starts_with($file->uri, str_replace($subtheme_paths, '', $file->uri))) {
-      continue;
-    }
-    // Remove the extension from the filename.
-    $template = str_replace($extension, '', $template);
-    // Transform - in filenames to _ to match function naming scheme
-    // for the purposes of searching.
-    $hook = strtr($template, '-', '_');
-    if (isset($cache[$hook])) {
-      $implementations[$hook] = [
-        'template' => $template,
-        'path' => dirname($file->uri),
-      ];
-    }
-
-    // Match templates based on the 'template' filename.
-    foreach ($cache as $hook => $info) {
-      if (isset($info['template'])) {
-        if ($template === $info['template']) {
-          $implementations[$hook] = [
-            'template' => $template,
-            'path' => dirname($file->uri),
-          ];
-        }
-      }
-    }
-  }
-
-  // Find templates that implement possible "suggestion" variants of registered
-  // theme hooks and add those as new registered theme hooks. See
-  // hook_theme_suggestions_alter() for more information about suggestions and
-  // the use of 'pattern' and 'base hook'.
-  $patterns = array_keys($files);
-  foreach ($cache as $hook => $info) {
-    $pattern = $info['pattern'] ?? ($hook . '__');
-    if (!isset($info['base hook']) && !empty($pattern)) {
-      // Transform _ in pattern to - to match file naming scheme
-      // for the purposes of searching.
-      $pattern = strtr($pattern, '_', '-');
-
-      $matches = preg_grep('/^' . $pattern . '/', $patterns);
-      if ($matches) {
-        foreach ($matches as $match) {
-          $file = $match;
-          // Remove the extension from the filename.
-          $file = str_replace($extension, '', $file);
-          // Put the underscores back in for the hook name and register this
-          // pattern.
-          $arg_name = isset($info['variables']) ? 'variables' : 'render element';
-          $implementations[strtr($file, '-', '_')] = [
-            'template' => $file,
-            'path' => dirname($files[$match]->uri),
-            $arg_name => $info[$arg_name],
-            'base hook' => $hook,
-          ];
-        }
-      }
-    }
-  }
-  return $implementations;
+  @trigger_error('drupal_find_theme_templates() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal::service(TemplateFinder::class)->scan() instead. See https://www.drupal.org/node/3632286', E_USER_DEPRECATED);
+  return \Drupal::service(TemplateFinder::class)->scan($cache, $extension, $path);
 }
 
 /**
@@ -216,8 +131,14 @@ function theme_get_setting($setting_name, $theme = NULL) {
  *   The Config object with updated data.
  *
  * @see system_theme_settings_submit()
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3632286
  */
 function theme_settings_convert_to_config(array $theme_settings, Config $config) {
+  @trigger_error('theme_settings_convert_to_config() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3632286', E_USER_DEPRECATED);
   foreach ($theme_settings as $key => $value) {
     if ($key == 'default_logo') {
       $config->set('logo.use_default', $value);
@@ -266,50 +187,13 @@ function theme_settings_convert_to_config(array $theme_settings, Config $config)
  *   An array of suggestions, suitable for adding to
  *   hook_theme_suggestions_HOOK_alter() or to $variables['attributes']['class']
  *   if the suggestions represent extra CSS classes.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(ThemeSuggestions::class)->get() instead.
+ *
+ * @see https://www.drupal.org/node/3632286
  */
 function theme_get_suggestions($args, $base, $delimiter = '__'): array {
-
-  // Build a list of suggested theme hooks in order of
-  // specificity. One suggestion is made for every element of the current path,
-  // though numeric elements are not carried to subsequent suggestions. For
-  // example, for $base='page', http://www.example.com/node/1/edit would result
-  // in the following suggestions:
-  //
-  // page__node
-  // page__node__%
-  // page__node__1
-  // page__node__edit
-
-  $suggestions = [];
-  $prefix = $base;
-  foreach ($args as $arg) {
-    // Remove slashes or null per SA-CORE-2009-003 and change - (hyphen) to _
-    // (underscore).
-    //
-    // When we discover templates in @see drupal_find_theme_templates,
-    // hyphens (-) are converted to underscores (_) before the theme hook
-    // is registered. We do this because the hyphens used for delimiters
-    // in hook suggestions cannot be used in the function names of the
-    // associated preprocess functions. Any page templates designed to be used
-    // on paths that contain a hyphen are also registered with these hyphens
-    // converted to underscores so here we must convert any hyphens in path
-    // arguments to underscores here before fetching theme hook suggestions
-    // to ensure the templates are appropriately recognized.
-    $arg = str_replace(["/", "\\", "\0", '-'], ['', '', '', '_'], $arg);
-    // The percent acts as a wildcard for numeric arguments since
-    // asterisks are not valid filename characters on many filesystems.
-    if (is_numeric($arg)) {
-      $suggestions[] = $prefix . $delimiter . '%';
-    }
-    $suggestions[] = $prefix . $delimiter . $arg;
-    if (!is_numeric($arg)) {
-      $prefix .= $delimiter . $arg;
-    }
-  }
-  if (\Drupal::service('path.matcher')->isFrontPage()) {
-    // Front templates should be based on root only, not prefixed arguments.
-    $suggestions[] = $base . $delimiter . 'front';
-  }
-
-  return $suggestions;
+  @trigger_error('theme_get_suggestions() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use \Drupal::service(ThemeSuggestions::class)->get() instead. See https://www.drupal.org/node/3632286', E_USER_DEPRECATED);
+  return \Drupal::service(ThemeSuggestions::class)->get($args, $base, $delimiter);
 }

@@ -1850,6 +1850,10 @@ services:
     tags:
       - { name: service_collector, tag: 'twig.extension', call: addExtension }
   Drupal\Core\Template\TwigEnvironment: '@twig'
+  Drupal\Core\Theme\ThemeSuggestions:
+    autowire: true
+  Drupal\Core\Theme\TemplateFinder:
+    autowire: true
   twig.extension:
     class: Drupal\Core\Template\TwigExtension
     arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator']

@@ -717,7 +717,7 @@ class Registry implements DestructableInterface {
       }
       // The 'base hook' is only applied to derivative hooks already registered
       // from a pattern. This is typically set from
-      // drupal_find_theme_templates().
+      // TemplateFinder::scan().
       if (isset($info['incomplete preprocess functions'])) {
         $this->completeSuggestion($hook, $cache);
         unset($cache[$hook]['incomplete preprocess functions']);

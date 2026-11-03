@@ -519,7 +519,31 @@ class ThemeSettingsForm extends ConfigFormBase {
       $values['favicon_mimetype'] = $this->mimeTypeGuesser->guessMimeType($values['favicon_path']);
     }
 
-    theme_settings_convert_to_config($values, $config)->save();
+    foreach ($values as $key => $value) {
+      if ($key == 'default_logo') {
+        $config->set('logo.use_default', $value);
+      }
+      elseif ($key == 'logo_path') {
+        $config->set('logo.path', $value);
+      }
+      elseif ($key == 'default_favicon') {
+        $config->set('favicon.use_default', $value);
+      }
+      elseif ($key == 'favicon_path') {
+        $config->set('favicon.path', $value);
+      }
+      elseif ($key == 'favicon_mimetype') {
+        $config->set('favicon.mimetype', $value);
+      }
+      elseif (str_starts_with($key, 'toggle_')) {
+        $config->set('features.' . mb_substr($key, 7), $value);
+      }
+      elseif (!in_array($key, ['theme', 'logo_upload'])) {
+        $config->set($key, $value);
+      }
+    }
+
+    $config->save();
   }
 
   /**

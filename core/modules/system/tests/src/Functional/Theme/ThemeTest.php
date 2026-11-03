@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Theme\ThemeSuggestions;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -76,14 +77,14 @@ class ThemeTest extends BrowserTestBase {
    * Ensure page-front template suggestion is added when on front page.
    */
   public function testFrontPageThemeSuggestion(): void {
-    // Set the current route to user.login because theme_get_suggestions() will
+    // Set the current route to user.login because ThemeSuggestions::get() will
     // query it to see if we are on the front page.
     $request = Request::create('/user/login');
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'user.login');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/user/login'));
     \Drupal::requestStack()->push($request);
     $this->config('system.site')->set('page.front', '/user/login')->save();
-    $suggestions = theme_get_suggestions(['user', 'login'], 'page');
+    $suggestions = \Drupal::service(ThemeSuggestions::class)->get(['user', 'login'], 'page');
     // Set it back to not annoy the batch runner.
     \Drupal::requestStack()->pop();
     $this->assertContains('page__front', $suggestions, 'Front page template was suggested.');
