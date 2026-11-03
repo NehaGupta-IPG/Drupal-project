@@ -57,6 +57,7 @@ internal.drupal.ckeditor5.codeBlock:
 internal.drupal.ckeditor5.image:
   js:
     js/build/drupalImage.js: { minified: true }
+    js/imageFileValidation.js: {}
   css:
     theme:
       css/image.css: { }

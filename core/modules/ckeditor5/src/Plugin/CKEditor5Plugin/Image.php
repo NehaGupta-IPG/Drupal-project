@@ -7,6 +7,8 @@ namespace Drupal\ckeditor5\Plugin\CKEditor5Plugin;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableTrait;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface;
+use Drupal\Component\Utility\Bytes;
+use Drupal\Component\Utility\Environment;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
@@ -48,6 +50,8 @@ class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
     $config = $static_plugin_config;
     if ($editor->getImageUploadSettings()['status'] === TRUE) {
+      $image_upload_settings = $editor->getImageUploadSettings();
+      $image_upload_settings['max_size'] = empty($image_upload_settings['max_size']) ? Environment::getUploadMaxSize() : min(Bytes::toNumber($image_upload_settings['max_size']), Environment::getUploadMaxSize());
       $config += [
         'drupalImageUpload' => [
           'uploadUrl' => self::getUrlWithReplacedCsrfTokenPlaceholder(
@@ -56,6 +60,7 @@ class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
           ),
           'withCredentials' => TRUE,
           'headers' => ['Accept' => 'application/json', 'text/javascript'],
+          'imageUploadSettings' => $image_upload_settings,
         ],
       ];
       $config['image']['insert']['integrations'][] = 'upload';
