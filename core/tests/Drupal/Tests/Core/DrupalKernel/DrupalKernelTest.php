@@ -23,6 +23,50 @@ use Symfony\Component\HttpFoundation\Response;
 class DrupalKernelTest extends UnitTestCase {
 
   /**
+   * Tests repeated registration keeps the same order without adding duplicate paths.
+   */
+  public function testRepeatedNamespaceRegistration(): void {
+    $loader = new ClassLoader();
+    $loader->addPsr4('Drupal\\example\\', '/external');
+    $kernel = new DrupalKernel('test', $loader, TRUE, '/drupal');
+    $register = new \ReflectionMethod(DrupalKernel::class, 'classLoaderAddMultiplePsr4');
+    $namespaces = [
+      // Deduplication must preserve lookup order, not sort the paths.
+      'Drupal\\example' => ['modules/example_z/src', 'modules/example/src', 'modules/example_z/src'],
+      'Drupal\\other' => 'modules/other/src',
+    ];
+    // Repeated boots must not accumulate duplicate paths in the class loader.
+    for ($i = 0; $i < 10; $i++) {
+      $register->invoke($kernel, $namespaces);
+    }
+    $this->assertSame([
+      'Drupal\\example\\' => ['/external', '/drupal/modules/example_z/src', '/drupal/modules/example/src'],
+      'Drupal\\other\\' => ['/drupal/modules/other/src'],
+    ], $loader->getPrefixesPsr4());
+
+    // Another boot may discover a new path for an existing namespace.
+    $register->invoke($kernel, ['Drupal\\example' => ['modules/example/src', 'modules/new/src']]);
+    $this->assertSame([
+      '/external',
+      '/drupal/modules/example_z/src',
+      '/drupal/modules/example/src',
+      '/drupal/modules/new/src',
+    ], $loader->getPrefixesPsr4()['Drupal\\example\\']);
+
+    // Preserve existing paths in the class loader passed to the method.
+    $other_loader = new ClassLoader();
+    $other_loader->addPsr4('Drupal\\example\\', '/other-external');
+    $register->invoke($kernel, $namespaces, $other_loader);
+    // Reusing the class loader must also avoid duplicate paths.
+    $register->invoke($kernel, $namespaces, $other_loader);
+    $this->assertSame([
+      '/other-external',
+      '/drupal/modules/example_z/src',
+      '/drupal/modules/example/src',
+    ], $other_loader->getPrefixesPsr4()['Drupal\\example\\']);
+  }
+
+  /**
    * Tests hostname validation with settings.
    *
    * @legacy-covers ::setupTrustedHosts
