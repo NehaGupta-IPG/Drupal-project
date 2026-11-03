@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Default theme implementation to present a permission name and description.
+ *
+ * This template is used when listing permissions e.g on the permissions
+ * overview page.
+ *
+ * Available variables:
+ * - title: Name of permission.
+ * - description: Description of permission.
+ * - warning: Optional warning message.
+ * - deprecated: Optional deprecation message.
+ *
+ * @see \Drupal\user\UserThemeHooks::preprocessUserPermissionInfo()
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div{{ attributes.addClass('permission') }}>
+  <span class="title table-filter-text-source">{{ title }}</span>
+  {% if description or warning or deprecated %}
+    <div class="description" data-admin-compact-collapsible>
+      {% if warning %}
+        <em class="permission-warning">{{ warning }}</em>
+      {% endif %}
+      {% if deprecated %}
+        <em class="permission-warning permission-deprecated">{{ deprecated }}</em>
+      {% endif %}
+      {{ description }}
+    </div>
+  {% endif %}
+</div>

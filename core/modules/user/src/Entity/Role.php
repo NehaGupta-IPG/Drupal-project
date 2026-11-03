@@ -249,6 +249,17 @@ class Role extends ConfigEntityBase implements RoleInterface {
       ]);
       $this->permissions = $valid_permissions;
     }
+    // List all deprecated permissions.
+    $deprecated_permission_definitions = array_filter($permission_definitions, fn (array $permission): bool => !empty($permission['deprecated']));
+    $deprecated_permissions = array_intersect($this->permissions, array_keys($deprecated_permission_definitions));
+    if (!empty($deprecated_permissions)) {
+      \Drupal::logger('user')->error('Found deprecated permission(s) assigned to role "@label" (@id): @permissions.', [
+        '@label' => $this->label(),
+        '@id' => $this->id(),
+        '@permissions' => implode(', ', $deprecated_permissions),
+      ]);
+    }
+
     foreach ($valid_permissions as $permission) {
       // Depend on the module that is providing this permission.
       $this->addDependency('module', $permission_definitions[$permission]['provider']);

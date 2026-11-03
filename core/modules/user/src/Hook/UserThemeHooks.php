@@ -47,6 +47,14 @@ class UserThemeHooks {
         ],
         'initial preprocess' => static::class . ':preprocessUsername',
       ],
+      'user_permission_info' => [
+        'variables' => [
+          'deprecated' => NULL,
+          'description' => NULL,
+          'title' => '',
+          'warning' => NULL,
+        ],
+      ],
     ];
   }
 

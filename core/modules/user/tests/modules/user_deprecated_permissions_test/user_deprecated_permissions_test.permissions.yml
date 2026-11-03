@@ -1,0 +1,19 @@
+d:
+  title: 'Test permission'
+e:
+  title: 'Test deprecated permission'
+  deprecated: The "%permission%" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.
+f:
+  title: 'Test used deprecated permission'
+  deprecated: The "%permission%" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.
+g:
+  title: 'Test admin permission'
+  restrict access: true
+h:
+  title: 'Test deprecated admin permission'
+  restrict access: true
+  deprecated: The "%permission%" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.
+i:
+  title: 'Test used deprecated admin permission'
+  restrict access: true
+  deprecated: The "%permission%" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.
