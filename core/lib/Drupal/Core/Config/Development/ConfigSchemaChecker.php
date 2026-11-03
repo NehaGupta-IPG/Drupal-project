@@ -3,7 +3,6 @@
 namespace Drupal\Core\Config\Development;
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
@@ -93,7 +92,7 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
       elseif (is_array($errors)) {
         $text_errors = [];
         foreach ($errors as $key => $error) {
-          $text_errors[] = new FormattableMarkup('@key @error', ['@key' => $key, '@error' => $error]);
+          $text_errors[] = "$key $error";
         }
         throw new SchemaIncompleteException("Schema errors for $name with the following errors: " . implode(', ', $text_errors));
       }
