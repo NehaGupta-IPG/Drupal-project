@@ -68,6 +68,7 @@ class Upgrade7WithContentModerationTest extends Upgrade7Test {
     ];
     $entity_counts['field_config'] = $entity_counts['field_config'] + 2;
     $entity_counts['view'] = $entity_counts['view'] + 1;
+    $entity_counts['action'] = $entity_counts['action'] + 3;
     return $entity_counts;
   }
 
