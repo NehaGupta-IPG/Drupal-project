@@ -8,13 +8,13 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\FileInterface;
-use Drupal\image\Controller\ImageStyleDownloadController;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 
 /**
  * Hook implementations for image.
@@ -81,62 +81,6 @@ class ImageHooks {
         $effect = $route_match->getParameter('image_style')->getEffect($route_match->getParameter('image_effect'));
         $effect_definition = $effect->getPluginDefinition();
         return isset($effect_definition['description']) ? '<p>' . $effect_definition['description'] . '</p>' : NULL;
-    }
-    return NULL;
-  }
-
-  /**
-   * Implements hook_file_download().
-   *
-   * Control the access to files underneath the styles directory.
-   */
-  #[Hook('file_download')]
-  public function fileDownload($uri): array|int|null {
-    $path = StreamWrapperManager::getTarget($uri);
-    // Private file access for image style derivatives.
-    if (str_starts_with($path, 'styles/')) {
-      $args = explode('/', $path);
-      // Discard "styles", style name, and scheme from the path.
-      $args = array_slice($args, 3);
-      // Then the remaining parts are the path to the image.
-      $original_uri = StreamWrapperManager::getScheme($uri) . '://' . implode('/', $args);
-      // Check that the file exists and is an image.
-      $image = \Drupal::service('image.factory')->get($uri);
-      if ($image->isValid()) {
-        // If the image style converted the extension, it has been added to the
-        // original file, resulting in filenames like image.png.jpeg. So to find
-        // the actual source image, we remove the extension and check if that
-        // image exists.
-        if (!file_exists($original_uri)) {
-          $converted_original_uri = ImageStyleDownloadController::getUriWithoutConvertedExtension($original_uri);
-          if ($converted_original_uri !== $original_uri && file_exists($converted_original_uri)) {
-            // The converted file does exist, use it as the source.
-            $original_uri = $converted_original_uri;
-          }
-        }
-        // Check the permissions of the original to grant access to this image.
-        $headers = \Drupal::moduleHandler()->invokeAll('file_download', [$original_uri]);
-        // Confirm there's at least one module granting access and none denying
-        // access.
-        if (!empty($headers) && !in_array(-1, $headers)) {
-          return [
-                // Send headers describing the image's size, and MIME-type.
-            'Content-Type' => $image->getMimeType(),
-            'Content-Length' => $image->getFileSize(),
-          ];
-        }
-      }
-      return -1;
-    }
-    // If it is the sample image we need to grant access.
-    $samplePath = \Drupal::config('image.settings')->get('preview_image');
-    if ($path === $samplePath) {
-      $image = \Drupal::service('image.factory')->get($samplePath);
-      return [
-            // Send headers describing the image's size, and MIME-type.
-        'Content-Type' => $image->getMimeType(),
-        'Content-Length' => $image->getFileSize(),
-      ];
     }
     return NULL;
   }
@@ -229,7 +173,7 @@ class ImageHooks {
     }
     // If the upload destination changed, then move the file.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
-      $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
+      $directory = $field_storage->getSetting('uri_scheme') . '://' . ImageItem::DEFAULT_IMAGE_DIRECTORY . '/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
       \Drupal::service('file.repository')->move($file_new, $directory . $file_new->getFilename());
     }
@@ -264,7 +208,7 @@ class ImageHooks {
     }
     // If the upload destination changed, then move the file.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
-      $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
+      $directory = $field_storage->getSetting('uri_scheme') . '://' . ImageItem::DEFAULT_IMAGE_DIRECTORY . '/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
       \Drupal::service('file.repository')->move($file_new, $directory . $file_new->getFilename());
     }
