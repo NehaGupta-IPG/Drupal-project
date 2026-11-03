@@ -702,6 +702,7 @@ default:
   # Any changes to the rules will probably require changes to the
   # 'Write lint caches' job.
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH == "main"
