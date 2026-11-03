@@ -107,6 +107,10 @@ class FormErrorHandler extends CoreFormErrorHandler {
     }
 
     if (!empty($error_links)) {
+      // Do not show form-level messages for elements that suppress it.
+      if (!empty($form_element['#error_field_only'])) {
+        return;
+      }
       $render_array = [
         '#theme' => 'inline_form_errors_summary',
         '#error_links' => $error_links,

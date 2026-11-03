@@ -123,6 +123,7 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
         'autofocus' => 'autofocus',
         'autocomplete' => 'username',
       ],
+      '#error_field_only' => TRUE,
     ];
     // Allow logged in users to request this also.
     $user = $this->currentUser();
