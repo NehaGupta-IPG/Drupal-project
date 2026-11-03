@@ -5,6 +5,7 @@ namespace Drupal\jsonapi;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\jsonapi\Access\EntityAccessChecker;
@@ -137,31 +138,30 @@ class IncludeResolver {
           $includes = IncludedData::merge($includes, new IncludedData([$exception]));
           continue;
         }
-        foreach ($field_list as $field_item) {
-          if (!($field_item->getDataDefinition()->getPropertyDefinition('entity') instanceof DataReferenceDefinitionInterface)) {
-            continue;
-          }
+        if ($field_list instanceof EntityReferenceFieldItemListInterface) {
+          $references = array_merge($references, $field_list->referencedEntities());
+        }
+        else {
+          foreach ($field_list as $field_item) {
+            if (!($field_item->getDataDefinition()->getPropertyDefinition('entity') instanceof DataReferenceDefinitionInterface)) {
+              continue;
+            }
 
-          if (!($field_item->entity instanceof EntityInterface)) {
-            continue;
-          }
+            if (!($field_item->entity instanceof EntityInterface)) {
+              continue;
+            }
 
-          // Support entity reference fields that don't have the referenced
-          // target type stored in settings.
-          $references[$field_item->entity->getEntityTypeId()][] = $field_item->get($field_item::mainPropertyName())->getValue();
+            $references[] = $field_item->entity;
+          }
         }
       }
-      foreach ($references as $target_type => $ids) {
-        $entity_storage = $this->entityTypeManager->getStorage($target_type);
-        $targeted_entities = $entity_storage->loadMultiple(array_unique($ids));
-        $access_checked_entities = array_map(function (EntityInterface $entity) {
-          return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
-        }, $targeted_entities);
-        $targeted_collection = new IncludedData(array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
-          return !$resource_object->getResourceType()->isInternal();
-        }));
-        $includes = static::resolveIncludeTree($children, $targeted_collection, IncludedData::merge($includes, $targeted_collection));
-      }
+      $access_checked_entities = array_map(function (EntityInterface $entity) {
+        return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
+      }, $references);
+      $targeted_collection = new IncludedData(array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
+        return !$resource_object->getResourceType()->isInternal();
+      }));
+      $includes = static::resolveIncludeTree($children, $targeted_collection, IncludedData::merge($includes, $targeted_collection));
     }
     return $includes;
   }
