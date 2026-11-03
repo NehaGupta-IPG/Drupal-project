@@ -87,6 +87,10 @@ class EntityAutocomplete extends Textfield {
     // its value is properly checked for access.
     $info['#process_default_value'] = TRUE;
 
+    // IMPORTANT! This must be set to NULL so as not to throw an error
+    // when the autocomplete selected result exceeds 128 characters.
+    $info['#maxlength'] = NULL;
+
     $info['#element_validate'] = [[static::class, 'validateEntityAutocomplete']];
     array_unshift($info['#process'], [static::class, 'processEntityAutocomplete']);
 
