@@ -428,6 +428,9 @@ class Ckeditor5Hooks {
   public function editorPresave(EditorInterface $editor): void {
     if ($editor->getEditor() === 'ckeditor5') {
       $settings = $editor->getSettings();
+      if (!isset($settings['plugins']) || !is_array($settings['plugins'])) {
+        $settings['plugins'] = [];
+      }
       // @see ckeditor5_post_update_list_type()
       if (array_key_exists('ckeditor5_list', $settings['plugins']) && array_key_exists('ckeditor5_sourceEditing', $settings['plugins'])) {
         $source_edited = HTMLRestrictions::fromString(implode(' ', $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']));
@@ -439,6 +442,10 @@ class Ckeditor5Hooks {
         // new "styles" setting for the List plugin to false.
         $ol_type = HTMLRestrictions::fromString('<ol type>');
         $ul_type = HTMLRestrictions::fromString('<ul type>');
+        if (!isset($settings['plugins']['ckeditor5_list']['properties']) || !is_array($settings['plugins']['ckeditor5_list']['properties'])) {
+          $properties = $settings['plugins']['ckeditor5_list'];
+          $settings['plugins']['ckeditor5_list']['properties'] = $properties;
+        }
         if (!array_key_exists('styles', $settings['plugins']['ckeditor5_list']['properties'])) {
           $settings['plugins']['ckeditor5_list']['properties']['styles'] =
             $ol_type->diff($source_edited)->allowsNothing() ||
