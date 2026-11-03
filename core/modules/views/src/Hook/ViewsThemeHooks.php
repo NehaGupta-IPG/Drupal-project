@@ -994,6 +994,8 @@ class ViewsThemeHooks {
   public function preprocessViewsViewGridResponsive(array &$variables): void {
     $variables['options'] = $variables['view']->style_plugin->options;
     $view = $variables['view'];
+    $variables['options']['grid_wrapper_class_custom'] = $view->style_plugin->getCustomClasses('grid_wrapper');
+    $variables['options']['grid_cell_class_custom'] = $view->style_plugin->getCustomClasses('grid_cell');
 
     $items = [];
 

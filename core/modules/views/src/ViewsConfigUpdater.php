@@ -67,9 +67,12 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      $changed = FALSE;
+      if ($this->processResponsiveGridClassUpdate($view)) {
+        $changed = TRUE;
+      }
+      return $changed;
     });
   }
 
@@ -174,6 +177,56 @@ class ViewsConfigUpdater {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Checks for responsive grid style views needing custom class options.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if responsive grid style needs to have custom class options added.
+   */
+  public function needsResponsiveGridClassUpdate(ViewEntityInterface $view): bool {
+    return $this->processResponsiveGridClassUpdate($view);
+  }
+
+  /**
+   * Processes views and adds default responsive grid custom classes.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view was updated with custom class defaults.
+   */
+  public function processResponsiveGridClassUpdate(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (isset($display['display_options']['style'])
+        && $display['display_options']['style']['type'] === 'grid_responsive'
+        && isset($display['display_options']['style']['options'])
+      ) {
+        $options = &$display['display_options']['style']['options'];
+        if (!isset($options['grid_wrapper_class_custom'])) {
+          $options['grid_wrapper_class_custom'] = '';
+          $changed = TRUE;
+        }
+        if (!isset($options['grid_cell_class_custom'])) {
+          $options['grid_cell_class_custom'] = '';
+          $changed = TRUE;
+        }
+      }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
   }
 
 }
