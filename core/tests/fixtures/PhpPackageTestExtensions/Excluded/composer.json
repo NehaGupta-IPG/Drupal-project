@@ -1,0 +1,14 @@
+{
+    "name": "package-test/excluded-package",
+    "version": "1.0.0",
+    "autoload": {
+        "psr-4": {
+            "Excluded\\": "src"
+        }
+    },
+    "extra": {
+        "drupal": {
+            "service-providers":  "Excluded\\ExcludedServiceProvider"
+        }
+    }
+}

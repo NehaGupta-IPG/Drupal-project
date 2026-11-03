@@ -2,6 +2,7 @@
 
 namespace Drupal\Core;
 
+use Drupal\PackageExtensionData;
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
@@ -643,6 +644,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     ];
     $this->serviceYamls['app']['core'] = 'core/core.services.yml';
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
+
+    // Add service yamls and providers of php packages.
+    if (class_exists('Drupal\PackageExtensionData')) {
+      $this->serviceProviderClasses['app'] += PackageExtensionData::getProviders();
+    }
 
     // Retrieve enabled modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
