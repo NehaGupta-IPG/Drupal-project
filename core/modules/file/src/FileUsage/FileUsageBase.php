@@ -43,15 +43,19 @@ abstract class FileUsageBase implements FileUsageInterface {
    */
   public function delete(FileInterface $file, $module, $type = NULL, $id = NULL, $count = 1) {
     // Do not actually mark files as temporary when the behavior is disabled.
-    if (!$this->configFactory->get('file.settings')->get('make_unused_managed_files_temporary')) {
-      return;
-    }
+    $set_temporary = $this->configFactory->get('file.settings')->get('make_unused_managed_files_temporary');
+
     // If there are no more remaining usages of this file, mark it as temporary,
     // which result in a delete through system_cron().
     $usage = \Drupal::service('file.usage')->listUsage($file);
     if (empty($usage)) {
-      $file->setTemporary();
-      $file->save();
+      if ($set_temporary) {
+        $file->setTemporary();
+        $file->save();
+      }
+      else {
+        $file->delete();
+      }
     }
   }
 
