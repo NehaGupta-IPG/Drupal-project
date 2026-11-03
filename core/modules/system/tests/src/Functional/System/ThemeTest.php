@@ -71,7 +71,7 @@ class ThemeTest extends BrowserTestBase {
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Create theme for testing semver.
-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/../themes/test_core_semver', NULL, TRUE);
+    mkdir($this->publicFilesDirectory . '/../themes/test_core_semver', 0777, TRUE);
     $contents = <<<INFO
 name: 'Theme test with semver core version'
 type: theme

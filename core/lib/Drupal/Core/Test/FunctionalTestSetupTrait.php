@@ -16,7 +16,6 @@ use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Site\SettingsEditor;
-use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\SessionTestTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -634,6 +633,8 @@ trait FunctionalTestSetupTrait {
    */
   protected function setupBaseUrl() {
     global $base_url;
+    global $base_path, $base_root;
+    global $base_secure_url, $base_insecure_url;
 
     // Get and set the domain of the environment we are running our test
     // coverage against.
@@ -676,6 +677,13 @@ trait FunctionalTestSetupTrait {
     $_SERVER['SCRIPT_FILENAME'] = $path . '/index.php';
     $_SERVER['PHP_SELF'] = $path . '/index.php';
     $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
+
+    // @see \Drupal\Core\DrupalKernel::initializeRequestGlobals()
+    $base_root = $parsed_url['scheme'] . '://' . $host;
+    $base_url = $base_root . $path;
+    $base_path = $path . '/';
+    $base_secure_url = str_replace('http://', 'https://', $base_url);
+    $base_insecure_url = str_replace('https://', 'http://', $base_url);
   }
 
   /**
@@ -683,21 +691,38 @@ trait FunctionalTestSetupTrait {
    *
    * Also sets up new resources for the testing environment, such as the public
    * filesystem and configuration directories.
+   *
+   * No kernel is booted and no container is built here. The calls below
+   * replace the parts of the test runner kernel boot that later code relies
+   * on. Do not reintroduce the boot to simplify them.
    */
   protected function prepareEnvironment() {
     // Bootstrap Drupal so we can use Drupal's built in functions.
     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
-    $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
-    $kernel->boot();
-    $kernel->preHandle($request);
+
+    // Runs before the test prefix, so DRUPAL_TEST_IN_CHILD_SITE stays FALSE.
+    DrupalKernel::bootEnvironment();
+
+    // The test runner has no storage or logger for Drupal's handlers.
+    if (get_error_handler() === '_drupal_error_handler') {
+      restore_error_handler();
+    }
+    restore_exception_handler();
+
     $this->prepareDatabasePrefix();
 
-    $this->originalSite = $kernel->findSitePath($request);
+    $this->originalSite = DrupalKernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
-    // information can be logged during installation process.
-    \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+    // information can be logged during installation process. The file system
+    // service is not used, as it would need a container.
+    foreach ([dirname($this->siteDirectory), $this->siteDirectory] as $directory) {
+      if (!is_dir($directory) && !@mkdir($directory) && !is_dir($directory)) {
+        throw new \RuntimeException("Unable to create directory: $directory");
+      }
+      @chmod($directory, 0777);
+    }
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
@@ -706,12 +731,6 @@ trait FunctionalTestSetupTrait {
 
     // Ensure the configImporter is refreshed for each test.
     $this->configImporter = NULL;
-
-    // Unregister all custom stream wrappers of the parent site.
-    $wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers(StreamWrapperInterface::ALL);
-    foreach ($wrappers as $scheme => $info) {
-      stream_wrapper_unregister($scheme);
-    }
 
     // Reset statics.
     // @phpstan-ignore function.deprecated
@@ -739,6 +758,9 @@ trait FunctionalTestSetupTrait {
       // For performance, simply use the database prefix as hash salt.
       'hash_salt' => $this->databasePrefix,
     ]);
+
+    // @see \Drupal\Core\DrupalKernel::initializeSettings()
+    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
     Environment::setTimeLimit($this->timeLimit);
 

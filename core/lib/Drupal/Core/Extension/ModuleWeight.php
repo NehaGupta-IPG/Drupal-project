@@ -32,14 +32,14 @@ class ModuleWeight {
       // installation.
       $extensionConfig
         ->set("module.$module", (int) $weight)
-        ->set('module', $this->sort($extensionConfig->get('module')))
+        ->set('module', static::sort($extensionConfig->get('module')))
         ->save();
 
       // Prepare the new module list, sorted by weight, including filenames.
       // @see \Drupal\Core\Extension\ModuleInstaller::install()
       $currentModuleFilenames = $this->moduleHandler->getModuleList();
       $currentModules = array_fill_keys(array_keys($currentModuleFilenames), 0);
-      $currentModules = $this->sort(array_merge($currentModules, $extensionConfig->get('module')));
+      $currentModules = static::sort(array_merge($currentModules, $extensionConfig->get('module')));
       $moduleFilenames = [];
       foreach ($currentModules as $name => $weight) {
         $moduleFilenames[$name] = $currentModuleFilenames[$name];
@@ -62,7 +62,7 @@ class ModuleWeight {
    * @return array
    *   An array of module configuration data sorted by weight and name.
    */
-  public function sort(array $data): array {
+  public static function sort(array $data): array {
     // PHP array sorting functions such as uasort() do not work with both keys
     // and values at the same time, so we achieve weight and name sorting by
     // computing strings with both information concatenated (weight first, name

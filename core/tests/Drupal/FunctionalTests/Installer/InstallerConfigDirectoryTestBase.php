@@ -112,10 +112,8 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
         $core_extension['module'][$module] = 0;
         // If the module depends on another driver module, add that too.
         $info = Database::getConnection()->getConnectionOptions();
-        foreach (array_keys($info['dependencies'] ?? []) as $dependency) {
-          $core_extension['module'][$dependency] = 0;
-        }
-        $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
+        $core_extension['module'] += array_fill_keys(array_keys($info['dependencies'] ?? []), 0);
+        $core_extension['module'] = ModuleWeight::sort($core_extension['module']);
       }
       if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
         // Remove the profile.

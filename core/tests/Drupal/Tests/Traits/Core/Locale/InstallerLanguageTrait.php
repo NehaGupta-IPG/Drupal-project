@@ -42,7 +42,7 @@ PO;
     $parameters['parameters']['langcode'] = $this->getInstallLangcode();
     // Create a po file so we don't attempt to download one from
     // localize.drupal.org and to have a test translation that will not change.
-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
+    mkdir($this->publicFilesDirectory . '/translations', 0777, TRUE);
     file_put_contents(
       $this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.' . $this->getInstallLangcode() . '.po',
       $this->getTranslationFileContents()
