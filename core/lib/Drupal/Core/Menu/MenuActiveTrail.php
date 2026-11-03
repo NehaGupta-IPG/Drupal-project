@@ -149,6 +149,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // service in the container.
     // The menu links coming from the storage are already sorted by depth,
     // weight and ID.
+    $routes = [];
     $links = [];
 
     $route_name = $this->routeMatch->getRouteName();
@@ -157,24 +158,28 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // it a feature that a relevant menu tree may be displayed.
     if ($route_name) {
       $route_parameters = $this->routeMatch->getRawParameters()->all();
-
-      // Load links matching this route.
-      $links = $this->menuLinkManager->loadLinksByRoute($route_name, $route_parameters, $menu_name);
+      $routes[] = [
+        'route_name' => $route_name,
+        'route_parameters' => $route_parameters,
+      ];
     }
 
     // If the request is for the site's front page, then menu links containing
     // <front> must also be loaded since it's a special route that's an alias
     // for the page.
-    // @todo Combine the two calls to loadLinksByRoute() in
-    // https://www.drupal.org/project/drupal/issues/3523497
     if ($this->pathMatcher->isFrontPage()) {
-      $links = array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
+      $routes[] = ['route_name' => '<front>', 'route_parameters' => []];
     }
 
-    // Select the first enabled matching link.
-    foreach ($links as $link) {
-      if ($link->isEnabled()) {
-        return $link;
+    if ($routes) {
+      $links = $this->menuLinkManager->loadLinksByRoutes($routes, $menu_name);
+      if ($links) {
+        // Select the first enabled matching link.
+        foreach ($links as $link) {
+          if ($link->isEnabled()) {
+            return $link;
+          }
+        }
       }
     }
 
