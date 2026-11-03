@@ -16,6 +16,7 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Composer\Composer;
+use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\PhpUnitTestDiscovery;
@@ -25,18 +26,24 @@ use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunnerKernel;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
+use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionFinished;
+use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionPoll;
+use Drupal\TestTools\TestRunner\Event\RunnerTestsExecutionStart;
+use Drupal\TestTools\TestRunner\Event\TestExecutionFinished;
+use Drupal\TestTools\TestRunner\Event\TestExecutionStart;
+use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgress;
+use Drupal\TestTools\TestRunner\EventSubscriber\ExecutionProgressDebug;
+use Drupal\TestTools\TestRunner\CliPrinter;
 use Drupal\TestTools\TestRunner\Configuration as Config;
 use Drupal\TestTools\TestRunner\MemoryTestRunResultsStorage;
 use Drupal\TestTools\TestRunner\WorkAllocator;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
-use Symfony\Component\Console\Helper\DescriptorHelper;
-use Symfony\Component\Console\Input\InputDefinition;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Process\PhpExecutableFinder;
-
-// cspell:ignore exitcode testbots wwwrun
 
 // Define some colors for display.
 // A nice calming green.
@@ -62,32 +69,59 @@ const SIMPLETEST_SCRIPT_EXIT_FAILURE = 1;
 const SIMPLETEST_SCRIPT_EXIT_ERROR = 2;
 const SIMPLETEST_SCRIPT_EXIT_EXCEPTION = 3;
 
+// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+$results_map = [
+  'pass' => 'Pass',
+  'fail' => 'Fail',
+  'error' => 'Error',
+  'skipped' => 'Skipped',
+  'cli_fail' => 'Failure',
+  'exception' => 'Exception',
+  'debug' => 'Log',
+];
+
 // Setup class autoloading.
 $autoloader = require_once __DIR__ . '/../../autoload.php';
 $autoloader->addPsr4('Drupal\\TestTools\\', __DIR__ . '/../tests/Drupal/TestTools');
 
-// Setup console output.
-$console_output = new ConsoleOutput();
+// Start overall timer.
+Timer::start('run-tests');
+$input = new ArgvInput($_SERVER['argv'], Config::commandLineDefinition());
+$output = new ConsoleOutput();
+$io = new SymfonyStyle($input, $output);
 
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
 try {
-  Config::createFromCommandLine($_SERVER['argv']);
+  Config::createFromCommandLine($input);
 }
 catch (\RuntimeException $e) {
-  simpletest_script_print_error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
-  simpletest_script_print(Config::commandLineDefinition()->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
+  $io->error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
+  $io->info('Options and arguments: ' . Config::commandLineDefinition()->getSynopsis());
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
+// Setup output coloring explicitly, GitLab lacks self-detection capabilities.
+$output->setDecorated(Config::get('color'));
+
+// Setup console printer.
+$reporter = new CliPrinter($io, Config::instance());
+
 // If --help requested, show it and exit.
 if (Config::get('help')) {
-  simpletest_script_help(Config::commandLineDefinition(), $script_basename, $console_output);
+  $reporter->help(Config::commandLineDefinition(), $script_basename, $io);
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
 // Initialize script variables and bootstrap Drupal kernel.
 simpletest_script_init($autoloader);
+
+// Register the event subscriber.
+$eventDispatcher = \Drupal::service(EventDispatcherInterface::class);
+$executionProgress = Config::get('debug-execution') ?
+  new ExecutionProgressDebug($io, Config::instance()) :
+  new ExecutionProgress($io, Config::instance());
+$eventDispatcher->addSubscriber($executionProgress);
 
 if (!class_exists(TestCase::class)) {
   echo "\nrun-tests.sh requires the PHPUnit testing framework. Use 'composer install' to ensure that it is present.\n\n";
@@ -169,7 +203,7 @@ if (Config::get('clean')) {
     DRUPAL_ROOT,
     Database::getConnection(),
     $test_run_results_storage,
-    $console_output,
+    $io,
     \Drupal::service('file_system')
   );
   try {
@@ -189,25 +223,10 @@ if (Config::get('clean')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-echo "\n";
-echo "Drupal test run\n\n";
-echo "--------------------------------------------------------------\n";
-echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
-echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary...........: %s\n", (new PhpExecutableFinder())->find());
-echo sprintf("PHPUnit Version......: %s\n", Version::id());
-echo sprintf("PHPUnit configuration: %s\n", Config::get('phpunit-configuration'));
-if (Config::get('dburl')) {
-  $sut_connection_info = Database::getConnectionInfo();
-  $sut_tasks_class = $sut_connection_info['default']['namespace'] . "\\Install\\Tasks";
-  $sut_installer = new $sut_tasks_class();
-  $sut_connection = Database::getConnection();
-  echo sprintf("Database.............: %s\n", (string) $sut_installer->name());
-  echo sprintf("Database Version.....: %s\n", $sut_connection->version());
-}
-echo sprintf("Working directory....: %s\n", getcwd());
-echo "--------------------------------------------------------------\n";
+$reporter->startTable();
 
+// Discover tests and allocate them to worker bins.
+Timer::start('run-tests:discovery');
 $groupedTestClassInfoList = simpletest_script_get_test_list();
 
 $workAllocator = new WorkAllocator(
@@ -219,33 +238,36 @@ $test_list = array_keys($workAllocator->getAllocatedList());
 
 if (Config::get('debug-discovery')) {
   if ((int) Config::get('ci-parallel-node-total') > 1) {
-    dump_bin_tests_sequence((int) Config::get('ci-parallel-node-index'), $workAllocator->getSortedList(), $workAllocator->getAllocatedList());
+    $reporter->testBinSequenceTable(
+      (int) Config::get('ci-parallel-node-index'),
+      $workAllocator->getSortedList(),
+      $workAllocator->getAllocatedList(),
+    );
   }
   else {
-    dump_tests_sequence($workAllocator->getAllocatedList());
+    $reporter->testSequenceTable($workAllocator->getAllocatedList());
   }
 }
-
-// Try to allocate unlimited time to run the tests.
-Environment::setTimeLimit(0);
-simpletest_script_reporter_init();
-
 $tests_to_run = [];
 for ($i = 0; $i < Config::get('repeat'); $i++) {
   $tests_to_run = array_merge($tests_to_run, $test_list);
 }
+// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+$end_discovery = Timer::stop('run-tests:discovery');
+
+$io->title("Test log");
 
 // Execute tests.
+$eventDispatcher->dispatch(new RunnerTestsExecutionStart($tests_to_run));
+// Try to allocate unlimited time to run the tests.
+Environment::setTimeLimit(0);
 $status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run);
-
-// Stop the timer.
-simpletest_script_reporter_timer_stop();
-
-// Ensure all test locks are released once finished. If tests are run with a
-// concurrency of 1 the each test will clean up its own lock. Test locks are
-// not released if using a higher concurrency to ensure each test has unique
-// fixtures.
+// Ensure all test locks are released once finished. If tests are run with
+// a concurrency of 1 then each test will clean up its own lock. Test locks
+// are not released if using a higher concurrency to ensure each test has
+// unique fixtures.
 TestDatabase::releaseAllTestLocks();
+$eventDispatcher->dispatch(new RunnerTestsExecutionFinished());
 
 // Display results before database is cleared.
 simpletest_script_reporter_display_results($test_run_results_storage);
@@ -261,60 +283,26 @@ if (!Config::get('keep-results')) {
       DRUPAL_ROOT,
       Database::getConnection(),
       $test_run_results_storage,
-      $console_output,
+      $io,
       \Drupal::service('file_system')
     );
     $cleaner->cleanResults();
   }
-  catch (Exception $e) {
+  catch (ConnectionNotDefinedException) {
+    exit($status);
+  }
+  catch (\Exception $e) {
     echo (string) $e;
     exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
   }
 }
 
+// Stop the timer.
+$end = Timer::stop('run-tests');
+$reporter->summaryTable($end, $total_time ?? 0.0, $end_discovery, $overall_test_time ?? NULL);
+
 // Test complete, exit.
 exit($status);
-
-/**
- * Print help text.
- */
-function simpletest_script_help(InputDefinition $input_definition, string $script_basename, ConsoleOutput $console_output): void {
-
-  echo <<<EOF
-
-Run Drupal tests from the shell.
-
-Usage:        {$script_basename} [OPTIONS] <tests>
-Example:      {$script_basename} Profile
-
-
-EOF;
-
-  $helper = new DescriptorHelper();
-  $helper->describe($console_output, $input_definition);
-
-  echo <<<EOF
-
-
-To run this script you will normally invoke it from the root directory of your
-Drupal installation as the webserver user (differs per configuration), or root:
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --all
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --class Drupal\\\\Tests\\\\block\\\\Functional\\\\BlockTest
-
-Without a preinstalled Drupal site, specify a SQLite database pathname to create
-(for the test runner) and the default database connection info (for Drupal) to
-use in tests:
-
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename}
-  --sqlite /tmpfs/drupal/test.sqlite
-  --dburl mysql://username:password@localhost/database
-  --url http://example.com/ --all
-
-
-EOF;
-}
 
 /**
  * Initialize script variables and perform general setup requirements.
@@ -496,7 +484,7 @@ function simpletest_script_setup_test_run_results_storage() {
  * Execute a batch of tests.
  */
 function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_run_results_storage, $test_classes) {
-  global $test_ids, $total_time;
+  global $test_ids, $total_time, $eventDispatcher, $executionProgress;
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
   $total_time = 0;
@@ -505,23 +493,41 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
     ->setConfigurationFilePath(Config::get('phpunit-configuration'));
 
   // Multi-process execution.
+  $l_count = $t_count = $cycles = 0;
+  $p_frequency = 2;
+  $p_watermark = 0;
   $children = [];
   while (!empty($test_classes) || !empty($children)) {
+    // Polling.
+    $e_time = microtime(TRUE) - $executionProgress->timeAtTestsExecutionStart;
+    if ($e_time > ($p_watermark + $p_frequency)) {
+      $eventDispatcher->dispatch(new RunnerTestsExecutionPoll(
+        cycle: $cycles,
+        launched: $l_count,
+        terminated: $t_count,
+        active: count($children),
+      ));
+      while (($p_watermark + $p_frequency) < (microtime(TRUE) - $executionProgress->timeAtTestsExecutionStart)) {
+        $p_watermark += $p_frequency;
+      }
+    }
+
+    // Allocate tests to child processes.
     while (count($children) < Config::get('concurrency')) {
       if (empty($test_classes)) {
         break;
       }
 
+      $test_class = array_shift($test_classes);
+
       try {
-        $test_run = TestRun::createNew($test_run_results_storage);
+        $test_run = TestRun::createNew(++$l_count, $test_class, $test_run_results_storage);
       }
       catch (Exception $e) {
         echo (string) $e;
         exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
       }
       $test_ids[] = $test_run->id();
-
-      $test_class = array_shift($test_classes);
 
       // Fork a child process.
       try {
@@ -545,12 +551,20 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         'test_run' => $test_run,
         'class' => $test_class,
       ];
+
+      // Progress info.
+      $eventDispatcher->dispatch(new TestExecutionStart(
+        cycle: $cycles,
+        sequence: $l_count,
+        testRun: $test_run,
+      ));
     }
 
     // Wait for children every 2ms.
     usleep(2000);
+    $cycles++;
 
-    // Check if some children finished.
+    // Process results of finished children.
     foreach ($children as $cid => $child) {
       if ($child['process']->isTerminated()) {
         // The child exited.
@@ -561,25 +575,14 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
           $child['test_run'],
           $child['class'],
         );
-        simpletest_script_reporter_display_summary(
-          $child['class'],
-          $process_outcome['summaries'][$child['class']],
-          $child['test_run']->duration()
-        );
-        if ($process_outcome['error_output']) {
-          echo 'ERROR: ' . implode("\n", $process_outcome['error_output']);
-        }
         if (in_array($process_outcome['status'], [SIMPLETEST_SCRIPT_EXIT_FAILURE, SIMPLETEST_SCRIPT_EXIT_ERROR])) {
           $total_status = max($process_outcome['status'], $total_status);
         }
         elseif ($process_outcome['status']) {
-          $message = 'FATAL ' . $child['class'] . ': test runner returned an unexpected error code (' . $process_outcome['status'] . ').';
-          echo $message . "\n";
           $total_status = max(SIMPLETEST_SCRIPT_EXIT_EXCEPTION, $total_status);
           if (Config::get('die-on-fail')) {
             $test_db = new TestDatabase($child['test_run']->getDatabasePrefix());
-            $test_directory = $test_db->getTestSitePath();
-            echo 'Test database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $child['test_run']->getDatabasePrefix() . ' and config directories in ' . $test_directory . "\n";
+            $process_outcome['test_directory'] = $test_db->getTestSitePath();
             Config::set('keep-results', TRUE);
             // Exit repeat loop immediately.
             Config::set('repeat', -1);
@@ -588,6 +591,14 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 
         // Remove this child.
         unset($children[$cid]);
+        $t_count++;
+
+        // Progress info.
+        $eventDispatcher->dispatch(new TestExecutionFinished(
+          cycle: $cycles,
+          testRun: $child['test_run'],
+          result: $process_outcome,
+        ));
       }
     }
   }
@@ -606,35 +617,14 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 function simpletest_script_get_test_list() {
   $testDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
 
-  echo "Test discovery\n";
-
   try {
     if (Config::get('all') || Config::get('module') || Config::get('directory')) {
-      if (Config::get('types')) {
-        echo sprintf("PHPUnit test suite(s): %s\n", implode(', ', Config::get('types')));
-      }
-      if (Config::get('module')) {
-        echo sprintf("Drupal module........: %s\n", Config::get('module'));
-      }
-      if (Config::get('directory')) {
-        echo sprintf("Directory............: %s\n", Config::get('directory'));
-      }
-      if (Config::getTests()) {
-        echo sprintf("PHPUnit test group(s): %s\n", implode(', ', Config::getTests()));
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = $testDiscovery->getTestClasses(Config::get('module'), Config::get('types'), Config::get('directory'), Config::getTests());
     }
     elseif (Config::get('class')) {
       // When --class is specified, we have to find the file of each of the
       // classes indicated as argument and run test discovery for it, then
       // merge the results.
-      $classesArg = Config::getTests();
-      echo sprintf("Test class(es).......: %s\n", array_shift($classesArg));
-      foreach ($classesArg as $arg) {
-        echo sprintf("                     : %s\n", $arg);
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       foreach (Config::getTests() as $test_class) {
         [$class_name] = explode('::', $test_class, 2);
@@ -668,12 +658,6 @@ function simpletest_script_get_test_list() {
     elseif (Config::get('file')) {
       // When --file is specified, we have to run test discovery for each of
       // the files indicated, then merge the results.
-      $filesArg = Config::getTests();
-      echo sprintf("Test file(s).........: %s\n", array_shift($filesArg));
-      foreach ($filesArg as $arg) {
-        echo sprintf("                     : %s\n", $arg);
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       foreach (Config::getTests() as $file) {
         if (!file_exists($file) || is_dir($file)) {
@@ -694,13 +678,6 @@ function simpletest_script_get_test_list() {
     else {
       // When no restriction options are specified, we consider the argument as
       // a list of groups of tests to be executed.
-      if (Config::get('types')) {
-        echo sprintf("PHPUnit test suite(s): %s\n", implode(', ', Config::get('types')));
-      }
-      if (Config::getTests()) {
-        echo sprintf("PHPUnit test group(s): %s\n", implode(', ', Config::getTests()));
-      }
-      echo "--------------------------------------------------------------\n";
       $groupedTestClassInfoList = [];
       try {
         $groupedTestClassInfoFullSuiteList = $testDiscovery->getTestClasses(NULL, Config::get('types'));
@@ -747,152 +724,6 @@ function simpletest_script_get_test_list() {
   }
 
   return $groupedTestClassInfoList;
-}
-
-/**
- * Dumps the list of tests in order of execution after sorting.
- *
- * @param array $tests
- *   The array of test class info.
- */
-function dump_tests_sequence(array $tests): void {
-  if (!Config::get('debug-discovery')) {
-    return;
-  }
-  echo "Test execution sequence\n";
-  echo "-----------------------\n\n";
-  echo " Seq Slow? Group            Cnt Weight Class\n";
-  echo "------------------------------------------------\n";
-  foreach ($tests as $testInfo) {
-    echo sprintf(
-      "%4d %5s %15s %4d %6d %s\n",
-      $testInfo['worker_sequence'],
-      in_array('#slow', $testInfo['groups']) ? '#slow' : '',
-      trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
-      $testInfo['tests_count'],
-      $testInfo['weight'],
-      trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
-    );
-  }
-  echo "------------------------------------------------\n\n";
-}
-
-/**
- * Dumps the list of tests in order of execution for a bin.
- *
- * @param int $bin
- *   The bin.
- * @param array $allTests
- *   The list of all test classes discovered.
- * @param array $tests
- *   The list of test class to run for this bin.
- */
-function dump_bin_tests_sequence(int $bin, array $allTests, array $tests): void {
-  echo "Test execution sequence. ";
-  echo "Tests marked *** will be executed in this PARALLEL BIN #{$bin}.\n";
-  echo "--------------------------------------------------------------------------------------------\n\n";
-  echo "    Sort  Bin                                 \n";
-  echo "Bin  Seq  Seq Slow? Group            Cnt Weight Class\n";
-  echo "--------------------------------------------------------------------------------------------\n";
-  foreach ($allTests as $testInfo) {
-    $inBin = isset($tests[$testInfo['name']]);
-    $message = sprintf(
-      "%s %4d %s %5s %15s %4d %6d %s\n",
-      $inBin ? "***" : "   ",
-      $testInfo['sorted_sequence'],
-      $inBin ? sprintf('%4d', $tests[$testInfo['name']]['worker_sequence']) : "    ",
-      in_array('#slow', $testInfo['groups']) ? '#slow' : '',
-      trim_with_ellipsis($testInfo['group'], 15, \STR_PAD_RIGHT),
-      $testInfo['tests_count'],
-      $testInfo['weight'],
-      trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
-    );
-    simpletest_script_print($message, $inBin ? SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE : SIMPLETEST_SCRIPT_COLOR_GRAY);
-  }
-  echo "--------------------------------------------------------------------------------------------\n\n";
-}
-
-/**
- * Initialize the reporter.
- */
-function simpletest_script_reporter_init(): void {
-  global $test_list, $results_map;
-
-  $results_map = [
-    'pass' => 'Pass',
-    'fail' => 'Fail',
-    'error' => 'Error',
-    'skipped' => 'Skipped',
-    'cli_fail' => 'Failure',
-    'exception' => 'Exception',
-    'debug' => 'Log',
-  ];
-
-  // Tell the user about what tests are to be run.
-  if (Config::get('all')) {
-    echo "All tests will run.\n\n";
-  }
-  else {
-    echo "Tests to be run:\n";
-    foreach ($test_list as $class_name) {
-      echo "  - $class_name\n";
-    }
-    echo "\n";
-  }
-
-  echo "Test run started:\n";
-  echo "  " . date('l, F j, Y - H:i', $_SERVER['REQUEST_TIME']) . "\n";
-  Timer::start('run-tests');
-  echo "\n";
-
-  echo "Test summary\n";
-  echo "------------\n";
-  echo "\n";
-}
-
-/**
- * Displays the assertion result summary for a single test class.
- *
- * @param string $class
- *   The test class name that was run.
- * @param array $results
- *   The assertion results using #pass, #fail, #exception, #debug array keys.
- * @param float|null $duration
- *   The time taken for the test to complete.
- */
-function simpletest_script_reporter_display_summary($class, $results, $duration = NULL): void {
-  // Output all test results vertically aligned.
-  $summary = [str_pad($results['#pass'], 4, " ", STR_PAD_LEFT) . ' passed'];
-  if ($results['#fail']) {
-    $summary[] = $results['#fail'] . ' failed';
-  }
-  if ($results['#error']) {
-    $summary[] = $results['#error'] . ' errored';
-  }
-  if ($results['#skipped']) {
-    $summary[] = $results['#skipped'] . ' skipped';
-  }
-  if ($results['#exception']) {
-    $summary[] = $results['#exception'] . ' exception(s)';
-  }
-  if ($results['#debug']) {
-    $summary[] = $results['#debug'] . ' log(s)';
-  }
-
-  if ($results['#cli_fail']) {
-    $summary[] = 'exit code ' . $results['#exit_code'];
-  }
-
-  // The key $results['#time'] holds the sum of the tests execution times,
-  // without taking into account the process spawning time and the setup
-  // times of the tests themselves. So for reporting to be consistent with
-  // PHPUnit CLI reported execution time, we report here the overall time of
-  // execution of the spawned process.
-  $time = sprintf('%8.3fs', $duration);
-
-  $output = vsprintf('%s %s %s', [$time, trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
-  $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
-  simpletest_script_print($output . "\n", simpletest_script_color_code($status));
 }
 
 /**
@@ -979,33 +810,16 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
 }
 
 /**
- * Stop the test timer.
- */
-function simpletest_script_reporter_timer_stop(): void {
-  global $total_time;
-
-  echo "\n";
-  $end = Timer::stop('run-tests');
-  $wall_seconds = $end['time'] / 1000;
-  $formatter = \Drupal::service('date.formatter');
-  echo "Wall time: " . $formatter->formatInterval((int) $wall_seconds) . "\n";
-  echo "Total time:  " . $formatter->formatInterval((int) $total_time) . "\n";
-  if ($wall_seconds > 0) {
-    echo sprintf("Speedup:   %.2fx (concurrency %d)\n", $total_time / $wall_seconds, Config::get('concurrency'));
-  }
-  echo "\n";
-}
-
-/**
  * Display test results.
  */
 function simpletest_script_reporter_display_results(TestRunResultsStorageInterface $test_run_results_storage): void {
-  global $test_ids, $results_map;
+  global $test_ids, $results_map, $overall_test_time;
 
   if (Config::get('verbose')) {
     // Report results.
+    echo "\n";
     echo "Detailed test results\n";
-    echo "---------------------\n";
+    echo "---------------------";
 
     try {
       $results = simpletest_script_load_messages_by_test_id($test_run_results_storage, $test_ids);
@@ -1015,6 +829,7 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
       exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
     }
     $test_class = '';
+    $overall_test_time = 0;
     foreach ($results as $result) {
       if (isset($results_map[$result->status])) {
         if ($result->test_class != $test_class) {
@@ -1029,6 +844,7 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
 
         simpletest_script_format_result($result);
       }
+      $overall_test_time += $result->time;
     }
   }
 }
@@ -1052,7 +868,7 @@ function simpletest_script_format_result($result): void {
     $duration = sprintf("%9.3fs", $result->time);
   }
 
-  $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, trim_with_ellipsis($result->function, 80, STR_PAD_LEFT));
+  $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, CliPrinter::trimWithEllipsis($result->function, 80, STR_PAD_LEFT));
 
   simpletest_script_print($summary, simpletest_script_color_code($result->status));
 
@@ -1122,6 +938,26 @@ function simpletest_script_color_code($status) {
     'skipped' => SIMPLETEST_SCRIPT_COLOR_YELLOW,
     'debug' => SIMPLETEST_SCRIPT_COLOR_CYAN,
     default => 0,
+  };
+}
+
+/**
+ * Get the Console color tag associated with the specified status.
+ *
+ * @param string $status
+ *   The status string to get code for. Special cases are: 'pass', 'fail', or
+ *   'exception'.
+ *
+ * @return ?string
+ *   Color tag.
+ */
+function simpletest_script_color_console_tag(string $status): ?string {
+  return match ($status) {
+    'pass' => '<fg=green>',
+    'fail', 'cli_fail', 'error', 'exception' => '<error>',
+    'skipped' => '<fg=yellow>',
+    'debug' => '<fg=cyan>',
+    default => NULL,
   };
 }
 
@@ -1200,32 +1036,6 @@ function simpletest_script_load_messages_by_test_id(TestRunResultsStorageInterfa
   }
 
   return $results;
-}
-
-/**
- * Trims a string adding a leading or trailing ellipsis.
- *
- * @param string $input
- *   The input string.
- * @param int $length
- *   The exact trimmed string length.
- * @param int $side
- *   Leading or trailing ellipsis.
- *
- * @return string
- *   The trimmed string.
- */
-function trim_with_ellipsis(string $input, int $length, int $side): string {
-  if (strlen($input) < $length) {
-    return str_pad($input, $length, ' ', \STR_PAD_RIGHT);
-  }
-  elseif (strlen($input) > $length) {
-    return match ($side) {
-      \STR_PAD_RIGHT => substr($input, 0, $length - 1) . '…',
-      default => '…' . substr($input, -$length + 1),
-    };
-  }
-  return $input;
 }
 
 /**

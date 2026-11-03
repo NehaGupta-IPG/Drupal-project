@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\TestRunner;
 
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 // cspell:ignore testbots
@@ -21,7 +21,7 @@ final class Configuration {
    *
    * phpcs:ignore Drupal.Commenting.VariableComment.MissingVar
    */
-  protected static ?self $instance = NULL;
+  private static ?self $instance = NULL;
 
   protected function __construct(
     private array $options,
@@ -30,14 +30,24 @@ final class Configuration {
   }
 
   /**
-   * Gets a config element.
+   * Returns the singleton instance.
+   *
+   * @return self
+   *   The singleton instance.
    */
-  public static function get(string $name): mixed {
+  public static function instance(): self {
     if (self::$instance === NULL) {
       throw new \RuntimeException("Configuration is not yet created");
     }
-    if (array_key_exists($name, self::$instance->options)) {
-      return self::$instance->options[$name];
+    return self::$instance;
+  }
+
+  /**
+   * Gets a config element.
+   */
+  public static function get(string $name): mixed {
+    if (array_key_exists($name, self::instance()->options)) {
+      return self::instance()->options[$name];
     }
     throw new \RuntimeException("There is no '{$name}' element in config");
   }
@@ -46,29 +56,27 @@ final class Configuration {
    * Gets the tests to execute.
    */
   public static function getTests(): array {
-    return self::$instance->arguments['tests'];
+    return self::instance()->arguments['tests'];
   }
 
   /**
    * Sets a config element.
    */
   public static function set(string $name, mixed $value): void {
-    self::$instance->options[$name] = $value;
+    self::instance()->options[$name] = $value;
   }
 
   /**
    * Builds the test runner configuration from command line arguments.
    */
-  public static function createFromCommandLine(array $arguments): self {
+  public static function createFromCommandLine(InputInterface $input): self {
     if (self::$instance) {
-      return self::$instance;
+      return self::instance();
     }
 
-    if (count($arguments) < 2) {
-      $arguments[] = '--help';
+    if (count($_SERVER['argv']) < 2) {
+      $input->setOption('help', TRUE);
     }
-
-    $input = new ArgvInput($arguments, self::commandLineDefinition());
 
     if ($input->getOption('directory') && ($input->getOption('file') || $input->getOption('class'))) {
       throw new \RuntimeException("--directory cannot be specified together with the --class or --file options.");
@@ -81,6 +89,10 @@ final class Configuration {
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
       throw new \RuntimeException("--concurrency must be a strictly positive integer.");
+    }
+
+    if ($input->getOption('color')) {
+      $_SERVER['FORCE_COLOR'] = '1';
     }
 
     if ($input->getArgument('tests')) {
@@ -99,7 +111,7 @@ final class Configuration {
 
     self::$instance = new self($input->getOptions(), $input->getArguments());
 
-    return self::$instance;
+    return self::instance();
   }
 
   /**
@@ -297,6 +309,12 @@ final class Configuration {
       NULL,
       InputOption::VALUE_NONE,
       'If provided, dumps detailed information on the tests selected for execution, before the execution starts.'
+    ));
+    $inputDefinition->addOption(new InputOption(
+      'debug-execution',
+      NULL,
+      InputOption::VALUE_NONE,
+      'If provided, dumps detailed information about state during execution.'
     ));
 
     $inputDefinition->addArgument(new InputArgument(

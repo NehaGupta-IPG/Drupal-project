@@ -17,7 +17,18 @@ use PHPUnit\TextUI\Configuration\TestSuiteBuilder;
 /**
  * Discovers available tests using the PHPUnit API.
  *
- * @phpstan-type TestClassInfo array{name: class-string, description: string, group: string|int, groups: list<string|int>, type: string, file: string, tests_count: positive-int}
+ * @phpstan-type TestClassInfo array{
+ *   'name': class-string,
+ *   'description': string,
+ *   'group': string|int,
+ *   'groups': list<string|int>,
+ *   'type': string,
+ *   'file': string,
+ *   'tests_count': positive-int,
+ *   'weight'?: positive-int,
+ *   'bin'?: positive-int,
+ *   'sorted_sequence': int,
+ * }
  * @phpstan-type TestClassInfoList array<class-string,TestClassInfo>
  * @phpstan-type GroupedTestClassInfoList array<string|int,TestClassInfoList>
  *

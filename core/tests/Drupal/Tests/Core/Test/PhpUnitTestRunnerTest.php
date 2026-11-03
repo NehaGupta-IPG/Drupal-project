@@ -65,7 +65,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
 
     // The execute() method expects $status by reference, so we initialize it
     // to some value we don't expect back.
-    $test_run = TestRun::createNew($storage);
+    $test_run = TestRun::createNew(1, 'SomeTest', $storage);
     $test_run->start(microtime(TRUE));
     $test_run->end(microtime(TRUE));
     $process_outcome = $runner->processPhpUnitOnSingleTestClassOutcome($process, $test_run, 'SomeTest');
