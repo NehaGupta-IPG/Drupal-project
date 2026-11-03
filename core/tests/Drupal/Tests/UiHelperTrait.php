@@ -187,7 +187,7 @@ trait UiHelperTrait {
 
     // @see ::drupalUserIsLoggedIn()
     $account->sessionId = $this->getSession()->getCookie(\Drupal::service('session_configuration')->getOptions(\Drupal::request())['name']);
-    $this->assertTrue($this->drupalUserIsLoggedIn($account), "User {$account->getAccountName()} successfully logged in.");
+    $this->assertTrue($this->drupalUserIsLoggedIn($account));
 
     $this->loggedInUser = $account;
     $this->container->get('current_user')->setAccount($account);
