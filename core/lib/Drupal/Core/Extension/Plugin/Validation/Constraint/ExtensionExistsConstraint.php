@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Checks that the value is the name of an installed extension.
+ *
+ * @ingroup extension_api
  */
 #[Constraint(
   id: 'ExtensionExists',

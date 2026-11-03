@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
  * $settings['extension_discovery_scan_tests'] = TRUE;
  * @endcode
  * to your settings.php.
+ *
+ * @ingroup extension_api
  */
 class ExtensionDiscovery {
 

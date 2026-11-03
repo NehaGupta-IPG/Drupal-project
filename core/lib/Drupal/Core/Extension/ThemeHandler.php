@@ -7,6 +7,8 @@ use Drupal\Core\Extension\Exception\UnknownExtensionException;
 
 /**
  * Default theme handler using the config system to store installation statuses.
+ *
+ * @ingroup extension_api
  */
 class ThemeHandler implements ThemeHandlerInterface {
 

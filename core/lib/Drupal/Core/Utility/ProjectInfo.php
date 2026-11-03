@@ -6,6 +6,8 @@ use Drupal\Core\Extension\Extension;
 
 /**
  * Performs operations on drupal.org project data.
+ *
+ * @ingroup extension_api
  */
 class ProjectInfo {
 

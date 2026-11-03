@@ -17,6 +17,8 @@ use Symfony\Contracts\Service\ServiceCollectionInterface;
 
 /**
  * Provides the default implementation of a theme manager.
+ *
+ * @ingroup extension_api
  */
 class ThemeManager implements ThemeManagerInterface {
 

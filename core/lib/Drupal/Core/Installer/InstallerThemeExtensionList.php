@@ -13,6 +13,8 @@ use Drupal\Core\Extension\ThemeExtensionList;
  *   \Drupal\Core\Extension\ThemeExtensionList instead.
  *
  * @see https://www.drupal.org/node/3577846
+ *
+ * @ingroup extension_api
  */
 class InstallerThemeExtensionList extends ThemeExtensionList {
   use ExtensionListTrait;

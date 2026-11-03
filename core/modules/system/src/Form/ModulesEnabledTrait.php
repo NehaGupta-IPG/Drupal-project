@@ -11,6 +11,8 @@ use Drupal\Core\Url;
  * Provides helpers for enabling modules.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 trait ModulesEnabledTrait {
 

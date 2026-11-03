@@ -8,6 +8,8 @@ namespace Drupal\Core\Hook\OrderOperation;
  * Moves one listener to be called before or after other listeners.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class BeforeOrAfter extends OrderOperation {
 

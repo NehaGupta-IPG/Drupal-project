@@ -1105,6 +1105,8 @@ function install_display_output($output, $install_state): void {
  *
  * @return array
  *   A themed status report, or an exception if there are requirement errors.
+ *
+ * @ingroup extension_api
  */
 function install_verify_requirements(&$install_state) {
   // Check the installation requirements for Drupal and this profile.
@@ -1549,6 +1551,8 @@ function _install_get_version_info($version) {
  * @param array $install_state
  *   An array of information about the current installation state. The loaded
  *   profile information will be added here.
+ *
+ * @ingroup extension_api
  */
 function install_load_profile(&$install_state): void {
   $profile = $install_state['parameters']['profile'];
@@ -1592,6 +1596,8 @@ function install_bootstrap_full(): void {
  *
  * @return array
  *   The batch definition.
+ *
+ * @ingroup extension_api
  */
 function install_profile_modules(&$install_state) {
   // We need to manually trigger the installation of core-provided entity types,
@@ -1716,6 +1722,8 @@ function install_core_entity_type_definitions(): void {
  *
  * @param array $install_state
  *   An array of information about the current installation state.
+ *
+ * @ingroup extension_api
  */
 function install_profile_themes(&$install_state): void {
   // Install the themes specified by the installation profile.
@@ -1738,6 +1746,8 @@ function install_profile_themes(&$install_state): void {
  *
  * @param array $install_state
  *   An array of information about the current installation state.
+ *
+ * @ingroup extension_api
  */
 function install_install_profile(&$install_state): void {
   // Install all available optional config. During installation the module order
@@ -1904,6 +1914,8 @@ function install_finished(&$install_state): void {
  * Implements callback_batch_operation().
  *
  * Performs batch installation of modules.
+ *
+ * @ingroup extension_api
  */
 function _install_module_batch(array $modules, array $module_names, array $install_state, array &$context): void {
   \Drupal::service('module_installer')->install($modules, FALSE);
@@ -2103,6 +2115,8 @@ function install_check_translations($langcode, $server_pattern, string $project 
 
 /**
  * Checks installation requirements and reports any errors.
+ *
+ * @ingroup extension_api
  */
 function install_check_requirements($install_state) {
   $requirements = [];
@@ -2672,6 +2686,8 @@ function _install_get_database_module_name(): ?string {
  *   The tasks.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 function install_get_tasks(Extension $extension, array &$install_state): array {
   assert($extension->getType() === 'profile');
@@ -2699,6 +2715,8 @@ function install_get_tasks(Extension $extension, array &$install_state): array {
  *   Whether tasks were altered.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 function install_alter_tasks(Extension $extension, array &$tasks, array $install_state): bool {
   assert($extension->getType() === 'profile');

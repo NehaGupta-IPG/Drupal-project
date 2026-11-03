@@ -4,6 +4,8 @@ namespace Drupal\Core\Extension;
 
 /**
  * Manages the list of available themes.
+ *
+ * @ingroup extension_api
  */
 interface ThemeHandlerInterface {
 

@@ -132,6 +132,8 @@ function drupal_install_profile_distribution_version() {
  *
  * @todo https://www.drupal.org/i/3005959 Rework this method as it is not only
  *   about profiles.
+ *
+ * @ingroup extension_api
  */
 function drupal_verify_profile($install_state): array {
   $profile = $install_state['parameters']['profile'];
@@ -545,6 +547,8 @@ function drupal_requirements_url(RequirementSeverity $severity): string {
  *
  * @return array
  *   Array of the installation profile's requirements.
+ *
+ * @ingroup extension_api
  */
 function drupal_check_profile($profile): array {
   $info = install_profile_info($profile);
@@ -597,6 +601,8 @@ function drupal_check_profile($profile): array {
  *
  * @return bool
  *   TRUE or FALSE, depending on whether the requirements are met.
+ *
+ * @ingroup extension_api
  */
 function drupal_check_module($module) {
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
@@ -684,6 +690,8 @@ function drupal_check_module($module) {
  *
  * @return array
  *   The info array.
+ *
+ * @ingroup extension_api
  */
 function install_profile_info($profile, $langcode = 'en') {
   static $cache = [];
@@ -755,6 +763,8 @@ function install_profile_info($profile, $langcode = 'en') {
  *   The tasks.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 function install_get_fixed_class_name(Extension $extension, string $directory_search): string {
   $class_name = '';
@@ -789,6 +799,8 @@ function install_get_fixed_class_name(Extension $extension, string $directory_se
  *   The requirements.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 function install_check_class_requirements(Extension $extension): array {
   $class_name = install_get_fixed_class_name($extension, 'Install/Requirements');

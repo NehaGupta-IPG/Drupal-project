@@ -11,6 +11,8 @@ use Drupal\Core\Hook\Order\OrderInterface;
  *
  * The effect of this attribute is independent from the specific class or method
  * on which it is placed.
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class ReorderHook implements HookAttributeInterface {

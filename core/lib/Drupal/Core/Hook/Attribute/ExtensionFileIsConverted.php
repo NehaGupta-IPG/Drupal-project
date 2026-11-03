@@ -15,6 +15,8 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * @see https://www.drupal.org/node/3581222
  * @see https://www.drupal.org/node/3551652
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class ExtensionFileIsConverted {}

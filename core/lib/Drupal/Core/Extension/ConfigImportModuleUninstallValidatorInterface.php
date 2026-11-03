@@ -12,6 +12,8 @@ use Drupal\Core\Config\StorageInterface;
  * a Drupal @link container service @endlink that is tagged
  * module_install.uninstall_validator. If autoconfiguration is enabled, the
  * service will be automatically tagged.
+ *
+ * @ingroup extension_api
  */
 interface ConfigImportModuleUninstallValidatorInterface extends ModuleUninstallValidatorInterface {
 

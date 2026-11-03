@@ -21,6 +21,8 @@ namespace Drupal\Core\Hook\Attribute;
  *
  * Adding this attribute will also skip deprecation messages on Drupal 11.3 and
  * later.
+ *
+ * @ingroup extension_api
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 class LegacyRequirementsHook {}

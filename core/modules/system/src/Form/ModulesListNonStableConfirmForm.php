@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Builds a confirmation form for enabling experimental and deprecated modules.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
 

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a form for uninstalling modules.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ModulesUninstallForm extends FormBase {
 

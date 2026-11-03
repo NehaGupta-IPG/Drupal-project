@@ -15,6 +15,8 @@ use Drupal\Core\Utility\CallableResolver;
 
 /**
  * Class that manages modules in a Drupal installation.
+ *
+ * @ingroup extension_api
  */
 class ModuleHandler implements ModuleHandlerInterface {
 

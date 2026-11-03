@@ -4,6 +4,8 @@ namespace Drupal\Core\Extension;
 
 /**
  * Manages theme installation/uninstallation.
+ *
+ * @ingroup extension_api
  */
 interface ThemeInstallerInterface {
 

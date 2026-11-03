@@ -8,6 +8,8 @@ namespace Drupal\Core\Extension;
  * @internal
  *
  * @see https://www.drupal.org/drupalorg/docs/apis/update-status-xml
+ *
+ * @ingroup extension_api
  */
 final class ExtensionVersion {
 

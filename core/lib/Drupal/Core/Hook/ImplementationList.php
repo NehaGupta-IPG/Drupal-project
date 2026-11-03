@@ -10,6 +10,8 @@ namespace Drupal\Core\Hook;
  * Also contains information about module names.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ImplementationList {
 

@@ -11,6 +11,8 @@ namespace Drupal\Core\Extension;
  * 2. Stabilizes and goes "stable".
  * 3. Eventually (maybe), becomes "deprecated" when being phased out.
  * 4. Finally (maybe), becomes "obsolete" and can't be enabled anymore.
+ *
+ * @ingroup extension_api
  */
 final class ExtensionLifecycle {
 

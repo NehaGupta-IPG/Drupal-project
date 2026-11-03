@@ -6,6 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Class that manages weights.
+ *
+ * @ingroup extension_api
  */
 class ModuleWeight {
 

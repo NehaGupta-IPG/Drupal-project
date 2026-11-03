@@ -6,6 +6,8 @@ namespace Drupal\Core\Hook\Order;
 
 /**
  * Set this implementation to be after others.
+ *
+ * @ingroup extension_api
  */
 readonly class OrderAfter extends RelativeOrderBase {
 

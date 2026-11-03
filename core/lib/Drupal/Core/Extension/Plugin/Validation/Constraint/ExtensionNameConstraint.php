@@ -11,6 +11,8 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
 
 /**
  * Checks that the value is a valid extension name.
+ *
+ * @ingroup extension_api
  */
 #[Constraint(
   id: 'ExtensionName',

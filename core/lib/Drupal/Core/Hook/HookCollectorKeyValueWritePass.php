@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @internal
  *
  * @see \Drupal\Core\Hook\HookCollectorPass::writeToContainer
+ *
+ * @ingroup extension_api
  */
 class HookCollectorKeyValueWritePass implements CompilerPassInterface {
 

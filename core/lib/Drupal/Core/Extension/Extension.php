@@ -9,6 +9,8 @@ namespace Drupal\Core\Extension;
  * occurred when using the serialize method.
  *
  * @see https://bugs.php.net/bug.php?id=66052
+ *
+ * @ingroup extension_api
  */
 #[\AllowDynamicProperties]
 class Extension {

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Manages theme installation/uninstallation.
+ *
+ * @ingroup extension_api
  */
 class ThemeInstaller implements ThemeInstallerInterface {
 

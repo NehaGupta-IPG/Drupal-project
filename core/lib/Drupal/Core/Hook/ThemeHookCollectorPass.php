@@ -33,6 +33,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * and removed automatically.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassInterface {
 

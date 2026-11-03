@@ -7,6 +7,8 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
  * Ensures that required modules cannot be uninstalled.
+ *
+ * @ingroup extension_api
  */
 class RequiredModuleUninstallValidator implements ModuleUninstallValidatorInterface {
 

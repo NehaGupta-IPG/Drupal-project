@@ -8,6 +8,8 @@ namespace Drupal\Core\Hook\OrderOperation;
  * Moves one listener to the start or end of the list.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class FirstOrLast extends OrderOperation {
 

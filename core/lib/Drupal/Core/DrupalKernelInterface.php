@@ -112,6 +112,8 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *   The new list of modules.
    * @param array $module_filenames
    *   List of module filenames, keyed by module name.
+   *
+   * @ingroup extension_api
    */
   public function updateModules(array $module_list, array $module_filenames = []);
 
@@ -123,6 +125,8 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * array<string, \Drupal\Core\Extension\Extension> $register_themes
    *   List of theme extensions, keyed by theme name.
+   *
+   * @ingroup extension_api
    */
   public function updateThemes(array $register_themes = []): void;
 

@@ -40,6 +40,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * removed automatically.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class HookCollectorPass extends HookCollectorBase implements CompilerPassInterface {
 

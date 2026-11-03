@@ -26,6 +26,8 @@ namespace Drupal\Core\Extension\Discovery;
  * @see ExtensionDiscovery::scanDirectory()
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 class RecursiveExtensionFilterCallback {
 

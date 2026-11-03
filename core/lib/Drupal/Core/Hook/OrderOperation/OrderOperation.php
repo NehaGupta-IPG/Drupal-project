@@ -6,6 +6,8 @@ namespace Drupal\Core\Hook\OrderOperation;
 
 /**
  * Base class for order operations.
+ *
+ * @ingroup extension_api
  */
 abstract class OrderOperation {
 

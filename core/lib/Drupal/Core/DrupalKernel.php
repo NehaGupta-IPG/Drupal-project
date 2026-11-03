@@ -803,6 +803,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return \Drupal\Core\Extension\Extension|false
    *   Returns an Extension object if the module is found, FALSE otherwise.
+   *
+   * @ingroup extension_api
    */
   protected function moduleData($module) {
     if (!$this->moduleData) {
@@ -816,6 +818,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * This function is expensive to call as it scans the filesystem for
    * extensions. Use ::moduleData() and ::themeExtensions() instead.
+   *
+   * @ingroup extension_api
    */
   private function setExtensionData(): void {
     // First, find profiles.
@@ -841,6 +845,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @todo Remove obsolete $module_list parameter. Only $module_filenames is
    *   needed.
+   *
+   * @ingroup extension_api
    */
   public function updateModules(array $module_list, array $module_filenames = []) {
     $pre_existing_module_namespaces = [];
@@ -891,6 +897,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return \Drupal\Core\Extension\Extension|false
    *   Returns an Extension object if the theme is found, FALSE otherwise.
+   *
+   * @ingroup extension_api
    */
   protected function themeExtensions($theme): Extension|false {
     if (!$this->themeExtensions) {
@@ -1690,6 +1698,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return array
    *   An associated array of extension class parameters, keyed by extension
    *   name, for all enabled themes.
+   *
+   * @ingroup extension_api
    */
   protected function getExtensionsParameter(array $extension_list, callable $get_data): array {
     $extensions = [];
@@ -1716,6 +1726,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return array
    *   Array where each key is a theme name, and each value is a path to the
    *   respective *.info.yml file.
+   *
+   * @ingroup extension_api
    */
   protected function getExtensionFileNames(array $extension_list, callable $get_data) {
     $filenames = [];
@@ -1738,6 +1750,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   Array where each key is an extension namespace like 'Drupal\system', and
    *   each value is the PSR-4 base directory associated with the extension
    *   namespace.
+   *
+   * @ingroup extension_api
    */
   protected function getExtensionNamespacesPsr4(array $extension_file_names): array {
     $namespaces = [];
@@ -1757,6 +1771,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param object $class_loader
    *   The class loader. Normally \Composer\Autoload\ClassLoader, as included by
    *   the front controller, but may also be decorated.
+   *
+   * @ingroup extension_api
    */
   protected function classLoaderAddMultiplePsr4(array $namespaces = [], $class_loader = NULL) {
     if ($class_loader === NULL) {
@@ -1890,6 +1906,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return string|false|null
    *   The name of the active install profile or distribution, FALSE if there is
    *   no install profile or NULL if Drupal is being installed.
+   *
+   * @ingroup extension_api
    */
   protected function getInstallProfile() {
     $config = $this->getExtensions();
@@ -1923,6 +1941,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return array|false
    *   The core.extension config object if it exists or FALSE.
+   *
+   * @ingroup extension_api
    */
   protected function getExtensions(): array|false {
     return $this->getConfigStorage()->read('core.extension');

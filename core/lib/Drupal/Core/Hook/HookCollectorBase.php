@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Provides shared hook collection functionality.
  *
  * @internal
+ *
+ * @ingroup extension_api
  */
 abstract class HookCollectorBase {
 

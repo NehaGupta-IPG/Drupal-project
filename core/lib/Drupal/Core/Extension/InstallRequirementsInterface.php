@@ -4,6 +4,8 @@ namespace Drupal\Core\Extension;
 
 /**
  * Provides method for checking requirements during install time.
+ *
+ * @ingroup extension_api
  */
 interface InstallRequirementsInterface {
 

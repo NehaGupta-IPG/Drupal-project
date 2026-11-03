@@ -17,6 +17,8 @@ namespace Drupal\Core\Extension;
  * @see \Drupal\Core\Extension\ModuleInstaller::validateUninstall()
  * @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber::validateModules()
  * @see \Drupal\Core\Extension\ConfigImportModuleUninstallValidatorInterface
+ *
+ * @ingroup extension_api
  */
 interface ModuleUninstallValidatorInterface {
 

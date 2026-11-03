@@ -20,6 +20,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * Validates that a given extension exists.
+ *
+ * @ingroup extension_api
  */
 class ExtensionAvailableConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
