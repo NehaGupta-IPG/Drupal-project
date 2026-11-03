@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Site\MaintenanceModeInterface;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -260,11 +261,10 @@ function drupal_generate_test_ua($prefix) {
  * Loads and initializes the theme system for site installs, updates and when
  * the site is in maintenance mode. This also applies when the database fails.
  *
- * @see _drupal_maintenance_theme()
+ * @see \Drupal\Core\Site\MaintenanceMode::setTheme()
  */
 function drupal_maintenance_theme(): void {
-  require_once __DIR__ . '/theme.maintenance.inc';
-  _drupal_maintenance_theme();
+  \Drupal::service(MaintenanceModeInterface::class)->setTheme();
 }
 
 /**

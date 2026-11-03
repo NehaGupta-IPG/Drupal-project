@@ -1472,7 +1472,7 @@ services:
       - { name: access_check, applies_to: _csrf_request_header_token, needs_incoming_request: TRUE }
   maintenance_mode:
     class: Drupal\Core\Site\MaintenanceMode
-    arguments: ['@state', '@config.factory']
+    autowire: true
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber

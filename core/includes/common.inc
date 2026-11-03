@@ -12,6 +12,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Render\Element\Table;
+use Drupal\Core\Site\MaintenanceModeInterface;
 
 /**
  * @defgroup php_wrappers PHP wrapper functions
@@ -318,8 +319,8 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Re-initialize the maintenance theme, if the current request attempted to
   // use it. Unlike regular usages of this function, the installer and update
   // scripts need to flush all caches during GET requests/page building.
-  if (function_exists('_drupal_maintenance_theme')) {
+  if (\Drupal::hasService(MaintenanceModeInterface::class)) {
     \Drupal::theme()->resetActiveTheme();
-    drupal_maintenance_theme();
+    \Drupal::service(MaintenanceModeInterface::class)->setTheme();
   }
 }
