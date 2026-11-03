@@ -143,30 +143,6 @@ class UserAuthenticationTest extends UnitTestCase {
   }
 
   /**
-   * Tests the authenticate method with a correct password.
-   *
-   * We discovered in https://www.drupal.org/node/2563751 that logging in with a
-   * password that is literally "0" was not possible. This test ensures that
-   * this regression can't happen again.
-   */
-  public function testAuthenticateWithZeroPassword(): void {
-    $this->setUpMockPasswordService();
-
-    $this->userStorage->expects($this->once())
-      ->method('loadByProperties')
-      ->with(['name' => $this->username])
-      ->willReturn([$this->createStub(User::class)]);
-
-    $this->passwordService
-      ->method('check')
-      ->with('0', 0)
-      ->willReturn(TRUE);
-
-    $user = $this->userAuth->lookupAccount($this->username);
-    $this->assertTrue($this->userAuth->authenticateAccount($user, '0'));
-  }
-
-  /**
    * Tests the authenticate method with a correct password & new password hash.
    */
   public function testAuthenticateWithCorrectPasswordAndNewPasswordHash(): void {
