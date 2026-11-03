@@ -67,9 +67,23 @@
     };
 
     // Find all <th> with class select-all, and insert the check all checkbox.
+    // Each checkbox gets a visible "Select all" label so that it has an
+    // accessible name.
     $table
       .find('th.select-all')
-      .prepend($(Drupal.theme('checkbox')).attr('title', strings.selectAll))
+      .each(function () {
+        const id = `tableselect-select-all-${Math.random()
+          .toString(36)
+          .slice(2, 10)}`;
+        const label = document.createElement('label');
+        label.className = 'tableselect__select-all-label';
+        label.htmlFor = id;
+        label.textContent = Drupal.t('Select all');
+        $(this).prepend(
+          $(Drupal.theme('checkbox')).attr({ id, title: strings.selectAll }),
+          label,
+        );
+      })
       .on('click', (event) => {
         if (event.target.matches('input[type="checkbox"]')) {
           // Loop through all checkboxes and set their state to the select all

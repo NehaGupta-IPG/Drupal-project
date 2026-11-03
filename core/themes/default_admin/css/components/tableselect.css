@@ -17,6 +17,16 @@ th.checkbox {
   text-align: center;
 }
 
+th.select-all {
+  white-space: nowrap;
+}
+
+.tableselect__select-all-label {
+  margin-inline-start: 0.25rem;
+  vertical-align: middle;
+  font-weight: inherit;
+}
+
 tr.selected td {
   background-color: var(--admin-color-bg-item-hover);
 }
