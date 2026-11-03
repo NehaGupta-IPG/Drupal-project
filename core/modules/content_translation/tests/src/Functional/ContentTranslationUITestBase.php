@@ -12,6 +12,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\EntityOwnerInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -295,8 +296,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     foreach ($this->langcodes as $index => $langcode) {
       if ($index > 0) {
         $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
-        $edit = ['content_translation[status]' => FALSE];
         $this->drupalGet($url);
+        $edit = $this->getMetadataValueAndAssertNoField('status', FALSE);
         $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
         $storage = $this->container->get('entity_type.manager')
           ->getStorage($this->entityTypeId);
@@ -306,10 +307,13 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       }
     }
 
-    // Check that the last published translation cannot be unpublished.
-    $this->drupalGet($entity->toUrl('edit-form'));
-    $this->assertSession()->fieldDisabled('content_translation[status]');
-    $this->assertSession()->fieldValueEquals('content_translation[status]', TRUE);
+    // Check that the last published translation cannot be unpublished, this
+    // only applies to the translation specific status field.
+    if (!$this->hasMetadataField('status')) {
+      $this->drupalGet($entity->toUrl('edit-form'));
+      $this->assertSession()->fieldDisabled('content_translation[status]');
+      $this->assertSession()->fieldValueEquals('content_translation[status]', TRUE);
+    }
   }
 
   /**
@@ -328,10 +332,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
         'uid' => $user->id(),
         'created' => \Drupal::time()->getRequestTime() - mt_rand(0, 1000),
       ];
-      $edit = [
-        'content_translation[uid]' => $user->getAccountName(),
-        'content_translation[created]' => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
-      ];
+      $edit = $this->getMetadataValueAndAssertNoField('uid', $user->getAccountName());
+      $edit += $this->getCreatedMetadataValueAndAssertNoField($values[$langcode]['created']);
       $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
       $this->drupalGet($url);
       $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
@@ -348,11 +350,8 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
-    $edit = [
-      // User names have by default length 8.
-      'content_translation[uid]' => $this->randomMachineName(12),
-      'content_translation[created]' => '19/11/1978',
-    ];
+    $edit = $this->getMetadataValueAndAssertNoField('uid', $this->randomMachineName(12));
+    $edit += $this->getCreatedMetadataValueAndAssertNoField('19/11/1978');
     $this->drupalGet($entity->toUrl('edit-form'));
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $this->assertSession()->statusMessageExists('error');
@@ -362,11 +361,9 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Verify that long usernames can be saved as the translation author.
     $user = $this->drupalCreateUser([], $this->randomMachineName(UserInterface::USERNAME_MAX_LENGTH));
-    $edit = [
-      // Format the username as it is entered in autocomplete fields.
-      'content_translation[uid]' => $user->getAccountName() . ' (' . $user->id() . ')',
-      'content_translation[created]' => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
-    ];
+    // Format the username as it is entered in autocomplete fields.
+    $edit = $this->getMetadataValueAndAssertNoField('uid', $user->getAccountName() . ' (' . $user->id() . ')');
+    $edit += $this->getCreatedMetadataValueAndAssertNoField($values[$langcode]['created']);
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $reloaded_entity = $storage->load($this->entityId);
     $metadata = $this->manager->getTranslationMetadata($reloaded_entity->getTranslation($langcode));
@@ -633,6 +630,101 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $entity = $storage->load($this->entityId);
       $this->assertNotEquals($changed_timestamp, $entity->getChangedTime(), 'The entity\'s changed time was updated after form save without changes.');
     }
+  }
+
+  /**
+   * Gets the metadata field value.
+   *
+   * @param string $field_name
+   *   The field name, uid or status.
+   * @param mixed $field_value
+   *   The field value.
+   *
+   * @return array
+   *   The edit array.
+   */
+  protected function getMetadataValueAndAssertNoField(string $field_name, $field_value): array {
+    $edit = [];
+    if (!$this->hasMetadataField($field_name)) {
+      $edit["content_translation[$field_name]"] = $field_value;
+      if ($this->entityTypeId !== 'user') {
+        $this->assertSession()->fieldNotExists($field_name);
+      }
+    }
+    else {
+      // Try a few different field name patterns.
+      if ($this->getSession()->getPage()->findField($field_name . '[value]')) {
+        $edit[$field_name . '[value]'] = $field_value;
+      }
+      elseif ($this->getSession()->getPage()->findField($field_name . '[0][target_id]')) {
+        $edit[$field_name . '[0][target_id]'] = $field_value;
+      }
+      else {
+        $edit[$field_name] = $field_value;
+      }
+
+      // Assert there is no content translation meta data field.
+      $this->assertSession()->fieldNotExists("content_translation[$field_name]");
+    }
+
+    return $edit;
+  }
+
+  /**
+   * Gets the metadata field value for the created field.
+   *
+   * @param string|int $field_value
+   *   The field value.
+   *
+   * @return array
+   *   The edit array.
+   */
+  protected function getCreatedMetadataValueAndAssertNoField(string|int $field_value): array {
+    $edit = [];
+    if (!$this->hasMetadataField('created')) {
+      if (is_numeric($field_value)) {
+        $edit["content_translation[created]"] = \Drupal::service('date.formatter')->format($field_value, 'custom', 'Y-m-d H:i:s O');
+      }
+      else {
+        $edit["content_translation[created]"] = $field_value;
+      }
+      // Assert there is no native meta data field.
+      $this->assertSession()->fieldNotExists('created[0][value][date]');
+    }
+    else {
+      $edit['created[0][value][date]'] = $field_value;
+      if (is_numeric($field_value)) {
+        $edit['created[0][value][date]'] = \Drupal::service('date.formatter')->format($field_value, 'custom', 'Y-m-d');
+        $edit['created[0][value][time]'] = \Drupal::service('date.formatter')->format($field_value, 'custom', 'H:i:s');
+      }
+
+      // Assert there is no content translation meta data field.
+      $this->assertSession()->fieldNotExists("content_translation[created]");
+    }
+
+    return $edit;
+  }
+
+  /**
+   * Returns whether a given field name exists in the field storage definitions.
+   *
+   * @param string $field_name
+   *   The field name.
+   *
+   * @return bool
+   *   TRUE if the field has metadata field, FALSE otherwise.
+   *
+   * @see \Drupal\content_translation\ContentTranslationHandler::checkFieldStorageDefinitionTranslatability
+   */
+  protected function hasMetadataField(string $field_name): bool {
+    $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions($this->entityTypeId);
+    $has_metadata_field = array_key_exists($field_name, $field_storage_definitions) && $field_storage_definitions[$field_name]->isTranslatable();
+    // Check if the entity type implements EntityOwnerInterface for uid field.
+    if ($field_name === 'uid') {
+      return $has_metadata_field && $this->container->get('entity_type.manager')->getDefinition($this->entityTypeId)->entityClassImplements(EntityOwnerInterface::class);
+    }
+
+    return $has_metadata_field;
   }
 
 }

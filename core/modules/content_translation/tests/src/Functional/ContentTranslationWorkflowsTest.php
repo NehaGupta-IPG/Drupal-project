@@ -188,7 +188,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
     );
     $edit = [
       'name[0][value]' => 'translation name',
-      'content_translation[status]' => FALSE,
+      'status[value]' => FALSE,
     ];
     $this->drupalGet($add_translation_url);
     $this->submitForm($edit, 'Save');

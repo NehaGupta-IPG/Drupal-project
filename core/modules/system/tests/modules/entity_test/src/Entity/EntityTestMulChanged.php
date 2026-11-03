@@ -65,6 +65,13 @@ class EntityTestMulChanged extends EntityTestMul implements EntityChangedInterfa
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
+    // Show the created field in the edit form.
+    assert($fields['created'] instanceof BaseFieldDefinition);
+    $fields['created']->setDisplayOptions('form', [
+      'type' => 'datetime_timestamp',
+      'weight' => 10,
+    ]);
+
     $fields['changed'] = BaseFieldDefinition::create('changed_test')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'))
