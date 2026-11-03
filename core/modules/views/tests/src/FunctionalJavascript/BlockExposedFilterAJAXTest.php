@@ -24,14 +24,14 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'block', 'views_test_config'];
+  protected static $modules = ['node', 'views', 'block', 'views_test_config', 'request_test'];
 
   /**
    * The views to use for testing.
    *
    * @var string[]
    */
-  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page'];
+  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page', 'test_exposed_block_ajax'];
 
   /**
    * {@inheritdoc}
@@ -100,6 +100,25 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElementRemoved('xpath', '//*[text()="Article A"]');
     $this->submitForm([], 'Reset');
     $this->assertSession()->addressEquals('some-path');
+  }
+
+  /**
+   * Tests if multiple exposed filters on the same page work correctly.
+   */
+  public function testMultipleExposedBlocks(): void {
+    // Place a view with exposed filters put in multiple exposed blocks on a single page.
+    $this->drupalPlaceBlock('views_block:test_exposed_block_ajax-block_1');
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block_ajax-block_1');
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block_ajax-block_1');
+    $this->getSession()->reload();
+
+    // Filter by page type.
+    $this->submitForm(['type' => 'page'], 'Apply');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Make sure that only single request has been generated.
+    $ajaxRequestCounter = $this->container->get('request_test.ajax_request_counter');
+    $this->assertEquals(1, $ajaxRequestCounter->getCount());
   }
 
 }

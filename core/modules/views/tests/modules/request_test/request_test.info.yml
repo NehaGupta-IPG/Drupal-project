@@ -1,0 +1,5 @@
+name: 'Request test'
+type: module
+description: 'Support module for testing events involving requests.'
+package: Testing
+version: VERSION

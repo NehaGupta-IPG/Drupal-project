@@ -1,0 +1,6 @@
+services:
+  request_test.ajax_request_counter:
+    class: Drupal\request_test\EventSubscriber\AjaxRequestSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }
