@@ -21,7 +21,7 @@ class CommentExtrasTest extends CommentTest {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     // Don't run any test methods from CommentTest because those will get run
     // for CommentTest itself.
     if (method_exists(parent::class, $this->name())) {

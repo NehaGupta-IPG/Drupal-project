@@ -19,7 +19,7 @@ class HtmlToTextTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $GLOBALS['base_path'] = '/';
     $GLOBALS['base_url'] = 'http://localhost';

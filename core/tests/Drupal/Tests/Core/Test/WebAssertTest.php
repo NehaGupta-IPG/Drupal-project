@@ -38,7 +38,7 @@ class WebAssertTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->client = new MockClient();
     $driver = new BrowserKitDriver($this->client);

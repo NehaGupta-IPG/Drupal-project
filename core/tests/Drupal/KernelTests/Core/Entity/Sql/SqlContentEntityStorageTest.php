@@ -26,7 +26,7 @@ class SqlContentEntityStorageTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('entity_test_rev');
   }

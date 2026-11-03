@@ -41,7 +41,7 @@ class PathExtractorTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp():void {
+  protected function setUp():void {
     parent::setUp();
     $this->iconFinder = $this->createStub(IconFinder::class);
     $this->pathExtractorPlugin = new PathExtractor(

@@ -20,7 +20,8 @@
     "autoload-dev": {
         "files": [
             "fixtures/test-classes-with-metadata.php",
-            "fixtures/test-methods-with-metadata.php"
+            "fixtures/test-methods-with-metadata.php",
+            "fixtures/set-up-method-visibility.php"
         ]
     },
     "require": {}

@@ -21,7 +21,7 @@ class ProceduralApiDeprecationTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     include_once $this->root . '/core/includes/common.inc';
   }
