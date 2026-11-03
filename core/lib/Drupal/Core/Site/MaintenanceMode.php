@@ -111,6 +111,8 @@ class MaintenanceMode implements MaintenanceModeInterface {
     require_once $this->root . '/common.inc';
     require_once $this->root . '/module.inc';
 
+    $customTheme = NULL;
+
     // Install and update pages are treated differently to prevent theming
     // overrides.
     if (defined('MAINTENANCE_MODE') && (MAINTENANCE_MODE == 'install' || MAINTENANCE_MODE == 'update')) {

@@ -392,18 +392,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/theme.inc',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$theme of method Drupal\\\\Core\\\\Extension\\\\ThemeHandler\\:\\:addTheme\\(\\) expects Drupal\\\\Core\\\\Extension\\\\Theme, Drupal\\\\Core\\\\Extension\\\\Extension given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/includes/theme.maintenance.inc',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$custom_theme might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/includes/theme.maintenance.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function update_check_requirements\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
