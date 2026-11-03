@@ -120,6 +120,10 @@
     this.settings = settings;
 
     // Add the ajax to exposed forms.
+    this.$exposed_form = $(
+      `form.views-exposed-form[data-drupal-target-view="${settings.view_dom_id}"], form.views-exposed-form[data-drupal-target-view="${settings.view_name}-${settings.view_display_id}"]`,
+    );
+
     once('exposed-form', this.$exposed_form).forEach(
       this.attachExposedFormAjax.bind(this),
     );
@@ -156,18 +160,19 @@
     this.exposedFormAjax = [];
     // Exclude the reset buttons so no AJAX behaviors are bound. Many things
     // break during the form reset phase if using AJAX.
-    $(
-      'input[type=submit], button[type=submit], input[type=image]',
-      this.$exposed_form,
-    )
-      .not('[data-drupal-selector=edit-reset]')
-      .each(function (index) {
-        const selfSettings = $.extend({}, that.element_settings, {
-          base: $(this).attr('id'),
-          element: this,
-        });
-        that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
+    once(
+      'attach-ajax',
+      $(
+        'input[type=submit], button[type=submit], input[type=image]',
+        this.$exposed_form,
+      ).not('[data-drupal-selector=edit-reset]'),
+    ).forEach(function (button, index) {
+      const selfSettings = $.extend({}, that.element_settings, {
+        base: $(button).attr('id'),
+        element: button,
       });
+      that.exposedFormAjax[index] = Drupal.ajax(selfSettings);
+    });
   };
 
   /**
