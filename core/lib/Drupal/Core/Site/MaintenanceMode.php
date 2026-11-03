@@ -107,9 +107,9 @@ class MaintenanceMode implements MaintenanceModeInterface {
       return;
     }
 
-    require_once $this->root . '/theme.inc';
-    require_once $this->root . '/common.inc';
-    require_once $this->root . '/module.inc';
+    require_once $this->root . '/core/includes/theme.inc';
+    require_once $this->root . '/core/includes/common.inc';
+    require_once $this->root . '/core/includes/module.inc';
 
     $customTheme = NULL;
 
