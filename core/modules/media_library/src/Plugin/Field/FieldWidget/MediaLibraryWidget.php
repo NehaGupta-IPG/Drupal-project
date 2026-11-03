@@ -377,6 +377,55 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       ];
     }
 
+    $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $remaining = $element['#cardinality'] - count($referenced_entities);
+
+    // Inform the user of how many items are remaining.
+    if (!$cardinality_unlimited) {
+      if ($remaining) {
+        $cardinality_message = $this->formatPlural($remaining, 'One media item remaining.', '@count media items remaining.');
+      }
+      else {
+        $cardinality_message = $this->t('The maximum number of media items have been selected.');
+      }
+
+      // Add a line break between the field message and the cardinality message.
+      if (!empty($element['#description'])) {
+        $element['#description'] .= '<br />';
+      }
+      $element['#description'] .= $cardinality_message;
+    }
+
+    // Create a new media library URL with the correct state parameters.
+    $selected_type_id = reset($allowed_media_type_ids);
+    $remaining = $cardinality_unlimited ? FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED : $remaining;
+    // This particular media library opener needs some extra metadata for its
+    // \Drupal\media_library\MediaLibraryOpenerInterface::getSelectionResponse()
+    // to be able to target the element whose 'data-media-library-widget-value'
+    // attribute is the same as $field_widget_id. The entity ID, entity type ID,
+    // bundle, field name are used for access checking.
+    $entity = $items->getEntity();
+    $opener_parameters = [
+      'field_widget_id' => $field_widget_id,
+      'entity_type_id' => $entity->getEntityTypeId(),
+      'bundle' => $entity->bundle(),
+      'field_name' => $field_name,
+    ];
+    if (isset($form['#form_mode'])) {
+      $opener_parameters['form_mode'] = $form['#form_mode'];
+    }
+    // Only add the entity ID when we actually have one. The entity ID needs to
+    // be a string to ensure that the media library state generates its
+    // tamper-proof hash in a consistent way.
+    if (!$entity->isNew()) {
+      $opener_parameters['entity_id'] = (string) $entity->id();
+
+      if ($entity->getEntityType()->isRevisionable()) {
+        $opener_parameters['revision_id'] = (string) $entity->getRevisionId();
+      }
+    }
+    $state = MediaLibraryState::create('media_library.opener.field_widget', $allowed_media_type_ids, $selected_type_id, $remaining, $opener_parameters);
+
     $element['selection'] = [
       '#type' => 'container',
       '#theme_wrappers' => [
@@ -425,6 +474,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           '#type' => 'submit',
           '#name' => $field_name . '-' . $delta . '-media-library-remove-button' . $id_suffix,
           '#value' => $this->t('Remove'),
+          '#weight' => -10,
           '#media_id' => $media_item->id(),
           '#attributes' => [
             'aria-label' => $media_item->access('view label') ? $this->t('Remove @label', ['@label' => $media_item->label()]) : $this->t('Remove media'),
@@ -440,6 +490,19 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           '#submit' => [[static::class, 'removeItem']],
           // Prevent errors in other widgets from preventing removal.
           '#limit_validation_errors' => $limit_validation_errors,
+        ],
+        'edit_button' => [
+          '#type' => 'submit',
+          '#value' => $this->t('Edit'),
+          '#weight' => 1,
+          '#access' => $media_item->access('update'),
+          '#attributes' => [
+            'aria-label' => $media_item->access('view label') ? $this->t('Edit @label', ['@label' => $media_item->label()]) : $this->t('Edit media'),
+            'class' => ['edit-media', 'use-ajax'],
+            'href' => $media_item->toUrl('edit-form', ['query' => $state->all()])->toString(),
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => '{"width":"80%"}',
+          ],
         ],
         'rendered_entity' => $preview,
         'target_id' => [
@@ -461,52 +524,6 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         ],
       ];
     }
-
-    $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $remaining = $element['#cardinality'] - count($referenced_entities);
-
-    // Inform the user of how many items are remaining.
-    if (!$cardinality_unlimited) {
-      if ($remaining) {
-        $cardinality_message = $this->formatPlural($remaining, 'One media item remaining.', '@count media items remaining.');
-      }
-      else {
-        $cardinality_message = $this->t('The maximum number of media items have been selected.');
-      }
-
-      // Add a line break between the field message and the cardinality message.
-      if (!empty($element['#description'])) {
-        $element['#description'] .= '<br />';
-      }
-      $element['#description'] .= $cardinality_message;
-    }
-
-    // Create a new media library URL with the correct state parameters.
-    $selected_type_id = reset($allowed_media_type_ids);
-    $remaining = $cardinality_unlimited ? FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED : $remaining;
-    // This particular media library opener needs some extra metadata for its
-    // \Drupal\media_library\MediaLibraryOpenerInterface::getSelectionResponse()
-    // to be able to target the element whose 'data-media-library-widget-value'
-    // attribute is the same as $field_widget_id. The entity ID, entity type ID,
-    // bundle, field name are used for access checking.
-    $entity = $items->getEntity();
-    $opener_parameters = [
-      'field_widget_id' => $field_widget_id,
-      'entity_type_id' => $entity->getEntityTypeId(),
-      'bundle' => $entity->bundle(),
-      'field_name' => $field_name,
-    ];
-    // Only add the entity ID when we actually have one. The entity ID needs to
-    // be a string to ensure that the media library state generates its
-    // tamper-proof hash in a consistent way.
-    if (!$entity->isNew()) {
-      $opener_parameters['entity_id'] = (string) $entity->id();
-
-      if ($entity->getEntityType()->isRevisionable()) {
-        $opener_parameters['revision_id'] = (string) $entity->getRevisionId();
-      }
-    }
-    $state = MediaLibraryState::create('media_library.opener.field_widget', $allowed_media_type_ids, $selected_type_id, $remaining, $opener_parameters);
 
     // Add a button that will load the Media library in a modal using AJAX.
     $element['open_button'] = [
