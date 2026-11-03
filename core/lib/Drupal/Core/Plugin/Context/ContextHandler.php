@@ -21,7 +21,7 @@ class ContextHandler implements ContextHandlerInterface {
    * safe: an object id alone could be reused by a later object while the
    * answer for the collected one is still readable.
    *
-   * @var \WeakMap<\Drupal\Core\Plugin\Context\ContextDefinitionInterface, \WeakMap<\Drupal\Core\Plugin\Context\ContextInterface, bool>>|null
+   * @var \WeakMap<\Drupal\Core\Plugin\Context\ContextDefinitionInterface, \WeakMap>|null
    */
   protected ?\WeakMap $satisfiedBy = NULL;
 
