@@ -88,7 +88,19 @@ class Statement extends StatementBase {
         $converter = new NamedPlaceholderConverter();
         $converter->parse($this->queryString, $args);
         [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
-        $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
+        if ($this->connection->getConnectionOptions()['use_prepared_statements']) {
+          $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
+        }
+        else {
+          $executableQueryString = preg_replace_callback(
+            '/(?<!\?)\?(?!\?)/',
+            function () use (&$args): string {
+              $arg = array_shift($args);
+              return $arg === NULL ? 'NULL' : "'" . $this->clientConnection->real_escape_string($arg) . "'";
+            },
+            $convertedQueryString,
+          );
+        }
       }
       else {
         // Transform the $args to positional.
@@ -101,11 +113,19 @@ class Statement extends StatementBase {
 
       // In mysqli, the results of the statement execution are returned in a
       // different object than the statement itself.
-      $return = $this->getClientStatement()->execute($args);
+      if ($this->connection->getConnectionOptions()['use_prepared_statements']) {
+        $return = $this->getClientStatement()->execute($args);
+        $result = $this->getClientStatement()->get_result();
+      }
+      else {
+        assert(isset($executableQueryString));
+        $result = $this->clientConnection->query($executableQueryString);
+        $return = (bool) $result;
+      }
       $this->result = new Result(
         $this->fetchMode,
         $this->fetchOptions,
-        $this->getClientStatement()->get_result(),
+        $result,
         $this->clientConnection,
       );
       $this->markResultsetIterable($return);
