@@ -1,0 +1,16 @@
+﻿{% extends 'sdc_test:just-a-slot' %}
+{% block the_slot %}
+  Here is an embedded component inside the slot.
+  {% embed 'sdc_test:my-banner' with {
+    heading: 'Heading',
+    ctaText: 'Example',
+    ctaHref: 'https://www.drupal.org',
+    ctaTarget: '',
+    image: '',
+
+  } %}
+    {% block banner_body %}
+      <em>This</em> is the block contents.
+    {% endblock %}
+  {% endembed %}
+{% endblock %}

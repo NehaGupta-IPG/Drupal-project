@@ -2,6 +2,9 @@
 {% if image is not empty %}
   {% set attributes = attributes.setAttribute('style', 'background-image: linear-gradient(to right, black, black, rgba(0, 0, 0, 70%), transparent), url("' ~ image ~ '");') %}
 {% endif %}
+{% set the_slot %}
+  {% block nested_slot %}{% endblock %}
+{% endset %}
 
 {# Markup for the component #}
 <div {{ attributes }}>
@@ -12,5 +15,10 @@
   <div class="component--my-banner--body">
     {% block banner_body %}
     {% endblock %}
+  </div>
+  <div class="component--my-banner--nested-slot">
+    {% embed 'sdc_test:just-a-slot' %}
+      {% block the_slot %}{{ the_slot }}{% endblock %}
+    {% endembed %}
   </div>
 </div>
