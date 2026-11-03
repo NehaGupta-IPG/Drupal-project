@@ -134,6 +134,48 @@ class RegistryTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a named theme is resolved once, not on every call.
+   */
+  public function testNamedThemeIsResolvedOnce(): void {
+    $theme = new ActiveTheme([
+      'name' => 'test_theme',
+      'path' => 'core/modules/system/tests/themes/test_theme/test_theme.info.yml',
+      'engine' => 'twig',
+      'owner' => 'twig',
+      'libraries_override' => [],
+      'libraries_extend' => [],
+      'libraries' => [],
+      'extension' => '.twig',
+      'base_theme_extensions' => [],
+    ]);
+
+    // Resolving a named theme reads cache.bootstrap and then loads the theme.
+    // The instance was constructed for this one name, which cannot change, so
+    // repeating it can only ever produce the same object.
+    $this->themeInitialization->expects($this->once())
+      ->method('getActiveThemeByName')
+      ->with('test_theme')
+      ->willReturn($theme);
+    $this->themeInitialization->expects($this->once())
+      ->method('loadActiveTheme')
+      ->with($theme);
+    // A named instance never falls back to the active theme.
+    $this->themeManager->expects($this->never())
+      ->method('getActiveTheme');
+
+    $registry = new Registry($this->root, $this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->themeInitialization, $this->runtimeCache, $this->moduleList, $this->kernel, 'test_theme', $this->keyValueFactory);
+    $registry->setThemeManager($this->themeManager);
+
+    // init() is what get(), getRuntime() and getBaseHook() each call first;
+    // driving it directly keeps the test on the resolution being asserted
+    // rather than on building a registry.
+    $init = new \ReflectionMethod($registry, 'init');
+    for ($i = 0; $i < 3; $i++) {
+      $init->invoke($registry, 'test_theme');
+    }
+  }
+
+  /**
    * Tests getting the theme registry defined by a module.
    */
   public function testGetRegistryForModule(): void {

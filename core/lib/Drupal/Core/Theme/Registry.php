@@ -276,6 +276,13 @@ class Registry implements DestructableInterface {
     }
     // Instead of the active theme, a specific theme was requested.
     else {
+      // Resolving a named theme is not free: it reads cache.bootstrap and then
+      // loads the theme. init() runs on every getRuntime(), so a render-heavy
+      // page repeats that hundreds of times for a theme that cannot change —
+      // the instance was constructed for this one name. Skip once resolved.
+      if (isset($this->theme) && $this->theme->getName() === $theme_name) {
+        return;
+      }
       $this->theme = $this->themeInitialization->getActiveThemeByName($theme_name);
       $this->themeInitialization->loadActiveTheme($this->theme);
     }
