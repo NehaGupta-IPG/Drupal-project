@@ -11,6 +11,7 @@ use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
@@ -1232,6 +1233,103 @@ abstract class Connection {
    */
   public function supportsTransactionalDDL() {
     return $this->transactionalDDLSupport;
+  }
+
+  /**
+   * Executes an operation, creating its schema if necessary.
+   *
+   * Attempts the operation optimistically and retries it once if it fails
+   * because a table is missing. Before the retry, any missing tables in the
+   * schema definition are created. Other exceptions are propagated unchanged.
+   * Drivers where a failed statement aborts a transaction override this method
+   * to check for the tables first.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   The schema definition of the tables used by the operation.
+   * @param callable $operation
+   *   The operation. It may be called twice and must be safe to retry after a
+   *   missing-table failure. Start any transaction before calling this method,
+   *   not inside the callback, so drivers can check for the tables first.
+   *
+   * @return mixed
+   *   The result of the operation.
+   */
+  public function executeWithSchema(SchemaDefinition $schema, callable $operation): mixed {
+    try {
+      return $operation();
+    }
+    catch (DatabaseException $e) {
+      if (!$this->isMissingTableException($e)) {
+        throw $e;
+      }
+    }
+    $this->createSchemaIfNotExists($schema);
+    return $operation();
+  }
+
+  /**
+   * Creates the tables of a schema definition that do not exist yet.
+   *
+   * Another process may create a table at the same time. Losing that race is
+   * not an error.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   The schema definition.
+   */
+  protected function createSchemaIfNotExists(SchemaDefinition $schema): void {
+    foreach ($schema->tables as $table) {
+      if ($this->schema()->tableExists($table->name)) {
+        continue;
+      }
+      try {
+        $this->schema()->createTableFromDefinition($schema->type, $schema->name, $table);
+      }
+      catch (DatabaseException $e) {
+        // Recover only if another process created the table concurrently.
+        if (!$this->schema()->tableExists($table->name) || !$this->isTableCreationRace($e)) {
+          throw $e;
+        }
+      }
+    }
+  }
+
+  /**
+   * Determines whether an operation failed because a table was missing.
+   *
+   * @param \Throwable $exception
+   *   The operation exception.
+   *
+   * @return bool
+   *   TRUE for missing table errors, FALSE for unrelated database errors.
+   */
+  protected function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      return $state === '42S02';
+    }
+    return FALSE;
+  }
+
+  /**
+   * Determines whether table creation failed because another creator won.
+   *
+   * @param \Throwable $exception
+   *   The table creation exception.
+   *
+   * @return bool
+   *   TRUE for duplicate table errors, FALSE for unrelated schema errors.
+   */
+  protected function isTableCreationRace(\Throwable $exception): bool {
+    if ($exception instanceof SchemaObjectExistsException) {
+      return TRUE;
+    }
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      return $state === '42S01';
+    }
+    return FALSE;
   }
 
   /**

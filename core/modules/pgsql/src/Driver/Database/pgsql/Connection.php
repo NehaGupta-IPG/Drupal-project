@@ -5,8 +5,10 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
@@ -301,6 +303,77 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function driver() {
     return 'pgsql';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeWithSchema(SchemaDefinition $schema, callable $operation): mixed {
+    if (!$this->inTransaction()) {
+      return parent::executeWithSchema($schema, $operation);
+    }
+    // A failed statement aborts the enclosing transaction. Inside a
+    // transaction, check for the tables before the operation instead of
+    // recovering from the failure.
+    $this->createSchemaIfNotExists($schema);
+    return $operation();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function createSchemaIfNotExists(SchemaDefinition $schema): void {
+    if (!$this->inTransaction()) {
+      parent::createSchemaIfNotExists($schema);
+      return;
+    }
+    foreach ($schema->tables as $table) {
+      if ($this->schema()->tableExists($table->name)) {
+        continue;
+      }
+      // A failed statement aborts the enclosing transaction. Create each table
+      // in a savepoint, so that losing a creation race does not abort the
+      // enclosing transaction.
+      $savepoint = $this->startTransaction();
+      try {
+        $this->schema()->createTableFromDefinition($schema->type, $schema->name, $table);
+        $savepoint->commitOrRelease();
+      }
+      catch (\Throwable $e) {
+        $savepoint->rollBack();
+        // Recover only if another process created the table concurrently.
+        if (!$e instanceof DatabaseException || !$this->schema()->tableExists($table->name) || !$this->isTableCreationRace($e)) {
+          throw $e;
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function isMissingTableException(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    return $previous instanceof \PDOException
+      && ($previous->errorInfo[0] ?? $previous->getCode()) === '42P01';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function isTableCreationRace(\Throwable $exception): bool {
+    $previous = $exception->getPrevious();
+    if ($previous instanceof \PDOException) {
+      $state = $previous->errorInfo[0] ?? $previous->getCode();
+      // Concurrent CREATE TABLE statements can also collide on the table's
+      // row type, either as a duplicate object or on the catalog's type-name
+      // constraint, before the table is visible.
+      // cspell:ignore typname
+      if ($state === '42P07' || $state === '42710' || ($state === '23505' && str_contains($previous->getMessage(), 'pg_type_typname_nsp_index'))) {
+        return TRUE;
+      }
+    }
+    return parent::isTableCreationRace($exception);
   }
 
   /**
