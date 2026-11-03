@@ -250,6 +250,21 @@ class StyleTableTest extends ViewTestBase {
   }
 
   /**
+   * Tests that column alignment is applied to the header and the cells.
+   */
+  public function testColumnAlignment(): void {
+    $view = View::load('test_table');
+    $display = &$view->getDisplay('default');
+    $display['display_options']['style']['options']['info']['age']['align'] = 'views-align-right';
+    $view->save();
+
+    $this->drupalGet('test-table');
+    $this->assertSession()->elementExists('xpath', '//thead/tr/th[contains(concat(" ", @class, " "), " views-field-age ") and contains(concat(" ", @class, " "), " text-align-right ")]');
+    $this->assertSession()->elementExists('xpath', '//tbody/tr/td[contains(concat(" ", @class, " "), " views-field-age ") and contains(concat(" ", @class, " "), " text-align-right ")]');
+    $this->assertSession()->elementNotExists('xpath', '//*[contains(concat(" ", @class, " "), " views-align-right ")]');
+  }
+
+  /**
    * Tests custom CSS classes are added to table element.
    */
   public function testCssTableClass(): void {
