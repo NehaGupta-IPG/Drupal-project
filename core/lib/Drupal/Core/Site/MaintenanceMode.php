@@ -34,7 +34,7 @@ class MaintenanceMode implements MaintenanceModeInterface {
      * @var \Closure(): \Drupal\Core\Theme\Registry
      */
     #[AutowireServiceClosure(Registry::class)]
-    protected readonly \Closure|ServiceClosureArgument $registryClosure,
+    protected \Closure|ServiceClosureArgument $registryClosure,
     #[Autowire(param: 'app.root')]
     protected ?string $root,
   ) {
