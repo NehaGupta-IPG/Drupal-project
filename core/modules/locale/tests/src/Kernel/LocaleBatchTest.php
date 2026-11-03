@@ -6,6 +6,9 @@ namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\locale\File\LocaleFile;
+use Drupal\locale\File\LocaleFileManager;
+use Drupal\locale\File\RemoteFileInfo;
+use Drupal\locale\File\RemoteFileStatus;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleTranslationSource;
 use Drupal\locale\Model\SourceType;
@@ -69,6 +72,11 @@ class LocaleBatchTest extends KernelTestBase {
 
     \Drupal::keyValue('locale.translation_status')->setMultiple(['test_module' => ['en' => $source]]);
 
+    // The remote file must not be requested.
+    $file_manager = $this->createMock(LocaleFileManager::class);
+    $file_manager->expects($this->never())->method('checkRemoteFileStatus');
+    $this->container->set(LocaleFileManager::class, $file_manager);
+
     $context = ['results' => []];
     \Drupal::service(LocaleFetch::class)->batchStatusCheck(
       'test_module',
@@ -99,6 +107,15 @@ class LocaleBatchTest extends KernelTestBase {
     $source->files[SourceType::Remote->value] = new LocaleFile('test_module-1.0.0.en.po', 'https://ftp.drupal.org/files/translations/all/test_module/test_module-1.0.0.en.po', '');
 
     \Drupal::keyValue('locale.translation_status')->setMultiple(['test_module' => ['de' => $source]]);
+
+    $remote_file_info = new RemoteFileInfo();
+    $remote_file_info->status = RemoteFileStatus::Missing;
+    $file_manager = $this->createMock(LocaleFileManager::class);
+    $file_manager->expects($this->once())
+      ->method('checkRemoteFileStatus')
+      ->with('https://ftp.drupal.org/files/translations/all/test_module/test_module-1.0.0.en.po')
+      ->willReturn($remote_file_info);
+    $this->container->set(LocaleFileManager::class, $file_manager);
 
     $context = ['results' => []];
     \Drupal::service(LocaleFetch::class)->batchStatusCheck(

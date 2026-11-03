@@ -340,7 +340,7 @@ class LocaleFetch {
         }
       }
 
-      $remoteFileInfo = $this->localeFileManager->checkRemoteFileStatus($remote_file->uri);
+      $remoteFileInfo = $failure ? NULL : $this->localeFileManager->checkRemoteFileStatus($remote_file->uri);
       if (!$failure && $remoteFileInfo->status !== RemoteFileStatus::Error) {
         // Update the file object with the result data. In case of a redirect we
         // store the resulting uri.
