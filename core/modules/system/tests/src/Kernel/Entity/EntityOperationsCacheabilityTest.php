@@ -99,7 +99,13 @@ class EntityOperationsCacheabilityTest extends EntityKernelTestBase {
     ];
     yield [['filter'], 'filter_format', [], [], ['user.permissions'], FALSE, TRUE];
     yield [['image'], 'image_style', [], [], ['user.permissions'], FALSE, TRUE];
-    yield [['menu_link_content'], 'menu_link_content', ['link' => 'route:<nolink>'], [], ['user.permissions']];
+    yield [
+      ['menu_link_content'],
+      'menu_link_content',
+      ['link' => 'route:<nolink>'],
+      ['menu_link_content:1'],
+      ['user.permissions'],
+    ];
     yield [['menu_ui'], 'menu', [], ['config:system.menu.test'], ['user.permissions'], FALSE, TRUE];
     yield [['node'], 'node_type', [], ['config:node.type.test'], ['user.permissions'], FALSE, TRUE];
     yield [['responsive_image'], 'responsive_image_style', [], [], ['user.permissions'], FALSE, TRUE];

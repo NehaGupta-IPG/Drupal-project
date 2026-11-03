@@ -50,6 +50,11 @@ class MenuLinkContentTest extends ResourceTestBase {
 
   /**
    * {@inheritdoc}
+   */
+  protected static bool $noViewAccessControl = TRUE;
+
+  /**
+   * {@inheritdoc}
    *
    * @var \Drupal\menu_link_content\MenuLinkContentInterface
    */
@@ -113,6 +118,7 @@ class MenuLinkContentTest extends ResourceTestBase {
         'type' => 'menu_link_content--menu_link_content',
         'links' => [
           'self' => ['href' => $self_url->toString()],
+          'working-copy' => ['href' => (clone $base_url)->setOption('query', ['resourceVersion' => 'rel:working-copy'])->toString()],
         ],
         'attributes' => [
           'bundle' => 'menu_link_content',
@@ -186,6 +192,15 @@ class MenuLinkContentTest extends ResourceTestBase {
       default:
         return parent::getExpectedUnauthorizedAccessMessage($method);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedUnauthorizedAccessCacheability() {
+    $cacheability = parent::getExpectedUnauthorizedAccessCacheability();
+    $cacheability->addCacheTags(['menu_link_content:1']);
+    return $cacheability;
   }
 
   /**
