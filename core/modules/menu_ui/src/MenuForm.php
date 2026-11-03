@@ -20,6 +20,7 @@ use Drupal\menu_link_content\MenuLinkContentStorageInterface;
 use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 use Drupal\system\MenuStorage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Base form for menu edit forms.
@@ -408,7 +409,14 @@ class MenuForm extends EntityForm {
         $id = 'menu_plugin_id:' . $link->getPluginId();
         $form[$id]['#item'] = $element;
         $form[$id]['#attributes'] = $link->isEnabled() ? ['class' => ['menu-enabled']] : ['class' => ['menu-disabled']];
-        $form[$id]['title'] = Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toRenderable();
+        try {
+          $url = $link->getUrlObject();
+          $url->toString(TRUE);
+          $form[$id]['title'] = Link::fromTextAndUrl($link->getTitle(), $url)->toRenderable();
+        }
+        catch (RouteNotFoundException) {
+          $form[$id]['title'] = ['#plain_text' => $link->getTitle()];
+        }
         if (!$link->isEnabled()) {
           $form[$id]['title']['#suffix'] = ' (' . $this->t('disabled') . ')';
         }
