@@ -411,7 +411,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
-    if ($this->inTransaction()) {
+    if ($this->inTransaction() && !$this->transactionManager()->has($savepoint_name)) {
       $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
   }
