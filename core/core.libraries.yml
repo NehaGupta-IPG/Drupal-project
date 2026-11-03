@@ -227,6 +227,7 @@ drupal.ajax:
     ajaxTrustedUrl: {}
   dependencies:
     - core/jquery
+    - core/internal.jquery.form
     - core/drupal
     - core/drupalSettings
     - core/drupal.progress
