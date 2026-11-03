@@ -5,8 +5,8 @@ namespace Drupal\Core\Datetime\Element;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
@@ -422,8 +422,10 @@ class Datetime extends DateElementBase {
         return DateFormat::load('html_date')->getPattern();
 
       case 'datetime':
-      case 'datetime-local':
         return DateFormat::load('html_datetime')->getPattern();
+
+      case 'datetime-local':
+        return 'Y-m-d\TH:i';
 
       default:
         return $element['#date_date_format'];
