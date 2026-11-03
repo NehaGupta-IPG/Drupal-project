@@ -37,6 +37,26 @@ class OptionsAllowedValues {
    *
    * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
    */
+  public static function allowedValues(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
+    return [1 => 'One', 2 => 'Two', 3 => 'Three'];
+  }
+
+  /**
+   * Implements callback_allowed_values_function().
+   *
+   * Returns integer keys 2 and 3, deliberately omitting key 1.
+   *
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
+   */
+  public static function allowedValuesExcludingKey1(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
+    return [2 => 'Two', 3 => 'Three'];
+  }
+
+  /**
+   * Implements callback_allowed_values_function().
+   *
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
+   */
   public static function dynamicValues(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL, &$cacheable = NULL): array {
     $values = [];
     if (isset($entity)) {
