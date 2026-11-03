@@ -43,6 +43,7 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
         '#type' => 'checkboxes',
         '#default_value' => $selected,
         '#options' => $options,
+        '#select_all' => $this->getSetting('select_all_enabled'),
       ];
     }
     else {
@@ -66,6 +67,49 @@ class OptionsButtonsWidget extends OptionsWidgetBase {
     if (!$this->required && !$this->multiple) {
       return $this->t('N/A');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return [
+      'select_all_enabled' => FALSE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+
+    // Single-value fields render as radio buttons, which have no "Select all"
+    // checkbox. Return no settings so Field UI hides the edit button.
+    if (!$this->fieldDefinition->getFieldStorageDefinition()->isMultiple()) {
+      return $element;
+    }
+
+    $element['select_all_enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show "Select all" checkbox'),
+      '#default_value' => $this->getSetting('select_all_enabled'),
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    if ($this->fieldDefinition->getFieldStorageDefinition()->isMultiple() && $this->getSetting('select_all_enabled')) {
+      $summary[] = $this->t('"Select all" checkbox enabled');
+    }
+
+    return $summary;
   }
 
 }

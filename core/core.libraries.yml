@@ -326,6 +326,14 @@ drupal.checkbox:
   dependencies:
     - core/drupal
 
+drupal.checkboxes-select-all:
+  version: VERSION
+  js:
+    misc/checkboxes-select-all.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
 drupal.collapse:
   version: VERSION
   js:

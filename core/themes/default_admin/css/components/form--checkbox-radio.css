@@ -18,7 +18,8 @@
   line-height: var(--admin-space-l);
 }
 
-.form-boolean {
+.form-boolean,
+.form-checkboxes__select-all .select-all {
   display: inline-block;
   box-sizing: border-box;
   width: 1.3125rem;
@@ -138,7 +139,8 @@
 /*
  * Checkboxes.
  */
-.form-boolean--type-checkbox {
+.form-boolean--type-checkbox,
+.form-checkboxes__select-all .select-all {
   &:not(:checked) {
     .dark-mode & {
       background: var(--admin-color-bg-input);
@@ -181,6 +183,20 @@
       }
     }
   }
+}
+
+/**
+ * "Select all" checkbox of the checkboxes element, added by JavaScript.
+ */
+.form-checkboxes__select-all-label {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--input--label-spacing) - 1.3125rem);
+  min-block-size: var(--admin-space-l);
+  margin-block: var(--admin-space-xs);
+  font-size: var(--admin-font-size-s);
+  line-height: var(--admin-space-l);
+  cursor: pointer;
 }
 
 /**

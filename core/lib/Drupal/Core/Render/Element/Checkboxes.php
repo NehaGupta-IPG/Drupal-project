@@ -13,6 +13,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
+ * - #select_all: (optional) If TRUE, a "Select all" checkbox is added
+ *   client-side to select or deselect all options. Defaults to FALSE.
  *
  * Usage example:
  * @code
@@ -58,14 +60,14 @@ class Checkboxes extends FormElementBase {
    * Processes a checkboxes form element.
    */
   public static function processCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = is_array($element['#value']) ? $element['#value'] : [];
+    $value = is_array($element['#value'] ?? NULL) ? $element['#value'] : [];
     $element['#tree'] = TRUE;
     if (count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
         $element['#default_value'] = [];
       }
       $weight = 0;
-      $child_attributes = $element['#attributes'];
+      $child_attributes = $element['#attributes'] ?? [];
       // Prevent child elements from inheriting an aria-describedby attribute.
       // The individual children won't have descriptions and the attribute will
       // be invalid.
@@ -107,6 +109,19 @@ class Checkboxes extends FormElementBase {
         ];
       }
     }
+
+    if (!empty($element['#select_all'])) {
+      // The "Select all" control only works with JavaScript, so its markup
+      // is added client-side by core/drupal.checkboxes-select-all. This
+      // placeholder marks where it should be inserted.
+      $element['all_wrapper'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['form-checkboxes__select-all']],
+        '#weight' => 0,
+      ];
+      $element['#attached']['library'][] = 'core/drupal.checkboxes-select-all';
+    }
+
     return $element;
   }
 
