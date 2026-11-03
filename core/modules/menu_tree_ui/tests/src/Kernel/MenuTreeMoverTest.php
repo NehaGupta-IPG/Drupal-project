@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\menu_tree_ui\Kernel;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuTreeStorage;
-use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\menu_link_content\MenuLinkContentInterface;
@@ -232,43 +230,6 @@ final class MenuTreeMoverTest extends KernelTestBase {
 
     $this->assertFalse($result['ok']);
     $this->assertSame('too_deep', $result['code']);
-  }
-
-  /**
-   * The menu_tree_ui_pre_move alter hook must be able to veto the move.
-   *
-   * The hook receives $veto by reference; setting $veto['veto'] = TRUE blocks
-   * the move and returns code 'vetoed' to the caller.
-   */
-  public function testPreMoveHookCanVeto(): void {
-    $entity = $this->createLink('test');
-
-    // Kernel tests cannot install a procedural hook_menu_tree_ui_pre_move() on
-    // the fly, so we verify the vetoed path by constructing a mover with a
-    // stub handler whose alter() sets the veto.
-    $mock_handler = $this->createStub(ModuleHandlerInterface::class);
-    $mock_handler
-      ->method('alter')
-      ->willReturnCallback(function (string $hook, array &$data): void {
-        if ($hook === 'menu_tree_ui_pre_move') {
-          $data['veto'] = TRUE;
-          $data['message'] = 'Test veto.';
-        }
-      });
-
-    $mover = new MenuTreeMover(
-      $this->createStub(MenuTreeStorageInterface::class),
-      $mock_handler,
-      $this->container->get('menu_tree_ui.loader'),
-      $this->container->get('plugin.manager.menu.link'),
-      $this->container->get('logger.channel.menu_tree_ui'),
-      $this->container->get('string_translation'),
-    );
-
-    $result = $mover->validateMove('test', $entity->getPluginId(), '', NULL);
-
-    $this->assertFalse($result['ok']);
-    $this->assertSame('vetoed', $result['code']);
   }
 
   /**

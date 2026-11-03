@@ -100,49 +100,6 @@ function hook_menu_tree_ui_row_operations_alter(array &$operations, MenuLinkTree
 }
 
 /**
- * Vetoes a menu link move before menu_tree_ui's own checks run.
- *
- * Fires from \Drupal\menu_tree_ui\Service\MenuTreeMover::validateConstraints(),
- * after \Drupal\treegrid_reorder\TreeReorderManager's universal self-target and
- * cycle checks pass, but before menu_tree_ui checks whether the link is
- * movable, belongs to the target menu, or fits the 9-level depth cap. It fires
- * at record time as the editor drags or keyboard-moves a row (against live
- * storage plus the pending moves), during Save's validation of the recorded
- * moves in order (against live storage, before the batch is written), and
- * again immediately before each move is written.
- *
- * To block the move, set $veto['veto'] = TRUE. Set $veto['message'] to a
- * translated string to give the editor a specific reason; otherwise a generic
- * "Move blocked by a module." message is shown. The message is safe HTML: set
- * a t() result, with @ placeholders for any user-supplied text. A plain
- * string is escaped.
- *
- * @param array $veto
- *   Empty on entry. Set $veto['veto'] = TRUE to block the move, and
- *   optionally $veto['message'] with a user-facing reason.
- * @param string $menu_name
- *   The menu the move is happening within.
- * @param string $moved_id
- *   Plugin ID of the link being moved.
- * @param string $new_parent_id
- *   Plugin ID of the prospective new parent, or empty string for the menu
- *   root.
- * @param string|null $before_id
- *   Plugin ID of the sibling the moved link would sit before, or NULL to drop
- *   at the end.
- *
- * @see \Drupal\menu_tree_ui\Service\MenuTreeMover::validateConstraints()
- * @see hook_menu_tree_ui_post_move()
- */
-function hook_menu_tree_ui_pre_move_alter(array &$veto, string $menu_name, string $moved_id, string $new_parent_id, ?string $before_id) {
-  // Prevent moving a protected link out of the menu root.
-  if ($moved_id === 'my_module.protected_link' && $new_parent_id !== '') {
-    $veto['veto'] = TRUE;
-    $veto['message'] = t('This link must stay at the top level.');
-  }
-}
-
-/**
  * Reacts to a menu link move that has just been written to storage.
  *
  * Fires from \Drupal\menu_tree_ui\Service\MenuTreeMover::applyMove(), once the
@@ -161,7 +118,6 @@ function hook_menu_tree_ui_pre_move_alter(array &$veto, string $menu_name, strin
  *   The weight the moved link was given among its new siblings.
  *
  * @see \Drupal\menu_tree_ui\Service\MenuTreeMover::applyMove()
- * @see hook_menu_tree_ui_pre_move_alter()
  */
 function hook_menu_tree_ui_post_move(string $menu_name, string $moved_id, string $new_parent_id, int $weight) {
   // Log moves of a specific link for an audit trail.

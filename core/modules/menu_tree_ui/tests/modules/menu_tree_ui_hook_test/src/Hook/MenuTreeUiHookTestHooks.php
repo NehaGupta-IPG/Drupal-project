@@ -7,7 +7,6 @@ namespace Drupal\menu_tree_ui_hook_test\Hook;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Hook implementations for menu_tree_ui_hook_test.
@@ -35,31 +34,6 @@ final class MenuTreeUiHookTestHooks {
     }
     $this->state->delete('menu_tree_ui_hook_test.change_parent_after_move');
     $this->menuLinkManager->updateDefinition($change['link'], ['parent' => $change['parent']]);
-  }
-
-  /**
-   * Implements hook_menu_tree_ui_pre_move_alter().
-   *
-   * Vetoes moves of one link. The state value is an array with the keys 'id'
-   * (the plugin ID to veto), 'skip' (how many checks of that link pass first),
-   * 'message' (a plain string) and 'name' (when set, the message is instead a
-   * translated string with this value in an @ placeholder).
-   */
-  #[Hook('menu_tree_ui_pre_move_alter')]
-  public function preMoveAlter(array &$veto, string $menu_name, string $moved_id): void {
-    $config = $this->state->get('menu_tree_ui_hook_test.veto');
-    if (!is_array($config) || $config['id'] !== $moved_id) {
-      return;
-    }
-    if (($config['skip'] ?? 0) > 0) {
-      $config['skip']--;
-      $this->state->set('menu_tree_ui_hook_test.veto', $config);
-      return;
-    }
-    $veto['veto'] = TRUE;
-    $veto['message'] = isset($config['name'])
-      ? new TranslatableMarkup('@name is protected', ['@name' => $config['name']])
-      : $config['message'];
   }
 
 }

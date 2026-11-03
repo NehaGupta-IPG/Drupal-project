@@ -20,15 +20,13 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * Tests that response messages are safe HTML, escaped exactly once.
  *
  * The client shows a response message without escaping it, so the server
- * escapes user-controlled parts (titles, user names, hook messages) once.
+ * escapes user-controlled parts (titles, user names) once.
  */
 #[Group('menu_tree_ui')]
 #[RunTestsInSeparateProcesses]
 final class MenuTreeMessageEscapingTest extends KernelTestBase {
 
   use UserCreationTrait;
-
-  private const string VETO_STATE = 'menu_tree_ui_hook_test.veto';
 
   /**
    * {@inheritdoc}
@@ -37,7 +35,6 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
     'link',
     'menu_link_content',
     'menu_tree_ui',
-    'menu_tree_ui_hook_test',
     'treegrid',
     'treegrid_reorder',
     'system',
@@ -71,67 +68,6 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
   }
 
   /**
-   * A reason built from a placeholder is escaped once in a wrapping message.
-   */
-  public function testVetoReasonIsEscapedOnceInSaveMessage(): void {
-    $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'name' => "Tom's"]);
-
-    $result = $this->container->get('menu_tree_ui.mover')->commitWorkingCopy('test', [
-      ['type' => 'move', 'id' => $this->ids['A'], 'new_parent' => '', 'before_id' => NULL],
-    ]);
-
-    $this->assertStringContainsString('Tom&#039;s', (string) $result['message']);
-    $this->assertStringNotContainsString('&amp;#039;', (string) $result['message']);
-  }
-
-  /**
-   * A partial save keeps the reason escaped once.
-   */
-  public function testVetoReasonIsEscapedOnceInPartialSaveMessage(): void {
-    $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, [
-      'id' => $this->ids['B'],
-      'skip' => 1,
-      'name' => "Tom's",
-    ]);
-    $working_copy = $this->container->get('menu_tree_ui.working_copy');
-    $working_copy->addOp('test', [
-      'type' => 'move',
-      'id' => $this->ids['A'],
-      'new_parent' => $this->ids['B'],
-      'before_id' => NULL,
-    ]);
-    $working_copy->addOp('test', [
-      'type' => 'move',
-      'id' => $this->ids['B'],
-      'new_parent' => '',
-      'before_id' => NULL,
-    ]);
-
-    $response = MenuTreeController::create($this->container)->save(Menu::load('test'));
-
-    $result = json_decode((string) $response->getContent(), TRUE);
-    $this->assertSame('vetoed', $result['code']);
-    $this->assertStringContainsString('Tom&#039;s', $result['message']);
-    $this->assertStringNotContainsString('&amp;#039;', $result['message']);
-  }
-
-  /**
-   * A veto message that is a plain string is escaped.
-   */
-  public function testPlainStringVetoMessageIsEscaped(): void {
-    $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'message' => '<b>x</b>']);
-
-    $result = $this->container->get('menu_tree_ui.mover')->validateMove('test', $this->ids['A'], '', NULL);
-
-    $this->assertSame('vetoed', $result['code']);
-    $this->assertStringContainsString('&lt;b&gt;', (string) $result['message']);
-    $this->assertStringNotContainsString('<b>', (string) $result['message']);
-  }
-
-  /**
    * The lock owner's name is escaped in the locked message.
    */
   public function testLockOwnerNameIsEscaped(): void {
@@ -157,27 +93,6 @@ final class MenuTreeMessageEscapingTest extends KernelTestBase {
     $this->assertSame('locked', $result['code']);
     $this->assertStringContainsString('&lt;b&gt;', $result['message']);
     $this->assertStringNotContainsString('<b>', $result['message']);
-  }
-
-  /**
-   * A vetoed move's response message holds the reason escaped once.
-   */
-  public function testVetoReasonIsEscapedOnceInMoveResponse(): void {
-    $this->createLinks('A', 'B');
-    \Drupal::state()->set(self::VETO_STATE, ['id' => $this->ids['A'], 'name' => "Tom's"]);
-    $request = Request::create('/', 'POST', [], [], [], [], json_encode([
-      'id' => $this->ids['A'],
-      'new_parent' => '',
-      'before_id' => NULL,
-    ]));
-
-    $response = MenuTreeController::create($this->container)->move(Menu::load('test'), $request);
-
-    $this->assertSame(400, $response->getStatusCode());
-    $result = json_decode((string) $response->getContent(), TRUE);
-    $this->assertSame('vetoed', $result['code']);
-    $this->assertStringContainsString('Tom&#039;s', $result['message']);
-    $this->assertStringNotContainsString('&amp;#039;', $result['message']);
   }
 
   /**

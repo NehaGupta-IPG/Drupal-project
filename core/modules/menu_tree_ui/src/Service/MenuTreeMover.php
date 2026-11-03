@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Drupal\menu_tree_ui\Service;
 
 use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
@@ -38,7 +36,6 @@ use Psr\Log\LoggerInterface;
  * does. Links whose plugin can't persist the change are refused up front.
  *
  * Extension without subclassing:
- *   - hook_menu_tree_ui_pre_move_alter() — veto a move before the menu checks.
  *   - hook_menu_tree_ui_post_move() — react after a successful move.
  *
  * Uses StringTranslationTrait for the user-facing messages below, with the
@@ -212,45 +209,9 @@ final class MenuTreeMover implements TreeMoveHandlerInterface {
   }
 
   /**
-   * Returns a veto's message as markup.
-   *
-   * @param mixed $message
-   *   The message a hook set: markup is trusted, anything else is plain text.
-   */
-  private function vetoMessage(mixed $message): MarkupInterface {
-    if ($message instanceof MarkupInterface) {
-      return $message;
-    }
-    if (is_string($message) && $message !== '') {
-      return new FormattableMarkup('@message', ['@message' => $message]);
-    }
-    return $this->t('Move blocked by a module.');
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function validateConstraints(string $tree_id, MoveIntent $intent): array {
-    // Allow modules to veto the move before the menu's own checks.
-    // Implementing hook_menu_tree_ui_pre_move_alter() and setting
-    // $veto['veto'] = TRUE will block the move; set $veto['message'] to
-    // provide a user-facing reason. alter() binds its context arguments by
-    // reference, so they are passed as locals rather than readonly MoveIntent
-    // properties.
-    $menu_name = $tree_id;
-    $moved_id = $intent->id;
-    $new_parent_id = $intent->newParent;
-    $before_id = $intent->beforeId;
-    $veto = [];
-    $this->moduleHandler->alter('menu_tree_ui_pre_move', $veto, $menu_name, $moved_id, $new_parent_id, $before_id);
-    if (!empty($veto['veto'])) {
-      return [
-        'ok' => FALSE,
-        'code' => 'vetoed',
-        'message' => $this->vetoMessage($veto['message'] ?? NULL),
-      ];
-    }
-
     $link = $this->loadLink($intent->id);
     if ($link === NULL || !MenuLinkMovability::isMovable($link)) {
       return [
