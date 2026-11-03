@@ -21,11 +21,23 @@ class ConfigEntityListBuilder extends EntityListBuilder {
   protected $storage;
 
   /**
+   * A flag to decide whether we want to load entity override free or not.
+   *
+   * @var bool
+   */
+  protected bool $loadOverrideFree = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function load() {
     $entity_ids = $this->getEntityIds();
-    $entities = $this->storage->loadMultipleOverrideFree($entity_ids);
+    if ($this->loadOverrideFree) {
+      $entities = $this->storage->loadMultipleOverrideFree($entity_ids);
+    }
+    else {
+      $entities = $this->storage->loadMultiple($entity_ids);
+    }
 
     // Sort the entities using the entity class's sort() method.
     // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().

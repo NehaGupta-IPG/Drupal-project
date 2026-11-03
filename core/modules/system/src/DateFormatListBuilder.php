@@ -39,6 +39,7 @@ class DateFormatListBuilder extends ConfigEntityListBuilder {
     protected TimeInterface $time,
   ) {
     parent::__construct($entity_type, $storage);
+    $this->loadOverrideFree = TRUE;
   }
 
   /**
