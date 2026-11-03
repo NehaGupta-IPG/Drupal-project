@@ -672,7 +672,7 @@ internal.jquery.form:
     url: https://raw.githubusercontent.com/jquery-form/form/master/LICENSE
     gpl-compatible: true
   js:
-    misc/jquery.form.js: {}
+    misc/jquery.form.js: { weight: -19 }
   dependencies:
     - core/jquery
 
