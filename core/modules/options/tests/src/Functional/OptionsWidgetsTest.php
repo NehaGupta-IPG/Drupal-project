@@ -146,6 +146,31 @@ class OptionsWidgetsTest extends FieldTestBase {
       ])
       ->save();
 
+    // Create a boolean field.
+    $boolean_field_storage = FieldStorageConfig::create([
+      'field_name' => 'sample_boolean',
+      'entity_type' => 'entity_test',
+      'type' => 'boolean',
+    ]);
+    $boolean_field_storage->save();
+    $boolean_field = FieldConfig::create([
+      'field_name' => 'sample_boolean',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Boolean field',
+      'settings' => [
+        'on_label' => 'On',
+        'off_label' => 'Off',
+      ],
+    ]);
+    $boolean_field->save();
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent('sample_boolean', [
+        'type' => 'options_buttons',
+      ])
+      ->save();
+
     // Create an entity.
     $entity = EntityTest::create([
       'user_id' => 1,
@@ -163,7 +188,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->responseContains('Some HTML encoded markup with &lt; &amp; &gt;');
 
     // Select first option.
-    $edit = ['card_1' => 0];
+    $edit = ['card_1' => 0, 'sample_boolean' => 0];
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', [0]);
 
@@ -172,11 +197,16 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->checkboxChecked('edit-card-1-0');
     $this->assertSession()->checkboxNotChecked('edit-card-1-1');
     $this->assertSession()->checkboxNotChecked('edit-card-1-2');
+    $this->assertSession()->checkboxChecked('edit-sample-boolean-0');
 
     // Unselect option.
-    $edit = ['card_1' => '_none'];
+    $edit = ['card_1' => '_none', 'sample_boolean' => '_none'];
     $this->submitForm($edit, 'Save');
     $this->assertFieldValues($entity_init, 'card_1', []);
+
+    // Check that the boolean field _none option is checked.
+    $this->drupalGet('entity_test/manage/' . $entity->id() . '/edit');
+    $this->assertSession()->checkboxChecked('edit-sample-boolean-none');
 
     // Check that required radios with one option is auto-selected.
     $this->card1->setSetting('allowed_values', [99 => 'Only allowed value']);

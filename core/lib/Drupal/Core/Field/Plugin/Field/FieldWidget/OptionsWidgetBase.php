@@ -210,6 +210,12 @@ abstract class OptionsWidgetBase extends WidgetBase {
       }
     }
 
+    $field_type = $items->getFieldDefinition()->getFieldStorageDefinition()->getType();
+    if ($field_type === 'boolean' &&
+      isset($flat_options['_none']) && $selected_options === []) {
+      $selected_options[] = '_none';
+    }
+
     return $selected_options;
   }
 
