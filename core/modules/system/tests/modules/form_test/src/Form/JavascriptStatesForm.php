@@ -765,6 +765,239 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    // Ajax related testing.
+    $form['header_ajax_affected_triggers'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'h3',
+      '#value' => 'Ajax affected triggers tests',
+    ];
+    // Ajax trigger.
+    $form['ajax_reload'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Check me to reload elements with the states_ajax_test_wrapper',
+      '#ajax' => [
+        'callback' => '::buildAjax',
+        'wrapper' => 'states_ajax_test_wrapper',
+      ],
+    ];
+    // Ajax trigger that is also a States trigger.
+    $form['shared_ajax_states_trigger'] = [
+      '#type' => 'select',
+      '#options' => ['' => 'Select', '0' => '0', '1' => '1'],
+      '#title' => 'Change me to reload elements with the shared_ajax_states_trigger_test_wrapper',
+      '#ajax' => [
+        'callback' => '::buildAjaxShared',
+        'wrapper' => 'shared_ajax_states_trigger_test_wrapper',
+      ],
+    ];
+    $form['shared_checkbox_trigger'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Shared Checkbox Trigger',
+      '#description' => 'This trigger is shared by a dependent inside the Ajax wrapper and a dependent outside it.',
+    ];
+    $form['shared_textfield_trigger'] = [
+      '#type' => 'textfield',
+      '#title' => 'Shared Textfield Trigger',
+      '#description' => 'This trigger provides different states to dependents inside and outside the Ajax wrapper.',
+    ];
+    // Ajax wrappers.
+    $form['states_ajax_test'] = [
+      '#type' => 'details',
+      '#title' => 'states_ajax_test_wrapper',
+      '#open' => TRUE,
+      '#prefix' => '<div id="states_ajax_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    $form['states_ajax_test']['ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['states_ajax_test']['ajax_set_trigger'] = [
+      '#type' => 'radios',
+      '#title' => 'Ajax Set trigger',
+      '#options' => [
+        'value1' => 'Value 1',
+        'value2' => 'Value 2',
+      ],
+    ];
+    // Add an Ajax removed dependent which shares an external trigger.
+    if (!$form_state->getValue('ajax_reload')) {
+      $form['states_ajax_test']['ajax_removed_textfield_with_shared_trigger'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax removed Textfield with shared trigger',
+        '#description' => 'This dependent is removed when Ajax Reload is checked and uses triggers inside and outside the Ajax wrapper.',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+            ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ],
+        ],
+      ];
+      $form['states_ajax_test']['ajax_removed_textfield_with_shared_trigger_state'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax removed Textfield with shared trigger state',
+        '#description' => 'This dependent uses the empty state of the shared textfield trigger and is removed when Ajax Reload is checked.',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_textfield_trigger"]' => ['empty' => FALSE],
+            ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ],
+        ],
+      ];
+    }
+    // Add element added via ajax when ajax_reload is checked.
+    if ($form_state->getValue('ajax_reload')) {
+      $form['states_ajax_test']['ajax_added_trigger'] = [
+        '#type' => 'checkbox',
+        '#title' => 'Ajax Added Trigger',
+      ];
+      $form['states_ajax_test']['ajax_added_textfield_enabled_when_checkbox_trigger_checked'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax added Textfield enabled when Checkbox Trigger is checked',
+        '#states' => [
+          'enabled' => [
+            ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+      $form['states_ajax_test']['ajax_set_trigger']['#default_value'] = 'value1';
+    }
+    $form['shared_ajax_states_trigger_test'] = [
+      '#type' => 'details',
+      '#title' => 'shared_ajax_states_trigger_test_wrapper',
+      '#open' => TRUE,
+      '#prefix' => '<div id="shared_ajax_states_trigger_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    // Add elements added via ajax when shared_ajax_states_trigger has value.
+    $shared_ajax_states_trigger = $form_state->getValue('shared_ajax_states_trigger');
+    if ($shared_ajax_states_trigger === '0' || $shared_ajax_states_trigger === '1') {
+      $form['shared_ajax_states_trigger_test']['ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax added Textfield enabled when Shared Ajax States Trigger is 1',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_ajax_states_trigger"]' => ['value' => '1'],
+          ],
+        ],
+      ];
+    }
+    $form['textfield_enabled_when_shared_checkbox_trigger_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Shared Checkbox Trigger is checked',
+      '#description' => 'This dependent remains after the Ajax wrapper is replaced and shares the external trigger with the removed dependent.',
+      '#states' => [
+        'enabled' => [
+          ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_enabled_when_shared_textfield_trigger_value'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Shared Textfield Trigger has value1',
+      '#description' => 'This dependent remains after the Ajax wrapper is replaced and uses the value state of the shared textfield trigger.',
+      '#states' => [
+        'enabled' => [
+          ':input[name="shared_textfield_trigger"]' => ['value' => 'value1'],
+        ],
+      ],
+    ];
+    $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Checkbox Trigger is checked',
+      '#states' => [
+        'enabled' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['not_ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Not Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['textfield_visible_when_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_not_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_trigger_is_1_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1 and Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked AND Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_or_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked OR Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          [':input[name="ajax_added_trigger"]' => ['checked' => TRUE]],
+          'or',
+          [':input[name="not_ajax_select_trigger"]' => ['value' => 1]],
+        ],
+      ],
+    ];
+    // Use a selector which includes a form identifier. This is valid if there
+    // are multiple forms on a page which may have duplicate field names.
+    $form['textfield_visible_when_ajax_added_trigger_is_checked_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Added Trigger is checked',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_set_trigger_is_value1_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Set Trigger is Value 1',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_set_trigger"]' => ['value' => 'value1'],
+        ],
+      ],
+    ];
+
     return $form;
   }
 
@@ -772,6 +1005,20 @@ class JavascriptStatesForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * Return ajax.
+   */
+  public function buildAjax(array &$form, FormStateInterface $form_state): array {
+    return $form['states_ajax_test'];
+  }
+
+  /**
+   * Return ajax.
+   */
+  public function buildAjaxShared(array &$form, FormStateInterface $form_state): array {
+    return $form['shared_ajax_states_trigger_test'];
   }
 
 }

@@ -14,9 +14,15 @@
    */
   const states = {
     /**
-     * An array of functions that should be postponed.
+     * A list of functions that should be postponed.
+     *
+     * Functions will be executed at the end of the `attach` function.
      */
-    postponed: [],
+    postponed: new Map(),
+    /**
+     * Stores processed Dependees and their associated Dependents.
+     */
+    processedDependees: {},
   };
 
   Drupal.states = states;
@@ -93,25 +99,67 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
+      // Check if any previously missing dependees are now present in the DOM.
+      // This may occur when elements added via ajax.
+      Object.entries(states.processedDependees).forEach(
+        ([selector, dependees]) => {
+          // The previously missing dependee is now present.
+          if (
+            dependees.length &&
+            !dependees[0].inDOM &&
+            $(selector).length > 0
+          ) {
+            // Remove all existing events to ensure associated states are
+            // re-processed.
+            dependees.forEach(({ dependent }) => {
+              dependent.destroy();
+            });
+          }
+        },
+      );
+      // Cleanup empty states.processedDependees selectors.
+      Object.keys(states.processedDependees).forEach((selector) => {
+        if (states.processedDependees[selector].length === 0) {
+          delete states.processedDependees[selector];
+        }
+      });
       // Uses once to avoid duplicates if attach is called multiple times.
-      const elements = once('states', '[data-drupal-states]', context);
-      const il = elements.length;
-      for (let i = 0; i < il; i++) {
-        const config = JSON.parse(
-          elements[i].getAttribute('data-drupal-states'),
-        );
+      once('states', '[data-drupal-states]', context).forEach((element) => {
+        const config = JSON.parse(element.getAttribute('data-drupal-states'));
         Object.keys(config || {}).forEach((state) => {
           new states.Dependent({
-            element: $(elements[i]),
+            element: $(element),
             state: states.State.sanitize(state),
             constraints: config[state],
           });
         });
-      }
+      });
 
       // Execute all postponed functions now.
-      while (states.postponed.length) {
-        states.postponed.shift()();
+      states.postponed.forEach((func) => {
+        func();
+      });
+      // Clear the Map after execution.
+      states.postponed.clear();
+    },
+    detach(context, settings, trigger) {
+      if (trigger === 'unload') {
+        Object.keys(states.processedDependees).forEach((selector) => {
+          const dependeeIsUnloading = $(selector).closest(context).length;
+          states.processedDependees[selector].forEach((item) => {
+            const dependentIsUnloading =
+              item.dependent.element.closest(context).length;
+            if (dependeeIsUnloading || dependentIsUnloading) {
+              item.dependent.destroy();
+            }
+          });
+        });
+        // Cleanup empty states.processedDependees selectors.
+        Object.keys(states.processedDependees).forEach((selector) => {
+          if (states.processedDependees[selector].length === 0) {
+            delete states.processedDependees[selector];
+          }
+        });
       }
     },
   };
@@ -133,12 +181,42 @@
    *   arbitrary AND and OR clauses.
    */
   states.Dependent = function (args) {
-    $.extend(this, { values: {}, oldValue: null }, args);
+    $.extend(
+      this,
+      { values: {}, oldValue: null, triggers: [], destroyed: false },
+      args,
+    );
 
     this.dependees = this.getDependees();
+
+    // Track if all dependee selectors are not in the DOM.
+    let allNotInDom = true;
+
     Object.keys(this.dependees || {}).forEach((selector) => {
+      states.processedDependees[selector] =
+        states.processedDependees[selector] || [];
+      let inDom = true;
+      // Check if the dependee is present in the DOM.
+      if ($(selector).length === 0) {
+        inDom = false;
+      }
+      // If at least one element is found in the DOM, mark allNotInDom as false.
+      if (inDom) {
+        allNotInDom = false;
+      }
+      states.processedDependees[selector].push({
+        dependent: this,
+        inDOM: inDom,
+      });
       this.initializeDependee(selector, this.dependees[selector]);
     });
+
+    // If all selectors are not in the DOM, ensure this dependent is
+    // reevaluated as its constraints results may have changed.
+    // This may occur if a previously present dependee is removed via ajax.
+    if (allNotInDom) {
+      this.reevaluate();
+    }
   };
 
   /**
@@ -211,14 +289,74 @@
         // Initialize the value of this state.
         this.values[selector][state.name] = null;
 
+        // Bind the event handler and store the reference for later usage.
+        const handler = this.handleStateChange.bind(this);
+        this.values[selector][`${state.name}_handler`] = handler;
+
         // Monitor state changes of the specified state for this dependee.
-        $(selector).on(`state:${state}`, { selector, state }, (e) => {
-          this.update(e.data.selector, e.data.state, e.value);
-        });
+        $(selector).on(`state:${state}`, { selector, state }, handler);
 
         // Make sure the event we just bound ourselves to is actually fired.
-        new states.Trigger({ selector, state });
+        const trigger = new states.Trigger({
+          selector,
+          state,
+        });
+        this.triggers.push(trigger);
       });
+    },
+
+    /**
+     * State changes event handler.
+     */
+    handleStateChange(e) {
+      this.update(e.data.selector, e.data.state, e.value);
+    },
+
+    /**
+     * Remove all the event listeners.
+     */
+    destroy() {
+      // Prevent duplicate cleanup during Ajax detach.
+      if (this.destroyed) {
+        return;
+      }
+      this.destroyed = true;
+      // Loop through the dependee selectors.
+      Object.keys(this.values).forEach((selector) => {
+        const dependeeStates = this.dependees[selector];
+        const $selector = $(selector);
+        Object.keys(dependeeStates).forEach((i) => {
+          // Retrieve the stored handler reference to ensure we only remove
+          // the event associated with this Dependent.
+          const handler = this.values[selector][`${dependeeStates[i]}_handler`];
+          if (handler) {
+            $selector.off(`state:${dependeeStates[i]}`, handler);
+            delete this.values[selector][`${dependeeStates[i]}_handler`];
+          }
+        });
+        // Remove the dependent from states.statesObjects[selector] to ensure
+        // duplicates don't get added when states are re-processed.
+        if (states.processedDependees[selector]) {
+          states.processedDependees[selector] = states.processedDependees[
+            selector
+          ].filter((obj) => obj.dependent !== this);
+        }
+      });
+      // Remove triggers which are not used by another Dependent.
+      this.triggers.forEach((trigger) => {
+        const triggerIsUsed = states.processedDependees[trigger.selector]?.some(
+          (obj) =>
+            obj.dependent.dependees[trigger.selector].includes(
+              trigger.state.name,
+            ),
+        );
+        if (!triggerIsUsed) {
+          trigger.destroy();
+        }
+      });
+      // Remove the drupal once id to ensure states get reprocessed for this
+      // dependent.
+      once.remove('states', this.element);
     },
 
     /**
@@ -445,12 +583,23 @@
 
     if (this.state in states.Trigger.states) {
       this.element = $(this.selector);
+      const initializedElements = once.filter(
+        `states-trigger:${this.state.name}`,
+        this.element,
+      );
 
-      // Only call the trigger initializer when it wasn't yet attached to this
-      // element. Otherwise we'd end up with duplicate events.
-      if (!this.element.data(`trigger:${this.state}`)) {
-        this.initialize();
+      // If the trigger has already been initialized, check there is a postponed
+      // function to trigger its state. If there isn't one, destroy the trigger
+      // and re-initialize to ensure all states are applied when a target
+      // element is loaded. This will also ensure duplicate events are not
+      // added.
+      if (initializedElements.length) {
+        if (states.postponed.has(`${this.selector}|${this.state.name}`)) {
+          return;
+        }
+        this.destroy();
       }
+      this.initialize();
     }
   };
 
@@ -471,7 +620,23 @@
       }
 
       // Mark this trigger as initialized for this element.
-      this.element.data(`trigger:${this.state}`, true);
+      once(`states-trigger:${this.state.name}`, this.element);
+    },
+
+    /**
+     * Remove trigger related event listeners to enable re-initialization.
+     */
+    destroy() {
+      // Remove the associated trigger event handlers.
+      const trigger = states.Trigger.states[this.state];
+      if (typeof trigger !== 'function') {
+        Object.keys(trigger || {}).forEach((event) => {
+          // Remove only handlers for this state.
+          this.element.off(`${event}.drupalStates.${this.state.name}`);
+        });
+      }
+      // Mark this trigger as not initialized for this element.
+      once.remove(`states-trigger:${this.state.name}`, this.element);
     },
 
     /**
@@ -487,7 +652,8 @@
 
       // Attach the event callback.
       this.element.on(
-        event,
+        // Namespace the handler by state for independent cleanup.
+        `${event}.drupalStates.${this.state.name}`,
         function (e) {
           const value = valueFn.call(this.element, e);
           // Only trigger the event if the value has actually changed.
@@ -502,16 +668,23 @@
         }.bind(this),
       );
 
-      states.postponed.push(
-        function () {
-          // Trigger the event once for initialization purposes.
-          this.element.trigger({
-            type: `state:${this.state}`,
-            value: oldValue,
-            oldValue: null,
-          });
-        }.bind(this),
-      );
+      // Add a postponed function to trigger the state. This will be called at
+      // the end of the `attach` function.
+      const postponedFunction = function () {
+        this.element.trigger({
+          type: `state:${this.state}`,
+          value: oldValue,
+          oldValue: null,
+        });
+      }.bind(this);
+
+      // Create a unique key based on selector and state.
+      const key = `${this.selector}|${this.state.name}`;
+
+      // Each state only needs to be triggered once per selector.
+      if (!states.postponed.has(key)) {
+        states.postponed.set(key, postponedFunction);
+      }
     },
   };
 
