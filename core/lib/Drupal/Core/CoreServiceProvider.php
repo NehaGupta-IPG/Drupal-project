@@ -105,7 +105,8 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterEventSubscribersPass(new RegisterListenersPass()), PassConfig::TYPE_AFTER_REMOVING);
-    $container->addCompilerPass(new LoggerAwarePass(), PassConfig::TYPE_AFTER_REMOVING);
+    // Runs before decoration so the logger is set on the decorated service.
+    $container->addCompilerPass(new LoggerAwarePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
 
     $container->addCompilerPass(new RegisterAccessChecksPass());
 

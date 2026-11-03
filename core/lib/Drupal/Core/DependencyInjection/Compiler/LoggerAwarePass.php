@@ -23,8 +23,9 @@ class LoggerAwarePass implements CompilerPassInterface {
       if ($definition->hasMethodCall('setLogger')) {
         continue;
       }
-      if (!is_subclass_of($definition->getClass(), $interface)) {
-        throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+      $class = $container->getParameterBag()->resolveValue($definition->getClass());
+      if (!is_subclass_of($class, $interface)) {
+        throw new \InvalidArgumentException(sprintf('Service "%s" (%s) must implement interface "%s".', $id, $class, $interface));
       }
       $providerTag = $definition->getTag('_provider');
       $loggerId = 'logger.channel.' . $providerTag[0]['provider'];

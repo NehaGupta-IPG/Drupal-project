@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\DependencyInjection\CompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\LoggerAwarePass;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\logger_aware_test\LoggerAwareStub;
+use Drupal\logger_aware_test\LoggerAwareStubDecorator;
 use Drupal\logger_aware_test\LoggerStub;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -52,6 +53,18 @@ class LoggerAwarePassTest extends KernelTestBase {
     $logger_aware_stub = $container->get('logger_aware_test.logger_aware_existing');
     $logger = $logger_aware_stub->getLogger();
     $this->assertInstanceOf(LoggerStub::class, $logger);
+  }
+
+  /**
+   * Tests that decorated services get the logger.
+   *
+   * @legacy-covers ::process
+   */
+  public function testDecoratedService(): void {
+    $container = $this->container;
+    $decorator = $container->get('logger_aware_test.logger_aware_decorated');
+    $this->assertInstanceOf(LoggerAwareStubDecorator::class, $decorator);
+    $this->assertSame($container->get('logger.channel.logger_aware_test'), $decorator->inner->getLogger());
   }
 
 }
