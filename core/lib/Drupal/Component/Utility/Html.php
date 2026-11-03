@@ -383,7 +383,7 @@ class Html {
    * will convert "&eacute;" to "é", whereas Html::escape() will not convert "é"
    * to "&eacute;".
    *
-   * @param string $text
+   * @param string|null $text
    *   The text to decode entities in.
    *
    * @return string
@@ -430,8 +430,8 @@ class Html {
    *
    * @ingroup sanitization
    */
-  public static function escape(string $text): string {
-    return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  public static function escape(string|NULL $text): string {
+    return htmlspecialchars($text ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   }
 
   /**
