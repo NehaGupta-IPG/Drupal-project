@@ -17,6 +17,14 @@ class DatabaseTestHooks {
    */
   #[Hook('query_alter')]
   public function queryAlter(AlterableInterface $query): void {
+    if ($query->hasTag('database_test_nested_select')) {
+      $id = \Drupal::database()->select('test', 't')
+        ->fields('t', ['id'])
+        ->condition('name', 'John')
+        ->execute()
+        ->fetchField();
+      $query->condition('id', $id);
+    }
     if ($query->hasTag('database_test_alter_add_range')) {
       $query->range(0, 2);
     }

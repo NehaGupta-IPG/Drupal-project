@@ -143,7 +143,7 @@ class Select extends QuerySelect {
    * {@inheritdoc}
    */
   public function execute() {
-    if ($this->connection->inTransaction()) {
+    if ($this->connection->inTransaction() && !$this->connection->transactionManager()->has('mimic_implicit_commit')) {
       $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
     }
     try {

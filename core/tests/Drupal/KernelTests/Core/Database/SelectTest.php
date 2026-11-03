@@ -20,6 +20,44 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class SelectTest extends DatabaseTestBase {
 
   /**
+   * Tests a query-alter hook executing a SELECT inside a transaction.
+   */
+  public function testNestedSelectInTransaction(): void {
+    $transaction = $this->connection->startTransaction();
+    $this->connection->insert('test')
+      ->fields(['name' => 'Transaction test', 'age' => 42])
+      ->execute();
+
+    // Execute twice to check that each query releases only its own savepoint.
+    for ($i = 0; $i < 2; $i++) {
+      $name = $this->connection->select('test', 't')
+        ->fields('t', ['name'])
+        ->addTag('database_test_nested_select')
+        ->execute()
+        ->fetchField();
+      $this->assertSame('John', $name);
+      $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+    }
+
+    // A failed SELECT must not abort the caller's transaction.
+    try {
+      $this->connection->select('test', 't')
+        ->fields('t', ['missing_column'])
+        ->addTag('database_test_nested_select')
+        ->execute();
+      $this->fail('The invalid SELECT should throw an exception.');
+    }
+    catch (DatabaseExceptionWrapper) {
+      $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+    }
+    $this->assertEquals(1, $this->connection->select('test', 't')
+      ->condition('name', 'Transaction test')->countQuery()->execute()->fetchField());
+    $transaction->rollBack();
+    $this->assertEquals(0, $this->connection->select('test', 't')
+      ->condition('name', 'Transaction test')->countQuery()->execute()->fetchField());
+  }
+
+  /**
    * Tests rudimentary SELECT statements.
    */
   public function testSimpleSelect(): void {
