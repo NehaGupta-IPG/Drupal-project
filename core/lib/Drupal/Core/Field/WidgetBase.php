@@ -500,6 +500,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $values = NestedArray::getValue($form_state->getValues(), $path, $key_exists);
 
     if ($key_exists) {
+      if (!is_array($values)) {
+        $values = [];
+      }
+
       // Account for drag-and-drop reordering if needed.
       if (!$this->handlesMultipleValues()) {
         // Remove the 'value' of the 'add more' button.
@@ -508,7 +512,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         // The original delta, before drag-and-drop reordering, is needed to
         // route errors to the correct form element.
         foreach ($values as $delta => &$value) {
-          $value['_original_delta'] = $delta;
+          if (is_array($value)) {
+            $value['_original_delta'] = $delta;
+          }
         }
 
         usort($values, function ($a, $b) {
