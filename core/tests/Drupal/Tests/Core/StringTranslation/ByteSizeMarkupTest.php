@@ -26,8 +26,8 @@ class ByteSizeMarkupTest extends UnitTestCase {
    * @legacy-covers ::create
    */
   #[DataProvider('providerTestCommonFormatSize')]
-  public function testCommonFormatSize(string $expected, int|float $input): void {
-    $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub());
+  public function testCommonFormatSize(string $expected, int|float $input, int $precision = 2): void {
+    $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub(), $precision);
     $this->assertInstanceOf(TranslatableMarkup::class, $size);
     $this->assertEquals($expected, $size);
   }
@@ -67,6 +67,20 @@ class ByteSizeMarkupTest extends UnitTestCase {
       ['59.72 PB', 67234178751368124],
       // Decimal Yottabytes.
       ['194.67 YB', 235346823821125814962843827],
+      // Decimal Megabytes - lower precision.
+      ['3 MB', 3623651, 0],
+      ['4 GB', 4053371676, 0],
+      // Decimal Petabytes.
+      ['60 PB', 67234178751368124, 0],
+      // Decimal Yottabytes.
+      ['195 YB', 235346823821125814962843827, 0],
+      // Decimal Megabytes - more precision.
+      ['3.456 MB', 3623651, 3],
+      ['3.775 GB', 4053371676, 3],
+      // Decimal Petabytes - more precision.
+      ['59.716 PB', 67234178751368124, 3],
+      // Decimal Yottabytes - more precision.
+      ['194.674 YB', 235346823821125814962843827, 3],
     ];
   }
 

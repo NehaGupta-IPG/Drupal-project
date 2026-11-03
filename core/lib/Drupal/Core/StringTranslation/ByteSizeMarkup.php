@@ -19,13 +19,24 @@ final class ByteSizeMarkup {
   /**
    * Gets the TranslatableMarkup object for the provided size.
    *
+   * @param float|int $size
+   *   The size to format (in bytes).
+   * @param string|null $langcode
+   *   (optional) The language code of the language to translate to, if
+   *   different from the default language.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface|null $stringTranslation
+   *   (optional) The string translation service.
+   * @param int $precision
+   *   (optional) The number of digits after the decimal point to round to.
+   *   Defaults to 2.
+   *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The translatable markup.
    *
    * @throws \LogicException
    *   Thrown when an invalid unit size is used.
    */
-  public static function create(float|int $size, ?string $langcode = NULL, ?TranslationInterface $stringTranslation = NULL): TranslatableMarkup {
+  public static function create(float|int $size, ?string $langcode = NULL, ?TranslationInterface $stringTranslation = NULL, int $precision = 2): TranslatableMarkup {
     $options = ['langcode' => $langcode];
     $absolute_size = abs($size);
     if ($absolute_size < Bytes::KILOBYTE) {
@@ -35,7 +46,7 @@ final class ByteSizeMarkup {
     $sign = $absolute_size / $size;
     foreach (['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] as $unit) {
       $absolute_size /= Bytes::KILOBYTE;
-      $rounded_size = round($absolute_size, 2);
+      $rounded_size = round($absolute_size, $precision);
       if ($rounded_size < Bytes::KILOBYTE) {
         break;
       }
