@@ -10,8 +10,11 @@ use Drupal\Core\Database\Connection;
  * This class works like Insert except the rows will be set to the desired
  * values even if the key existed before. It supports both single-field and
  * composite (multi-field) unique or primary key constraints.
+ *
+ * @todo Remove commented out QueryExecutionVoidInterface in drupal:13.0.0.
+ *   in https://www.drupal.org/project/drupal/issues/3615136
  */
-abstract class Upsert extends Query implements \Countable {
+abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoidInterface */ {
 
   use InsertTrait;
 
@@ -46,6 +49,7 @@ abstract class Upsert extends Query implements \Countable {
    *   (optional) An array of database options.
    */
   public function __construct(Connection $connection, $table, array $options = []) {
+    $options = array_merge(['return_affected_rows' => TRUE], $options);
     parent::__construct($connection, $options);
     $this->table = $table;
   }
@@ -165,12 +169,15 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Executes the UPSERT operation.
    *
-   * @return int
-   *   An integer indicating the number of rows affected by the operation. Do
-   *   not rely on this value as a precise indication of the actual rows
-   *   affected: different database engines return different values.
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidReturnVoid
+   * @return void
+   *   No return value.
    */
-  public function execute() {
+  public function execute() /* : void */ {
+    if ($this->queryOptions['return_affected_rows']) {
+      @trigger_error(__METHOD__ . '() returning a value is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Pass \'return_affected_rows\' => FALSE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/3615151', E_USER_DEPRECATED);
+    }
+
     if (!$this->preExecute()) {
       return NULL;
     }
@@ -193,7 +200,9 @@ abstract class Upsert extends Query implements \Countable {
       $stmt->execute($values, $this->queryOptions);
       // Re-initialize the values array so that we can re-use this query.
       $this->insertValues = [];
-      return $stmt->rowCount();
+      if ($this->queryOptions['return_affected_rows']) {
+        return $stmt->rowCount();
+      }
     }
     catch (\Exception $e) {
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);

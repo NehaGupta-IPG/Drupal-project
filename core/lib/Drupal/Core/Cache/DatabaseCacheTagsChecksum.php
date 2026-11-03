@@ -36,7 +36,7 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   protected function doInvalidateTags(array $tags) {
     try {
       foreach ($tags as $tag) {
-        $this->connection->upsert('cachetags')
+        $this->connection->upsert('cachetags', ['return_affected_rows' => FALSE])
           ->key(['tag'])
           ->fields([
             'tag',

@@ -10,6 +10,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -26,7 +27,7 @@ class UpsertTest extends DatabaseTestBase {
     $connection = Database::getConnection();
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
-    $upsert = $connection->upsert('test_people')
+    $upsert = $connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields(['job', 'age', 'name']);
 
@@ -46,8 +47,9 @@ class UpsertTest extends DatabaseTestBase {
     ]);
 
     $result = $upsert->execute();
-    $this->assertIsInt($result);
-    $this->assertGreaterThanOrEqual(2, $result, 'The result of the upsert operation should report that at least two rows were affected.');
+    // @todo Remove the assertion in drupal:13.0.0.
+    //   https://www.drupal.org/project/drupal/issues/3615136
+    $this->assertNull($result);
 
     $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after, 'Rows were inserted and updated properly.');
@@ -69,7 +71,7 @@ class UpsertTest extends DatabaseTestBase {
   public function testUpsertWithUpsertUpdateExpression(): void {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    $upsert = $this->connection->upsert('test_people')
+    $upsert = $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields([
         'job',
@@ -112,7 +114,7 @@ class UpsertTest extends DatabaseTestBase {
     // An associative $fields array cannot mix insert values with update
     // expressions, because the values cannot be told apart from column names.
     try {
-      $this->connection->upsert('test_people')
+      $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
         ->key('job')
         ->fields([
           'job' => 'Speaker',
@@ -126,7 +128,7 @@ class UpsertTest extends DatabaseTestBase {
 
     // An update expression needs a column name key.
     try {
-      $this->connection->upsert('test_people')
+      $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
         ->key('job')
         ->fields([
           'job',
@@ -143,6 +145,52 @@ class UpsertTest extends DatabaseTestBase {
    * Confirms that we can upsert records with keywords successfully.
    */
   public function testUpsertWithKeywords(): void {
+    $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
+
+    $upsert = $this->connection->upsert('select', ['return_affected_rows' => FALSE])
+      ->key('id')
+      ->fields(['id', 'update']);
+
+    // Add a new row.
+    $upsert->values([
+      'id' => 3,
+      'update' => 'Update value 2',
+    ]);
+
+    // Update an existing row.
+    $upsert->values([
+      'id' => 1,
+      'update' => 'Update value 1 updated',
+    ]);
+
+    $upsert->execute();
+
+    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
+    $this->assertEquals($num_records_before + 1, $num_records_after, 'Rows were inserted and updated properly.');
+
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 1])->fetch();
+    $this->assertEquals('Update value 1 updated', $record->update);
+
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 3])->fetch();
+    $this->assertEquals('Update value 2', $record->update);
+
+    // An upsert should be re-usable.
+    $upsert->values([
+      'id' => 4,
+      'update' => 'Another value',
+    ]);
+    $upsert->execute();
+    $record = $this->connection->query('SELECT * FROM {select} WHERE [id] = :id', [':id' => 4])->fetch();
+    $this->assertEquals('Another value', $record->update);
+  }
+
+  /**
+   * Confirms that we deprecated returning a value from Upsert::execute().
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedUpsertExecuteReturningValue(): void {
+    $this->expectUserDeprecationMessage('Drupal\Core\Database\Query\Upsert::execute() returning a value is deprecated in drupal:12.1.0 and is removed in drupal:13.0.0. Pass \'return_affected_rows\' => FALSE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/3615151');
+
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
 
     $upsert = $this->connection->upsert('select')
@@ -195,7 +243,7 @@ class UpsertTest extends DatabaseTestBase {
    */
   public function testUpsertNonExistingTable(): void {
     $this->expectException(DatabaseExceptionWrapper::class);
-    $upsert = $this->connection->upsert('a-table-that-does-not-exist')
+    $upsert = $this->connection->upsert('a-table-that-does-not-exist', ['return_affected_rows' => FALSE])
       ->key('id')
       ->fields(['id', 'update']);
     $upsert->values([
@@ -229,7 +277,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField();
 
-    $upsert = $connection->upsert('test_composite_primary')
+    $upsert = $connection->upsert('test_composite_primary', ['return_affected_rows' => FALSE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields([
@@ -294,7 +342,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // An upsert that only adds a record.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -303,7 +351,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // Do the same upsert, should be a no-op.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -320,7 +368,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // An upsert that only adds a record.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -329,7 +377,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // Do a multi-value upsert that should add two more records.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['return_affected_rows' => FALSE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -364,7 +412,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
 
     // Performing an upsert with the same composite key should be a no-op.
-    $this->connection->upsert('test_composite_primary')
+    $this->connection->upsert('test_composite_primary', ['return_affected_rows' => FALSE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields([
@@ -380,7 +428,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
 
     // Different composite keys should insert other rows.
-    $this->connection->upsert('test_composite_primary')
+    $this->connection->upsert('test_composite_primary', ['return_affected_rows' => FALSE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields(['name', 'age'])
@@ -415,7 +463,7 @@ class UpsertTest extends DatabaseTestBase {
     $r = $this->connection->query('SELECT * FROM {test_one_blob} WHERE [id] = :id', [':id' => $id])->fetchAssoc();
     $this->assertSame('test', $r['blob1']);
 
-    $this->connection->upsert('test_one_blob')
+    $this->connection->upsert('test_one_blob', ['return_affected_rows' => FALSE])
       ->key('id')
       ->fields(['id', 'blob1'])
       ->values(['id' => $id, 'blob1' => NULL])
