@@ -344,6 +344,28 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $directory = $scheme . '://styles/' . $this->style->id() . '/' . $scheme . '/' . $this->randomMachineName();
     $this->drupalGet(\Drupal::service('file_url_generator')->generateAbsoluteString($directory . '/' . $this->randomString()));
     $this->assertDirectoryDoesNotExist($directory);
+
+    // Create another working copy of the file.
+    $files = $this->drupalGetTestFiles('image');
+    $file = array_shift($files);
+    $original_uri = $file_system->copy($file->uri, $scheme . '://');
+    // Let the image_module_test module know about this file, so it can claim
+    // ownership in hook_file_download().
+    \Drupal::keyValue('image')->set('test_file_download', $original_uri);
+
+    // Move the file outside the filesystem root
+    // and create a symlink.
+    $originalPath = $file_system->realpath($original_uri);
+    $tmpPath = $file_system->move(
+      $original_uri,
+      $file_system->realpath('temporary://' . $this->randomMachineName())
+    );
+    symlink($tmpPath, $originalPath);
+
+    // Check if the file can still be accessed.
+    $generate_url = $this->style->buildUrl($original_uri, $clean_url);
+    $this->drupalGet($generate_url);
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }
