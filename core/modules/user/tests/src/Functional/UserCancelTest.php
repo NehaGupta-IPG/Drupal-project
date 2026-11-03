@@ -385,6 +385,7 @@ class UserCancelTest extends BrowserTestBase {
     $test_node = $node_storage->load($node->id());
     $this->assertEquals(0, $test_node->getOwnerId(), 'Node of the user has been attributed to anonymous user.');
     $this->assertTrue($test_node->isPublished());
+    /** @var \Drupal\node\NodeInterface $test_node */
     $test_node = $node_storage->loadRevision($revision);
     $this->assertEquals(0, $test_node->getOwnerId(), 'Node revision of the user has been attributed to anonymous user.');
     $this->assertEquals(0, $test_node->getRevisionUser()->id(), 'Node revision of the user has been attributed to anonymous user.');

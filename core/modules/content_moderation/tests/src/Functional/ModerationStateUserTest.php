@@ -78,8 +78,8 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     // Add a forward draft revision in the original language.
     $node = $node->getTranslation('en');
     $node->setNewRevision();
-    $node->moderation_state = 'draft';
     $node
+      ->set('moderation_state', 'draft')
       ->set('title', 'Second version of the content en.')
       ->setRevisionUserId($user1->id());
     $node->save();
@@ -114,9 +114,16 @@ class ModerationStateUserTest extends ModerationStateTestBase {
     // revision author, even though the first user owns the node.
     $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
     $nodeStorage->resetCache();
-    $this->assertEquals(0, $nodeStorage->loadRevision($originalRevisionId)->getRevisionUserId());
-    $this->assertEquals($user2->id(), $nodeStorage->loadRevision($translationRevisionId)->getRevisionUserId());
-    $this->assertEquals(0, $nodeStorage->loadRevision($draftRevisionId)->getRevisionUserId());
+    $expectedRevisionUserIds = [
+      $originalRevisionId => 0,
+      $translationRevisionId => $user2->id(),
+      $draftRevisionId => 0,
+    ];
+    foreach ($expectedRevisionUserIds as $revisionId => $expectedRevisionUserId) {
+      /** @var \Drupal\node\NodeInterface $revision */
+      $revision = $nodeStorage->loadRevision($revisionId);
+      $this->assertEquals($expectedRevisionUserId, $revision->getRevisionUserId());
+    }
 
     // Check content as an anonymous user.
     $this->drupalLogout();

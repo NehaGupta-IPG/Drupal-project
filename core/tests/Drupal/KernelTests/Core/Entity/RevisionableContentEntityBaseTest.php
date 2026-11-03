@@ -209,6 +209,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     }
 
     // Resaving it while syncing is allowed.
+    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $firstRevision */
     $firstRevision = $storage->loadRevision($firstRevisionId);
     $firstRevision->setOriginal(clone $firstRevision);
     $firstRevision->setName('first updated');
@@ -216,6 +217,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     $firstRevision->save();
 
     // The first revision is updated in place and keeps its flags.
+    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $firstRevision */
     $firstRevision = $storage->loadRevisionUnchanged($firstRevisionId);
     $this->assertEquals('first updated', $firstRevision->label());
     $this->assertTrue($firstRevision->wasDefaultRevision());

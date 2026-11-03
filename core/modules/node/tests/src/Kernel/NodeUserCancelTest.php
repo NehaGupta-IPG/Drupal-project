@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests node behavior when users are cancelled.
+ * Tests node behavior when users are canceled.
  */
 #[Group('node')]
 #[RunTestsInSeparateProcesses]
@@ -79,10 +80,12 @@ class NodeUserCancelTest extends KernelTestBase {
     $secondRevisionId = $node->getRevisionId();
 
     $this->assertNotEquals($firstRevisionId, $secondRevisionId);
-    $changedTimes = [
-      $firstRevisionId => $nodeStorage->loadRevision($firstRevisionId)->getChangedTime(),
-      $secondRevisionId => $nodeStorage->loadRevision($secondRevisionId)->getChangedTime(),
-    ];
+    $changedTimes = [];
+    foreach ([$firstRevisionId, $secondRevisionId] as $revisionId) {
+      /** @var \Drupal\node\NodeInterface $revision */
+      $revision = $nodeStorage->loadRevision($revisionId);
+      $changedTimes[$revisionId] = $revision->getChangedTime();
+    }
     $this->assertEquals(1000, $changedTimes[$firstRevisionId]);
 
     \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
@@ -91,7 +94,9 @@ class NodeUserCancelTest extends KernelTestBase {
     // updated.
     $this->assertEquals([$firstRevisionId, $secondRevisionId], array_keys($nodeStorage->getQuery()->accessCheck(FALSE)->allRevisions()->sort('vid')->execute()));
     foreach ($changedTimes as $revisionId => $changedTime) {
-      $this->assertEquals($changedTime, $nodeStorage->loadRevision($revisionId)->getChangedTime());
+      /** @var \Drupal\node\NodeInterface $revision */
+      $revision = $nodeStorage->loadRevision($revisionId);
+      $this->assertEquals($changedTime, $revision->getChangedTime());
     }
 
     // Test default revision.
@@ -120,7 +125,7 @@ class NodeUserCancelTest extends KernelTestBase {
   }
 
   /**
-   * Tests reassigning a translation owned by the cancelled user.
+   * Tests reassigning a translation owned by the canceled user.
    *
    * The ownership of the other languages of the node must not change.
    */
@@ -167,6 +172,96 @@ class NodeUserCancelTest extends KernelTestBase {
     $this->assertEquals($user2->id(), $translationRevision->getOwnerId());
     $this->assertEquals(0, $translationRevision->getTranslation('es')->getOwnerId());
     $this->assertEquals(0, $translationRevision->getRevisionUserId());
+  }
+
+  /**
+   * Tests reassigning a node where the canceled user owns all translations.
+   *
+   * The same revision is updated once per language and once for the revision
+   * author, so make sure later passes do not revert earlier ones.
+   */
+  public function testCancelReassignAllTranslationsOwner(): void {
+    /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $user1 = User::create(['name' => 'test user 1']);
+    $user1->save();
+
+    $node = Node::create([
+      'title' => 'test node',
+      'type' => 'test',
+      'langcode' => 'en',
+      'uid' => $user1->id(),
+      'revision_uid' => $user1->id(),
+    ]);
+    $node->save();
+    $originalRevisionId = $node->getRevisionId();
+
+    $node->setNewRevision();
+    $node->addTranslation('es', [
+      'title' => 'test node es',
+      'uid' => $user1->id(),
+    ])
+      ->setRevisionUserId($user1->id())
+      ->save();
+    $translationRevisionId = $node->getRevisionId();
+
+    \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
+
+    // Confirm that no revisions were created.
+    $this->assertEquals([$originalRevisionId, $translationRevisionId], array_keys($nodeStorage->getQuery()->accessCheck(FALSE)->allRevisions()->sort('vid')->execute()));
+
+    // Confirm that the default revision did not change.
+    $nodeStorage->resetCache();
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $nodeStorage->load($node->id());
+    $this->assertEquals($translationRevisionId, $node->getRevisionId());
+
+    /** @var \Drupal\node\NodeInterface $translationRevision */
+    $translationRevision = $nodeStorage->loadRevision($translationRevisionId);
+    $this->assertEquals(0, $translationRevision->getOwnerId());
+    $this->assertEquals(0, $translationRevision->getTranslation('es')->getOwnerId());
+    $this->assertEquals(0, $translationRevision->getRevisionUserId());
+
+    /** @var \Drupal\node\NodeInterface $originalRevision */
+    $originalRevision = $nodeStorage->loadRevision($originalRevisionId);
+    $this->assertEquals(0, $originalRevision->getOwnerId());
+    $this->assertEquals(0, $originalRevision->getRevisionUserId());
+  }
+
+  /**
+   * Tests reassigning language-neutral nodes owned by the canceled user.
+   */
+  public function testCancelReassignLanguageNeutralNode(): void {
+    /** @var \Drupal\node\NodeStorageInterface $nodeStorage */
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $user1 = User::create(['name' => 'test user 1']);
+    $user1->save();
+
+    $nodeIds = [];
+    foreach ([LanguageInterface::LANGCODE_NOT_SPECIFIED, LanguageInterface::LANGCODE_NOT_APPLICABLE] as $langcode) {
+      $node = Node::create([
+        'title' => 'test node ' . $langcode,
+        'type' => 'test',
+        'langcode' => $langcode,
+        'uid' => $user1->id(),
+        'revision_uid' => $user1->id(),
+      ]);
+      $node->save();
+      $nodeIds[$langcode] = $node->id();
+    }
+
+    \Drupal::service(AccountCancellation::class)->cancel([], (int) $user1->id(), 'user_cancel_reassign');
+
+    $nodeStorage->resetCache();
+    foreach ($nodeIds as $langcode => $nodeId) {
+      /** @var \Drupal\node\NodeInterface $node */
+      $node = $nodeStorage->load($nodeId);
+      $this->assertEquals($langcode, $node->language()->getId());
+      $this->assertEquals(0, $node->getOwnerId(), "The $langcode node was reassigned to the anonymous user.");
+      $this->assertEquals(0, $node->getRevisionUserId(), "The $langcode node revision author was reassigned to the anonymous user.");
+    }
   }
 
 }
