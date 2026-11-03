@@ -144,6 +144,11 @@ class ImageWidget extends FileWidget {
 
     $field_settings = $this->getFieldSettings();
 
+    // Add image style on upload validation.
+    if (!empty($field_settings['image_style'])) {
+      $element['#upload_validators']['file_validate_image_style_on_upload'][0] = $field_settings['image_style'];
+    }
+
     // Add image validation.
     $element['#upload_validators']['FileIsImage'] = [];
 

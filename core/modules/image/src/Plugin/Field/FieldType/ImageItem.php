@@ -84,6 +84,7 @@ class ImageItem extends FileItem {
       'alt_field_required' => 1,
       'title_field' => 0,
       'title_field_required' => 0,
+      'image_style' => '',
       'max_resolution' => '',
       'min_resolution' => '',
       'default_image' => [
@@ -215,13 +216,24 @@ class ImageItem extends FileItem {
 
     $settings = $this->getSettings();
 
+    // Add image style on upload.
+    $element['image_style'] = [
+      '#type' => 'select',
+      '#title' => t('Image style on upload'),
+      '#description' => t('Select if an image style should be applied to the uploaded image file.'),
+      '#options' => image_style_options(),
+      '#default_value' => $settings['image_style'],
+      '#empty_option' => $this->t('- No -'),
+      '#weight' => 4.1,
+    ];
+
     // Add maximum and minimum dimensions settings.
     $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
     $element['max_resolution'] = [
       '#type' => 'item',
       '#title' => $this->t('Maximum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.1,
+      '#weight' => 4.2,
       '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to reflect the given width and height. Resizing images on upload will cause the loss of <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image.'),
     ];
     $element['max_resolution']['x'] = [
@@ -248,7 +260,7 @@ class ImageItem extends FileItem {
       '#type' => 'item',
       '#title' => $this->t('Minimum image dimensions'),
       '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.2,
+      '#weight' => 4.3,
       '#description' => $this->t('The minimum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
     ];
     $element['min_resolution']['x'] = [

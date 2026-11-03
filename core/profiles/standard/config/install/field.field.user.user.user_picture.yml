@@ -28,6 +28,7 @@ settings:
   alt_field_required: false
   title_field: false
   title_field_required: false
+  image_style: ''
   default_image:
     uuid: null
     alt: ''
