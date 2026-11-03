@@ -54,6 +54,11 @@ class UrlHelperTest extends TestCase {
         'foo',
         'Simple parameters are properly added.',
       ],
+      [
+        ['a' => '1', 'b' => [], 'c' => []],
+        'a=1',
+        'Empty key ignored.',
+      ],
     ];
   }
 
