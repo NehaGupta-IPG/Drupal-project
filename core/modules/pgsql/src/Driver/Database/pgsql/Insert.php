@@ -28,7 +28,7 @@ class Insert extends QueryInsert {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions);
 
     // Fetch the list of blobs and sequences used on that table.
-    $table_information = $this->connection->schema()->queryTableInformation($this->table);
+    $table_information = $this->connection->tableInformation()->getTableInformation($this->table);
 
     $max_placeholder = 0;
     $blobs = [];
@@ -150,7 +150,7 @@ class Insert extends QueryInsert {
     }
     try {
       // Fetch the list of blobs and sequences used on that table.
-      $table_information = $this->connection->schema()->queryTableInformation($this->table);
+      $table_information = $this->connection->tableInformation()->getTableInformation($this->table);
       if (isset($table_information->serial_fields[0])) {
         // Use RETURNING syntax to get the last insert ID in the same INSERT
         // query, see https://www.postgresql.org/docs/12/dml-returning.html.

@@ -22,7 +22,7 @@ class Upsert extends QueryUpsert {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
 
     // Fetch the list of blobs and sequences used on that table.
-    $table_information = $this->connection->schema()->queryTableInformation($this->table);
+    $table_information = $this->connection->tableInformation()->getTableInformation($this->table);
 
     $max_placeholder = 0;
     $blobs = [];

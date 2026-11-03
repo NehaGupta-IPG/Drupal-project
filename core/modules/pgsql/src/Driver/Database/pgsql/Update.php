@@ -23,7 +23,7 @@ class Update extends QueryUpdate {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
 
     // Fetch the list of blobs and sequences used on that table.
-    $table_information = $this->connection->schema()->queryTableInformation($this->table);
+    $table_information = $this->connection->tableInformation()->getTableInformation($this->table);
 
     // Expressions take priority over literal fields, so we process those first
     // and remove any literal fields that conflict.
