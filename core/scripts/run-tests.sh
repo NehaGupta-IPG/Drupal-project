@@ -142,7 +142,7 @@ if (Config::get('list-files') || Config::get('list-files-json')) {
   $testDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
   // PhpUnitTestDiscovery::findAllClassFiles() gives us a classmap similar to a
   // Composer 'classmap' array.
-  $test_classes = $testDiscovery->findAllClassFiles(Config::get('module'), Config::get('types'), Config::get('directory'), Config::getTests());
+  $test_classes = $testDiscovery->findAllClassFiles(Config::get('module'), Config::get('directory'), Config::getTests());
   // JSON output is the easiest.
   if (Config::get('list-files-json')) {
     echo json_encode($test_classes);
@@ -617,7 +617,7 @@ function simpletest_script_get_test_list() {
         echo sprintf("Drupal module........: %s\n", Config::get('module'));
       }
       if (Config::get('directory')) {
-        echo sprintf("Directory............: %s\n", Config::get('directory'));
+        echo sprintf("Directory............: %s\n", implode(', ', Config::get('directory')));
       }
       if (Config::getTests()) {
         echo sprintf("PHPUnit test group(s): %s\n", implode(', ', Config::getTests()));

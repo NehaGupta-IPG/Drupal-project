@@ -97,6 +97,13 @@ final class Configuration {
       $input->setOption('types', []);
     }
 
+    if ($input->getOption('directory')) {
+      $input->setOption('directory', explode(',', $input->getOption('directory')));
+    }
+    else {
+      $input->setOption('directory', []);
+    }
+
     self::$instance = new self($input->getOptions(), $input->getArguments());
 
     return self::$instance;
@@ -221,7 +228,7 @@ final class Configuration {
       'directory',
       NULL,
       InputOption::VALUE_REQUIRED,
-      'Run all tests found within the specified file directory.',
+      'Run all tests found within the specified file directory, or within several directories separated by commas, for example run-tests.sh --directory "modules/a,modules/b"',
     ));
     $inputDefinition->addOption(new InputOption(
       'color',

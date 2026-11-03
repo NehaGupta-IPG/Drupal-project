@@ -81,8 +81,9 @@ class PhpUnitTestDiscovery {
    *   (optional) The name of an extension to limit discovery to; e.g., 'node'.
    * @param list<string> $testSuites
    *   (optional) An array of PHPUnit test suites to filter the discovery for.
-   * @param string|null $directory
-   *   (optional) Limit discovered tests to a specific directory.
+   * @param string|list<string>|null $directory
+   *   (optional) Limit discovered tests to a specific directory, or to a list
+   *   of directories.
    * @param list<string> $testGroups
    *   (optional) An array of test groups to filter the discovery for.
    *
@@ -92,7 +93,7 @@ class PhpUnitTestDiscovery {
    *   ::getTestClassInfo(), keyed by test class. If a test class belongs to
    *   multiple groups, it will appear under all group keys it belongs to.
    */
-  public function getTestClasses(?string $extension = NULL, array $testSuites = [], ?string $directory = NULL, array $testGroups = []): array {
+  public function getTestClasses(?string $extension = NULL, array $testSuites = [], string|array|null $directory = NULL, array $testGroups = []): array {
     $this->warnings = [];
 
     $args = ['--configuration', $this->configurationFilePath];
@@ -109,8 +110,10 @@ class PhpUnitTestDiscovery {
       $args[] = '--testsuite=' . implode(',', $testSuites);
     }
 
-    if ($directory !== NULL) {
-      $args[] = $directory;
+    // PHPUnit adds the tests of every directory to one test suite.
+    $directories = (array) $directory;
+    foreach ($directories as $path) {
+      $args[] = $path;
     }
 
     $phpUnitConfiguration = (new Builder())->build($args);
@@ -135,7 +138,7 @@ class PhpUnitTestDiscovery {
       \Drupal::setContainer($container);
     }
 
-    $list = $directory === NULL ?
+    $list = $directories === [] ?
       $this->getTestList($phpUnitTestSuite, $extension, $testGroups) :
       $this->getTestListLimitedToDirectory($phpUnitTestSuite, $extension, $testSuites, $testGroups);
 
@@ -153,8 +156,9 @@ class PhpUnitTestDiscovery {
    *
    * @param string|null $extension
    *   (optional) The name of an extension to limit discovery to; e.g., 'node'.
-   * @param string|null $directory
-   *   (optional) Limit discovered tests to a specific directory.
+   * @param string|list<string>|null $directory
+   *   (optional) Limit discovered tests to a specific directory, or to a list
+   *   of directories.
    * @param list<string> $testGroups
    *   (optional) An array of test groups to filter the discovery for.
    *
@@ -162,7 +166,7 @@ class PhpUnitTestDiscovery {
    *   A classmap containing all discovered class files; i.e., a map of
    *   fully-qualified classnames to path names.
    */
-  public function findAllClassFiles(?string $extension = NULL, ?string $directory = NULL, array $testGroups = []): array {
+  public function findAllClassFiles(?string $extension = NULL, string|array|null $directory = NULL, array $testGroups = []): array {
     $testClasses = $this->getTestClasses($extension, [], $directory, $testGroups);
     $classMap = [];
     foreach ($testClasses as $group) {
