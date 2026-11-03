@@ -20,36 +20,25 @@ Drupal includes works under other copyright notices and distributed
 according to the terms of the GNU General Public License or a compatible
 license, including:
 
-JavaScript
+JavaScript and CSS
 
-  CKEditor5 - Copyright (c) 2003 CKSource Holding sp. z o.o.
+  Third-party JavaScript and CSS libraries in core/assets/vendor retain the
+  copyright of the authors. Each library includes its license file in its
+  directory.
 
-  Floating UI - Copyright (c) 2021 Floating UI contributors
+  Drupal also includes the following third-party code outside that
+  directory:
 
-  htmx - Zero-Clause BSD
+  jQuery Form Plugin (core/misc/jquery.form.js) - Copyright (c) 2017 Kevin
+    Morris, Copyright (c) 2006 M. Alsup
 
-  jQuery - Copyright (c) OpenJS Foundation and other contributors
-
-  jQuery UI - Copyright (c) OpenJS Foundation and other contributors
-
-  LoadJS - Copyright (c) 2015 Andres Morey
-
-  Sortable - Copyright (c) 2019 All contributors to Sortable
-
-  Tabbable - Copyright (c) 2015 David Clark
-
-  transliteration Copyright (c) 2019 Daniel W. Hieber
-
-  tua-body-scroll-lock Copyright (c) 2018 Evinma, StEve Young
-
-CSS
-
-  Normalize.css - Copyright (c) Nicolas Gallagher and Jonathan Neal
+  jQuery UI Position (core/misc/position.js) - Copyright (c) OpenJS
+    Foundation and other contributors
 
 PHP
 
   Drupal depends on numerous PHP Composer packages. All Composer packages
-    retain the copyright of the authors.
+  retain the copyright of the authors.
 
 Brand materials
 
