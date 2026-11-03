@@ -349,7 +349,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
    *   The sanitized string with tokens replaced.
    */
   protected function viewsTokenReplace($text, $tokens) {
-    if (!strlen($text)) {
+    if (!strlen($text ?? '')) {
       // No need to run filterAdmin on an empty string.
       return '';
     }
