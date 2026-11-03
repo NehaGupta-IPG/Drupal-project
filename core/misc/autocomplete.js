@@ -169,13 +169,16 @@
    *   Returns false to indicate the event status.
    */
   function selectHandler(event, ui) {
-    const terms = autocomplete.splitValues(event.target.value);
+    const { target } = event;
+    const terms = autocomplete.splitValues(target.value);
     // Remove the current input.
     terms.pop();
     // Add the selected item.
     terms.push(ui.item.value);
 
-    event.target.value = terms.join(', ');
+    target.value = terms.join(', ');
+    $(target).trigger('formUpdated');
+
     // Return false to tell jQuery UI that we've filled in the value already.
     return false;
   }
