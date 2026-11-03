@@ -40,7 +40,7 @@ class TestDatabase {
    *   Thrown when $db_prefix does not match the regular expression.
    */
   public function __construct($db_prefix = NULL, bool $create_lock = FALSE) {
-    if ($db_prefix === NULL) {
+    if ($db_prefix === NULL || $db_prefix === '') {
       $this->lockId = $this->getTestLock($create_lock);
       $this->databasePrefix = 'test' . $this->lockId;
     }
