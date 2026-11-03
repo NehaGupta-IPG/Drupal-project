@@ -49,10 +49,6 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    // The widget form element type has transformed the value to a
-    // DrupalDateTime object at this point. We need to convert it back to the
-    // storage timezone and format.
-
     $datetime_type = $this->getFieldSetting('datetime_type');
     if ($datetime_type === DateRangeItem::DATETIME_TYPE_DATE) {
       $storage_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
@@ -66,7 +62,6 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
 
     foreach ($values as &$item) {
       if (!empty($item['value']) && $item['value'] instanceof DrupalDateTime) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
         $start_date = $item['value'];
 
         if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
@@ -74,15 +69,18 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
           // stored like datetime fields, so we need to adjust the time.
           // This function is called twice, so to prevent a double conversion
           // we need to explicitly set the timezone.
-          $start_date->setTimeZone($user_timezone)->setTime(0, 0, 0);
+          $start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
         }
 
         // Adjust the date for storage.
         $item['value'] = $start_date->setTimezone($storage_timezone)->format($storage_format);
       }
+      else {
+        // The value did not pass validation and is still an array.
+        $item['value'] = NULL;
+      }
 
       if (!empty($item['end_value']) && $item['end_value'] instanceof DrupalDateTime) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
         $end_date = $item['end_value'];
 
         if ($datetime_type === DateRangeItem::DATETIME_TYPE_ALLDAY) {
@@ -90,11 +88,15 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
           // stored like datetime fields, so we need to adjust the time.
           // This function is called twice, so to prevent a double conversion
           // we need to explicitly set the timezone.
-          $end_date->setTimeZone($user_timezone)->setTime(23, 59, 59);
+          $end_date->setTimezone($user_timezone)->setTime(23, 59, 59);
         }
 
         // Adjust the date for storage.
         $item['end_value'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
+      }
+      else {
+        // The value did not pass validation and is still an array.
+        $item['end_value'] = NULL;
       }
     }
 
