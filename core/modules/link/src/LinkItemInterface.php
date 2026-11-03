@@ -33,6 +33,14 @@ interface LinkItemInterface extends FieldItemInterface {
   public function isExternal();
 
   /**
+   * Determines if a link is a token.
+   *
+   * @return bool
+   *   TRUE if the link contains a token, FALSE otherwise.
+   */
+  public function isToken();
+
+  /**
    * Gets the URL object.
    *
    * @return \Drupal\Core\Url
