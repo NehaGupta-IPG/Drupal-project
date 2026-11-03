@@ -107,9 +107,7 @@ class NumericArgument extends ArgumentPluginBase {
     $this->ensureMyTable();
 
     if (!empty($this->options['break_phrase'])) {
-      $break = static::breakString($this->argument, FALSE);
-      $this->value = $break->value;
-      $this->operator = $break->operator;
+      $this->unpackArgumentValue();
     }
     else {
       $this->value = [$this->argument];
@@ -119,10 +117,57 @@ class NumericArgument extends ArgumentPluginBase {
     $null_check = empty($this->options['not']) ? '' : " OR $this->tableAlias.$this->realField IS NULL";
 
     if (count($this->value) > 1) {
-      $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
-      $placeholder .= '[]';
-      $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
+      // Multiple values with 'OR' operator.
+      if ($this->operator == 'or') {
+        $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
+        $placeholder .= '[]';
+        $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator($placeholder)" . $null_check, [$placeholder => $this->value]);
+      }
+      // Multiple values with 'AND' operator.
+      elseif ($this->operator == 'and') {
+        $connection = $this->query->getConnection();
+
+        if ($this->options['not']) {
+          $subquery_clause = $connection->condition('AND');
+          $join = $this->getJoin();
+
+          if (isset($join->configuration['table'], $join->configuration['field'])) {
+            $main_table = $join->configuration['table'];
+            $main_field = $join->configuration['field'];
+            /** @var \Drupal\Core\Database\Query\Select $subquery */
+            $subquery = $connection->select($main_table);
+            $subquery->addField($main_table, $main_field);
+            $count = 0;
+
+            foreach ($this->value as $item_value) {
+              $alias = !$count++ ? $main_table : $subquery->leftJoin($main_table, NULL, "%alias.$main_field = $main_table.$main_field");
+              $subquery_clause->condition("$alias.$this->realField", $item_value);
+            }
+
+            $subquery->condition($subquery_clause);
+
+            // Add to selection the rows that don't have any value.
+            $clause = $connection->condition('OR');
+            $clause->condition("$this->tableAlias.$main_field", $subquery, 'NOT IN');
+            $clause->condition("$this->tableAlias.$this->realField", NULL, 'IS NULL');
+
+            $this->query->addWhere(0, $clause);
+          }
+        }
+        else {
+          $clause = $connection->condition('AND');
+          $count = 0;
+
+          foreach ($this->value as $item_value) {
+            $alias = !$count++ ? $this->tableAlias : $this->query->addTable($this->table);
+            $clause->condition("$alias.$this->realField", $item_value);
+          }
+
+          $this->query->addWhere(0, $clause);
+        }
+      }
     }
+    // Single value.
     else {
       $operator = empty($this->options['not']) ? '=' : '!=';
       $this->query->addWhereExpression(0, "$this->tableAlias.$this->realField $operator $placeholder" . $null_check, [$placeholder => $this->argument]);

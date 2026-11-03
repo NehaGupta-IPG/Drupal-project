@@ -229,15 +229,15 @@ class ModuleTest extends ViewsKernelTestBase {
     $renderer->renderInIsolation($result);
     $this->assertCount(1, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2');
+    $result = views_embed_view('test_argument', 'default', '1+2');
     $renderer->renderInIsolation($result);
     $this->assertCount(2, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John');
+    $result = views_embed_view('test_argument', 'default', '1+2', 'John');
     $renderer->renderInIsolation($result);
     $this->assertCount(1, $result['view_build']['#view']->result);
 
-    $result = views_embed_view('test_argument', 'default', '1,2', 'John,George');
+    $result = views_embed_view('test_argument', 'default', '1+2', 'John+George');
     $renderer->renderInIsolation($result);
     $this->assertCount(2, $result['view_build']['#view']->result);
   }
@@ -259,27 +259,27 @@ class ModuleTest extends ViewsKernelTestBase {
     $this->assertCount(1, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['0' => '1,2']);
+    $result = $view->preview('default', ['0' => '1+2']);
     $this->assertCount(2, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['3' => '1,2']);
+    $result = $view->preview('default', ['3' => '1+2']);
     $this->assertCount(2, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['0' => '1,2', '1' => 'John']);
+    $result = $view->preview('default', ['0' => '1+2', '1' => 'John']);
     $this->assertCount(1, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['3' => '1,2', '4' => 'John']);
+    $result = $view->preview('default', ['3' => '1+2', '4' => 'John']);
     $this->assertCount(1, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['0' => '1,2', '1' => 'John,George']);
+    $result = $view->preview('default', ['0' => '1+2', '1' => 'John+George']);
     $this->assertCount(2, $result['#view']->result);
 
     $view = Views::getView('test_argument');
-    $result = $view->preview('default', ['3' => '1,2', '4' => 'John,George']);
+    $result = $view->preview('default', ['3' => '1+2', '4' => 'John+George']);
     $this->assertCount(2, $result['#view']->result);
   }
 
