@@ -28,6 +28,9 @@
  * @ingroup themeable
  */
 #}
+{% if configuration.label and not label %}
+  {% do attributes.setAttribute('aria-label', configuration.label) %}
+{% endif %}
 <div{{ attributes }}>
   {{ title_prefix }}
   {% if label %}
