@@ -195,7 +195,35 @@ class ImageThemeFunctionTest extends KernelTestBase {
         ],
       ],
     ];
-    $renderer->renderRoot($element);
+    $html_output = str_replace("\n", '', (string) $renderer->renderRoot($element));
+    $this->assertStringContainsString('class="foo"', $html_output);
+    $this->expectUserDeprecationMessage('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585');
+
+    // Test when both attributes and item_attributes are used.
+    $element = [
+      '#theme' => 'image_formatter',
+      '#item' => $entity->image_test,
+      '#url' => Url::fromUri('base:' . $path),
+      '#attributes' => [
+        'class' => [
+          'bar',
+        ],
+        'loading' => 'lazy',
+        'data-attributes' => 'foo',
+      ],
+      '#item_attributes' => [
+        'class' => [
+          'foo',
+        ],
+        'loading' => 'eager',
+        'data-item-attributes' => 'bar',
+      ],
+    ];
+    $html_output = str_replace("\n", '', (string) $renderer->renderRoot($element));
+    $this->assertStringContainsString('class="bar"', $html_output);
+    $this->assertStringContainsString('loading="lazy"', $html_output);
+    $this->assertStringContainsString('data-attributes="foo"', $html_output);
+    $this->assertStringContainsString('data-item-attributes="bar"', $html_output);
     $this->expectUserDeprecationMessage('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585');
   }
 

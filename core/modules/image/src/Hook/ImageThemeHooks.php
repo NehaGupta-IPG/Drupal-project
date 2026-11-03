@@ -163,9 +163,10 @@ class ImageThemeHooks {
         '#theme' => 'image',
       ];
     }
-    $variables['image']['#attributes'] = $variables['attributes'] ?? $variables['item_attributes'];
+    $variables['image']['#attributes'] = $variables['attributes'] ?? [];
     if (isset($variables['item_attributes'])) {
       @trigger_error('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585', E_USER_DEPRECATED);
+      $variables['image']['#attributes'] += $variables['item_attributes'];
     }
 
     $item = $variables['item'];
