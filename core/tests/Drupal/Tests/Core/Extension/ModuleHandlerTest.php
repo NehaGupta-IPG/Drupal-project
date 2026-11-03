@@ -8,6 +8,7 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Hook\HookData;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Utility\CallableResolver;
@@ -66,7 +67,7 @@ class ModuleHandlerTest extends UnitTestCase {
     $callableResolver
       ->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition) => $definition);
-    $moduleHandler = new ModuleHandler($this->root, $moduleList, $keyvalue, $callableResolver, $cache);
+    $moduleHandler = new ModuleHandler($this->root, $moduleList, new HookData($keyvalue, $cache), $callableResolver);
     if ($loadAll) {
       $moduleHandler->loadAll();
     }
@@ -121,9 +122,8 @@ class ModuleHandlerTest extends UnitTestCase {
             'filename' => 'module_handler_test.module',
           ],
         ],
-        new KeyValueMemoryFactory(),
+        new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap')),
         $this->createStub(CallableResolver::class),
-        new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['load'])
       ->getMock();
@@ -181,9 +181,8 @@ class ModuleHandlerTest extends UnitTestCase {
       ->setConstructorArgs([
         $this->root,
         [],
-        new KeyValueMemoryFactory(),
+        new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap')),
         $this->createStub(CallableResolver::class),
-        new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['resetImplementations'])
       ->getMock();
@@ -227,9 +226,8 @@ class ModuleHandlerTest extends UnitTestCase {
             'filename' => 'module_handler_test.module',
           ],
         ],
-        new KeyValueMemoryFactory(),
+        new HookData(new KeyValueMemoryFactory(), new NullBackend('bootstrap')),
         $this->createStub(CallableResolver::class),
-        new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['loadInclude'])
       ->getMock();
