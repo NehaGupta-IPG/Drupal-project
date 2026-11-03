@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
+use Drupal\workspaces\Routing\EntityModerationRouteProvider;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -83,9 +84,12 @@ class EntityTypeInfo {
 
       // Non-default workspaces display the active revision on the canonical
       // route of an entity, so the latest version route is no longer needed.
-      $link_templates = $entity_type->get('links');
-      unset($link_templates['latest-version']);
-      $entity_type->set('links', $link_templates);
+      // Modify the route provider for moderation to add an access callback.
+      $providers = $entity_type->getRouteProviderClasses() ?: [];
+      if (\array_key_exists('moderation', $providers)) {
+        $providers['moderation'] = EntityModerationRouteProvider::class;
+        $entity_type->setHandlerClass('route_provider', $providers);
+      }
     }
   }
 
