@@ -28,6 +28,7 @@ class InlineBlockTest extends InlineBlockTestBase {
    */
   protected static $modules = [
     'field_ui',
+    'dblog',
     'navigation',
   ];
 
@@ -300,7 +301,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $cron = \Drupal::service('cron');
     /** @var \Drupal\layout_builder\InlineBlockUsageInterface $usage */
     $usage = \Drupal::service('inline_block.usage');
-    $this->drupalLogin($this->drupalCreateUser([
+    $account = $this->drupalCreateUser([
       'administer content types',
       'access contextual links',
       'configure any layout',
@@ -309,7 +310,8 @@ class InlineBlockTest extends InlineBlockTestBase {
       'administer nodes',
       'bypass node access',
       'create and edit custom blocks',
-    ]));
+    ]);
+    $this->drupalLogin($account);
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -326,10 +328,23 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->assertCount(1, $this->blockStorage->loadMultiple());
     $default_block_id = $this->getLatestBlockEntityId();
 
+    // Create a third node.
+    $this->createNode([
+      'type' => 'bundle_with_section_field',
+      'title' => 'The node3 title',
+      'body' => [
+        [
+          'value' => 'The node3 body',
+        ],
+      ],
+    ]);
+
     // Ensure the block shows up on node pages.
     $this->drupalGet('node/1');
     $assert_session->pageTextContains('The DEFAULT block body');
     $this->drupalGet('node/2');
+    $assert_session->pageTextContains('The DEFAULT block body');
+    $this->drupalGet('node/3');
     $assert_session->pageTextContains('The DEFAULT block body');
 
     // Enable overrides.
@@ -344,6 +359,10 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->drupalGet('node/2/layout');
     $this->assertSaveLayout();
     $node_2_block_id = $this->getLatestBlockEntityId();
+    $this->assertCount(3, $this->blockStorage->loadMultiple());
+
+    // Do not save the third layout, no additional block was created.
+    $this->drupalGet('node/3/layout');
     $this->assertCount(3, $this->blockStorage->loadMultiple());
 
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
@@ -361,6 +380,22 @@ class InlineBlockTest extends InlineBlockTestBase {
     // Ensure other blocks still exist.
     $this->assertCount(2, $this->blockStorage->loadMultiple());
     $this->assertEmpty($usage->getUsage($default_block_id));
+
+    // Check for broken / missing message.
+    $this->drupalGet('node/3/layout');
+    $assert_session->pageTextNotContains('The DEFAULT block body');
+    $assert_session->pageTextContains('This block is broken or missing. You may be missing content or you might need to enable the original module.');
+
+    $log = \Drupal::database()
+      ->select('watchdog', 'w')
+      ->fields('w', ['message', 'variables'])
+      ->orderBy('wid', 'DESC')
+      ->range(0, 1)
+      ->execute()
+      ->fetch();
+
+    $this->assertEquals('Unable to load inline block content entity with revision ID %vid.', $log->message);
+    $this->assertEquals($default_block_id, unserialize($log->variables)['%vid']);
 
     $this->drupalGet('node/1/layout');
     $assert_session->pageTextContains('The DEFAULT block body');
@@ -392,11 +427,14 @@ class InlineBlockTest extends InlineBlockTestBase {
     $default_block2_id = $this->getLatestBlockEntityId();
     $this->assertCount(2, $this->blockStorage->loadMultiple());
 
-    // Delete the other node so bundle can be deleted.
+    // Delete the other nodes so the bundle can be deleted.
     $this->assertNotEmpty($usage->getUsage($node_2_block_id));
     $this->drupalGet('node/2/delete');
     $page->pressButton('Delete');
     $this->assertEmpty(Node::load(2));
+    $this->drupalGet('node/3/delete');
+    $page->pressButton('Delete');
+    $this->assertEmpty(Node::load(3));
     $cron->run();
     // Ensure entity block was deleted.
     $this->assertEmpty($this->blockStorage->load($node_2_block_id));
