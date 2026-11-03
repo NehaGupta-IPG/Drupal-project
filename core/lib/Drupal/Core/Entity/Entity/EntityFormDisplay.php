@@ -114,6 +114,7 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
     $results = \Drupal::entityQuery('entity_form_display')
       ->condition('id', $candidate_ids)
       ->condition('status', TRUE)
+      ->accessCheck()
       ->execute();
 
     // Load the first valid candidate display, if any.

@@ -112,6 +112,7 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
     $results = \Drupal::entityQuery('entity_view_display')
       ->condition('id', NestedArray::mergeDeepArray($candidate_ids))
       ->condition('status', TRUE)
+      ->accessCheck()
       ->execute();
 
     // For each bundle, select the first valid candidate display, if any.
