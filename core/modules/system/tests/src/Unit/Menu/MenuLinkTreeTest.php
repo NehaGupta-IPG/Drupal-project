@@ -157,7 +157,9 @@ class MenuLinkTreeTest extends UnitTestCase {
         'in_active_trail' => FALSE,
       ];
 
-      if ($element->hasChildren && !empty($element->subtree)) {
+      // If no access information is provided, access is allowed. Or if access
+      // is explicitly allowed, access is allowed.
+      if ($element->hasChildren && !empty($element->subtree) && ($element->subtree[0]->access === NULL || $element->subtree[0]->access->isAllowed())) {
         $return['is_expanded'] = TRUE;
       }
       elseif ($element->hasChildren) {

@@ -213,16 +213,6 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       }
       $element = [];
 
-      // Set a variable for the <li> tag. Only set 'expanded' to true if the
-      // link also has visible children within the current tree.
-      $element['is_expanded'] = FALSE;
-      $element['is_collapsed'] = FALSE;
-      if ($data->hasChildren && !empty($data->subtree)) {
-        $element['is_expanded'] = TRUE;
-      }
-      elseif ($data->hasChildren) {
-        $element['is_collapsed'] = TRUE;
-      }
       // Set a helper variable to indicate whether the link is in the active
       // trail.
       $element['in_active_trail'] = FALSE;
@@ -237,6 +227,16 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       $element['url'] = $link->getUrlObject();
       $element['url']->setOption('set_active_class', TRUE);
       $element['below'] = $data->subtree ? $this->buildItems($data->subtree, $tree_access_cacheability, $tree_link_cacheability) : [];
+      // Only set 'expanded' to true if the link also has visible children
+      // within the current tree.
+      $element['is_expanded'] = FALSE;
+      $element['is_collapsed'] = FALSE;
+      if ($data->hasChildren && !empty($element['below'])) {
+        $element['is_expanded'] = TRUE;
+      }
+      elseif ($data->hasChildren) {
+        $element['is_collapsed'] = TRUE;
+      }
       if (isset($data->options)) {
         $element['url']->setOptions(NestedArray::mergeDeep($element['url']->getOptions(), $data->options));
       }
