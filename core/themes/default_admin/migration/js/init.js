@@ -64,36 +64,17 @@ if (localStorage.getItem('Drupal.defaultAdmin.sidebarWidth')) {
   );
 }
 
-if (localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop')) {
-  const style = document.createElement('style');
-  const className = 'sidebar-inline-styles';
-  style.className = className;
-
-  if (
-    window.innerWidth < 1024 ||
-    localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop') ===
+// Set the initial edit form sidebar state before first paint. Otherwise the
+// sidebar renders open until the sidebar-toggle behavior runs, then animates
+// closed. The attribute goes on <html> because <body> doesn't exist yet.
+// Small viewports always start closed. On large viewports, the sidebar is open
+// unless the user collapsed it. The media query matches `--admin-large`.
+// @see components/sidebar-toggle/sidebar-toggle.js
+document.documentElement.setAttribute(
+  'data-meta-sidebar',
+  window.matchMedia('(min-width: 64em)').matches &&
+    localStorage.getItem('Drupal.defaultAdmin.sidebarExpanded.desktop') !==
       'false'
-  ) {
-    style.innerHTML = `
-    body {
-      --admin-theme-sidebar-offset: 0px;
-      padding-inline-end: 0;
-      transition: none;
-    }
-
-    .layout-region--secondary {
-      transform: translateX(var(--admin-theme-sidebar-width, 360px));
-      transition: none;
-    }
-
-    .meta-sidebar__overlay {
-      display: none;
-    }
-    `;
-
-    const scriptTag = document.querySelector('script');
-    scriptTag.parentNode.insertBefore(style, scriptTag);
-  } else if (document.getElementsByClassName(className).length > 0) {
-    document.getElementsByClassName(className)[0].remove();
-  }
-}
+    ? 'open'
+    : 'closed',
+);

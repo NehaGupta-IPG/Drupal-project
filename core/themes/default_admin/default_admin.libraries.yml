@@ -429,15 +429,6 @@ sticky:
     - core/drupal.displace
     - core/once
 
-sidebar:
-  css:
-    theme:
-      css/components/sidebar.css: { minified: false }
-  js:
-    migration/js/sidebar.js: { minified: false }
-  dependencies:
-    - core/once
-
 settings:
   js:
     migration/js/settings.js: { minified: false }
@@ -489,3 +480,13 @@ revisions:
   css:
     component:
       css/components/revisions.css: { minified: false }
+
+edit-sidebar:
+  css:
+    component:
+      css/components/edit-sidebar.css: {}
+  js:
+    js/edit-sidebar.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

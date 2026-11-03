@@ -717,12 +717,17 @@ class FormHooks {
     $this->ensureAdvancedSettings($form);
 
     // Add sidebar toggle.
-    $hide_panel = $this->t('Hide sidebar panel');
     $form['default_admin_sticky_actions']['default_admin_sidebar_toggle'] = [
-      '#markup' => '<a href="#toggle-sidebar" class="meta-sidebar__trigger trigger" role="button" title="' . $hide_panel . '" aria-controls="default_admin_sidebar"><span class="visually-hidden">' . $hide_panel . '</span></a>',
+      '#type' => 'component',
+      '#component' => 'default_admin:sidebar-toggle',
+      '#props' => [
+        'label' => $this->t('Sidebar panel'),
+        'controls' => 'default_admin_sidebar',
+        'expanded' => TRUE,
+      ],
       '#weight' => 1000,
     ];
-    $form['#attached']['library'][] = 'default_admin/sidebar';
+    $form['#attached']['library'][] = 'default_admin/edit-sidebar';
 
     // Create default_admin_sidebar group.
     $form['default_admin_sidebar'] = [
@@ -743,10 +748,25 @@ class FormHooks {
     $form['default_admin_sidebar']['footer'] = ($form['footer']) ?? [];
     $form['default_admin_sidebar']['footer']['#parents'] = ['footer'];
 
-    // Sidebar close button.
+    // Sidebar close button. Placed first in the meta group, so it is the first
+    // element in the sidebar and receives focus before the fields that follow.
     $close_sidebar_translation = $this->t('Close sidebar panel');
-    $form['default_admin_sidebar']['default_admin_sidebar_close'] = [
-      '#markup' => '<a href="#close-sidebar" class="meta-sidebar__close trigger" role="button" title="' . $close_sidebar_translation . '"><span class="visually-hidden">' . $close_sidebar_translation . '</span></a>',
+    $form['meta']['default_admin_sidebar_close'] = [
+      '#type' => 'html_tag',
+      '#weight' => -1000,
+      '#tag' => 'button',
+      '#attributes' => [
+        'type' => 'button',
+        'class' => ['meta-sidebar__close', 'trigger'],
+        'title' => $close_sidebar_translation,
+        'aria-controls' => 'default_admin_sidebar',
+      ],
+      'label' => [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => $close_sidebar_translation,
+        '#attributes' => ['class' => ['visually-hidden']],
+      ],
     ];
 
     $form['default_admin_sidebar_overlay'] = [

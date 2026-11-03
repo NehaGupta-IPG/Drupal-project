@@ -13,6 +13,8 @@
   height: 100%;
   padding: 0;
   cursor: ew-resize;
+  /* Dragging the handle resizes the sidebar; never start a scroll from it. */
+  touch-action: none;
   inset-block-start: 0;
   inset-inline-start: 0;
 
@@ -27,9 +29,36 @@
   @media (prefers-reduced-motion: no-preference) {
     transition: var(--admin-transition-slow);
   }
+
+  /* The sidebar has a fixed width at small viewports (see below), so resizing
+     would have no visible effect and would only change the stored width. */
+  @media (--admin-to-medium) {
+    display: none;
+  }
 }
 
 .layout-region--secondary {
+  /* Sit below the Navigation top bar. */
+  --admin-edit-sidebar-top: var(--admin-theme-top-bar-bottom, var(--admin-theme-toolbar-y-offset));
+
+  position: fixed;
+  z-index: 103;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: var(--admin-theme-sidebar-width);
+  min-width: var(--admin-theme-sidebar-min-width);
+  max-width: var(--admin-theme-sidebar-max-width);
+  height: calc(100% - var(--admin-edit-sidebar-top));
+  margin: 0;
+  border-inline-start: 1px solid var(--admin-color-border-soft);
+  background: var(--admin-color-bg-surface);
+  inset-block-start: var(--admin-edit-sidebar-top);
+  inset-inline-end: 0;
+
+  .dark-mode & {
+    box-shadow: 0 0 4px rgb(0, 0, 0, 0.1);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     transition: transform var(--admin-transition-slow);
   }
@@ -44,7 +73,7 @@
   }
 }
 
-body[data-meta-sidebar="closed"] {
+:root[data-meta-sidebar="closed"] {
   --admin-theme-sidebar-offset: 0px;
 
   .layout-region--secondary {
@@ -57,12 +86,11 @@ body[data-meta-sidebar="closed"] {
   }
 }
 
-body[data-meta-sidebar="open"] {
+:root[data-meta-sidebar="open"] {
   .layout-region--secondary {
-    @media (--admin-to-large) {
-      visibility: visible;
-      opacity: 1;
-    }
+    visibility: visible;
+    transform: none;
+    opacity: 1;
   }
 }
 
@@ -70,7 +98,9 @@ body[data-meta-sidebar="open"] {
 .meta-sidebar__close {
   width: 32px;
   height: 32px;
+  padding: 0;
   cursor: pointer;
+  border: 0;
   border-radius: var(--admin-radius-m);
   background: transparent;
 
@@ -90,6 +120,10 @@ body[data-meta-sidebar="open"] {
 
     &::before {
       background-color: var(--admin-color-primary);
+
+      @media (forced-colors: active) {
+        background-color: canvasText;
+      }
     }
   }
 
@@ -126,6 +160,10 @@ body[data-meta-sidebar="open"] {
     mask-position: center center;
     mask-image: url("../../migration/media/icons/general/sidebar.svg");
     mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
+  }
+
+  &:dir(rtl)::before {
+    scale: -1 1;
   }
 
   &:hover,
@@ -194,8 +232,8 @@ body[data-meta-sidebar="open"] {
   }
 }
 
-body[data-meta-sidebar="open"] :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__overlay,
-body[data-meta-sidebar="open"] .meta-sidebar__overlay {
+:root[data-meta-sidebar="open"] :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__overlay,
+:root[data-meta-sidebar="open"] .meta-sidebar__overlay {
   visibility: visible;
   opacity: 0.9;
 }

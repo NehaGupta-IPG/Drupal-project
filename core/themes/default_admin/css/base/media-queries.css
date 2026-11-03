@@ -9,5 +9,6 @@
  * Media query breakpoints.
  * Processed by postcss/postcss-custom-media.
  */ /* 576px */ /* 420px */ /* 588px */ /* 768px */ /* 976px */ /* 1024px */ /* 1280px */ /* 1360px */ /* 1440px */ /* 1730px */
+/* Matches the Navigation module's --admin-toolbar-desktop breakpoint. */
 
 /* Max-width variants (exclusive) */
