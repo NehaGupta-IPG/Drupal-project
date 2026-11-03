@@ -60,7 +60,13 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
           break;
 
         default:
-          throw new \Exception('Invalid CSS asset type.');
+          $valid_types = ['file', 'external'];
+          throw new \Exception(sprintf(
+            'Invalid CSS asset type "%s". Valid types are: "%s". Asset data: %s',
+            $css_asset['type'],
+            implode('", "', $valid_types),
+            $css_asset['data']
+          ));
       }
 
       // Merge any additional attributes.

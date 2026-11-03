@@ -310,7 +310,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    */
   public function testRenderInvalidType(): void {
     $this->expectException('Exception');
-    $this->expectExceptionMessageIs('Invalid CSS asset type.');
+    $this->expectExceptionMessageIsOrContains('Invalid CSS asset type "internal"');
 
     $css_group = [
       'group' => 0,
