@@ -31,7 +31,25 @@ trait DependencySerializationTrait {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    $vars = get_object_vars($this);
+    // Collect the same properties as get_object_vars($this) would, except
+    // virtual properties. Those only have hooks, no stored value, so
+    // serialize() can't store them. get_object_vars() would also run their get
+    // hooks, which can be expensive, like loading a referenced entity.
+    // get_mangled_object_vars() leaves virtual properties out and runs no
+    // hooks. It marks protected properties with "\0*\0" and private ones with
+    // "\0ClassName\0". Turn those back into plain names, and like
+    // get_object_vars() in this scope, only keep private properties of the
+    // class that uses this trait.
+    $vars = [];
+    foreach (get_mangled_object_vars($this) as $key => $value) {
+      if (str_starts_with($key, "\0")) {
+        [, $scope, $key] = explode("\0", $key, 3);
+        if ($scope !== '*' && $scope !== self::class) {
+          continue;
+        }
+      }
+      $vars[$key] = $value;
+    }
     try {
       $container = \Drupal::getContainer();
       $reverse_container = $container->get(ReverseContainer::class);

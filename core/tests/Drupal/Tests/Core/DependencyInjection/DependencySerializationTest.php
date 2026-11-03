@@ -45,6 +45,36 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertEmpty($dependencySerialization->getServiceIds());
   }
 
+  /**
+   * Tests serialization of objects with virtual properties.
+   *
+   * @legacy-covers ::__sleep
+   */
+  public function testVirtualProperties(): void {
+    $object = new DependencySerializationVirtualPropertyTestDummy();
+
+    // Virtual properties have no stored value, so __sleep() must not return
+    // them, and must not run their get hooks either.
+    $this->assertEqualsCanonicalizing(['hookCalls', 'stored', '_serviceIds', '_entityStorages'], $object->__sleep());
+    $this->assertSame(0, $object->hookCalls);
+
+    // Serializing must not cause a warning about the virtual property.
+    set_error_handler(function (int $errno, string $errstr): never {
+      throw new \ErrorException($errstr, 0, $errno);
+    });
+    try {
+      $string = serialize($object);
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    /** @var \Drupal\Tests\Core\DependencyInjection\DependencySerializationVirtualPropertyTestDummy $object */
+    $object = unserialize($string);
+    $this->assertSame('stored value', $object->stored);
+    $this->assertSame('virtual value', $object->virtual);
+  }
+
 }
 
 /**

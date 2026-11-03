@@ -5144,6 +5144,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/ContainerInjectionInterface.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Storing entity storage as a class property is not recommended\\. Call Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:getStorage\\(\\) at the call\\-site instead\\.$#',
+	'identifier' => 'drupal.entityStoragePropertyAssignment',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DependencyInjection/DependencySerializationTrait.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\ServiceModifierInterface\\:\\:alter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
