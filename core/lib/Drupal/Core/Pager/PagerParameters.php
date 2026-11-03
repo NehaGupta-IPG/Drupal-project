@@ -3,6 +3,8 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -36,7 +38,13 @@ class PagerParameters implements PagerParametersInterface {
     $request = $this->requestStack->getCurrentRequest();
     if ($request) {
       return UrlHelper::filterQueryParameters(
-        $request->query->all(), ['page']
+        $request->query->all(),
+        [
+           'page',
+           MainContentViewSubscriber::WRAPPER_FORMAT,
+           FormBuilderInterface::AJAX_FORM_REQUEST,
+           'ajax_page_state',
+        ]
       );
     }
     return [];
