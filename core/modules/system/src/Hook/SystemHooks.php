@@ -442,7 +442,11 @@ class SystemHooks {
     if ($stream_wrapper_manager->isValidScheme($scheme)) {
       $target = $stream_wrapper_manager->getTarget($uri);
       if ($target !== FALSE) {
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+        $file_sa_core_2023_005_schemes = Settings::get('file_sa_core_2023_005_schemes', []);
+        if ($file_sa_core_2023_005_schemes) {
+          @trigger_error('The \'file_sa_core_2023_005_schemes\' setting is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3591511', E_USER_DEPRECATED);
+        }
+        if (!in_array($scheme, $file_sa_core_2023_005_schemes)) {
           if (DIRECTORY_SEPARATOR !== '/') {
             $class = $stream_wrapper_manager->getClass($scheme);
             if (is_subclass_of($class, LocalStream::class)) {
