@@ -92,17 +92,19 @@ class MatcherDumper implements MatcherDumperInterface {
     // states due to random failures.
     try {
       $transaction = $this->connection->startTransaction();
-      // We don't use truncate, because it is not guaranteed to be transaction
-      // safe.
-      try {
-        $this->connection->delete($this->tableName)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        if (!$this->ensureTableExists()) {
-          throw $e;
-        }
-      }
+
+      $this->connection->executeEnsuringSchemaOnFailure(
+        execute: function (): void {
+          // We don't use truncate, because it is not guaranteed to be
+          // transaction safe.
+          $this->connection->delete($this->tableName)
+            ->execute();
+        },
+        schema: [
+          $this->tableName => $this->schemaDefinition(),
+        ],
+        retryAfterSchemaEnsured: TRUE,
+      );
 
       // Split the routes into chunks to avoid big INSERT queries.
       $route_chunks = array_chunk($this->routes->all(), 50, TRUE);
@@ -195,8 +197,15 @@ class MatcherDumper implements MatcherDumperInterface {
    *
    * @return bool
    *   TRUE if the table was created, FALSE otherwise.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createTable($this->tableName, $this->schemaDefinition());
     }

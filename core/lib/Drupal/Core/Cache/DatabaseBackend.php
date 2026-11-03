@@ -217,23 +217,15 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
-    $try_again = FALSE;
-    try {
-      // The bin might not yet exist.
-      $this->doSetMultiple($items);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the bins.
-      if (!$try_again = $this->ensureBinExists()) {
-        // If the exception happened for other reason than the missing bin
-        // table, propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the bin has been created, try again if necessary.
-    if ($try_again) {
-      $this->doSetMultiple($items);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($items): void {
+        $this->doSetMultiple($items);
+      },
+      schema: [
+        $this->bin => $this->schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
   }
 
   /**
@@ -321,39 +313,33 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   public function deleteMultiple(array $cids) {
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
-    try {
-      // Delete in chunks when a large array is passed.
-      foreach (array_chunk($cids, 1000) as $cids_chunk) {
-        $this->connection->delete($this->bin)
-          ->condition('cid', $cids_chunk, 'IN')
-          ->execute();
-      }
-    }
-    catch (\Exception $e) {
-      // Create the cache table, which will be empty. This fixes cases during
-      // core install where a cache table is cleared before it is set
-      // with {cache_render} and {cache_data}.
-      if (!$this->ensureBinExists()) {
-        $this->catchException($e);
-      }
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($cids): void {
+        // Delete in chunks when a large array is passed.
+        foreach (array_chunk($cids, 1000) as $cids_chunk) {
+          $this->connection->delete($this->bin)
+            ->condition('cid', $cids_chunk, 'IN')
+            ->execute();
+        }
+      },
+      schema: [
+        $this->bin => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    try {
-      $this->connection->truncate($this->bin)->execute();
-    }
-    catch (\Exception $e) {
-      // Create the cache table, which will be empty. This fixes cases during
-      // core install where a cache table is cleared before it is set
-      // with {cache_render} and {cache_data}.
-      if (!$this->ensureBinExists()) {
-        $this->catchException($e);
-      }
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): void {
+        $this->connection->truncate($this->bin)->execute();
+      },
+      schema: [
+        $this->bin => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -368,19 +354,21 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   public function invalidateMultiple(array $cids) {
     $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
-    try {
-      // Update in chunks when a large array is passed.
-      $requestTime = $this->time->getRequestTime();
-      foreach (array_chunk($cids, 1000) as $cids_chunk) {
-        $this->connection->update($this->bin)
-          ->fields(['expire' => $requestTime - 1])
-          ->condition('cid', $cids_chunk, 'IN')
-          ->execute();
-      }
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($cids): void {
+        // Update in chunks when a large array is passed.
+        $requestTime = $this->time->getRequestTime();
+        foreach (array_chunk($cids, 1000) as $cids_chunk) {
+          $this->connection->update($this->bin)
+            ->fields(['expire' => $requestTime - 1])
+            ->condition('cid', $cids_chunk, 'IN')
+            ->execute();
+        }
+      },
+      schema: [
+        $this->bin => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -424,14 +412,23 @@ class DatabaseBackend implements CacheBackendInterface {
       $this->connection->schema()->dropTable($this->bin);
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      if ($this->connection->schema()->tableExists($this->bin)) {
+        throw $e;
+      }
     }
   }
 
   /**
    * Check if the cache bin exists and create it if not.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   * instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureBinExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       if (!$database_schema->tableExists($this->bin)) {
@@ -462,8 +459,14 @@ class DatabaseBackend implements CacheBackendInterface {
    *   The table name. Defaults to $this->bin.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Catch
+   *   exceptions directly instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e, $table_name = NULL) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Catch exceptions directly instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists($table_name ?: $this->bin)) {
       throw $e;
     }

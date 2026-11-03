@@ -3,9 +3,10 @@
 namespace Drupal\Core\KeyValueStore;
 
 use Drupal\Component\Serialization\SerializationInterface;
-use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Query\Merge;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -62,16 +63,18 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function has($key) {
-    try {
-      return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
-        ':collection' => $this->collection,
-        ':key' => $key,
-      ])->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      return FALSE;
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($key): bool {
+        return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key', [
+          ':collection' => $this->collection,
+          ':key' => $key,
+        ])->fetchField();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : FALSE;
   }
 
   /**
@@ -104,13 +107,15 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function getAll() {
-    try {
-      $result = $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      $result = [];
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): ?StatementInterface {
+        return $this->connection->query('SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection', [':collection' => $this->collection]);
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
+    $result = $execution->isSuccessful() ? $execution->getResult() : [];
 
     $values = [];
     foreach ($result as $item) {
@@ -125,18 +130,19 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function getAllKeys(): iterable {
-    try {
-      $values = $this->connection->query(
-        'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
-        [
-          ':collection' => $this->collection,
-        ])->fetchCol();
-      return $values;
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return [];
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): array {
+        return $this->connection->query(
+          'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection',
+          [
+            ':collection' => $this->collection,
+          ])->fetchCol();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : [];
   }
 
   /**
@@ -148,8 +154,15 @@ class DatabaseStorage extends StorageBase {
    *   The key of the data to store.
    * @param mixed $value
    *   The data to store.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function doSet($key, $value) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     $this->connection->upsert($this->table)
       ->key(['collection', 'name'])
       ->fields([
@@ -164,24 +177,28 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function set($key, $value) {
-    try {
-      $this->doSet($key, $value);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        $this->doSet($key, $value);
-      }
-      else {
-        throw $e;
-      }
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($key, $value): void {
+        $this->connection->upsert($this->table)
+          ->key(['collection', 'name'])
+          ->fields([
+            'collection' => $this->collection,
+            'name' => $key,
+            'value' => $this->serializer->encode($value),
+          ])
+          ->execute();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
   }
 
   /**
    * Saves key/value pairs.
    *
-   * This will be called by ::setMultiple() within a try block.
+   * This will be called by ::setMultiple() with schema enforcement.
    *
    * @param array $data
    *   An associative array of key/value pairs.
@@ -218,18 +235,15 @@ class DatabaseStorage extends StorageBase {
     if (empty($data)) {
       return;
     }
-    try {
-      $this->doSetMultiple($data);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($data): void {
         $this->doSetMultiple($data);
-      }
-      else {
-        throw $e;
-      }
-    }
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
   }
 
   /**
@@ -244,8 +258,15 @@ class DatabaseStorage extends StorageBase {
    *
    * @return bool
    *   TRUE if the data was set, FALSE if it already existed.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function doSetIfNotExists($key, $value) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     $result = $this->connection->merge($this->table)
       ->insertFields([
         'collection' => $this->collection,
@@ -262,66 +283,79 @@ class DatabaseStorage extends StorageBase {
    * {@inheritdoc}
    */
   public function setIfNotExists($key, $value) {
-    try {
-      return $this->doSetIfNotExists($key, $value);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        return $this->doSetIfNotExists($key, $value);
-      }
-      else {
-        throw $e;
-      }
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($key, $value): bool {
+        $result = $this->connection->merge($this->table)
+          ->insertFields([
+            'collection' => $this->collection,
+            'name' => $key,
+            'value' => $this->serializer->encode($value),
+          ])
+          ->condition('collection', $this->collection)
+          ->condition('name', $key)
+          ->execute();
+        return $result == Merge::STATUS_INSERT;
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function rename($key, $new_key) {
-    try {
-      $this->connection->update($this->table)
-        ->fields(['name' => $new_key])
-        ->condition('collection', $this->collection)
-        ->condition('name', $key)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($key, $new_key): void {
+        $this->connection->update($this->table)
+          ->fields(['name' => $new_key])
+          ->condition('collection', $this->collection)
+          ->condition('name', $key)
+          ->execute();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteMultiple(array $keys) {
-    // Delete in chunks when a large array is passed.
-    while ($keys) {
-      try {
-        $this->connection->delete($this->table)
-          ->condition('name', array_splice($keys, 0, 1000), 'IN')
-          ->condition('collection', $this->collection)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e);
-      }
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($keys): void {
+        // Delete in chunks when a large array is passed.
+        while ($keys) {
+          $this->connection->delete($this->table)
+            ->condition('name', array_splice($keys, 0, 1000), 'IN')
+            ->condition('collection', $this->collection)
+            ->execute();
+        }
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    try {
-      $this->connection->delete($this->table)
-        ->condition('collection', $this->collection)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): void {
+        $this->connection->delete($this->table)
+          ->condition('collection', $this->collection)
+          ->execute();
+      },
+      schema: [
+        $this->table => static::schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -329,8 +363,15 @@ class DatabaseStorage extends StorageBase {
    *
    * @return bool
    *   TRUE if the table exists, FALSE if it does not exists.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $database_schema->createTable($this->table, $this->schemaDefinition());
@@ -358,8 +399,15 @@ class DatabaseStorage extends StorageBase {
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if (!($e instanceof DatabaseException) && $this->connection->schema()->tableExists($this->table)) {
       throw $e;
     }

@@ -57,13 +57,19 @@ class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
     $this->assertFalse($schema->tableExists('simpletest'));
     $this->assertFalse($schema->tableExists('simpletest_test_id'));
-    $this->assertFalse($this->testRunResultsStorage->validateTestingResultsEnvironment());
+    $this->assertTrue($this->testRunResultsStorage->validateTestingResultsEnvironment());
 
     $this->testRunResultsStorage->buildTestingResultsEnvironment(FALSE);
 
+    // Tables are not created, they will once an operation is requested.
+    $this->assertFalse($schema->tableExists('simpletest'));
+    $this->assertFalse($schema->tableExists('simpletest_test_id'));
+    $this->assertTrue($this->testRunResultsStorage->validateTestingResultsEnvironment());
+
+    // A new test_id is requested, the tables need to be created.
+    $this->assertEquals(1, $this->testRunResultsStorage->createNew());
     $this->assertTrue($schema->tableExists('simpletest'));
     $this->assertTrue($schema->tableExists('simpletest_test_id'));
-    $this->assertTrue($this->testRunResultsStorage->validateTestingResultsEnvironment());
   }
 
   /**

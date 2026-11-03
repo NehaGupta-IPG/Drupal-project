@@ -88,13 +88,7 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
       // Exception was expected.
     }
 
-    try {
-      $this->storage->read('config.settings');
-      $this->fail('Expected exception not thrown from read()');
-    }
-    catch (DatabaseExceptionWrapper) {
-      // Exception was expected.
-    }
+    $this->assertFalse($this->storage->read('config.settings'));
 
     try {
       $this->storage->readMultiple(['config.settings', 'config.settings2']);
@@ -112,13 +106,7 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
       // Exception was expected.
     }
 
-    try {
-      $this->storage->listAll();
-      $this->fail('Expected exception not thrown from listAll()');
-    }
-    catch (DatabaseExceptionWrapper) {
-      // Exception was expected.
-    }
+    $this->assertSame([], $this->storage->listAll());
 
     try {
       $this->storage->deleteAll();

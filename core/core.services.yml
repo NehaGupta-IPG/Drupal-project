@@ -534,6 +534,7 @@ services:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
   Drupal\Core\Database\ReplicaKillSwitch: '@database.replica_kill_switch'
+  Drupal\Core\Database\EventSubscriber\SchemaRequestSubscriber: ~
   Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber: ~
   datetime.time:
     class: Drupal\Component\Datetime\Time

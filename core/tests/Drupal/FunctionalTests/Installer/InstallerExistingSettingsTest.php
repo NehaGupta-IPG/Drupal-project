@@ -69,8 +69,10 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
   protected function visitInstaller(array $query = []): void {
     // Should redirect to the installer.
     parent::visitInstaller();
-    // Ensure no database tables have been created yet.
-    $this->assertSame([], Database::getConnection()->schema()->findTables('%'));
+    // Ensure only the config table has been created yet.
+    $this->assertSame([
+      'config' => 'config',
+    ], Database::getConnection()->schema()->findTables('%'));
     $this->assertSession()->addressEquals($GLOBALS['base_url'] . '/core/install.php');
   }
 

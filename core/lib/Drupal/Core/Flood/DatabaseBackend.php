@@ -42,19 +42,18 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    $try_again = FALSE;
-    try {
-      $this->doInsert($name, $window, $identifier);
-    }
-    catch (\Exception $e) {
-      $try_again = $this->ensureTableExists();
-      if (!$try_again) {
-        throw $e;
-      }
-    }
-    if ($try_again) {
-      $this->doInsert($name, $window, $identifier);
-    }
+
+    $this->connection->insert(static::TABLE_NAME)
+      ->fields([
+        'event' => $name,
+        'identifier' => $identifier,
+        'timestamp' => $this->time->getRequestTime(),
+        'expiration' => $this->time->getRequestTime() + $window,
+      ])
+      ->executeEnsuringSchemaOnFailure(
+        schema: [static::TABLE_NAME => $this->schemaDefinition()],
+        retryAfterSchemaEnsured: TRUE,
+      );
   }
 
   /**
@@ -68,8 +67,15 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    *   Unique identifier of the current user.
    *
    * @see \Drupal\Core\Flood\DatabaseBackend::register
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   * instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function doInsert($name, $window, $identifier) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     $this->connection->insert(static::TABLE_NAME)
       ->fields([
         'event' => $name,
@@ -87,30 +93,25 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('event', $name)
-        ->condition('identifier', $identifier)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+
+    $this->connection->delete(static::TABLE_NAME)
+      ->condition('event', $name)
+      ->condition('identifier', $identifier)
+      ->executeEnsuringSchemaOnFailure([
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function clearByPrefix(string $name, string $prefix): void {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('event', $name)
-        ->condition('identifier', $prefix . '-%', 'LIKE')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->delete(static::TABLE_NAME)
+      ->condition('event', $name)
+      ->condition('identifier', $prefix . '-%', 'LIKE')
+      ->executeEnsuringSchemaOnFailure([
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ]);
   }
 
   /**
@@ -120,42 +121,43 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
     if (!isset($identifier)) {
       $identifier = $this->requestStack->getCurrentRequest()->getClientIp();
     }
-    try {
-      $number = $this->connection->select(static::TABLE_NAME, 'f')
-        ->condition('event', $name)
-        ->condition('identifier', $identifier)
-        ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
-        ->countQuery()
-        ->execute()
-        ->fetchField();
-      return ($number < $threshold);
-    }
-    catch (\Exception $e) {
-      if (!$this->ensureTableExists()) {
-        throw $e;
-      }
-      return TRUE;
-    }
+
+    $number = $this->connection->select(static::TABLE_NAME, 'f')
+      ->condition('event', $name)
+      ->condition('identifier', $identifier)
+      ->condition('timestamp', $this->time->getRequestTime() - $window, '>')
+      ->countQuery()
+      ->executeEnsuringSchemaOnFailure(
+        schema: [static::TABLE_NAME => $this->schemaDefinition()],
+        retryAfterSchemaEnsured: TRUE,
+      )
+      ->fetchField();
+
+    return ($number < $threshold);
   }
 
   /**
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('expiration', $this->time->getRequestTime(), '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->delete(static::TABLE_NAME)
+      ->condition('expiration', $this->time->getRequestTime(), '<')
+      ->executeEnsuringSchemaOnFailure([
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ]);
   }
 
   /**
    * Check if the flood table exists and create it if not.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   * instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();
@@ -183,8 +185,15 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   * \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   * instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }

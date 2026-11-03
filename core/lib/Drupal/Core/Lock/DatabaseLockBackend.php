@@ -67,37 +67,37 @@ class DatabaseLockBackend extends LockBackendAbstract {
       $retry = FALSE;
       // We always want to do this code at least once.
       do {
-        try {
-          $this->database->insert('semaphore')
-            ->fields([
-              'name' => $name,
-              'value' => $this->getLockId(),
-              'expire' => $expire,
-            ])
-            ->execute();
-          // We track all acquired locks in the global variable.
-          $this->locks[$name] = TRUE;
-          // We never need to try again.
-          $retry = FALSE;
-        }
-        catch (IntegrityConstraintViolationException) {
-          // Suppress the error. If this is our first pass through the loop,
-          // then $retry is FALSE. In this case, the insert failed because some
-          // other request acquired the lock but did not release it. We decide
-          // whether to retry by checking lockMayBeAvailable(). This will clear
-          // the offending row from the database table in case it has expired.
-          $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
-        }
-        catch (\Exception $e) {
-          // Create the semaphore table if it does not exist and retry.
-          if ($this->ensureTableExists()) {
-            // Retry only once.
-            $retry = !$retry;
-          }
-          else {
-            throw $e;
-          }
-        }
+        $this->database->executeEnsuringSchemaOnFailure(
+          execute: function () use ($name, $expire, &$retry): void {
+            try {
+              $this->database->insert('semaphore')
+                ->fields([
+                  'name' => $name,
+                  'value' => $this->getLockId(),
+                  'expire' => $expire,
+                ])
+                ->execute();
+              // We track all acquired locks in the global variable.
+              $this->locks[$name] = TRUE;
+              // We never need to try again.
+              $retry = FALSE;
+            }
+            catch (IntegrityConstraintViolationException) {
+              // Suppress the error. If this is our first pass through the
+              // loop, then $retry is FALSE. In this case, the insert failed
+              // because some other request acquired the lock but did not
+              // release it. We decide whether to retry by checking
+              // lockMayBeAvailable(). This will clear the offending row from
+              // the database table in case it has expired.
+              $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
+            }
+          },
+          schema: [
+            static::TABLE_NAME => $this->schemaDefinition(),
+          ],
+          retryAfterSchemaEnsured: TRUE,
+        );
+
         // We only retry in case the first attempt failed, but we then broke
         // an expired lock.
       } while ($retry);
@@ -111,14 +111,17 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function lockMayBeAvailable($name) {
     $name = $this->normalizeName($name);
 
-    try {
-      $lock = $this->database->query('SELECT [expire], [value] FROM {semaphore} WHERE [name] = :name', [':name' => $name])->fetchAssoc();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If the table does not exist yet then the lock may be available.
-      $lock = FALSE;
-    }
+    $execution = $this->database->executeEnsuringSchemaOnFailure(
+      execute: function () use ($name): array|FALSE {
+        return $this->database
+          ->query('SELECT [expire], [value] FROM {semaphore} WHERE [name] = :name', [':name' => $name])
+          ->fetchAssoc();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    $lock = $execution->isSuccessful() ? $execution->getResult() : FALSE;
     if (!$lock) {
       return TRUE;
     }
@@ -144,15 +147,17 @@ class DatabaseLockBackend extends LockBackendAbstract {
     $name = $this->normalizeName($name);
 
     unset($this->locks[$name]);
-    try {
-      $this->database->delete('semaphore')
-        ->condition('name', $name)
-        ->condition('value', $this->getLockId())
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->database->executeEnsuringSchemaOnFailure(
+      execute: function () use ($name): void {
+        $this->database->delete('semaphore')
+          ->condition('name', $name)
+          ->condition('value', $this->getLockId())
+          ->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -173,15 +178,24 @@ class DatabaseLockBackend extends LockBackendAbstract {
           ->execute();
       }
       catch (\Exception $e) {
-        $this->catchException($e);
+        if ($this->database->schema()->tableExists(static::TABLE_NAME)) {
+          throw $e;
+        }
       }
     }
   }
 
   /**
    * Check if the semaphore table exists and create it if not.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->database->schema();
       $schema_definition = $this->schemaDefinition();
@@ -209,8 +223,15 @@ class DatabaseLockBackend extends LockBackendAbstract {
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if ($this->database->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }

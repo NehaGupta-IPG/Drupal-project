@@ -51,23 +51,26 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function createItem($data) {
-    $try_again = FALSE;
-    try {
-      $id = $this->doCreateItem($data);
-    }
-    catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
-        // If the exception happened for other reason than the missing table,
-        // propagate the exception.
-        throw $e;
-      }
-    }
-    // Now that the table has been created, try again if necessary.
-    if ($try_again) {
-      $id = $this->doCreateItem($data);
-    }
-    return $id;
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($data): int|string {
+        $query = $this->connection->insert(static::TABLE_NAME)
+          ->fields([
+            'name' => $this->name,
+            'data' => serialize($data),
+            // We cannot rely on \Drupal::time()->getRequestTime() because
+            // many items might be created by a single request which takes
+            // longer than 1 second.
+            'created' => \Drupal::time()->getCurrentTime(),
+          ]);
+        // Return the new serial ID, or FALSE on failure.
+        return $query->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+      retryAfterSchemaEnsured: TRUE,
+    );
+    return $execution->getResult();
   }
 
   /**
@@ -81,8 +84,15 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    *   added to the queue, otherwise FALSE. We don't guarantee the item was
    *   committed to disk etc, but as far as we know, the item is now in the
    *   queue.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function doCreateItem($data) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     $query = $this->connection->insert(static::TABLE_NAME)
       ->fields([
         'name' => $this->name,
@@ -100,15 +110,16 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function numberOfItems() {
-    try {
-      return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
-        ->fetchField();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If there is no table there cannot be any items.
-      return 0;
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): int {
+        return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
+          ->fetchField();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : 0;
   }
 
   /**
@@ -120,12 +131,17 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     // until an item is successfully claimed or we are reasonably sure there
     // are no unclaimed items left.
     while (TRUE) {
-      try {
-        $item = $this->connection->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e);
-      }
+      $execution = $this->connection->executeEnsuringSchemaOnFailure(
+        execute: function (): object|FALSE {
+          return $this->connection
+            ->queryRange('SELECT [data], [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])
+            ->fetchObject();
+        },
+        schema: [
+          static::TABLE_NAME => $this->schemaDefinition(),
+        ],
+      );
+      $item = $execution->isSuccessful() ? $execution->getResult() : [];
 
       // If the table does not exist there are no items currently available to
       // claim.
@@ -157,19 +173,20 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function releaseItem($item) {
-    try {
-      $update = $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => 0,
-        ])
-        ->condition('item_id', $item->item_id);
-      return (bool) $update->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If the table doesn't exist we should consider the item released.
-      return TRUE;
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($item): bool {
+        $update = $this->connection->update(static::TABLE_NAME)
+          ->fields([
+            'expire' => 0,
+          ])
+          ->condition('item_id', $item->item_id);
+        return (bool) $update->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : TRUE;
   }
 
   /**
@@ -181,36 +198,39 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
       throw new \InvalidArgumentException('$delay must be non-negative');
     }
 
-    try {
-      // Add the delay relative to the current time.
-      $expire = \Drupal::time()->getCurrentTime() + $delay;
-      // Update the expiry time of this item.
-      $update = $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => $expire,
-        ])
-        ->condition('item_id', $item->item_id);
-      return (bool) $update->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      // If the table doesn't exist we should consider the item nonexistent.
-      return TRUE;
-    }
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($item, $delay): bool {
+        // Add the delay relative to the current time.
+        $expire = \Drupal::time()->getCurrentTime() + $delay;
+        // Update the expiry time of this item.
+        $update = $this->connection->update(static::TABLE_NAME)
+          ->fields([
+            'expire' => $expire,
+          ])
+          ->condition('item_id', $item->item_id);
+        return (bool) $update->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteItem($item) {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('item_id', $item->item_id)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function () use ($item): void {
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('item_id', $item->item_id)
+          ->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -225,46 +245,57 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function deleteQueue() {
-    try {
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('name', $this->name)
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): void {
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('name', $this->name)
+          ->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function garbageCollection() {
-    try {
-      // Clean up the queue for failed batches.
-      $this->connection->delete(static::TABLE_NAME)
-        ->condition('created', \Drupal::time()->getRequestTime() - 864000, '<')
-        ->condition('name', 'drupal_batch:%', 'LIKE')
-        ->execute();
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): void {
+        // Clean up the queue for failed batches.
+        $this->connection->delete(static::TABLE_NAME)
+          ->condition('created', \Drupal::time()->getRequestTime() - 864000, '<')
+          ->condition('name', 'drupal_batch:%', 'LIKE')
+          ->execute();
 
-      // Reset expired items in the default queue implementation table. If
-      // that's not used, this will simply be a no-op.
-      $this->connection->update(static::TABLE_NAME)
-        ->fields([
-          'expire' => 0,
-        ])
-        ->condition('expire', 0, '<>')
-        ->condition('expire', \Drupal::time()->getRequestTime(), '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+        // Reset expired items in the default queue implementation table. If
+        // that's not used, this will simply be a no-op.
+        $this->connection->update(static::TABLE_NAME)
+          ->fields([
+            'expire' => 0,
+          ])
+          ->condition('expire', 0, '<>')
+          ->condition('expire', \Drupal::time()->getRequestTime(), '<')
+          ->execute();
+      },
+      schema: [
+        static::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
   }
 
   /**
    * Check if the table exists and create it if not.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();
@@ -293,8 +324,15 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    *
    * @throws \Exception
    *   If the table exists the exception passed in is rethrown.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }

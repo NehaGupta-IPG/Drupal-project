@@ -25,17 +25,20 @@ class Batch extends DatabaseQueue {
    * item to be claimed repeatedly until it is deleted.
    */
   public function claimItem($lease_time = 0) {
-    try {
-      $item = $this->connection->queryRange('SELECT [data], [item_id] FROM {queue} q WHERE [name] = :name ORDER BY [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
-      if ($item) {
-        $item->data = unserialize($item->data);
-        return $item;
-      }
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return FALSE;
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): bool|object {
+        $item = $this->connection->queryRange('SELECT [data], [item_id] FROM {queue} q WHERE [name] = :name ORDER BY [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
+        if ($item) {
+          $item->data = unserialize($item->data);
+          return $item;
+        }
+        return FALSE;
+      },
+      schema: [
+        DatabaseQueue::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : FALSE;
   }
 
   /**
@@ -48,23 +51,26 @@ class Batch extends DatabaseQueue {
    *   An array of queue items.
    */
   public function getAllItems() {
-    $result = [];
-    try {
-      $items = $this->connection->select('queue', 'q')
-        ->fields('q', ['data'])
-        ->condition('name', $this->name)
-        ->orderBy('item_id', 'ASC')
-        ->execute()
-        ->fetchAll();
+    $execution = $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): array {
+        $items = $this->connection->select('queue', 'q')
+          ->fields('q', ['data'])
+          ->condition('name', $this->name)
+          ->orderBy('item_id', 'ASC')
+          ->execute()
+          ->fetchAll();
 
-      foreach ($items as $item) {
-        $result[] = unserialize($item->data);
-      }
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
-    return $result;
+        $result = [];
+        foreach ($items as $item) {
+          $result[] = unserialize($item->data);
+        }
+        return $result;
+      },
+      schema: [
+        DatabaseQueue::TABLE_NAME => $this->schemaDefinition(),
+      ],
+    );
+    return $execution->isSuccessful() ? $execution->getResult() : [];
   }
 
 }

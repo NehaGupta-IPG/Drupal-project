@@ -58,7 +58,10 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public function createNew(): int|string {
     return $this->connection->insert('simpletest_test_id')
       ->useDefaults(['test_id'])
-      ->execute();
+      ->executeEnsuringSchemaOnFailure(
+        schema: $this->testingResultsSchema(),
+        retryAfterSchemaEnsured: TRUE,
+      );
   }
 
   /**
@@ -97,7 +100,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $transaction = $this->connection->startTransaction('delete_test_run');
     $this->connection->delete('simpletest')
       ->condition('test_id', $test_run->id())
-      ->execute();
+      ->executeEnsuringSchemaOnFailure($this->testingResultsSchema());
     $count = $this->connection->delete('simpletest_test_id')
       ->condition('test_id', $test_run->id())
       ->execute();
@@ -114,7 +117,10 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
       ->condition('test_id', $test_run->id())
       ->orderBy('test_class')
       ->orderBy('message_id')
-      ->execute()
+      ->executeEnsuringSchemaOnFailure(
+        schema: $this->testingResultsSchema(),
+        retryAfterSchemaEnsured: TRUE,
+      )
       ->fetchAll();
   }
 
@@ -137,21 +143,21 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     $select->addField('st_tid', 'last_prefix', 'db_prefix');
     $select->addField('st', 'test_class');
 
-    return $select->execute()->fetchAssoc();
+    return $select
+      ->executeEnsuringSchemaOnFailure(
+        schema: $this->testingResultsSchema(),
+        retryAfterSchemaEnsured: TRUE,
+      )
+      ->fetchAssoc();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildTestingResultsEnvironment(bool $keep_results): void {
-    $schema = $this->connection->schema();
-    foreach (static::testingResultsSchema() as $name => $table_spec) {
-      $table_exists = $schema->tableExists($name);
-      if (!$keep_results && $table_exists) {
+  public function buildTestingResultsEnvironment(bool $keepResults): void {
+    foreach (array_keys(static::testingResultsSchema()) as $name) {
+      if ($this->connection->schema()->tableExists($name) && !$keepResults) {
         $this->connection->truncate($name)->execute();
-      }
-      if (!$table_exists) {
-        $schema->createTable($name, $table_spec);
       }
     }
   }
@@ -160,8 +166,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    * {@inheritdoc}
    */
   public function validateTestingResultsEnvironment(): bool {
-    $schema = $this->connection->schema();
-    return $schema->tableExists('simpletest') && $schema->tableExists('simpletest_test_id');
+    return TRUE;
   }
 
   /**
@@ -170,7 +175,9 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public function cleanUp(): int {
     // Clear test results.
     $transaction = $this->connection->startTransaction('delete_simpletest');
-    $this->connection->delete('simpletest')->execute();
+    $this->connection
+      ->delete('simpletest')
+      ->executeEnsuringSchemaOnFailure($this->testingResultsSchema());
     $count = $this->connection->delete('simpletest_test_id')->execute();
     $transaction->commitOrRelease();
     return $count;

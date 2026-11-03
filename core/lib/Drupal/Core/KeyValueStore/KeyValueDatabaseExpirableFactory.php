@@ -49,14 +49,16 @@ class KeyValueDatabaseExpirableFactory implements KeyValueExpirableFactoryInterf
    * Deletes expired items.
    */
   public function garbageCollection() {
-    try {
-      $this->connection->delete('key_value_expire')
-        ->condition('expire', $this->time->getRequestTime(), '<')
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $this->catchException($e);
-    }
+    $this->connection->executeEnsuringSchemaOnFailure(
+      execute: function (): void {
+        $this->connection->delete('key_value_expire')
+          ->condition('expire', $this->time->getRequestTime(), '<')
+          ->execute();
+      },
+      schema: [
+        'key_value_expire' => DatabaseStorageExpirable::schemaDefinition(),
+      ],
+    );
   }
 
   /**
@@ -69,8 +71,15 @@ class KeyValueDatabaseExpirableFactory implements KeyValueExpirableFactoryInterf
    *   The exception.
    *
    * @throws \Exception
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function catchException(\Exception $e) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     if ($this->connection->schema()->tableExists('key_value_expire')) {
       throw $e;
     }

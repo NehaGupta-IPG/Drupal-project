@@ -236,13 +236,18 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   protected function safeExecuteSelect(SelectInterface $query) {
     try {
-      return $query->execute();
+      $execution = $this->connection->executeEnsuringSchemaOnFailure(
+        execute: function () use ($query): mixed {
+          return $query->execute();
+        },
+        schema: [
+          $this->table => static::schemaDefinition(),
+        ],
+        retryAfterSchemaEnsured: TRUE,
+      );
+      return $execution->getResult();
     }
     catch (\Exception $e) {
-      // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
-        return $query->execute();
-      }
       // Some other failure that we can not recover from.
       throw new PluginException($e->getMessage(), 0, $e);
     }
@@ -1188,8 +1193,15 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @return bool
    *   TRUE if the table was created, FALSE otherwise.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3489185
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Database\Connection::executeEnsuringSchemaOnFailure() instead. See https://www.drupal.org/node/3489185', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createTable($this->table, static::schemaDefinition());
     }
