@@ -4,7 +4,6 @@ namespace Drupal\serialization\Normalizer;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\TypedData\PrimitiveInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
  * Converts primitive data objects to their casted values.
@@ -54,12 +53,11 @@ class PrimitiveDataNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function getNormalizationSchema(mixed $object, array $context = []): array {
-    $nullable = !$object instanceof TypedDataInterface || !$object->getDataDefinition()->isRequired();
     return $this->getJsonSchemaForMethod(
       $object,
       'getCastedValue',
       ['$comment' => 'Unable to provide schema, no type specified.'],
-      $nullable,
+      $this->isNullable($object),
     );
   }
 

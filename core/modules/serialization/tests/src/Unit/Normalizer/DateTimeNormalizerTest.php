@@ -7,6 +7,7 @@ namespace Drupal\Tests\serialization\Unit\Normalizer;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601;
 use Drupal\Core\TypedData\Plugin\DataType\IntegerData;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
@@ -191,6 +192,30 @@ class DateTimeNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the JSON Schema for optional and required data.
+   */
+  #[DataProvider('providerTestJsonSchemaNullable')]
+  public function testJsonSchemaNullable(mixed $object, array $expected): void {
+    $this->assertSame($expected, $this->normalizer->normalize($object, 'json_schema'));
+  }
+
+  /**
+   * Data provider for ::testJsonSchemaNullable().
+   */
+  public static function providerTestJsonSchemaNullable(): array {
+    $optional = DataDefinition::createFromDataType('datetime_iso8601')->setRequired(FALSE);
+    $required = DataDefinition::createFromDataType('datetime_iso8601')->setRequired(TRUE);
+    $not_nullable = ['type' => 'string', 'format' => 'date-time'];
+    $nullable = ['oneOf' => [$not_nullable, ['type' => 'null']]];
+    return [
+      'optional typed data: nullable' => [new DateTimeIso8601($optional), $nullable],
+      'required typed data: not nullable' => [new DateTimeIso8601($required), $not_nullable],
+      'class name: nullable' => [DateTimeInterface::class, $nullable],
+      'plain object: not nullable' => [new \stdClass(), $not_nullable],
+    ];
+  }
+
+  /**
    * Generate test data for date data providers.
    *
    * @return array
@@ -209,8 +234,11 @@ class DateTimeNormalizerTest extends UnitTestCase {
         ->willReturn($drupal_date_time->reveal());
       return $data->reveal();
     };
+    $date = new DateTimeIso8601(DataDefinition::createFromDataType('datetime_iso8601'));
+    $date->setValue(NULL);
     return [
       'RFC 3339' => [fn (UnitTestCase $test): DateTimeInterface => $case($test)],
+      'null' => [$date],
     ];
   }
 

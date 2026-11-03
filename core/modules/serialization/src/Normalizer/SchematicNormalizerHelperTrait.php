@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\serialization\Normalizer;
 
+use Drupal\Core\TypedData\TypedDataInterface;
+
 /**
  * Methods for normalizing JSON schema.
  */
@@ -33,7 +35,22 @@ trait SchematicNormalizerHelperTrait {
    * @see https://json-schema.org/specification#specification-documents
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    return $this->getJsonSchemaForMethod($this, 'normalize', ['$comment' => 'No schema available.']);
+    return $this->getJsonSchemaForMethod($this, 'normalize', ['$comment' => 'No schema available.'], $this->isNullable($object));
+  }
+
+  /**
+   * Determines whether the normalization may be NULL.
+   *
+   * @param mixed $object
+   *   The value passed to ::getNormalizationSchema().
+   *
+   * @return bool
+   *   TRUE for a class name, which has no definition to check, and for typed
+   *   data whose definition is not required.
+   */
+  protected function isNullable(mixed $object): bool {
+    return is_string($object)
+      || ($object instanceof TypedDataInterface && !$object->getDataDefinition()->isRequired());
   }
 
   /**

@@ -40,13 +40,12 @@ class TypedDataNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    assert($object instanceof TypedDataInterface);
-    $value = $object->getValue();
-    $nullable = !$object->getDataDefinition()->isRequired();
+    $nullable = $this->isNullable($object);
+    $value = $object instanceof TypedDataInterface ? $object->getValue() : NULL;
     // Match the special-cased logic in ::normalize().
     if (is_object($value) && method_exists($value, '__toString')) {
       return $nullable
-        ? ['oneOf' => ['string', 'null']]
+        ? ['oneOf' => [['type' => 'string'], ['type' => 'null']]]
         : ['type' => 'string'];
     }
     return $this->getJsonSchemaForMethod(

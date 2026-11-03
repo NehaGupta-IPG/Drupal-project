@@ -62,7 +62,12 @@ trait SchematicNormalizerTrait {
    * {@inheritdoc}
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    return $this->getJsonSchemaForMethod($this, 'doNormalize', ['$comment' => static::generateNoSchemaAvailableMessage($object)]);
+    return $this->getJsonSchemaForMethod(
+      $this,
+      'doNormalize',
+      ['$comment' => static::generateNoSchemaAvailableMessage($object)],
+      $this->isNullable($object),
+    );
   }
 
 }

@@ -115,6 +115,28 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests the JSON Schema for optional and required data.
+   */
+  #[DataProvider('providerTestJsonSchemaNullable')]
+  public function testJsonSchemaNullable(bool $required, array $expected): void {
+    $string = new StringData(DataDefinition::createFromDataType('string')->setRequired($required));
+
+    $this->assertSame($expected, $this->normalizer->normalize($string, 'json_schema'));
+  }
+
+  /**
+   * Data provider for ::testJsonSchemaNullable().
+   */
+  public static function providerTestJsonSchemaNullable(): array {
+    $not_nullable = ['type' => 'string'];
+    $nullable = ['oneOf' => [$not_nullable, ['type' => 'null']]];
+    return [
+      'optional string: nullable' => [FALSE, $nullable],
+      'required string: not nullable' => [TRUE, $not_nullable],
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function jsonSchemaDataProvider(): array {
