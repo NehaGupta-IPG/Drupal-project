@@ -4,7 +4,6 @@ namespace Drupal\jsonapi;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\jsonapi\Access\EntityAccessChecker;
@@ -30,13 +29,6 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 class IncludeResolver {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * The JSON:API entity access checker.
    *
    * @var \Drupal\jsonapi\Access\EntityAccessChecker
@@ -46,8 +38,7 @@ class IncludeResolver {
   /**
    * IncludeResolver constructor.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityAccessChecker $entity_access_checker) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(EntityAccessChecker $entity_access_checker) {
     $this->entityAccessChecker = $entity_access_checker;
   }
 
@@ -61,11 +52,6 @@ class IncludeResolver {
    *
    * @return \Drupal\jsonapi\JsonApiResource\IncludedData
    *   An IncludedData object of resolved resources to be included.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   *   Thrown if an included entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *   Thrown if a storage handler couldn't be loaded.
    */
   public function resolve($data, $include_parameter) {
     assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
@@ -79,9 +65,9 @@ class IncludeResolver {
    *
    * This method takes a tree of relationship field names and JSON:API Data
    * object. For the top-level of the tree and for each entity in the
-   * collection, it gets the target entity type and IDs for each relationship
-   * field. The method then loads all of those targets and calls itself
-   * recursively with the next level of the tree and those loaded resources.
+   * collection, it gets the referenced entities for each relationship field.
+   * The method then calls itself recursively with the next level of the tree
+   * and those referenced resources.
    *
    * @param array $include_tree
    *   The include paths, represented as a tree.
@@ -92,11 +78,6 @@ class IncludeResolver {
    *
    * @return \Drupal\jsonapi\JsonApiResource\Data
    *   A JSON:API Data of included items.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   *   Thrown if an included entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *   Thrown if a storage handler couldn't be loaded.
    */
   protected function resolveIncludeTree(array $include_tree, Data $data, ?Data $includes = NULL) {
     $includes = is_null($includes) ? new IncludedData([]) : $includes;
@@ -146,22 +127,16 @@ class IncludeResolver {
             continue;
           }
 
-          // Support entity reference fields that don't have the referenced
-          // target type stored in settings.
-          $references[$field_item->entity->getEntityTypeId()][] = $field_item->get($field_item::mainPropertyName())->getValue();
+          $references[] = $field_item->entity;
         }
       }
-      foreach ($references as $target_type => $ids) {
-        $entity_storage = $this->entityTypeManager->getStorage($target_type);
-        $targeted_entities = $entity_storage->loadMultiple(array_unique($ids));
-        $access_checked_entities = array_map(function (EntityInterface $entity) {
-          return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
-        }, $targeted_entities);
-        $targeted_collection = new IncludedData(array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
-          return !$resource_object->getResourceType()->isInternal();
-        }));
-        $includes = static::resolveIncludeTree($children, $targeted_collection, IncludedData::merge($includes, $targeted_collection));
-      }
+      $access_checked_entities = array_map(function (EntityInterface $entity) {
+        return $this->entityAccessChecker->getAccessCheckedResourceObject($entity);
+      }, $references);
+      $targeted_collection = new IncludedData(array_filter($access_checked_entities, function (ResourceIdentifierInterface $resource_object) {
+        return !$resource_object->getResourceType()->isInternal();
+      }));
+      $includes = static::resolveIncludeTree($children, $targeted_collection, IncludedData::merge($includes, $targeted_collection));
     }
     return $includes;
   }
