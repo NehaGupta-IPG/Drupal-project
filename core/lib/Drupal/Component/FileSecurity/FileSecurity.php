@@ -69,6 +69,13 @@ SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
 <Files *>
   # Override the handler again if we're run later in the evaluation list.
   SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003
+
+  # Override the handler again inside an If in case the inherited handler
+  # is inside an If.
+  # The REQUEST_URI regex limits the rule to PHP files.
+  <If "%{REQUEST_URI} =~ /.+\.ph(ar|p|tml)$/">
+    SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003
+  </If>
 </Files>
 
 # If we know how to do it safely, disable the PHP engine entirely.
