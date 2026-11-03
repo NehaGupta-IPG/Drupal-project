@@ -31,7 +31,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
 
   public function __construct(
     /**
-     * @var \Closure(): \Drupal\Core\Theme\Registry
+     * @var \Closure(): \Drupal\Core\Site\MaintenanceModeInterface
      */
     #[AutowireServiceClosure(MaintenanceModeInterface::class)]
     protected readonly \Closure $maintenanceModeClosure,
