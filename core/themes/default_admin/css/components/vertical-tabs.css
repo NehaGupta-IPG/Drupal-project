@@ -196,7 +196,7 @@
     }
 
     .dark-mode & {
-      border-color: var(--admin-color-border);
+      border-color: var(--vertical-tabs-border-color);
       background: var(--admin-color-bg);
     }
   }
@@ -205,6 +205,49 @@
     &:not(.is-selected *) {
       margin-inline-start: var(--vertical-tabs-menu-link--active-border-size);
       border-width: 0;
+    }
+  }
+}
+
+/* Styles for vertical tabs that contain child validation errors. */
+.vertical-tabs__menu-item.error {
+  & .vertical-tabs__menu-link {
+    color: var(--input--error-color);
+
+    &::before {
+      /* Width must be enough to create a good non-color contrast with the blue active border */
+      border-inline-start: calc(var(--vertical-tabs-menu-link--active-border-size) + 2px) solid var(--input--error-color);
+      border-start-start-radius: var(--vertical-tabs-border-radius);
+      border-end-start-radius: var(--vertical-tabs-border-radius);
+
+      @media (forced-colors: active) {
+        /* Match color of details element border */
+        border-color: canvasText;
+      }
+    }
+  }
+
+  & .vertical-tabs__menu-item-title {
+    position: relative;
+    display: inline-block;
+    /* Make room for validation error icon. */
+    padding-inline-end: calc(var(--admin-space-m) + var(--admin-space-xs));
+
+    &::before {
+      position: absolute;
+      display: block;
+      padding-block-end: calc(var(--admin-line-height) * 1rem); /* Match line-height */
+      padding-inline-end: var(--admin-space-m);
+      content: "";
+      mask-image: var(--admin-icon-error);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      background: var(--input--error-color);
+      inset-inline-end: 0;
+
+      @media (forced-colors: active) {
+        background: canvasText;
+      }
     }
   }
 }
@@ -241,7 +284,7 @@
   box-shadow: var(--vertical-tabs-shadow);
 
   .dark-mode & {
-    border-color: var(--admin-color-border);
+    border-color: var(--vertical-tabs-border-color);
     background: var(--admin-color-bg);
   }
 
@@ -295,6 +338,12 @@
     border-end-end-radius: var(--details-accordion-border-size-radius);
   }
 
+  &.error {
+    &::before {
+      border-radius: 0;
+    }
+  }
+
   .js .vertical-tabs & {
     float: inline-start;
     overflow: visible;
@@ -308,6 +357,11 @@
     }
 
     > summary {
+      display: none;
+    }
+
+    /* Hide details border for vertical tabs pane */
+    &.error::before {
       display: none;
     }
   }

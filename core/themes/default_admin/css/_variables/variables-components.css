@@ -147,7 +147,7 @@
   --vertical-tabs-margin-vertical: var(--admin-space-s);
   --vertical-tabs-border-radius: var(--details-accordion-border-size-radius);
   --vertical-tabs-shadow: var(--details-box-shadow);
-  --vertical-tabs-border-color: var(--admin-color-border);
+  --vertical-tabs-border-color: var(--admin-color-border-input);
   --vertical-tabs-border-size: 1px;
   --vertical-tabs-border: var(--vertical-tabs-border-size) solid var(--vertical-tabs-border-color);
   --vertical-tabs-menu-item-shadow-extraspace: 0.5rem;

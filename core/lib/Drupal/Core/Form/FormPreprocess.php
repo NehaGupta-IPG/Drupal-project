@@ -367,6 +367,8 @@ class FormPreprocess {
     $variables['children'] = (isset($element['#children'])) ? $element['#children'] : '';
     $variables['value'] = (isset($element['#value'])) ? $element['#value'] : '';
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
+    $variables['child_error_count'] = !empty($element['#attributes']['data-child-error-count'])
+      ? $element['#attributes']['data-child-error-count'] : 0;
 
     // Suppress error messages.
     $variables['errors'] = NULL;

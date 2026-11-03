@@ -214,6 +214,12 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
       }
     }
 
+    // Set attributes to indicate that there is a child element with an error.
+    if (!empty($element['#children_errors'])) {
+      $element['#attributes']['class'][] = 'error';
+      $element['#attributes']['data-child-error-count'] = count($element['#children_errors']);
+    }
+
     return $element;
   }
 

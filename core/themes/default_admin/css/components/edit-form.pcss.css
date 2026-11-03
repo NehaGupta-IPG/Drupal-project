@@ -205,6 +205,14 @@
     border-color: var(--admin-color-border);
   }
 
+  &.error {
+    border-block: 1px solid var(--input--error-color);
+
+    &::before {
+      border-radius: 0;
+    }
+  }
+
   > .details__summary {
     display: block;
     padding-inline-start: 3rem;

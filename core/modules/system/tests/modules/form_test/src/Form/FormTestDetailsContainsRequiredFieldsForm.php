@@ -34,7 +34,12 @@ class FormTestDetailsContainsRequiredFieldsForm extends FormBase {
     $form['meta']['required_textfield_in_details'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => 'Required textfield',
+      '#title' => 'First required textfield',
+    ];
+    $form['meta']['required_textfield_in_details_2'] = [
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => 'Second required textfield',
     ];
     $form['meta2'] = [
       '#type' => 'details',
