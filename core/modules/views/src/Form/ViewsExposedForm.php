@@ -10,6 +10,7 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -53,7 +54,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('views.exposed_form_cache'),
-      $container->get('path.current')
+      $container->get('path.current'),
     );
   }
 
@@ -74,6 +75,13 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     /** @var \Drupal\views\ViewExecutable $view */
     $view = $form_state->get('view');
     $display = &$form_state->get('display');
+    // Existing arguments need to be passed as this exposed form might
+    // be used in a block. Without this contextual views arguments
+    // will be lost.
+    if ($this->getRouteMatch()->getRouteObject() && $this->getRouteMatch()->getRouteName() !== 'views.ajax' && empty($view->args)) {
+      $args = Views::buildArgs($this->getRouteMatch());
+      $view->setArguments($args);
+    }
 
     $form_state->setUserInput($view->getExposedInput());
 
@@ -132,7 +140,15 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       }
     }
     else {
-      $form_action = $view->getUrl()->toString();
+      $view_url = $view->getUrl();
+      $parameters = [];
+      foreach ($view_url->getRouteParameters() as $k => $parameter) {
+        $parameters[$k] = $parameter;
+      }
+      if (!empty($parameters)) {
+        $view_url->setRouteParameters($parameters);
+      }
+      $form_action = $view_url->toString();
     }
 
     $form['#action'] = $form_action;

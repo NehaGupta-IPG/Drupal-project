@@ -36,28 +36,8 @@ class ViewPageController implements ContainerInjectionInterface {
    *   A render array or a Response object.
    */
   public function handle($view_id, $display_id, RouteMatchInterface $route_match) {
-    $args = [];
+    $args = Views::buildArgs($route_match);
     $route = $route_match->getRouteObject();
-    $map = $route->hasOption('_view_argument_map') ? $route->getOption('_view_argument_map') : [];
-
-    foreach ($map as $attribute => $parameter_name) {
-      // Allow parameters be pulled from the request.
-      // The map stores the actual name of the parameter in the request. Views
-      // which override existing controller, use for example 'node' instead of
-      // arg_nid as name.
-      if (isset($map[$attribute])) {
-        $attribute = $map[$attribute];
-      }
-      if ($arg = $route_match->getRawParameter($attribute)) {
-      }
-      else {
-        $arg = $route_match->getParameter($attribute);
-      }
-
-      if (isset($arg)) {
-        $args[] = $arg;
-      }
-    }
 
     $class = $route->getOption('_view_display_plugin_class');
     if ($route->getOption('returns_response')) {
