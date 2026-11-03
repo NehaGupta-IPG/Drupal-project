@@ -312,7 +312,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $field_name = $this->fieldDefinition->getName();
     $parents = $form['#parents'];
     // Create an ID suffix from the parents to make sure each widget is unique.
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
+    $id_suffix = $parents ? '-' . implode('-', $parents) : $this->fieldDefinition->getUniqueIdentifier();
     $field_widget_id = implode(':', array_filter([$field_name, $id_suffix]));
     $wrapper_id = $field_name . '-media-library-wrapper' . $id_suffix;
     $limit_validation_errors = [array_merge($parents, [$field_name])];
