@@ -14,7 +14,6 @@ use Drupal\Core\Theme\Registry;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -35,8 +34,6 @@ class MaintenanceMode implements MaintenanceModeInterface {
      */
     #[AutowireServiceClosure(Registry::class)]
     protected \Closure|ServiceClosureArgument $registryClosure,
-    #[Autowire(param: 'app.root')]
-    protected ?string $root,
   ) {
     if ($this->themeHandler === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $themeHandler argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3058979', E_USER_DEPRECATED);
@@ -57,10 +54,6 @@ class MaintenanceMode implements MaintenanceModeInterface {
     if (!$this->registryClosure instanceof \Closure) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $registryClosure argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3058979', E_USER_DEPRECATED);
       $this->registryClosure = new ServiceClosureArgument(new Reference('theme.registry'));
-    }
-    if ($this->root === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $root argument is deprecated in drupal:12.1.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3058979', E_USER_DEPRECATED);
-      $this->root = \Drupal::root();
     }
   }
 
@@ -106,10 +99,6 @@ class MaintenanceMode implements MaintenanceModeInterface {
     if ($this->themeManager->hasActiveTheme()) {
       return;
     }
-
-    require_once $this->root . '/core/includes/theme.inc';
-    require_once $this->root . '/core/includes/common.inc';
-    require_once $this->root . '/core/includes/module.inc';
 
     $customTheme = NULL;
 
