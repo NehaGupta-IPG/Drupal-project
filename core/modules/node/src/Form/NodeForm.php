@@ -139,9 +139,24 @@ class NodeForm extends ContentEntityForm {
 
     $form = parent::form($form, $form_state);
 
-    $form['advanced']['#attributes']['class'][] = 'entity-meta';
+    // The structural containers below claim hardcoded form keys. A custom
+    // field on the bundle can share one of those machine names, in which case
+    // parent::form() has already placed its widget under that key. A field
+    // widget complete form nests its #field_name under the 'widget' element;
+    // fall back to a distinct key so the custom field keeps rendering.
+    $is_field_widget = static fn (string $key): bool => isset($form[$key]['widget']['#field_name']);
+    $meta_key = $is_field_widget('meta') ? 'meta_information' : 'meta';
+    $author_key = $is_field_widget('author') ? 'author_information' : 'author';
+    $options_key = $is_field_widget('options') ? 'options_information' : 'options';
 
-    $form['meta'] = [
+    // The advanced vertical tabs are created by the parent. When a custom
+    // field is named "advanced" its widget replaced the tabs, so only add the
+    // styling class when the key still holds the structural element.
+    if (!$is_field_widget('advanced')) {
+      $form['advanced']['#attributes']['class'][] = 'entity-meta';
+    }
+
+    $form[$meta_key] = [
       '#type' => 'details',
       '#group' => 'advanced',
       '#weight' => -10,
@@ -150,19 +165,19 @@ class NodeForm extends ContentEntityForm {
       '#tree' => TRUE,
       '#access' => $this->currentUser->hasPermission('administer nodes'),
     ];
-    $form['meta']['published'] = [
+    $form[$meta_key]['published'] = [
       '#type' => 'item',
       '#markup' => $node->isPublished() ? $this->t('Published') : $this->t('Not published'),
       '#access' => !$node->isNew(),
       '#wrapper_attributes' => ['class' => ['entity-meta__title']],
     ];
-    $form['meta']['changed'] = [
+    $form[$meta_key]['changed'] = [
       '#type' => 'item',
       '#title' => $this->t('Last saved'),
       '#markup' => !$node->isNew() ? $this->dateFormatter->format($node->getChangedTime(), 'short') : $this->t('Not saved yet'),
       '#wrapper_attributes' => ['class' => ['entity-meta__last-saved']],
     ];
-    $form['meta']['author'] = [
+    $form[$meta_key]['author'] = [
       '#type' => 'item',
       '#title' => $this->t('Author'),
       '#markup' => $node->getOwner()?->getDisplayName(),
@@ -174,7 +189,7 @@ class NodeForm extends ContentEntityForm {
     }
 
     // Node author information for administrators.
-    $form['author'] = [
+    $form[$author_key] = [
       '#type' => 'details',
       '#title' => $this->t('Authoring information'),
       '#group' => 'advanced',
@@ -186,15 +201,15 @@ class NodeForm extends ContentEntityForm {
     ];
 
     if (isset($form['uid'])) {
-      $form['uid']['#group'] = 'author';
+      $form['uid']['#group'] = $author_key;
     }
 
     if (isset($form['created'])) {
-      $form['created']['#group'] = 'author';
+      $form['created']['#group'] = $author_key;
     }
 
     // Node options for administrators.
-    $form['options'] = [
+    $form[$options_key] = [
       '#type' => 'details',
       '#title' => $this->t('Promotion options'),
       '#group' => 'advanced',
@@ -206,11 +221,11 @@ class NodeForm extends ContentEntityForm {
     ];
 
     if (isset($form['promote'])) {
-      $form['promote']['#group'] = 'options';
+      $form['promote']['#group'] = $options_key;
     }
 
     if (isset($form['sticky'])) {
-      $form['sticky']['#group'] = 'options';
+      $form['sticky']['#group'] = $options_key;
     }
 
     $form['#attached']['library'][] = 'node/drupal.node';
