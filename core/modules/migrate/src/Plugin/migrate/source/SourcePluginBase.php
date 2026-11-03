@@ -409,14 +409,14 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
         $row->setIdMap($id_map);
       }
 
-      // Clear any previous messages for this row before potentially adding
-      // new ones.
-      if (!empty($this->currentSourceIds)) {
-        $this->idMap->delete($this->currentSourceIds, TRUE);
-      }
-
       // Preparing the row gives source plugins the chance to skip.
       if ($this->prepareRow($row) === FALSE) {
+        // Clear any previous messages for this row before potentially adding
+        // new ones.
+        if (!empty($this->currentSourceIds)) {
+          $this->idMap->delete($this->currentSourceIds, TRUE);
+        }
+
         continue;
       }
 
@@ -426,6 +426,12 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
       // 3. The row is newer than the current high-water mark.
       // 4. If no such property exists then try by checking the hash of the row.
       if (!$row->getIdMap() || $row->needsUpdate() || $this->aboveHighWater($row) || $this->rowChanged($row)) {
+        // Clear any previous messages for this row before potentially adding
+        // new ones.
+        if (!empty($this->currentSourceIds)) {
+          $this->idMap->delete($this->currentSourceIds, TRUE);
+        }
+
         $this->currentRow = $row->freezeSource();
       }
 

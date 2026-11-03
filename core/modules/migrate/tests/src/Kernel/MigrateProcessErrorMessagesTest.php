@@ -158,6 +158,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     $this->processPluginManager->createInstance('test_error', Argument::cetera())->willReturn($error_plugin_prophecy->reveal());
 
     $this->idMap->setMessage(Argument::any())->willReturn();
+    $this->idMap->getMessages(Argument::any())->willReturn();
     $this->idMap->getRowBySource(Argument::any())->willReturn([]);
     $this->idMap->delete(Argument::cetera())->willReturn();
     $this->idMap->saveIdMapping(Argument::cetera())->willReturn();
