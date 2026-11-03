@@ -22300,18 +22300,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/BulkDeleteTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/ConfigFieldDefinitionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_rev\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/ConfigFieldDefinitionTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 3,
@@ -22456,42 +22444,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/EntityReference/Views/SelectionTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 11,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_2\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 18,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_name_2\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 14,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_storage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_storage_2\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 7,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -22522,30 +22474,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachOtherTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 10,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_definition\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 30,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_storage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRevisionId\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 4,
@@ -22568,18 +22496,6 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_name_2\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldDataCountTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_storage_2\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 7,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldDataCountTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRevisionId\\(\\)\\.$#',
@@ -22748,24 +22664,6 @@ $ignoreErrors[] = [
 	'identifier' => 'offsetAssign.valueType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldStorageCrudTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property ArrayObject\\:\\:\\$field_storage\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',

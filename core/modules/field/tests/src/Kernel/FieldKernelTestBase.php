@@ -38,7 +38,17 @@ abstract class FieldKernelTestBase extends KernelTestBase {
    * - $this->fieldTestData->field[suffix]
    * - $this->fieldTestData->field_definition[suffix]
    *
-   * @var \ArrayObject
+   * @var \ArrayObject<string, mixed>&object{
+   *   field_name: string,
+   *   field_name_2: string,
+   *   field_storage: \Drupal\field\Entity\FieldStorageConfig,
+   *   field_storage_2: \Drupal\field\Entity\FieldStorageConfig,
+   *   field_storage_uuid: string,
+   *   field_definition: array<string, mixed>,
+   *   field: \Drupal\field\Entity\FieldConfig,
+   *   field_2: \Drupal\field\Entity\FieldConfig,
+   *   field_rev: \Drupal\field\Entity\FieldConfig,
+   * }
    *
    * @see \Drupal\field\Tests\FieldUnitTestBase::createFieldWithStorage()
    */

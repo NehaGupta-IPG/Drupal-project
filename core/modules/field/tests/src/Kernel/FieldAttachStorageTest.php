@@ -308,8 +308,9 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     EntityTestHelper::createBundle($new_bundle, NULL, $entity_type);
 
     // Add a field to that bundle.
-    $this->fieldTestData->field_definition['bundle'] = $new_bundle;
-    FieldConfig::create($this->fieldTestData->field_definition)->save();
+    $field_definition = $this->fieldTestData->field_definition;
+    $field_definition['bundle'] = $new_bundle;
+    FieldConfig::create($field_definition)->save();
 
     // Save an entity with data in the field.
     $entity = $this->container->get('entity_type.manager')
@@ -335,8 +336,9 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     EntityTestHelper::createBundle($new_bundle, NULL, $entity_type);
 
     // Add a field to that bundle.
-    $this->fieldTestData->field_definition['bundle'] = $new_bundle;
-    FieldConfig::create($this->fieldTestData->field_definition)->save();
+    $field_definition = $this->fieldTestData->field_definition;
+    $field_definition['bundle'] = $new_bundle;
+    FieldConfig::create($field_definition)->save();
 
     // Create a second field for the test bundle.
     $field_name = $this->randomMachineName() . '_field_name';
