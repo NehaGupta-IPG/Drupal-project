@@ -59,7 +59,8 @@
  * @ingroup themeable
  */
 #}
-<article{{ attributes }}>
+{% set wrapper_element = wrapper_element ?: 'article' %}
+<{{ wrapper_element }}{{ attributes }}>
 
   {{ title_prefix }}
   {% if label and view_mode != 'full' %}
@@ -82,4 +83,4 @@
     {{ content }}
   </div>
 
-</article>
+</{{ wrapper_element }}>
