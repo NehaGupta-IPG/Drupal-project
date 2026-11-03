@@ -1088,7 +1088,7 @@
     // Track if any command is altering the focus so we can avoid changing the
     // focus set by the Ajax command.
     const focusChanged = Object.keys(response || {}).some((key) => {
-      const { command, method } = response[key];
+      const { command, method } = response[key] || {};
       return (
         command === 'focusFirst' ||
         command === 'openDialog' ||
