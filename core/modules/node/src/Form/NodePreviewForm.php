@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 
 /**
@@ -42,7 +43,7 @@ class NodePreviewForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, ?EntityInterface $node = NULL) {
     $view_mode = $node->preview_view_mode;
 
-    $query_options = ['query' => ['uuid' => $node->uuid()]];
+    $query_options = ['query' => ['uuid' => self::getPreviewUuid($node)]];
     $query = $this->getRequest()->query;
     if ($query->has('destination')) {
       $query_options['query']['destination'] = $query->get('destination');
@@ -64,7 +65,7 @@ class NodePreviewForm extends FormBase {
 
     $form['uuid'] = [
       '#type' => 'value',
-      '#value' => $node->uuid(),
+      '#value' => self::getPreviewUuid($node),
     ];
 
     $form['view_mode'] = [
@@ -104,6 +105,19 @@ class NodePreviewForm extends FormBase {
       $query->remove('destination');
     }
     $form_state->setRedirect('entity.node.preview', $route_parameters, $options);
+  }
+
+  /**
+   * Gets a UUID for the node to use as a key in the node_preview tempstore.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $node
+   *   The node to generate the UUID for.
+   *
+   * @return string
+   *   The node's UUID with a language suffix.
+   */
+  public static function getPreviewUuid(EntityInterface $node): string {
+    return \sprintf('%s-%s', $node->uuid(), $node->language()?->getId() ?? LanguageInterface::LANGCODE_DEFAULT);
   }
 
 }
