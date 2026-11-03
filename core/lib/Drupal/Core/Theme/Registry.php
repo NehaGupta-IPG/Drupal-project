@@ -776,6 +776,11 @@ class Registry implements DestructableInterface {
     foreach ($runtime_registries as $runtime_registry) {
       $runtime_registry->destruct();
     }
+    // CacheCollector::destruct() calls reset() on each runtime registry,
+    // emptying its storage. Drop the now-empty instances so a subsequent
+    // getRuntime() call rebuilds a complete registry instead of reusing an
+    // emptied one.
+    $this->runtimeRegistry = [];
   }
 
   /**
