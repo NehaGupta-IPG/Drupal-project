@@ -16,3 +16,4 @@ services:
     parent: logger.channel_base
     arguments: ['image']
   Drupal\image\ImageDerivativeUtilities: ~
+  Drupal\image\ImageConfigUpdater: ~

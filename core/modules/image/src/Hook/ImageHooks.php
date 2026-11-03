@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\image\Hook;
 
+use Drupal\Core\Field\FieldConfigInterface as CoreFieldConfigInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
@@ -15,6 +18,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Drupal\image\ImageConfigUpdater;
 
 /**
  * Hook implementations for image.
@@ -26,6 +30,8 @@ class ImageHooks {
   public function __construct(
     #[AutowireServiceClosure(ImageDerivativeUtilities::class)]
     protected readonly \Closure $imageDerivativeUtilitiesClosure,
+    #[AutowireServiceClosure(ImageConfigUpdater::class)]
+    private readonly \Closure $imageConfigUpdaterClosure,
   ) {}
 
   /**
@@ -63,7 +69,7 @@ class ImageHooks {
           ])->toString(),
         ]) . '</dd>';
         $output .= '<dd>' . $this->t('The maximum file size that can be uploaded is limited by PHP settings of the server, but you can restrict it further by configuring a <em>Maximum upload size</em> in the field settings (this setting can be changed later). The maximum file size, either from PHP server settings or field configuration, is automatically displayed to users in the help text of the image field.') . '</dd>';
-        $output .= '<dd>' . $this->t('You can also configure a minimum and/or maximum dimensions for uploaded images. Images that are too small will be rejected. Images that are to large will be resized. During the resizing the <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image will be lost.') . '</dd>';
+        $output .= '<dd>' . $this->t('You can also configure a minimum and/or maximum dimensions for uploaded images. Images must be between allowed min and max pixels. Images that are too large will be resized. During the resizing the <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image will be lost. The image resize policy can be adjusted with the option "Image resize policy" through the field settings.') . '</dd>';
         $output .= '<dd>' . $this->t('You can also configure a default image that will be used if no image is uploaded in an image field. This default can be defined for all instances of the field in the field storage settings when you create a field, and the setting can be overridden for each entity sub-type that uses the field.') . '</dd>';
         $output .= '<dt>' . $this->t('Configuring displays and form displays') . '</dt>';
         $output .= '<dd>' . $this->t('On the <em>Manage display</em> page, you can choose the image formatter, which determines the image style used to display the image in each display mode and whether or not to display the image as a link. On the <em>Manage form display</em> page, you can configure the image upload widget, including setting the preview image style shown on the entity edit form.') . '</dd>';
@@ -284,6 +290,14 @@ class ImageHooks {
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
       \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
     }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_presave() for 'field_config'.
+   */
+  #[Hook('field_config_presave')]
+  public function fieldConfigPresave(CoreFieldConfigInterface $field): void {
+    ($this->imageConfigUpdaterClosure)()->updateField($field);
   }
 
   /**

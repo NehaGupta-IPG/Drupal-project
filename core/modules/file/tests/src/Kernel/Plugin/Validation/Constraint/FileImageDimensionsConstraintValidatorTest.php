@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel\Plugin\Validation\Constraint;
 
+use Drupal\Core\Image\ImageResizePolicy;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\file\Plugin\Validation\Constraint\FileImageDimensionsConstraintValidator;
@@ -114,6 +115,15 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
       ];
       $violations = $this->validator->validate($this->image, $validators);
       $this->assertCount(0, $violations, 'No errors should be reported when an oversized image can be scaled down.');
+
+      $validators = [
+        'FileImageDimensions' => [
+          'maxDimensions' => '1x1',
+          'resizePolicy' => ImageResizePolicy::RejectLargerImagesWithError,
+        ],
+      ];
+      $violations = $this->validator->validate($this->image, $validators);
+      $this->assertCount(1, $violations, 'An error reported for an oversized image that is not allowed to resize.');
 
       $image = $this->container->get('image.factory')
         ->get($this->image->getFileUri());

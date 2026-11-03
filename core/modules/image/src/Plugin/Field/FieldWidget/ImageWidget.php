@@ -152,6 +152,7 @@ class ImageWidget extends FileWidget {
       $element['#upload_validators']['FileImageDimensions'] = [
         'maxDimensions' => $field_settings['max_resolution'],
         'minDimensions' => $field_settings['min_resolution'],
+        'resizePolicy' => $field_settings['resize_policy'],
       ];
     }
 
