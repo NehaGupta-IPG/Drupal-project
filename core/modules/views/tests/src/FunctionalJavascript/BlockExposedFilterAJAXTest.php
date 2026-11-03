@@ -102,4 +102,35 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->addressEquals('some-path');
   }
 
+  /**
+   * Tests if bulk operations works with a views block and ajax.
+   *
+   * @todo maybe this should go in \Drupal\Tests\node\Functional\Views\BulkFormTest.
+   */
+  public function testBulkOperations(): void {
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer nodes',
+      'bypass node access',
+    ]));
+    $node = $this->createNode();
+    $this->drupalPlaceBlock('views_block:test_block_exposed_ajax-block_1');
+    $this->drupalGet($node->toUrl());
+
+    $page = $this->getSession()->getPage();
+
+    // Filter by page type.
+    $this->submitForm(['type' => 'page'], 'Apply');
+    $this->assertSession()->waitForElementRemoved('xpath', '//*[text()="Article A"]');
+
+    // Bulk operations.
+    $page->checkField('node_bulk_form[0]');
+    $this->submitForm([
+      'action' => 'node_promote_action',
+      'node_bulk_form[0]' => TRUE,
+    ], 'Apply to selected items');
+
+    $this->assertSession()->waitForText('Promote content to front page was applied to 1 item.');
+    $this->assertSession()->responseNotContains('The requested page could not be found.');
+  }
+
 }

@@ -8,6 +8,8 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\views\ViewExecutable;
@@ -26,71 +28,35 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   use DependencySerializationTrait;
 
   /**
-   * The class resolver to get the subform form objects.
-   *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
-   */
-  protected $classResolver;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The URL generator to generate the form action.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
-   * The ID of the view.
-   *
-   * @var string
-   */
-  protected $viewId;
-
-  /**
-   * The ID of the active view's display.
-   *
-   * @var string
-   */
-  protected $viewDisplayId;
-
-  /**
-   * The arguments passed to the active view.
-   *
-   * @var string[]
-   */
-  protected $viewArguments;
-
-  /**
    * Constructs a ViewsForm object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
    *   The class resolver to get the subform form objects.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator to generate the form action.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param string $view_id
+   * @param string $viewId
    *   The ID of the view.
-   * @param string $view_display_id
+   * @param string $viewDisplayId
    *   The ID of the active view's display.
-   * @param string[] $view_args
+   * @param string[] $viewArguments
    *   The arguments passed to the active view.
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $currentRouteMatch
+   *   The current route match.
+   * @param \Drupal\Core\Path\CurrentPathStack $currentPathStack
+   *   The current path stack.
    */
-  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, $view_id, $view_display_id, array $view_args) {
-    $this->classResolver = $class_resolver;
-    $this->urlGenerator = $url_generator;
-    $this->requestStack = $requestStack;
-    $this->viewId = $view_id;
-    $this->viewDisplayId = $view_display_id;
-    $this->viewArguments = $view_args;
-  }
+  public function __construct(
+    protected ClassResolverInterface $classResolver,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected RequestStack $requestStack,
+    protected $viewId,
+    protected $viewDisplayId,
+    protected array $viewArguments,
+    protected CurrentRouteMatch $currentRouteMatch,
+    protected CurrentPathStack $currentPathStack,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -102,7 +68,9 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
       $container->get('request_stack'),
       $view_id,
       $view_display_id,
-      $view_args
+      $view_args,
+      $container->get('current_route_match'),
+      $container->get('path.current'),
     );
   }
 
@@ -160,7 +128,15 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
     $query = UrlHelper::filterQueryParameters($query, ['_wrapper_format'], '');
 
     $options = ['query' => $query];
-    $form['#action'] = $view->hasUrl() ? $view->getUrl()->setOptions($options)->toString() : Url::fromRoute('<current>')->setOptions($options)->toString();
+    $form['#action'] = match (TRUE) {
+      // If the view has a URL we can use that.
+      $view->hasUrl() => $view->getUrl()->setOptions($options)->toString(),
+      // On the views.ajax route, set the action to the page we were on.
+      $this->currentRouteMatch->getRouteName() === 'views.ajax' => Url::fromUserInput($this->currentPathStack->getPath())->setOptions($options)->toString(),
+      // On any non views.ajax route, use the current route for the form action.
+      default => Url::fromRoute('<current>')->setOptions($options)->toString(),
+    };
+
     // Tell the preprocessor whether it should hide the header, footer, pager,
     // etc.
     $form['show_view_elements'] = [
