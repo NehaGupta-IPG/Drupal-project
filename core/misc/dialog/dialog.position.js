@@ -124,7 +124,6 @@
   }
 
   window.addEventListener('dialog:aftercreate', (e) => {
-    const autoResize = debounce(resetSize, 20);
     const $element = $(e.target);
     const { settings } = e;
     const eventData = { settings, $element };
@@ -137,12 +136,12 @@
       // Keep a reference so that a scheduled call can be cancelled on close.
       $element.data('drupalAutoResize', autoResize);
       $(window)
-        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
+        .on('resize.dialogResize scroll.dialogResize', eventData, resetSize)
         .trigger('resize.dialogResize');
       $(document).on(
         'drupalViewportOffsetChange.dialogResize',
         eventData,
-        autoResize,
+        resetSize,
       );
     }
   });

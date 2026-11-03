@@ -1,3 +1,7 @@
 .ui-dialog ~ .ck-body-wrapper {
   --ck-z-panel: 1261;
 }
+
+.ck-balloon-panel {
+  z-index: 10000 !important;
+}

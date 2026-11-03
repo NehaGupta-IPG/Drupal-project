@@ -147,6 +147,7 @@
         hasFocus = this.uiDialog.get(0);
       }
       $(hasFocus).eq(0).trigger('focus');
+      $(hasFocus).removeAttr('tabindex');
     },
   });
 })(jQuery, window.tabbable);

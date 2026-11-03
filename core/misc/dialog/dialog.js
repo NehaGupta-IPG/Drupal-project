@@ -90,6 +90,7 @@ class DrupalDialogEvent extends Event {
         bodyScrollLock.lock(domElement);
       }
 
+      $($element.get(0).parentElement).removeAttr('tabindex');
       domElement.dispatchEvent(
         new DrupalDialogEvent('aftercreate', dialog, event.settings),
       );
