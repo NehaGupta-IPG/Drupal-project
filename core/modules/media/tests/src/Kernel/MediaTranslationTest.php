@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
-use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\file\Entity\File;
+use Drupal\media\Entity\Media;
+use Drupal\Tests\TestFileCreationTrait;
+use Drupal\content_translation\ContentTranslationHandler;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
 class MediaTranslationTest extends MediaKernelTestBase {
+  use TestFileCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -47,6 +51,77 @@ class MediaTranslationTest extends MediaKernelTestBase {
       ])->save();
       file_put_contents('public://' . $language_id . '.png', '');
     }
+  }
+
+  /**
+   * Tests media title is not overridden when resaved.
+   */
+  public function testMediaNameNotOverridden(): void {
+    // Create three test image files: one for the media item in its original
+    // language, and one for each of its two translations.
+    $images = $this->getTestFiles('image');
+
+    $original_image = File::create([
+      'uri' => reset($images)->uri,
+    ]);
+    $original_image->save();
+
+    $translated_image_l1 = File::create([
+      'uri' => $images[1]->uri ?? end($images)->uri,
+    ]);
+    $translated_image_l1->save();
+
+    $translated_image_l2 = File::create([
+      'uri' => end($images)->uri,
+    ]);
+    $translated_image_l2->save();
+
+    $media_type = $this->createMediaType('image');
+
+    $source_field_name = $media_type->getSource()
+      ->getSourceFieldDefinition($media_type)
+      ->getName();
+
+    // The media's name should be derived from the filename of the image.
+    $media = Media::create([
+      'bundle' => $media_type->id(),
+      $source_field_name => $original_image->id(),
+    ]);
+    $media->save();
+    $this->assertSame($original_image->getFilename(), $media->getName());
+
+    // Create a translation in l1 which uses a different image, but also sets
+    // an arbitrary title.
+    $translation_l1 = $media->addTranslation('l1');
+    $this->assertNotSame($media->language()->getId(), $translation_l1->language()->getId());
+    $translation_l1->set($source_field_name, $translated_image_l1->id());
+    $translation_l1->setName('Capricious and arbitrary');
+    $translation_l1->save();
+    // The arbitrary title should be preserved.
+    $this->assertSame('Capricious and arbitrary', $translation_l1->getName());
+
+    // Create a translation in l2 which uses yet another image, and sets
+    // a different arbitrary title.
+    $translation_l2 = $media->addTranslation('l2');
+    $this->assertNotSame($media->language()->getId(), $translation_l2->language()->getId());
+    $this->assertNotSame($translation_l1->language()->getId(), $translation_l2->language()->getId());
+    $translation_l2->set($source_field_name, $translated_image_l2->id());
+    $translation_l2->setName('Another capricious title');
+    $translation_l2->save();
+    // The arbitrary title should be preserved.
+    $this->assertSame('Another capricious title', $translation_l2->getName());
+
+    // Reset cache and verify all three versions maintain their correct names.
+    $this->container->get('entity_type.manager')
+      ->getStorage('media')
+      ->resetCache();
+    $loaded_media = Media::load($media->id());
+    // The original version should be unaffected by translations.
+    $this->assertSame($original_image->getFilename(), $loaded_media->getName());
+    // The l1 translation should still have its arbitrary title.
+    $this->assertSame('Capricious and arbitrary', $loaded_media->getTranslation('l1')->getName());
+    // The l2 translation should still have its arbitrary title.
+    $this->assertSame('Another capricious title', $loaded_media->getTranslation('l2')->getName());
   }
 
   /**

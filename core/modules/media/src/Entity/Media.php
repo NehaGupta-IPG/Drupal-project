@@ -347,8 +347,22 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * @internal
    */
   protected function hasSourceFieldChanged() {
+    $original = $this->getOriginal();
+    if (!$original) {
+      return FALSE;
+    }
+
+    $langcode = $this->language()->getId();
+    if (!$original->hasTranslation($langcode)) {
+      return FALSE;
+    }
+
+    $translation_original = $original->getTranslation($langcode);
     $source = $this->getSource();
-    return $this->getOriginal() && $source->getSourceFieldValue($this) !== $source->getSourceFieldValue($this->getOriginal());
+    $new_value = $source->getSourceFieldValue($this);
+    $old_value = $source->getSourceFieldValue($translation_original);
+
+    return $new_value !== $old_value;
   }
 
   /**
@@ -447,6 +461,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     foreach ($this->translations as $langcode => $data) {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
+        $translation_original = $this->getOriginal() && $this->getOriginal()->hasTranslation($langcode) ? $this->getOriginal()->getTranslation($langcode) : NULL;
         // Try to set fields provided by the media source and mapped in
         // media type config.
         $original = $this->getOriginal();
@@ -464,13 +479,21 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
           }
           else {
             // 2nd scenario: field is not empty, but the source field has
-            // changed between two non-empty values.
+            // changed between two non-empty values. Only overwrite if the
+            // field value hasn't been manually customised for this translation
+            // (i.e. it still matches the previously-stored value).
             $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
             $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
             if (!$original_source_field_empty &&
                 !$new_source_field_empty &&
                 $translation->hasSourceFieldChanged()) {
-              $set_metadata = TRUE;
+              $new_value = $translation->get($entity_field_name)->getValue();
+              $old_value = $translation_original
+                ? $translation_original->get($entity_field_name)?->getValue()
+                : ($this->getOriginal() && $this->getOriginal()->hasField($entity_field_name) ? $this->getOriginal()->get($entity_field_name)->getValue() : NULL);
+              if (empty($old_value) || $new_value === $old_value) {
+                $set_metadata = TRUE;
+              }
             }
           }
           if ($set_metadata) {
