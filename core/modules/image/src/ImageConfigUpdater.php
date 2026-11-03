@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\image;
 
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Image\ImageResizePolicy;
-use Drupal\field\FieldConfigInterface;
 
 /**
  * Provides a BC layer for modules providing old configurations.
@@ -41,7 +41,7 @@ class ImageConfigUpdater {
   /**
    * Performs the required update.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
+   * @param \Drupal\Core\Field\FieldConfigInterface $field
    *   The field to update.
    *
    * @return bool
@@ -59,7 +59,7 @@ class ImageConfigUpdater {
   /**
    * Checks if the field still misses 'resize_policy' setting.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
+   * @param \Drupal\Core\Field\FieldConfigInterface $field
    *   The field to update.
    *
    * @return bool

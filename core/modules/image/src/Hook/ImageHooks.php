@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\image\Hook;
 
+use Drupal\Core\Field\FieldConfigInterface as CoreFieldConfigInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
@@ -295,7 +296,7 @@ class ImageHooks {
    * Implements hook_ENTITY_TYPE_presave() for 'field_config'.
    */
   #[Hook('field_config_presave')]
-  public function fieldConfigPresave(FieldConfigInterface $field): void {
+  public function fieldConfigPresave(CoreFieldConfigInterface $field): void {
     ($this->imageConfigUpdaterClosure)()->updateField($field);
   }
 
