@@ -85,7 +85,7 @@ class UserPasswordResetTest extends BrowserTestBase {
    * Tests password reset functionality.
    */
   public function testUserPasswordReset(): void {
-    \Drupal::service('module_installer')->install(['page_cache']);
+    \Drupal::service('module_installer')->install(['dblog', 'page_cache']);
     // Verify that accessing the password reset form without having the session
     // variables set results in an access denied message.
     $this->drupalGet(Url::fromRoute('user.reset.form', ['uid' => $this->account->id()]));
@@ -141,6 +141,21 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->submitForm([], 'Log in');
     $this->assertSession()->linkExists('Log out');
     $this->assertSession()->titleEquals($this->account->getAccountName() . ' | Drupal');
+
+    // Confirm the timestamp in the log message is human readable,
+    $fields = \Drupal::database()->select('watchdog', 'w')
+      ->fields('w', ['message', 'variables'])
+      ->condition('type', 'user')
+      ->orderBy('wid', 'DESC')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAssoc();
+    $this->assertEquals('User %name used one-time login link at time %timestamp.', $fields['message']);
+    // Convert the login timestamp to the expected format.
+    $timestamp = $this->account->getLastLoginTime();
+    $format_date = \Drupal::service('date.formatter')->format($timestamp);
+    $variables = unserialize($fields['variables']);
+    $this->assertEquals($format_date, $variables['%timestamp']);
 
     // Try to save without entering password.
     $this->submitForm([], 'Save');

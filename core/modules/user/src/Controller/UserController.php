@@ -289,7 +289,7 @@ class UserController extends ControllerBase {
     $this->loginFinalizer->finalizeLogin($user);
     $this->logger->info('User %name used one-time login link at time %timestamp.', [
       '%name' => $user->getDisplayName(),
-      '%timestamp' => $timestamp,
+      '%timestamp' => $this->dateFormatter->format($timestamp),
     ]);
     $this->messenger()->addStatus($this->t('You have used a one-time login link.'));
     // Let the user's password be changed without the current password
