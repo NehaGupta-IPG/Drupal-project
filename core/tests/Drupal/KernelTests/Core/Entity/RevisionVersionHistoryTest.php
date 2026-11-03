@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -330,6 +331,13 @@ class RevisionVersionHistoryTest extends KernelTestBase {
    * Test revisions are paginated.
    */
   public function testRevisionsPagination(): void {
+    // Make the entity translatable so revisions without translation changes
+    // are filtered out.
+    $this->enableModules(['language']);
+    $this->installConfig(['language']);
+    ConfigurableLanguage::createFromLangcode('es')->save();
+    $this->container->get('state')->set('entity_test.translation', TRUE);
+    $this->container->get('entity_type.bundle.info')->clearCachedBundles();
     $this->installEntitySchema('entity_test_mulrev');
     /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
     $entity = EntityTestMulRev::create([
