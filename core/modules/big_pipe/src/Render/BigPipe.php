@@ -333,10 +333,10 @@ class BigPipe {
    *   The cumulative assets sent so far; to be updated while rendering no-JS
    *   BigPipe placeholders.
    *
-   * @throws \Exception
-   *   If an exception is thrown during the rendering of a placeholder, it is
+   * @throws \Throwable
+   *   If a throwable is thrown during the rendering of a placeholder, it is
    *   caught to allow the other placeholders to still be replaced. But when
-   *   error logging is configured to be verbose, the exception is rethrown to
+   *   error logging is configured to be verbose, the throwable is rethrown to
    *   simplify debugging.
    */
   protected function sendNoJsPlaceholders($html, $no_js_placeholders, AttachedAssetsInterface $cumulative_assets) {
@@ -385,7 +385,7 @@ class BigPipe {
       try {
         $elements = $this->renderPlaceholder($placeholder, $placeholder_plus_cumulative_settings);
       }
-      catch (\Exception $e) {
+      catch (\Throwable $e) {
         if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
           throw $e;
         }
@@ -421,7 +421,7 @@ class BigPipe {
       try {
         $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
       }
-      catch (\Exception $e) {
+      catch (\Throwable $e) {
         if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
           throw $e;
         }
@@ -437,7 +437,7 @@ class BigPipe {
       // Another placeholder was rendered and sent, track the set of asset
       // libraries sent so far. Any new settings also need to be tracked, so
       // they can be sent in ::sendPreBody().
-      $cumulative_assets->setAlreadyLoadedLibraries(array_merge($cumulative_assets->getAlreadyLoadedLibraries(), $html_response->getAttachments()['library']));
+      $cumulative_assets->setAlreadyLoadedLibraries(array_values(array_unique(array_merge($cumulative_assets->getAlreadyLoadedLibraries(), $html_response->getAttachments()['library']))));
       $cumulative_assets->setSettings($html_response->getAttachments()['drupalSettings']);
 
       // If there are multiple occurrences of this particular placeholder, track
@@ -463,10 +463,10 @@ class BigPipe {
    *   The cumulative assets sent so far; to be updated while rendering BigPipe
    *   placeholders.
    *
-   * @throws \Exception
-   *   If an exception is thrown during the rendering of a placeholder, it is
+   * @throws \Throwable
+   *   If a throwable is thrown during the rendering of a placeholder, it is
    *   caught to allow the other placeholders to still be replaced. But when
-   *   error logging is configured to be verbose, the exception is rethrown to
+   *   error logging is configured to be verbose, the throwable is rethrown to
    *   simplify debugging.
    */
   protected function sendPlaceholders(array $placeholders, array $placeholder_order, AttachedAssetsInterface $cumulative_assets) {
@@ -626,7 +626,7 @@ EOF;
           $this->sendChunk("\n" . static::STOP_SIGNAL . "\n");
           break;
         }
-        catch (\Exception $e) {
+        catch (\Throwable $e) {
           unset($fibers[$placeholder_id]);
           if ($this->configFactory->get('system.logging')->get('error_level') === ERROR_REPORTING_DISPLAY_VERBOSE) {
             throw $e;
