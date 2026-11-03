@@ -485,6 +485,12 @@ views_exposed_form:
     sort_desc_label:
       type: label
       label: 'Descending'
+    preserve_url_query_parameters:
+      type: sequence
+      label: 'Preserve query parameters from URL'
+      sequence:
+        type: string
+        label: 'URL query parameter to preserve'
 
 views_field:
   type: views_handler

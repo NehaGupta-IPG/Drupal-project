@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\exposed_form;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
@@ -32,6 +33,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     $options['expose_sort_order'] = ['default' => TRUE];
     $options['sort_asc_label'] = ['default' => $this->t('Asc')];
     $options['sort_desc_label'] = ['default' => $this->t('Desc')];
+    $options['preserve_url_query_parameters'] = ['default' => []];
     return $options;
   }
 
@@ -103,6 +105,27 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         ],
       ],
     ];
+
+    $form['preserve_url_query_parameters'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Preserve query parameters from URL'),
+      '#description' => $this->t('A comma separated list of URL query parameters which should be preserved in the URL during the form submit'),
+      '#default_value' => implode(', ', $this->options['preserve_url_query_parameters']),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+    $query_parameters = $form_state->getValue(['exposed_form_options', 'preserve_url_query_parameters']);
+    if (!is_array($query_parameters)) {
+      // Convert preserve_url_query_parameters to array.
+      $query_parameters = array_filter(array_map('trim', explode(',', $query_parameters)), function ($value) {
+        return $value !== '';
+      });
+      $form_state->setValue(['exposed_form_options', 'preserve_url_query_parameters'], $query_parameters);
+    }
   }
 
   /**
@@ -276,6 +299,29 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $pager->exposedFormAlter($form, $form_state);
       $form_state->set('pager_plugin', $pager);
     }
+
+    if (!empty($this->options['preserve_url_query_parameters'])) {
+      $query = \Drupal::request()->query->all();
+      foreach ($this->options['preserve_url_query_parameters'] as $name) {
+        if (!isset($form[$name]) && isset($query[$name]) && ($value = $query[$name]) !== '') {
+          if (is_array($value)) {
+            foreach (explode('&', UrlHelper::buildQuery($value, $name)) as $param) {
+              list($raw_name, $value) = explode('=', $param);
+              $form[rawurldecode($raw_name)] = [
+                '#type' => 'hidden',
+                '#value' => rawurldecode($value),
+              ];
+            }
+          }
+          else {
+            $form[$name] = [
+              '#type' => 'hidden',
+              '#value' => $value,
+            ];
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -341,7 +387,16 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $this->view->exposed_data = [];
     }
 
-    $form_state->setRedirect('<current>');
+    $preserveQuery = [];
+    if (!empty($this->options['preserve_url_query_parameters'])) {
+      $query = \Drupal::request()->query->all();
+      foreach ($this->options['preserve_url_query_parameters'] as $name) {
+        if (isset($query[$name])) {
+          $preserveQuery[$name] = $query[$name];
+        }
+      }
+    }
+    $form_state->setRedirect('<current>', [], ['query' => $preserveQuery]);
     $form_state->setValues([]);
   }
 
@@ -357,6 +412,11 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
    */
   public function getCacheContexts() {
     $contexts = [];
+    if (!empty($this->options['preserve_url_query_parameters'])) {
+      foreach ($this->options['preserve_url_query_parameters'] as $name) {
+        $contexts[] = 'url.query_args:' . $name;
+      }
+    }
     if ($this->options['expose_sort_order']) {
       // The sort order query arg is just important in case there is an exposed
       // sort order.
