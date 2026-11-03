@@ -376,11 +376,14 @@ class ImageThemeHooks {
       // to override that if they need to.
       $variables['image']['#access'] = FALSE;
 
-      // Inform the site builders why their image didn't work.
-      ($this->imageLogger)()->warning('Could not apply @style image style to @uri because the style does not support it.', [
-        '@style' => $style->label(),
-        '@uri' => $variables['uri'],
-      ]);
+      $ext = mb_strtolower(pathinfo($variables['uri'], PATHINFO_EXTENSION));
+      if ($ext !== 'svg') {
+        // Inform the site builders why their image didn't work.
+        ($this->imageLogger)()->warning('Could not apply @style image style to @uri because the style does not support it.', [
+          '@style' => $style->label(),
+          '@uri' => $variables['uri'],
+        ]);
+      }
     }
 
     if (\array_key_exists('alt', $variables)) {
