@@ -8,6 +8,7 @@ use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class CommentTranslationUITest extends ContentTranslationUITestBase {
 
   use CommentTestTrait;
+  use ContentTranslationTestTrait;
 
   /**
    * {@inheritdoc}
@@ -238,6 +240,35 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
         $this->assertSession()->pageTextContains("Edit {$this->entityTypeId} {$entity->getTranslation($langcode)->label()} [{$languages[$langcode]->getName()} translation]");
       }
     }
+  }
+
+  /**
+   * Tests making changes on entity with hidden non-translatable comment field.
+   */
+  public function testNonTranslatableCommentFieldHasAffectingChanges(): void {
+    // Make comment field non-translatable and hide on translation forms.
+    $this->enableContentTranslation('node', 'article');
+    $this->container->get('content_translation.manager')->setBundleTranslationSettings('node', 'article', [
+      'untranslatable_fields_hide' => TRUE,
+    ]);
+    self::setFieldTranslatable('node', 'article', 'comment_article', FALSE);
+    // Login as article translator.
+    $this->drupalLogin($this->createUser([
+      'create content translations',
+      'translate article node',
+    ]));
+    // Create a node.
+    $node = $this->drupalCreateNode([
+      'title' => 'Node with non-translatable comment field',
+      'type' => 'article',
+    ]);
+    $nid = $node->id();
+    // Create translation on entity with hidden non-translatable comment field.
+    $this->drupalGet("/node/$nid/translations/add/en/fr");
+    $this->submitForm([], 'Save (this translation)');
+    $assert_session = $this->assertSession();
+    $assert_session->pageTextNotContains('Non-translatable fields can only be changed when updating the original language.');
+    $assert_session->pageTextContains('Article Node with non-translatable comment field has been updated.');
   }
 
 }

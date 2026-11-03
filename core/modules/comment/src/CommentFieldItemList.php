@@ -4,6 +4,7 @@ namespace Drupal\comment;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -61,6 +62,13 @@ class CommentFieldItemList extends FieldItemList {
       return $return_as_object ? $result : $result->isAllowed();
     }
     return parent::access($operation, $account, $return_as_object);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode): bool {
+    return $this->status !== $original_items->status;
   }
 
 }

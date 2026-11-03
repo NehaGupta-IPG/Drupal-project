@@ -124,4 +124,52 @@ class CommentItemTest extends FieldKernelTestBase {
     $this->assertNull($comment_anonymous->mail->value);
   }
 
+  /**
+   * Tests CommentFieldItemList field has relevant changes.
+   *
+   * @legacy-covers \Drupal\comment\CommentFieldItemList::hasAffectingChanges
+   */
+  public function testCommentHasAffectingChanges(): void {
+    $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
+
+    // Create a host entity.
+    $entity = EntityTest::create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    /** @var \Drupal\comment\CommentFieldItemList $field */
+    $field = $entity->comment;
+
+    // Set original values on a cloned list for comparison.
+    $original_list = clone $field;
+    $original_list->setValue([
+      'status' => CommentingStatus::Open,
+      'cid' => 99,
+      'last_comment_timestamp' => 1766149999,
+      'last_comment_name' => 'FooBar',
+      'last_comment_uid' => 1,
+      'comment_count' => 10,
+    ]);
+
+    // Same status, different other fields → not affecting.
+    $field->setValue([
+      'status' => CommentingStatus::Open,
+      'cid' => 0,
+      'last_comment_timestamp' => 1766146139,
+      'last_comment_name' => NULL,
+      'last_comment_uid' => 714574,
+      'comment_count' => 0,
+    ]);
+    $this->assertFalse($field->hasAffectingChanges($original_list, ''));
+
+    // Different status → affecting.
+    $field->setValue([
+      'status' => CommentingStatus::Closed,
+      'cid' => 0,
+      'last_comment_timestamp' => 1766146139,
+      'last_comment_name' => NULL,
+      'last_comment_uid' => 714574,
+      'comment_count' => 0,
+    ]);
+    $this->assertTrue($field->hasAffectingChanges($original_list, ''));
+  }
+
 }
