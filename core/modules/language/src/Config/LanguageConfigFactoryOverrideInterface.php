@@ -31,8 +31,12 @@ interface LanguageConfigFactoryOverrideInterface extends ConfigFactoryOverrideIn
   /**
    * Get language override for given language and configuration name.
    *
+   * If none exist for the requested $langcode,
+   * a new config override object is instantiated.
+   *
    * @param string $langcode
-   *   Language code.
+   *   Language code. If none provided a new config override object is
+   *   instantiated.
    * @param string $name
    *   Configuration name.
    *
