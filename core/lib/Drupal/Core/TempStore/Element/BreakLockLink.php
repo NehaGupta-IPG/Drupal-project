@@ -79,9 +79,10 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function getInfo() {
+    $class = get_class($this);
     return [
       '#pre_render' => [
-        [$this, 'preRenderLock'],
+        [$class, 'preRenderLock'],
       ],
     ];
   }
@@ -98,19 +99,21 @@ class BreakLockLink extends RenderElementBase implements ContainerFactoryPluginI
    * @return array
    *   The passed-in element containing a rendered lock in '#markup'.
    */
-  public function preRenderLock($element) {
+  public static function preRenderLock($element) {
     if (isset($element['#lock']) && isset($element['#label']) && isset($element['#url'])) {
       /** @var \Drupal\Core\TempStore\Lock $lock */
       $lock = $element['#lock'];
-      $age = $this->dateFormatter->formatTimeDiffSince($lock->getUpdated());
-      $owner = $this->entityTypeManager->getStorage('user')->load($lock->getOwnerId());
+
+      $age = \Drupal::service('date.formatter')
+        ->formatTimeDiffSince($lock->getUpdated());
+      $owner = \Drupal::entityTypeManager()->getStorage('user')->load($lock->getOwnerId());
       $username = [
         '#theme' => 'username',
         '#account' => $owner,
       ];
-      $element['#markup'] = $this->t('This @label is being edited by user @user, and is therefore locked from editing by others. This lock is @age old. Click here to <a href=":url">break this lock</a>.', [
+      $element['#markup'] = \Drupal::translation()->translate('This @label is being edited by user @user, and is therefore locked from editing by others. This lock is @age old. Click here to <a href=":url">break this lock</a>.', [
         '@label' => $element['#label'],
-        '@user' => $this->renderer->render($username),
+        '@user' => \Drupal::service('renderer')->render($username),
         '@age' => $age,
         ':url' => $element['#url']->toString(),
       ]);
