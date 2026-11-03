@@ -82,6 +82,28 @@ use Drupal\Core\Utility\UpdateException;
  *
  * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
  */
+function hook_extension_info_alter(array &$info, \Drupal\Core\Extension\Extension $file, $type) {
+  // Only fill this in if the .info.yml file does not define a 'datestamp'.
+  if (empty($info['datestamp'])) {
+    $info['datestamp'] = $file->getFileInfo()->getMTime();
+  }
+}
+
+/**
+ * Alter the information parsed from module and theme .info.yml files.
+ *
+ * @param array $info
+ *   The .info.yml file contents, passed by reference so that it can be altered.
+ * @param \Drupal\Core\Extension\Extension $file
+ *   Full information about the module or theme.
+ * @param string $type
+ *   Either 'module' or 'theme', depending on the type of .info.yml file that
+ *   was passed.
+ *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   hook_extension_info_alter() instead.
+ * @see https://www.drupal.org/node/3624723
+ */
 function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $file, $type) {
   // Only fill this in if the .info.yml file does not define a 'datestamp'.
   if (empty($info['datestamp'])) {
@@ -279,6 +301,8 @@ function hook_uninstall($is_syncing): void {
  * Return an array of tasks to be performed by an installation profile.
  *
  * Only procedural implementations are supported for this hook.
+ * See \Drupal\Core\Extension\Install\TasksInterface for OOP versions.
+ * This hook will not run if an OOP implementation is present.
  *
  * Any tasks you define here will be run, in order, after the installer has
  * finished the site configuration step but before it has moved on to the
@@ -375,6 +399,11 @@ function hook_uninstall($is_syncing): void {
  *     could be used, for example, to allow the same function to be called by
  *     two different tasks.
  *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Extension\Install\TasksInterface instead.
+ *
+ * @see https://www.drupal.org/node/3623397
+ *
  * @see install_state_defaults()
  * @see batch_set()
  * @see hook_install_tasks_alter()
@@ -445,6 +474,8 @@ function hook_install_tasks(&$install_state) {
  * Alter the full list of installation tasks.
  *
  * Only procedural implementations are supported for this hook.
+ * See \Drupal\Core\Extension\Install\TasksInterface for OOP versions.
+ * This hook will not run if an OOP implementation is present.
  *
  * You can use this hook to change or replace any part of the Drupal
  * installation process that occurs after the installation profile is selected.
@@ -457,6 +488,11 @@ function hook_install_tasks(&$install_state) {
  *   steps within the installation process.
  * @param array $install_state
  *   An array of information about the current installation state.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Extension\Install\TasksInterface instead.
+ *
+ * @see https://www.drupal.org/node/3623397
  *
  * @see hook_install_tasks()
  * @see install_tasks()
@@ -666,10 +702,11 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * Future updates can be marked as equivalent by adding the following code to an
  * update.
  * @code
- * function my_module_update_10400() {
- *   \Drupal::service('update.update_hook_registry')->markFutureUpdateEquivalent(11101, '11.1.1');
+ * use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
  *
- *   // The rest of the update function.
+ * #[MarkFutureUpdateEquivalent(11101, '11.1.1')]
+ * function my_module_update_10400(): void {
+ *   // The function can be no-op.
  * }
  * @endcode
  *

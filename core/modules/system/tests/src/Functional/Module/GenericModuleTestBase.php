@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Module;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
 /**
@@ -54,7 +55,9 @@ abstract class GenericModuleTestBase extends BrowserTestBase {
     if (!empty($info['required']) && !empty($info['hidden'])) {
       $this->markTestSkipped('Nothing to assert for hidden, required modules.');
     }
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access help pages']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access help pages',
+    ])->save();
     $this->assertHookHelp($module);
 
     if (empty($info['required'])) {
@@ -70,6 +73,11 @@ abstract class GenericModuleTestBase extends BrowserTestBase {
         $this->preUnInstallSteps();
         $this->assertTrue(\Drupal::service('module_installer')->uninstall([$module]), "Failed to uninstall '$module' module");
         $this->assertTrue(\Drupal::service('module_installer')->install([$module]), "Failed to install '$module' module");
+      }
+      elseif (!empty($info['hidden'])) {
+        // If a database driver is hidden, there will have been no assertions at
+        // all, so mark the test skipped.
+        $this->markTestSkipped('Nothing to assert for database driver modules.');
       }
     }
   }

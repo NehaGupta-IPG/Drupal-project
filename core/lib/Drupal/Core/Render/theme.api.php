@@ -857,6 +857,8 @@ function hook_render_template($template_file, $variables): string|\Stringable {
  * @param array $info
  *   An associative array with structure identical to that of the return value
  *   of \Drupal\Core\Render\ElementInfoManagerInterface::getInfo().
+ *   This array will be serialized so it should not contain closures or
+ *   anonymous functions.
  *
  * @see \Drupal\Core\Render\ElementInfoManager
  * @see \Drupal\Core\Render\Element\ElementInterface
@@ -1322,10 +1324,10 @@ function hook_theme($existing, $type, $theme, $path): array {
  *   'template' => 'entity-add-list',
  *   'initial preprocess' => 'Drupal\\system\\Hook\\SystemThemeHooks:preprocessEntityAddList',
  *   'type' => 'theme_engine',
- *   'theme path' => 'core/themes/claro',
- *   'path' => 'core/themes/claro/templates',
+ *   'theme path' => 'core/themes/my_theme',
+ *   'path' => 'core/themes/my_theme/templates',
  *   'preprocess functions' => [
- *     0 => 'claro_preprocess_entity_add_list',
+ *     0 => 'my_theme_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode

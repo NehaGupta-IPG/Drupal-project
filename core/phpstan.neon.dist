@@ -8,7 +8,7 @@ parameters:
 
   tmpDir: phpstan-tmp
 
-  level: 1
+  level: 3
 
   checkFunctionArgumentTypes: true
   checkInternalClassCaseSensitivity: true
@@ -37,6 +37,7 @@ parameters:
     - ../*/node_modules/*
     - */fixtures/*.php
     - */fixtures/*.php.gz
+    - tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures
     # Skip the phpstan tmpDir
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
@@ -68,6 +69,9 @@ parameters:
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
 
+    # @todo Fix this in https://www.drupal.org/project/drupal/issues/3624168
+    - identifier: loadIncludes.fileNotLoadable
+
   disallowedFunctionCalls:
     -
        function: 'crc32()'
@@ -97,8 +101,6 @@ rules:
   - Drupal\PHPStan\Rules\TestClassClassMetadata
   - Drupal\PHPStan\Rules\TestClassMethodMetadata
   # ----------------------------------------------------------
-  # The rule below can be removed when we increase level to 2.
-  - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
   # The rules below can be removed when we increase level to 6.
   - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
   - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule

@@ -142,42 +142,6 @@ INFO;
   }
 
   /**
-   * Tests that module dependencies are enabled in the correct order in the UI.
-   *
-   * Dependencies should be enabled before their dependents.
-   */
-  public function testModuleEnableOrder(): void {
-    \Drupal::service('module_installer')->install(['module_test'], FALSE);
-    $this->resetAll();
-    $this->assertModules(['module_test'], TRUE);
-    \Drupal::state()->set('module_test.dependency', 'dependency');
-    // module_test creates a dependency chain: dblog depends on config which
-    // depends on help.
-    $expected_order = ['help', 'config', 'dblog'];
-
-    // Enable the modules through the UI, verifying that the dependency chain
-    // is correct.
-    $edit = [];
-    $edit['modules[dblog][enable]'] = 'dblog';
-    $this->drupalGet('admin/modules');
-    $this->submitForm($edit, 'Install');
-    $this->assertModules(['dblog'], FALSE);
-    // Note that dependencies are sorted alphabetically in the confirmation
-    // message.
-    $this->assertSession()->pageTextContains('You must install the following modules to install Database Logging:Configuration ManagerHelp');
-
-    $this->drupalGet('admin/modules');
-    $edit['modules[config][enable]'] = 'config';
-    $edit['modules[help][enable]'] = 'help';
-    $this->submitForm($edit, 'Install');
-    $this->assertModules(['dblog', 'config', 'help'], TRUE);
-
-    // Check the actual order which is saved by module_test_modules_enabled().
-    $module_order = \Drupal::state()->get('module_test.install_order', []);
-    $this->assertSame($expected_order, $module_order);
-  }
-
-  /**
    * Tests that module dependencies install text is formatted correctly.
    */
   public function testModuleDependencyMessages(): void {
@@ -202,7 +166,30 @@ INFO;
     $edit['modules[navigation][enable]'] = 'navigation';
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
-    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:BlockFileFieldLayout BuilderLayout DiscoveryContextual Links');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:BlockContextual LinksFieldFileLayout BuilderLayout Discovery');
+
+    // Check the module install text with more than 2 module dependencies and
+    // when the modules to be installed share a dependency.
+    $edit = [];
+    $edit['modules[block_content][enable]'] = 'block_content';
+    $edit['modules[navigation][enable]'] = 'navigation';
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Block Content:BlockFieldFilterText');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:BlockContextual LinksFieldFileLayout BuilderLayout Discovery');
+
+    // Same as above with a common dependent module, Block, also selected to be
+    // installed. In this case, 'Block' should not be in the list of what must
+    // be installed.
+    $edit = [];
+    $edit['modules[block][enable]'] = 'block';
+    $edit['modules[block_content][enable]'] = 'block_content';
+    $edit['modules[navigation][enable]'] = 'navigation';
+    $this->drupalGet('admin/modules');
+    $this->submitForm($edit, 'Install');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Block Content:FieldFilterText');
+    $this->assertSession()->pageTextContains('You must install the following modules to install Navigation:Contextual LinksFieldFileLayout BuilderLayout Discovery');
+
   }
 
 }

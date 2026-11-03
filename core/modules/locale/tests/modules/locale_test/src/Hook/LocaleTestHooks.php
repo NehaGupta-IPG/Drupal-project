@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\locale_test\Hook;
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for locale_test.
@@ -18,19 +20,19 @@ class LocaleTestHooks {
   use StringTranslationTrait;
 
   /**
-   * Implements hook_system_info_alter().
+   * Implements hook_extension_info_alter().
    *
    * Make the test scripts to be believe this is not a hidden test module, but
    * a regular custom module.
    */
-  #[Hook('system_info_alter')]
-  public function systemInfoAlter(&$info, Extension $file, $type): void {
-    // Only modify the system info if required. By default the locale_test
+  #[Hook('extension_info_alter')]
+  public function extensionInfoAlter(&$info, Extension $file, $type): void {
+    // Only modify the extension info if required. By default the locale_test
     // modules are hidden and have a project specified. To test the module
     // detection process by
     // \Drupal\locale\LocaleProjectRepository::getProjectList() the test modules
     // should mimic a custom module. I.e. be non-hidden.
-    if (\Drupal::state()->get('locale.test_system_info_alter')) {
+    if (\Drupal::state()->get('locale.test_extension_info_alter')) {
       if ($file->getName() == 'locale_test' || $file->getName() == 'locale_test_translate') {
         // Don't hide the module.
         $info['hidden'] = FALSE;
@@ -38,7 +40,7 @@ class LocaleTestHooks {
     }
     // Alter the name and the core version of the project. This should not
     // affect the locale project information.
-    if (\Drupal::state()->get('locale.test_system_info_alter_name_core')) {
+    if (\Drupal::state()->get('locale.test_extension_info_alter_name_core')) {
       if ($file->getName() == 'locale_test') {
         $info['core'] = '8.6.7';
         $info['name'] = 'locale_test_alter';
@@ -217,6 +219,31 @@ class LocaleTestHooks {
   #[Hook('countries_alter')]
   public function countriesAlter(&$countries): void {
     $countries['EB'] = 'Elbonia';
+  }
+
+  /**
+   * Implements hook_entity_extra_field_info().
+   */
+  #[Hook('entity_extra_field_info')]
+  public function entityExtraFieldInfo(): array {
+    $fields['user']['user']['display']['translatable_text'] = [
+      'label' => $this->t('Translatable text'),
+      'description' => $this->t('Test translatable text displayed on user profile.'),
+      'weight' => 5,
+    ];
+    return $fields;
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_view() for user entities.
+   */
+  #[Hook('user_view')]
+  public function userView(array &$build, UserInterface $account, EntityViewDisplayInterface $display): void {
+    if ($account->isAuthenticated() && $display->getComponent('translatable_text')) {
+      $build['translatable_text'] = [
+        '#markup' => $this->t('This is translatable text'),
+      ];
+    }
   }
 
 }
