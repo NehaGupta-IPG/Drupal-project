@@ -111,8 +111,11 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
     $original_translation = $this->getOriginalTranslation($entity, $original);
     if ($this->hasSynchronizedPropertyChanges($entity, $original_translation, $synchronized_properties)) {
       if ($entity->isDefaultTranslationAffectedOnly()) {
+        $moderationInformation = \Drupal::hasService('content_moderation.moderation_information') ?
+          \Drupal::service('content_moderation.moderation_information') :
+          NULL;
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
-          if ($entity->getTranslation($langcode)->hasTranslationChanges()) {
+          if ($entity->getTranslation($langcode)->hasTranslationChanges() && ($moderationInformation === NULL || !$moderationInformation->isModeratedEntity($entity->getTranslation($langcode)))) {
             $this->context->addViolation($constraint->defaultTranslationMessage);
             break;
           }
