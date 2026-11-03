@@ -29,6 +29,7 @@ class PathItemTest extends KernelTestBase {
     'node',
     'user',
     'language',
+    'content_translation',
   ];
 
   /**
@@ -75,7 +76,7 @@ class PathItemTest extends KernelTestBase {
 
     $stored_alias = $alias_repository->lookupBySystemPath('/' . $node->toUrl()->getInternalPath(), $node->language()->getId());
     $this->assertEquals('/foo', $stored_alias['alias']);
-    $this->assertEquals($node->language()->getId(), $stored_alias['langcode']);
+    $this->assertEquals(LanguageInterface::LANGCODE_NOT_SPECIFIED, $stored_alias['langcode']);
 
     $node_storage->resetCache();
     $loaded_node = $node_storage->load($node->id());
@@ -105,6 +106,11 @@ class PathItemTest extends KernelTestBase {
     $loaded_node = $node_storage->load($node->id());
     $values = $loaded_node->get('path')->getValue();
     $this->assertEquals('/foo', $values[0]['alias']);
+
+    // Ensure that the bundle is translatable, using the same technique
+    // as enableTranslation() in Drupal\Tests\content_translation\Functional
+    \Drupal::service('content_translation.manager')->setEnabled('node', 'foo', TRUE);
+    \Drupal::service('router.builder')->rebuild();
 
     $node_storage->resetCache();
     $loaded_node = $node_storage->load($node->id());

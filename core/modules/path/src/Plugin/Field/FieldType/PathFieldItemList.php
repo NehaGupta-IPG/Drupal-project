@@ -21,8 +21,6 @@ class PathFieldItemList extends FieldItemList {
   protected function computeValue() {
     // Default the langcode to the current language if this is a new entity or
     // there is no alias for an existent entity.
-    // @todo Set the langcode to not specified for untranslatable fields
-    //   in https://www.drupal.org/node/2689459.
     $value = ['langcode' => $this->getLangcode()];
 
     $entity = $this->getEntity();
@@ -36,6 +34,11 @@ class PathFieldItemList extends FieldItemList {
           'pid' => $path_alias['id'],
           'langcode' => $path_alias['langcode'],
         ];
+
+        // Set the langcode to not specified for untranslatable fields.
+        if (!$entity->isTranslatable() || !$this->getFieldDefinition()->isTranslatable()) {
+          $value['langcode'] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
+        }
       }
     }
 
@@ -59,9 +62,13 @@ class PathFieldItemList extends FieldItemList {
     // Delete all aliases associated with this entity.
     $entity = $this->getEntity();
     $langcode_list = [$entity->language()->getId()];
-
+    // If neither the path field nor entity being deleted is translatable,
+    // delete alias with LANGCODE_NOT_SPECIFIED.
+    if (!$entity->isTranslatable() || !$this->getFieldDefinition()->isTranslatable()) {
+      $langcode_list = [LanguageInterface::LANGCODE_NOT_SPECIFIED];
+    }
     // The default translation may also have language-neutral aliases.
-    if ($entity->isDefaultTranslation()) {
+    elseif ($entity->isDefaultTranslation()) {
       $langcode_list[] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
     }
 
