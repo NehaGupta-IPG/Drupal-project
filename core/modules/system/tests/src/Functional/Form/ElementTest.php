@@ -126,6 +126,22 @@ class ElementTest extends BrowserTestBase {
   }
 
   /**
+   * Tests required attribute for radios element.
+   */
+  public function testRadiosRequired() {
+    // Verify that there is require attributes.
+    $this->drupalGet('form-test/radios-required');
+    $elements = $this->xpath('//fieldset[@id="edit-radios-required--wrapper" and @aria-required="true"]');
+    $this->assertCount(1, $elements);
+    $elements = $this->xpath('//fieldset[@id="edit-radios-required--wrapper" and @role="radiogroup"]');
+    $this->assertCount(1, $elements);
+    $elements = $this->xpath('//input[@id="edit-radios-required-0" and @required="required"]');
+    $this->assertCount(1, $elements);
+    $elements = $this->xpath('//input[@id="edit-radios-required-0" and @aria-required="true"]');
+    $this->assertCount(0, $elements);
+  }
+
+  /**
    * Tests wrapper ids for checkboxes and radios.
    */
   protected function testWrapperIds(): void {
