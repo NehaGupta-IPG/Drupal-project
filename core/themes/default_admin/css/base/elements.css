@@ -36,8 +36,7 @@ body {
 }
 
 :any-link,
-.link,
-button.link {
+.link {
   word-wrap: break-word;
   color: var(--admin-color-link);
   overflow-wrap: break-word;
@@ -253,8 +252,7 @@ img {
 /**
  * Default focus styles for focused elements.
  */
-.page-wrapper *:focus,
-.ui-dialog *:focus {
+:where(.page-wrapper, .ui-dialog) *:focus {
   outline: var(--focus-outline);
   outline-offset: var(--outline-offset);
 }
