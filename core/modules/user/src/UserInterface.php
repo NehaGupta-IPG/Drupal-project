@@ -51,6 +51,17 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   const TIMEZONE_SELECT = 2;
 
   /**
+   * Gets the user ID.
+   *
+   * @return int|null
+   *   The user ID, or NULL for a stub user entity that was not saved yet.
+   *   An id of zero represents the anonymous user.
+   *
+   * @phpstan-return non-negative-int|null
+   */
+  public function id();
+
+  /**
    * Add a role to a user.
    *
    * @param string $rid

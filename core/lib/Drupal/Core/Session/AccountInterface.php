@@ -3,10 +3,18 @@
 namespace Drupal\Core\Session;
 
 /**
- * Defines an account interface which represents the current user.
+ * Defines an account interface intended to represent the current user.
  *
  * Defines an object that has a user id, roles and can have session data. The
  * interface is implemented both by the global session and the user entity.
+ *
+ * Technically, because UserInterface extends AccountInterface, an instance of
+ * AccountInterface could be any user entity, including a stub user entity
+ * object that has no id yet, or a user which is not currently logged in. On the
+ * other hand, it could be an anonymous user which is not a user entity.
+ *
+ * Variables which are explicitly annotated as AccountInterface typically intend
+ * to hold an instance of a "current" user rather than any user entity.
  *
  * @ingroup user_api
  */
@@ -25,8 +33,12 @@ interface AccountInterface {
   /**
    * Returns the user ID or 0 for anonymous.
    *
-   * @return int
-   *   The user ID.
+   * @return int|null
+   *   The user ID, or NULL for a stub user entity that was not saved yet.
+   *   When used for a "current user", the value NULL does not occur, but the
+   *   value zero can occur for anonymous.
+   *
+   * @phpstan-return non-negative-int|null
    */
   public function id();
 
