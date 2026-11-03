@@ -157,7 +157,7 @@ class Date extends NumericFilter {
     // Store this because it will get overwritten.
     $type = NULL;
     if ($this->isAGroup()) {
-      if (is_array($this->group_info)) {
+      if (is_array($this->group_info) && isset($this->group_info['type'])) {
         $type = $this->group_info['type'];
       }
     }
@@ -183,7 +183,7 @@ class Date extends NumericFilter {
     if ($operators[$operator]['values'] == 1) {
       // When the operator is either <, <=, =, !=, >=, > or regular_expression
       // the input contains only one value.
-      if ($this->value['value'] == '') {
+      if (isset($this->value['value']) && $this->value['value'] === '') {
         // If the filter was not submitted but has a default offset value,
         // apply it so backends receive a resolved date.
         if (!empty($this->options['value']['value']) && $this->options['value']['type'] === 'offset') {
@@ -197,7 +197,7 @@ class Date extends NumericFilter {
     elseif ($operators[$operator]['values'] == 2) {
       // When the operator is either between or not between the input contains
       // two values.
-      if ($this->value['min'] == '' || $this->value['max'] == '') {
+      if (!isset($this->value['min'], $this->value['max']) || $this->value['min'] === '' || $this->value['max'] === '') {
         // If the filter was not submitted but has default offset values,
         // apply them so backends receive resolved dates.
         if ((!empty($this->options['value']['min']) || !empty($this->options['value']['max'])) && $this->options['value']['type'] === 'offset') {
