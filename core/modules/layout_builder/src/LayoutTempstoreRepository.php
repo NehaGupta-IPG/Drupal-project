@@ -41,7 +41,7 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
 
     // Check if the storage is present in the static cache.
     if (isset($this->cache[$key])) {
-      return $this->cache[$key];
+      return $this->cache[$key]['section_storage'];
     }
 
     $tempstore = $this->getTempstore($section_storage)->get($key);
@@ -54,7 +54,7 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
       }
 
       // Set the storage in the static cache.
-      $this->cache[$key] = $section_storage;
+      $this->cache[$key] = $tempstore;
     }
     return $section_storage;
   }
@@ -77,11 +77,28 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function set(SectionStorageInterface $section_storage) {
+  public function hasUnsavedChanges(SectionStorageInterface $section_storage) {
     $key = $this->getKey($section_storage);
-    $this->getTempstore($section_storage)->set($key, ['section_storage' => $section_storage]);
+    // Check if the storage is present in the static cache.
+    if (isset($this->cache[$key])) {
+      return !empty($this->cache[$key]['has_unsaved_changes']);
+    }
+    $tempstore = $this->getTempstore($section_storage)->get($key);
+    return !empty($tempstore['has_unsaved_changes']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function set(SectionStorageInterface $section_storage, $has_unsaved_changes = TRUE) {
+    $key = $this->getKey($section_storage);
+    $tempstore = [
+      'section_storage' => $section_storage,
+      'has_unsaved_changes' => $has_unsaved_changes,
+    ];
+    $this->getTempstore($section_storage)->set($key, $tempstore);
     // Update the storage in the static cache.
-    $this->cache[$key] = $section_storage;
+    $this->cache[$key] = $tempstore;
   }
 
   /**
