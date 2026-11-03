@@ -33,6 +33,7 @@
 %}
 <div{{ attributes.addClass(classes).removeClass('clearfix') }}>
   <div class="form-managed-file__main">
+    {{ data.UPLOAD_IDENTIFIER }}
     {{ main_items.filename }}
     {{ main_items|without('filename') }}
   </div>
@@ -63,5 +64,5 @@
   {% endif %}
 
   {# Every third-party addition will be rendered here. #}
-  {{ data|without('preview', 'alt', 'title', 'description', 'display') }}
+  {{ data|without('preview', 'alt', 'title', 'description', 'display', 'UPLOAD_IDENTIFIER') }}
 </div>
