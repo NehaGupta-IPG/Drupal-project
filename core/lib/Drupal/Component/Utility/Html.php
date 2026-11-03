@@ -308,13 +308,6 @@ class Html {
     $html = '';
 
     if ($body_node !== NULL) {
-      foreach ($body_node->getElementsByTagName('script') as $node) {
-        static::escapeCdataElement($node);
-      }
-      foreach ($body_node->getElementsByTagName('style') as $node) {
-        static::escapeCdataElement($node, '/*', '*/');
-      }
-
       // Serialize the body using our custom set of rules.
       // @see \Masterminds\HTML5::saveHTML()
       $stream = fopen('php://temp', 'wb');
