@@ -3,6 +3,7 @@
 namespace Drupal\media\OEmbed;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -113,7 +114,14 @@ class ProviderRepository implements ProviderRepositoryInterface {
       throw new ProviderException("Could not retrieve the oEmbed provider database from $this->providersUrl", NULL, $e);
     }
 
-    $providers = Json::decode((string) $response->getBody());
+    $providers = NULL;
+    try {
+      $providers = Json::decode((string) $response->getBody());
+    }
+    catch (InvalidDataTypeException) {
+      // Ignore Json::decode() failure and allow later validation logic to
+      // process the error state.
+    }
 
     if (!is_array($providers) || empty($providers)) {
       if (isset($stored['data'])) {

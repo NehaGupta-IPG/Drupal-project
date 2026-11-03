@@ -2,6 +2,7 @@
 
 namespace Drupal\system\SecurityAdvisories;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -95,7 +96,15 @@ final class SecurityAdvisoriesFetcher {
       }
       $response = $this->doRequest($timeout);
       $interval_seconds = $this->config->get('interval_hours') * 60 * 60;
-      $json_payload = Json::decode($response);
+
+      try {
+        $json_payload = Json::decode($response);
+      }
+      catch (InvalidDataTypeException) {
+        $this->logger->error('The security advisory JSON feed from Drupal.org could not be decoded.');
+        return NULL;
+      }
+
       if (is_array($json_payload)) {
         // Only store and use the response if it could be successfully
         // decoded to an array from the JSON string.

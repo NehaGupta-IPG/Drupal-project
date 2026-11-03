@@ -715,7 +715,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   if that header should be absent. Defaults to FALSE.
    */
   protected function assertResourceResponse($expected_status_code, $expected_document, ResponseInterface $response, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = NULL, $expected_dynamic_page_cache_header_value = FALSE) {
-    $this->assertSame($expected_status_code, $response->getStatusCode(), var_export(Json::decode((string) $response->getBody()), TRUE));
+    $message = "";
+    if ((string) $response->getBody() !== "") {
+      $message = var_export((string) $response->getBody(), TRUE);
+    }
+    $this->assertSame($expected_status_code, $response->getStatusCode(), $message);
     if ($expected_status_code === 204) {
       // DELETE responses should not include a Content-Type header. But Apache
       // sets it to 'text/html' by default. We also cannot detect the presence

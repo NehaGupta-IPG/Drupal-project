@@ -2,6 +2,7 @@
 
 namespace Drupal\media\OEmbed;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
 use GuzzleHttp\ClientInterface;
@@ -53,10 +54,11 @@ class ResourceFetcher implements ResourceFetcherInterface {
     }
     // By default, try to parse the resource data as JSON.
     else {
-      $data = Json::decode($content);
-
-      if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new ResourceException('Error decoding oEmbed resource: ' . json_last_error_msg(), $url);
+      try {
+        $data = Json::decode($content);
+      }
+      catch (InvalidDataTypeException $e) {
+        throw new ResourceException('Error decoding oEmbed resource: ' . $e->getMessage(), $url);
       }
     }
     if (empty($data) || !is_array($data)) {
