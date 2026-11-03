@@ -1494,7 +1494,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * checkboxes widget, and this function will be called for each item
    * chosen in the checkboxes.
    */
-  public function convertExposedInput(&$input, $selected_group_id = NULL) {
+  public function convertExposedInput(&$input, $selected_group_id = NULL, bool $combine_options = FALSE) {
     if ($this->isAGroup()) {
       // If it is already defined the selected group, use it. Only valid
       // when the filter uses checkboxes for widget.
@@ -1525,7 +1525,16 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // Value can be optional, For example for 'empty' and 'not empty'
         // filters.
         if (isset($selected_group_options['value']) && $selected_group_options['value'] !== '') {
-          $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
+          // If this is the first conversion for a grouped filter, then override
+          // with group values.
+          // For subsequent conversions, group options should be appended to the
+          // options list.
+          if (!$combine_options) {
+            $input[$this->options['group_info']['identifier']] = $selected_group_options['value'];
+          }
+          else {
+            $input[$this->options['group_info']['identifier']] += $selected_group_options['value'];
+          }
         }
 
         $this->group_info = $input[$this->options['group_info']['identifier']];

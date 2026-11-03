@@ -1409,13 +1409,22 @@ class ViewExecutable {
         if ($handlers[$id]->multipleExposedInput()) {
           $multiple_exposed_input = $handlers[$id]->groupMultipleExposedInput($this->exposed_data);
         }
+        $input_count = count($multiple_exposed_input);
+        $i = 0;
         foreach ($multiple_exposed_input as $group_id) {
+          $i++;
           // Give this handler access to the exposed filter input.
           if (!empty($this->exposed_data)) {
             if ($handlers[$id]->isAGroup()) {
-              $converted = $handlers[$id]->convertExposedInput($this->exposed_data, $group_id);
+              $converted = $handlers[$id]->convertExposedInput($this->exposed_data, $group_id, $i !== 1);
               $handlers[$id]->storeGroupInput($this->exposed_data, $converted);
               if (!$converted) {
+                continue;
+              }
+              if ($i !== $input_count) {
+                // Delay adding the exposed data to a WHERE condition. This
+                // allows multiselect grouped values to be combined into one
+                // WHERE condition.
                 continue;
               }
             }
