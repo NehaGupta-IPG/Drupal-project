@@ -35,6 +35,20 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
   protected $context = 'COMMENT';
 
   /**
+   * Current pointer position when calling readLine().
+   *
+   * @var int
+   */
+  protected $currentSeek = -1;
+
+  /**
+   * Pointer position after the last read item.
+   *
+   * @var int
+   */
+  protected $lastSeek = -1;
+
+  /**
    * Current entry being read. Incomplete.
    *
    * @var array
@@ -208,6 +222,16 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
   }
 
   /**
+   * Gets the pointer position after the last read item.
+   *
+   * @return int
+   *   The file position offset after the last read item.
+   */
+  public function getSeekLastItem(): int {
+    return $this->finished ? $this->getSeek() : $this->lastSeek;
+  }
+
+  /**
    * Read the header from the PO stream.
    *
    * The header is a special case PoItem, using the empty string as source and
@@ -246,6 +270,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
   private function readLine() {
     // Read a line and set the stream finished indicator if it was not
     // possible anymore.
+    $this->currentSeek = ftell($this->fd);
     $line = fgets($this->fd);
     $this->finished = ($line === FALSE);
 
@@ -515,6 +540,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    * Store the parsed values as a PoItem object.
    */
   public function setItemFromArray($value) {
+    $this->lastSeek = $this->currentSeek;
     $plural = FALSE;
 
     $comments = '';
