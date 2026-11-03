@@ -377,6 +377,74 @@ class MenuTreeStorageTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a rebuild only invalidates cache tags for the menus it rebuilt.
+   */
+  public function testRebuildInvalidatesOnlyDiscoveredMenus(): void {
+    $link = [
+      'route_name' => 'test',
+      'route_parameters' => [],
+      'title' => 'test',
+      'parent' => '',
+      'options' => [],
+      'metadata' => [],
+    ];
+
+    // Populate one menu with a link managed outside of rebuild() (discovered =
+    // 0), as content menu links are.
+    $this->treeStorage->save(['id' => 'content_link', 'menu_name' => 'content_menu'] + $link);
+
+    // Record each menu's cache tag checksum so the invalidations caused by the
+    // rebuild can be observed directly.
+    $checksum = \Drupal::service('cache_tags.invalidator.checksum');
+    $content_before = $checksum->getCurrentChecksum(['config:system.menu.content_menu']);
+    $rebuilt_before = $checksum->getCurrentChecksum(['config:system.menu.rebuilt_menu']);
+
+    // Rebuild a second, separate menu. Only that menu's cache tag is
+    // invalidated; the content-only menu is left untouched.
+    $this->treeStorage->rebuild(['rebuilt_link' => ['id' => 'rebuilt_link', 'menu_name' => 'rebuilt_menu'] + $link]);
+
+    $this->assertNotEquals($rebuilt_before, $checksum->getCurrentChecksum(['config:system.menu.rebuilt_menu']));
+    $this->assertEquals($content_before, $checksum->getCurrentChecksum(['config:system.menu.content_menu']));
+  }
+
+  /**
+   * Tests that a rebuild invalidates the menu a link is actually stored in.
+   *
+   * A link with a parent inherits the parent's menu in preSave(), so the menu
+   * stored on the link can differ from the menu_name in its definition.
+   */
+  public function testRebuildInvalidatesInheritedMenu(): void {
+    $link = [
+      'route_name' => 'test',
+      'route_parameters' => [],
+      'title' => 'test',
+      'parent' => '',
+      'options' => [],
+      'metadata' => [],
+    ];
+
+    // A parent link managed outside of rebuild() (discovered = 0), living in
+    // parent_menu.
+    $this->treeStorage->save(['id' => 'parent_link', 'menu_name' => 'parent_menu'] + $link);
+
+    // A discovered child parented under it. Its definition declares child_menu,
+    // but it is stored in the parent's menu.
+    $child = ['id' => 'child_link', 'parent' => 'parent_link', 'menu_name' => 'child_menu'] + $link;
+    $this->treeStorage->rebuild(['child_link' => $child]);
+    $stored = $this->treeStorage->loadMultiple(['child_link'])['child_link'];
+    $this->assertEquals('parent_menu', $stored['menu_name']);
+
+    // Changing the child must invalidate the menu it is actually stored in
+    // (parent_menu), not the child_menu declared in its definition.
+    $checksum = \Drupal::service('cache_tags.invalidator.checksum');
+    $before = $checksum->getCurrentChecksum(['config:system.menu.parent_menu']);
+    $child['title'] = 'changed';
+    $this->treeStorage->rebuild(['child_link' => $child]);
+
+    $this->assertNotEquals($before, $checksum->getCurrentChecksum(['config:system.menu.parent_menu']));
+  }
+
+  /**
    * Tests MenuTreeStorage::loadByProperties().
    */
   public function testLoadByProperties(): void {
