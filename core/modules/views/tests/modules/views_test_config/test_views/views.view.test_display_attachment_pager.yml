@@ -1,0 +1,90 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_display_attachment_pager
+label: test_display_attachment_pager
+module: views
+description: ''
+tag: ''
+base_table: views_test_data
+base_field: id
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Default
+    position: null
+    display_options:
+      access:
+        type: none
+      cache:
+        type: tag
+      query:
+        type: views_query
+      exposed_form:
+        type: basic
+      pager:
+        type: full
+        options:
+          items_per_page: 4
+      style:
+        type: default
+      row:
+        type: fields
+      fields:
+        name:
+          id: name
+          table: views_test_data
+          field: name
+          label: ''
+          alter:
+            alter_text: false
+            make_link: false
+            absolute: false
+            trim: false
+            word_boundary: false
+            ellipsis: false
+            strip_tags: false
+            html: false
+          hide_empty: false
+          empty_zero: false
+      title: test_display_attachment_pager
+  attachment_1:
+    display_plugin: attachment
+    id: attachment_1
+    display_title: Attachment
+    position: 2
+    display_options:
+      pager:
+        type: full
+        options:
+          offset: 0
+          pagination_heading_level: h4
+          items_per_page: 2
+          total_pages: null
+          id: 1
+          tags:
+            next: 'Next ›'
+            previous: '‹ Previous'
+            first: '« First'
+            last: 'Last »'
+          expose:
+            items_per_page: false
+            items_per_page_label: 'Items per page'
+            items_per_page_options: '5, 10, 25, 50'
+            items_per_page_options_all: false
+            items_per_page_options_all_label: '- All -'
+            offset: false
+            offset_label: Offset
+          quantity: 9
+      render_pager: true
+      displays:
+        page: page
+        attachment_1: attachment_1
+  page:
+    display_plugin: page
+    id: page
+    display_title: Page
+    position: 1
+    display_options:
+      path: test-display-attachment-pager
