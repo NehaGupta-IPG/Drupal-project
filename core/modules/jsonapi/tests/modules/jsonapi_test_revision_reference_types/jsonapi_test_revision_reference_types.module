@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains hook implementations for the test revision reference types module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function jsonapi_test_reference_types_entity_base_field_info(EntityTypeInterface $entity_type) {
+  // Add a field of the revision reference type to nodes.
+  if ($entity_type->id() === 'node') {
+    $fields = [];
+    $fields['node_revision_reference'] = BaseFieldDefinition::create('jsonapi_test_node_revision_reference')
+      ->setLabel(t('Node revision reference'))
+      ->setDescription(t('Node revision reference field.'));
+
+    return $fields;
+  }
+}
