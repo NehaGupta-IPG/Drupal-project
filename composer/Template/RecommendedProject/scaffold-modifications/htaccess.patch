@@ -1,0 +1,57 @@
+diff --git a/web/.htaccess b/web/.htaccess
+index 9a73a3d3a3..9428a03315 100644
+--- a/web/.htaccess
++++ b/web/.htaccess
+@@ -1,3 +1,10 @@
++## DO NOT MODIFY THIS FILE DIRECTLY. This file is managed by Composer, and
++## should not be edited in place.
++##
++## This file was altered by the patch 'scaffold-modifications/htaccess.patch'.
++## For more information on how to manage alterations to scaffold files, see:
++## https://github.com/drupal/core-composer-scaffold#altering-scaffold-files
++
+ #
+ # Apache/PHP/Drupal settings:
+ #
+@@ -95,22 +102,25 @@ AddEncoding gzip svgz
+   # downloaded.
+   RewriteRule "/\.|^\.(?!well-known/)" - [F]
+
+-  # If your site can be accessed both with and without the 'www.' prefix, you
+-  # can use one of the following settings to redirect users to your preferred
+-  # URL, either WITH or WITHOUT the 'www.' prefix. Choose ONLY one option:
+-  #
+-  # To redirect all users to access the site WITH the 'www.' prefix,
+-  # (http://example.com/foo will be redirected to http://www.example.com/foo)
+-  # uncomment the following:
+-  # RewriteCond %{HTTP_HOST} .
+-  # RewriteCond %{HTTP_HOST} !^www\. [NC]
+-  # RewriteRule ^ http%{ENV:protossl}://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+-  #
+-  # To redirect all users to access the site WITHOUT the 'www.' prefix,
+-  # (http://www.example.com/foo will be redirected to http://example.com/foo)
+-  # uncomment the following:
+-  # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+-  # RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
++  ## Make modifications to your .htaccess file by creating a patch file. See
++  ## 'scaffold-modifications/htaccess.patch' for an example.
++
++  ## If your site can be accessed both with and without the 'www.' prefix, you
++  ## can use one of the following settings to redirect users to your preferred
++  ## URL, either WITH or WITHOUT the 'www.' prefix. Choose ONLY one option:
++  ##
++  ## To redirect all users to access the site WITH the 'www.' prefix,
++  ## (http://example.com/foo will be redirected to http://www.example.com/foo)
++  ## uncomment the following:
++  ## RewriteCond %{HTTP_HOST} .
++  ## RewriteCond %{HTTP_HOST} !^www\. [NC]
++  ## RewriteRule ^ http%{ENV:protossl}://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
++  ##
++  ## To redirect all users to access the site WITHOUT the 'www.' prefix,
++  ## (http://www.example.com/foo will be redirected to http://example.com/foo)
++  ## uncomment the following:
++  ## RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
++  ## RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
+
+   # Modify the RewriteBase if you are using Drupal in a subdirectory or in a
+   # VirtualDocumentRoot and the rewrite rules are not working properly.
