@@ -82,4 +82,22 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
     return $this->commands;
   }
 
+  /**
+   * Safely send headers and content.
+   *
+   * Empty anything already in the output buffer. Then, use the parent method
+   * to send headers and content.
+   *
+   * @param bool $flush
+   *   Whether output buffers should be flushed.
+   *
+   * @return $this
+   */
+  public function send(bool $flush = TRUE): static {
+    if ($flush) {
+      ob_clean();
+    }
+    return parent::send($flush);
+  }
+
 }
