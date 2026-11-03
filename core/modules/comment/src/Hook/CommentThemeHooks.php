@@ -41,6 +41,9 @@ class CommentThemeHooks {
       'field__comment' => [
         'base hook' => 'field',
       ],
+      'comment_form_wrapper' => [
+        'variables' => ['title' => NULL, 'form' => NULL],
+      ],
     ];
   }
 

@@ -32,6 +32,7 @@ content:
     settings:
       view_mode: default
       pager_id: 0
+      use_entity_access_control: TRUE
     third_party_settings: {  }
     weight: 110
     region: content

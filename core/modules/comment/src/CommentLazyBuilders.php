@@ -2,6 +2,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -100,11 +101,17 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    *   The comment field name.
    * @param string $comment_type_id
    *   The comment type ID.
+   * @param bool $use_entity_access_control
+   *   (deprecated) Whether to use entity access control or the deprecated
+   *   permission-based access control. The $use_entity_access_control parameter
+   *   is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
    *
    * @return array
-   *   A renderable array containing the comment form.
+   *   A themed comment form or an empty array if the user cannot post comments.
+   *
+   * @see https://www.drupal.org/node/3180183
    */
-  public function renderForm($commented_entity_type_id, $commented_entity_id, $field_name, $comment_type_id) {
+  public function renderForm($commented_entity_type_id, $commented_entity_id, $field_name, $comment_type_id, bool $use_entity_access_control = TRUE) {
     $values = [
       'entity_type' => $commented_entity_type_id,
       'entity_id' => $commented_entity_id,
@@ -112,8 +119,30 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'comment_type' => $comment_type_id,
       'pid' => NULL,
     ];
-    $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    return $this->entityFormBuilder->getForm($comment);
+
+    if (!$use_entity_access_control) {
+      @trigger_error('The $use_entity_access_control parameter is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
+      $comment = $this->entityTypeManager->getStorage('comment')->create($values);
+      return $this->entityFormBuilder->getForm($comment);
+    }
+
+    $host = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
+    $access = $host->get($field_name)->access('create', $this->currentUser, TRUE);
+    $build = [];
+    if ($access->isAllowed()) {
+      $build = [
+        '#theme' => 'comment_form_wrapper',
+        '#title' => $this->t('Add new comment'),
+        '#form' => $this->entityFormBuilder->getForm($this->entityTypeManager->getStorage('comment')->create($values)),
+      ];
+    }
+
+    // Merge access cacheable metadata into the render array.
+    CacheableMetadata::createFromRenderArray($build)
+      ->merge(CacheableMetadata::createFromObject($access))
+      ->applyTo($build);
+
+    return $build;
   }
 
   /**
@@ -190,9 +219,8 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
         ];
       }
       $field_definition = $commented_entity->getFieldDefinition($entity->getFieldName());
-      if ($entity->isPublished()
-        && $entity->access('create')
-        && $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED) {
+      $is_threaded = $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED;
+      if ($is_threaded && $entity->access('reply')) {
         $links['comment-reply'] = [
           'title' => $this->t('Reply'),
           'url' => Url::fromRoute('comment.reply', [

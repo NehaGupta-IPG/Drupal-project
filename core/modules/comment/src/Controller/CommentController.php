@@ -2,6 +2,7 @@
 
 namespace Drupal\comment\Controller;
 
+use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentingStatus;
@@ -289,32 +290,32 @@ class CommentController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    $account = $this->currentUser();
-
-    // Check if the user has the proper permissions.
-    $access = AccessResult::allowedIfHasPermission($account, 'post comments');
-
-    // If commenting is open on the entity.
-    $status = CommentingStatus::tryFrom((int) $entity->{$field_name}->status);
-    $access = $access->andIf(AccessResult::allowedIf($status == CommentingStatus::Open)
-      ->addCacheableDependency($entity))
-      // And if user has access to the host entity.
-      ->andIf(AccessResult::allowedIf($entity->access('view')));
+    $field = $entity->{$field_name};
+    assert($field instanceof CommentFieldItemList);
+    $status = CommentingStatus::tryFrom((int) $field->status);
+    // The user must have view access to the host entity.
+    $access = $entity->access('view', NULL, TRUE)
+      // And commenting must be open on this entity.
+      ->andIf(AccessResult::allowedIf($status === CommentingStatus::Open))
+      ->addCacheableDependency($entity);
 
     // $pid indicates that this is a reply to a comment.
     if ($pid) {
-      // Check if the user has the proper permissions.
-      $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'access comments'));
-
-      // Load the parent comment.
-      $comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
-      // Check if the parent comment is published and belongs to the entity.
-      $access = $access->andIf(AccessResult::allowedIf($comment && $comment->isPublished() && $comment->getCommentedEntityId() == $entity->id()));
-      if ($comment) {
-        $access->addCacheableDependency($comment);
+      // If replying, load the parent comment.
+      $parent_comment = $this->entityTypeManager()->getStorage('comment')->load($pid);
+      if (!$parent_comment instanceof CommentInterface) {
+        return $access->andIf(AccessResult::forbidden('Cannot reply to a non-existing comment'));
       }
+
+      return $access
+        // The user must be able to reply.
+        ->andIf($parent_comment->access('reply', NULL, TRUE))
+        // And the parent comment host belongs to the entity.
+        ->andIf(AccessResult::allowedIf($parent_comment->getCommentedEntityId() == $entity->id()));
     }
-    return $access;
+
+    // The user must be able to create comments.
+    return $access->andIf($field->access('create', NULL, TRUE));
   }
 
 }

@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Default theme implementation for the comment form and its title.
+ *
+ * Available variables:
+ * - title: The comment form title.
+ * - title_attributes: HTML attributes for the title.
+ * - form: The comment form.
+ *
+ * @see \Drupal\comment\CommentLazyBuilders::renderForm()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if title %}
+  <h2{{ title_attributes }}>{{ title }}</h2>
+{% endif %}
+{{ form }}

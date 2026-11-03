@@ -455,6 +455,9 @@ class CommentNonNodeTest extends BrowserTestBase {
     // Add a third comment field.
     $this->fieldUIAddNewField('entity_test/structure/entity_test', 'bar_foo', 'Bar_Foo', 'comment', $storage_edit);
 
+    // @phpstan-ignore method.deprecated
+    $this->setDeprecatedFormatterSetting(['field_foobar', 'field_bar_foo']);
+
     // Check the field contains the correct comment type.
     $field_storage = FieldStorageConfig::load('entity_test.field_bar_foo');
     $this->assertInstanceOf(FieldStorageConfig::class, $field_storage);
@@ -559,6 +562,28 @@ class CommentNonNodeTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('entity_test 2 has been created.');
+  }
+
+  /**
+   * Sets the deprecated 'use_entity_access_control' formatter setting.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. No
+   *   replacement is provided.
+   *
+   * @see https://www.drupal.org/node/3180183
+   */
+  private function setDeprecatedFormatterSetting(array $field_names): void {
+    @trigger_error('The ' . __METHOD__ . '() method is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. No replacement is provided. See https://www.drupal.org/node/3180183', E_USER_DEPRECATED);
+    $display_repository = $this->container->get('entity_display.repository');
+    $display = $display_repository->getViewDisplay('entity_test', 'entity_test');
+
+    foreach ($field_names as $field_name) {
+      $component = $display_repository->getViewDisplay('entity_test',
+        'entity_test')->getComponent($field_name);
+      $component['settings']['use_entity_access_control'] = TRUE;
+      $display->setComponent($field_name, $component);
+    }
+    $display->save();
   }
 
 }

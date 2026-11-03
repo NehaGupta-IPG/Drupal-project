@@ -20,12 +20,30 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\comment\CommentInterface|\Drupal\user\EntityOwnerInterface $entity */
+    /** @var \Drupal\comment\CommentInterface $entity */
 
     $comment_admin = $account->hasPermission('administer comments');
     if ($operation == 'approve') {
       return AccessResult::allowedIf($comment_admin && !$entity->isPublished())
         ->cachePerPermissions()
+        ->addCacheableDependency($entity);
+    }
+
+    if ($operation === 'reply') {
+      $context = array_filter(
+        [
+          'commented_entity' => $entity->getCommentedEntity(),
+          'field' => $entity->getFieldName(),
+          'parent' => $entity,
+        ],
+        static fn (mixed $val): bool => $val !== NULL,
+      );
+      // The user must be able to view the comment.
+      return $this->access($entity, 'view', $account, TRUE)
+        // And must be able to create comments.
+        ->andIf($this->createAccess($entity->bundle(), $account, $context, TRUE))
+        // And comment must be published.
+        ->andIf(AccessResult::allowedIf($entity->isPublished()))
         ->addCacheableDependency($entity);
     }
 
@@ -156,6 +174,48 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
       }
     }
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function buildCreateAccessCid(array $context, ?string $entity_bundle): ?string {
+    $defaults = ['commented_entity' => NULL, 'field' => NULL, 'parent' => NULL];
+    [
+      'commented_entity' => $commented_entity,
+      'field' => $field,
+      'parent' => $parent,
+    ] = $context += $defaults;
+
+    // Without a specific commented entity, or comment field, the CID would be
+    // ambiguous across entities or fields and could cause stale cache hits for
+    // the wrong entity context.
+    if (!$commented_entity instanceof EntityInterface || !$field) {
+      return NULL;
+    }
+
+    // Don't cache in case of a new, unsaved commented entity or parent.
+    if (
+      $commented_entity->isNew() ||
+      ($parent instanceof CommentInterface && $parent->isNew())
+    ) {
+      return NULL;
+    }
+
+    $parent_context = array_diff_key($context, $defaults);
+    $cid = parent::buildCreateAccessCid($parent_context, $entity_bundle);
+    if ($cid === NULL) {
+      return NULL;
+    }
+
+    // Vary by commented entity type, ID, comment field, and parent comment ID.
+    return implode(':', [
+      $cid,
+      $commented_entity->getEntityTypeId(),
+      $commented_entity->id(),
+      $field,
+      $parent?->id(),
+    ]);
   }
 
 }
