@@ -13,7 +13,7 @@ use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Pdo\Pgsql;
 
-// cSpell:ignore ilike nextval uncast
+// cSpell:ignore ilike nextval sslcert sslkey sslmode sslrootcert uncast
 
 /**
  * @addtogroup database
@@ -171,8 +171,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     $connection_options['database'] = (!empty($connection_options['database']) ? $connection_options['database'] : 'template1');
-    // Force PostgreSQL to use the UTF-8 character set by default.
-    $dsn = 'pgsql:host=' . $connection_options['host'] . ' dbname=' . $connection_options['database'] . ' port=' . $connection_options['port'] . ' client_encoding=UTF8';
+    $dsn = static::buildDsn($connection_options);
 
     // Allow PDO options to be overridden.
     $connection_options += [
@@ -207,6 +206,27 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     return $pgsql;
+  }
+
+  /**
+   * Builds a PostgreSQL DSN from the connection options.
+   */
+  protected static function buildDsn(array $connection_options): string {
+    // Force PostgreSQL to use the UTF-8 character set by default.
+    $dsn = 'pgsql:host=' . $connection_options['host'] . ' dbname=' . $connection_options['database'] . ' port=' . $connection_options['port'] . ' client_encoding=UTF8';
+    if (!empty($connection_options['sslmode'])) {
+      $dsn .= ' sslmode=' . $connection_options['sslmode'];
+    }
+    if (!empty($connection_options['sslcert'])) {
+      $dsn .= ' sslcert=' . $connection_options['sslcert'];
+    }
+    if (!empty($connection_options['sslkey'])) {
+      $dsn .= ' sslkey=' . $connection_options['sslkey'];
+    }
+    if (!empty($connection_options['sslrootcert'])) {
+      $dsn .= ' sslrootcert=' . $connection_options['sslrootcert'];
+    }
+    return $dsn;
   }
 
   /**
