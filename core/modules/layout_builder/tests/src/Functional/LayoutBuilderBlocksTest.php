@@ -21,6 +21,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['block'];
+
+  /**
    * Tests that block plugins can define custom attributes and contextual links.
    */
   public function testPluginsProvidingCustomAttributesAndContextualLinks(): void {

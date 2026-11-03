@@ -24,7 +24,6 @@ class BlockFormMessagesTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
     'node',
     'contextual',
   ];

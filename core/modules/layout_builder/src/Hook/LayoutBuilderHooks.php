@@ -44,11 +44,8 @@ class LayoutBuilderHooks {
     // Add help text to the Layout Builder UI.
     if ($route_match->getRouteObject()->getOption('_layout_builder')) {
       $output = '<p>' . $this->t('This layout builder tool allows you to configure the layout of the main content area.') . '</p>';
-      if (\Drupal::currentUser()->hasPermission('administer blocks')) {
+      if (\Drupal::moduleHandler()->moduleExists('block') && \Drupal::currentUser()->hasPermission('administer blocks')) {
         $output .= '<p>' . $this->t('To manage other areas of the page, use the <a href="@block-ui">block administration page</a>.', ['@block-ui' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
-      }
-      else {
-        $output .= '<p>' . $this->t('To manage other areas of the page, use the block administration page.') . '</p>';
       }
       $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool have been disabled.') . '</p>';
       return $output;

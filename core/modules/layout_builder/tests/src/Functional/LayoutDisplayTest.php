@@ -22,7 +22,7 @@ class LayoutDisplayTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui', 'layout_builder', 'block', 'node'];
+  protected static $modules = ['field_ui', 'layout_builder', 'node'];
 
   /**
    * {@inheritdoc}

@@ -1632,6 +1632,9 @@ services:
     tags:
       - { name: service_collector, tag: breadcrumb_builder, call: addBuilder }
   Drupal\Core\Breadcrumb\ChainBreadcrumbBuilderInterface: '@breadcrumb'
+  Drupal\Core\Block\BlockPreprocess:
+    class: Drupal\Core\Block\BlockPreprocess
+    autowire: true
   Drupal\Core\Breadcrumb\BreadcrumbPreprocess:
     class: Drupal\Core\Breadcrumb\BreadcrumbPreprocess
     autowire: true

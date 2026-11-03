@@ -21,7 +21,6 @@ class TestMultiWidthLayoutsTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'block',
     'node',
   ];
 

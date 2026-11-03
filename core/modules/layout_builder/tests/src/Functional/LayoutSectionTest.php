@@ -29,6 +29,7 @@ class LayoutSectionTest extends BrowserTestBase {
     'node',
     'block_test',
     'dynamic_page_cache',
+    'block',
   ];
 
   /**
