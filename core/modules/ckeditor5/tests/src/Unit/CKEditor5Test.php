@@ -9,6 +9,7 @@ use Drupal\ckeditor5\LanguageMapper;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\LibraryDependencyResolver;
+use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -143,6 +144,7 @@ class CKEditor5Test extends UnitTestCase {
       $this->createStub(ConfigFactoryInterface::class),
       $this->createStub(ThemeExtensionList::class),
       $this->createStub(MessengerInterface::class),
+      $this->createStub(LibraryDiscoveryInterface::class),
     );
     $assets = new AttachedAssets();
     $assets->setLibraries([
