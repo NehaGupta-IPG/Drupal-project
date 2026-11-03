@@ -52,10 +52,6 @@ class SectionTest extends UnitTestCase {
 
   /**
    * Tests get components.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::setComponent
-   * @legacy-covers ::getComponents
    */
   public function testGetComponents(): void {
     $expected = [
@@ -87,9 +83,6 @@ class SectionTest extends UnitTestCase {
 
   /**
    * Tests remove component.
-   *
-   * @legacy-covers ::removeComponent
-   * @legacy-covers ::getComponentsByRegion
    */
   public function testRemoveComponent(): void {
     $expected = [
@@ -103,10 +96,6 @@ class SectionTest extends UnitTestCase {
 
   /**
    * Tests append component.
-   *
-   * @legacy-covers ::appendComponent
-   * @legacy-covers ::getNextHighestWeight
-   * @legacy-covers ::getComponentsByRegion
    */
   public function testAppendComponent(): void {
     $expected = [
@@ -155,9 +144,6 @@ class SectionTest extends UnitTestCase {
 
   /**
    * Tests insert component.
-   *
-   * @legacy-covers ::insertComponent
-   * @legacy-covers ::getComponentsByRegion
    */
   public function testInsertComponent(): void {
     $expected = [

@@ -101,8 +101,6 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
    *   The request object with destination query set.
    * @param string|false $expected
    *   The expected target URL or FALSE.
-   *
-   * @legacy-covers ::checkRedirectUrl
    */
   #[DataProvider('providerTestDestinationRedirect')]
   public function testDestinationRedirect(Request $request, bool|string $expected): void {
@@ -161,8 +159,6 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
 
   /**
    * Tests redirect with opt in external url.
-   *
-   * @legacy-covers ::checkRedirectUrl
    */
   public function testRedirectWithOptInExternalUrl(): void {
     $dispatcher = new EventDispatcher();

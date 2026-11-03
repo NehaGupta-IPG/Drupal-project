@@ -107,8 +107,6 @@ class CacheContextsManagerTest extends UnitTestCase {
 
   /**
    * Tests invalid context.
-   *
-   * @legacy-covers ::convertTokensToKeys
    */
   public function testInvalidContext(): void {
     $container = $this->getMockContainer();
@@ -120,8 +118,6 @@ class CacheContextsManagerTest extends UnitTestCase {
 
   /**
    * Tests invalid calculated context.
-   *
-   * @legacy-covers ::convertTokensToKeys
    */
   #[DataProvider('providerTestInvalidCalculatedContext')]
   public function testInvalidCalculatedContext(string $context_token): void {
@@ -214,8 +210,6 @@ class CacheContextsManagerTest extends UnitTestCase {
 
   /**
    * Tests validate contexts.
-   *
-   * @legacy-covers ::validateTokens
    */
   #[DataProvider('validateTokensProvider')]
   public function testValidateContexts(array $contexts, bool|string $expected_exception_message): void {

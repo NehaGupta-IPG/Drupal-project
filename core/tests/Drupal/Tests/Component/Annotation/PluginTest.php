@@ -17,9 +17,7 @@ use PHPUnit\Framework\TestCase;
 class PluginTest extends TestCase {
 
   /**
-   * @legacy-covers ::__construct
-   * @legacy-covers ::parse
-   * @legacy-covers ::get
+   * Tests get.
    */
   public function testGet(): void {
     // Assert all values are accepted through constructor and default value is

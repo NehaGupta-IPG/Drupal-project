@@ -50,8 +50,6 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
    * This ensures the dimensions of a specific file is within bounds.
    *
    * The image will be resized if it's too large.
-   *
-   * @legacy-covers ::validate
    */
   public function testFileValidateImageResolution(): void {
     // Non-images.

@@ -112,8 +112,6 @@ class UrlHelperTest extends TestCase {
    *   The URL to test.
    * @param string $scheme
    *   The scheme to test.
-   *
-   * @legacy-covers ::isValid
    */
   #[DataProvider('providerTestValidAbsoluteData')]
   public function testValidAbsolute(string $url, string $scheme): void {
@@ -178,8 +176,6 @@ class UrlHelperTest extends TestCase {
    *   The URL to test.
    * @param string $scheme
    *   The scheme to test.
-   *
-   * @legacy-covers ::isValid
    */
   #[DataProvider('providerTestInvalidAbsolute')]
   public function testInvalidAbsolute(string $url, string $scheme): void {
@@ -213,8 +209,6 @@ class UrlHelperTest extends TestCase {
    *   The URL to test.
    * @param string $prefix
    *   The prefix to test.
-   *
-   * @legacy-covers ::isValid
    */
   #[DataProvider('providerTestValidRelativeData')]
   public function testValidRelative(string $url, string $prefix): void {
@@ -246,8 +240,6 @@ class UrlHelperTest extends TestCase {
    *   The URL to test.
    * @param string $prefix
    *   The prefix to test.
-   *
-   * @legacy-covers ::isValid
    */
   #[DataProvider('providerTestInvalidRelativeData')]
   public function testInvalidRelative(string $url, string $prefix): void {
@@ -517,9 +509,6 @@ class UrlHelperTest extends TestCase {
    *   Expected escaped value.
    * @param array $protocols
    *   Protocols to allow.
-   *
-   * @legacy-covers ::setAllowedProtocols
-   * @legacy-covers ::filterBadProtocol
    */
   #[DataProvider('providerTestFilterBadProtocol')]
   #[RunInSeparateProcess]
@@ -558,9 +547,6 @@ class UrlHelperTest extends TestCase {
    *   Expected escaped value.
    * @param array $protocols
    *   Protocols to allow.
-   *
-   * @legacy-covers ::setAllowedProtocols
-   * @legacy-covers ::stripDangerousProtocols
    */
   #[DataProvider('providerTestStripDangerousProtocols')]
   #[RunInSeparateProcess]

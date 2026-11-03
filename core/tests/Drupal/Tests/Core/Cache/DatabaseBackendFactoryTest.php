@@ -25,9 +25,6 @@ class DatabaseBackendFactoryTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::get
    */
   #[DataProvider('getProvider')]
   public function testGet(array $settings, int $expected_max_rows_foo, int $expected_max_rows_bar): void {

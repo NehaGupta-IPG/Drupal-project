@@ -248,8 +248,6 @@ class FieldPluginBaseTest extends UnitTestCase {
    *   An internal or external path.
    * @param string $url
    *   The final URL used by the more link.
-   *
-   * @legacy-covers ::renderText
    */
   #[DataProvider('providerTestRenderTrimmedWithMoreLinkAndPath')]
   public function testRenderTrimmedWithMoreLinkAndPath($path, string $url): void {
@@ -309,8 +307,6 @@ class FieldPluginBaseTest extends UnitTestCase {
 
   /**
    * Tests the "No results text" rendering.
-   *
-   * @legacy-covers ::renderText
    */
   public function testRenderNoResult(): void {
     $this->setupDisplayWithEmptyArgumentsAndFields();
@@ -691,8 +687,6 @@ class FieldPluginBaseTest extends UnitTestCase {
 
   /**
    * Tests rendering of a link with a path and options.
-   *
-   * @legacy-covers ::renderAsLink
    */
   #[DataProvider('providerTestRenderAsExternalLinkWithPathAndTokens')]
   public function testRenderAsExternalLinkWithPathAndTokens($path, $tokens, $link_html, array $context): void {
@@ -846,9 +840,6 @@ class FieldPluginBaseTest extends UnitTestCase {
 
   /**
    * Tests get render tokens with query.
-   *
-   * @legacy-covers ::getRenderTokens
-   * @legacy-covers ::getTokenValuesRecursive
    */
   #[DataProvider('providerTestGetRenderTokensWithQuery')]
   public function testGetRenderTokensWithQuery(array $query_params, array $expected): void {
@@ -948,10 +939,6 @@ class FieldPluginBaseTest extends UnitTestCase {
 
   /**
    * Ensures proper token replacement when generating CSS classes.
-   *
-   * @legacy-covers ::elementClasses
-   * @legacy-covers ::elementLabelClasses
-   * @legacy-covers ::elementWrapperClasses
    */
   public function testElementClassesWithTokens(): void {
     $this->setUpMockRenderer();

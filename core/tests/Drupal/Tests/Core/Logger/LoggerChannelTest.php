@@ -32,10 +32,6 @@ class LoggerChannelTest extends UnitTestCase {
    *   Whether to pass a request to the channel under test.
    * @param bool $account
    *   Whether to pass an account to the channel under test.
-   *
-   * @legacy-covers ::log
-   * @legacy-covers ::setCurrentUser
-   * @legacy-covers ::setRequestStack
    */
   #[DataProvider('providerTestLog')]
   public function testLog(callable $expected, bool $request = FALSE, bool $account = FALSE): void {
@@ -82,9 +78,6 @@ class LoggerChannelTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannel::addLoggers().
-   *
-   * @legacy-covers ::addLogger
-   * @legacy-covers ::sortLoggers
    */
   public function testSortLoggers(): void {
     $channel = new LoggerChannel($this->randomMachineName());

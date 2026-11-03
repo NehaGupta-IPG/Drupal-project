@@ -32,9 +32,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests that routes are rebuilt during install and uninstall of modules.
-   *
-   * @legacy-covers ::install
-   * @legacy-covers ::uninstall
    */
   public function testRouteRebuild(): void {
     // Remove the routing table manually to ensure it can be created lazily
@@ -52,8 +49,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests config changes by hook_install() are saved for dependent modules.
-   *
-   * @legacy-covers ::install
    */
   public function testConfigChangeOnInstall(): void {
     // Install the child module so the parent is installed automatically.
@@ -68,8 +63,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests cache bins defined by modules are removed when uninstalled.
-   *
-   * @legacy-covers ::removeCacheBins
    */
   public function testCacheBinCleanup(): void {
     $schema = $this->container->get('database')->schema();
@@ -117,8 +110,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests install with a module with an invalid core version constraint.
-   *
-   * @legacy-covers ::install
    */
   #[DataProvider('providerTestInvalidCoreInstall')]
   public function testInvalidCoreInstall(string $module_name, bool $install_dependencies): void {
@@ -145,8 +136,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests install with a dependency with an invalid core version constraint.
-   *
-   * @legacy-covers ::install
    */
   public function testDependencyInvalidCoreInstall(): void {
     $this->expectException(MissingDependencyException::class);
@@ -156,8 +145,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests no dependencies install with a dependency with invalid core.
-   *
-   * @legacy-covers ::install
    */
   public function testDependencyInvalidCoreInstallNoDependencies(): void {
     $this->assertTrue($this->container->get('module_installer')->install(['system_incompatible_core_version_dependencies_test'], FALSE));
@@ -165,8 +152,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests trying to install an obsolete module.
-   *
-   * @legacy-covers ::install
    */
   public function testObsoleteInstall(): void {
     $this->expectException(ObsoleteExtensionException::class);
@@ -181,8 +166,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    *   The modules to install.
    * @param int $count
    *   The number of times the container should have been rebuilt.
-   *
-   * @legacy-covers ::install
    */
   #[DataProvider('containerRebuildRequiredProvider')]
   public function testContainerRebuildRequired(array $modules, int $count): void {
@@ -215,8 +198,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests trying to install a deprecated module.
-   *
-   * @legacy-covers ::install
    */
   #[IgnoreDeprecations]
   public function testDeprecatedInstall(): void {

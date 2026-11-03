@@ -20,9 +20,6 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
    * Tests process placeholders.
-   *
-   * @legacy-covers ::addPlaceholderStrategy
-   * @legacy-covers ::processPlaceholders
    */
   #[DataProvider('providerProcessPlaceholders')]
   public function testProcessPlaceholders($strategies, array $placeholders, $result): void {

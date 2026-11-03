@@ -49,8 +49,6 @@ class PlaceholderGeneratorTest extends RendererTestBase {
    *
    * Between two renders neither the cache contexts nor tags sort should change.
    * A placeholder should generate the same hash, so it is not rendered twice.
-   *
-   * @legacy-covers ::createPlaceholder
    */
   public function testRenderPlaceholdersDifferentSortedContextsTags(): void {
     $contexts_1 = ['user', 'foo'];

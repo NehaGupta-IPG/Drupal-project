@@ -66,8 +66,6 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
 
   /**
    * Tests get definitions.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitions(): void {
     $example_container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')

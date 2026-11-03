@@ -929,8 +929,6 @@ class DateTimePlusTest extends TestCase {
    *   A date/time string.
    * @param string[] $errors
    *   An array of error messages.
-   *
-   * @legacy-covers ::__construct
    */
   #[DataProvider('providerTestInvalidConstructor')]
   public function testInvalidConstructor(string $time, array $errors): void {
@@ -1043,8 +1041,6 @@ class DateTimePlusTest extends TestCase {
 
   /**
    * Tests that object methods are chainable.
-   *
-   * @legacy-covers ::__call
    */
   public function testChainable(): void {
     $date = new DateTimePlus('now', 'Australia/Sydney');
@@ -1067,8 +1063,6 @@ class DateTimePlusTest extends TestCase {
 
   /**
    * Tests that non-chainable methods work.
-   *
-   * @legacy-covers ::__call
    */
   public function testChainableNonChainable(): void {
     $datetime1 = new DateTimePlus('2009-10-11 12:00:00');
@@ -1080,8 +1074,6 @@ class DateTimePlusTest extends TestCase {
 
   /**
    * Tests that chained calls to non-existent functions throw an exception.
-   *
-   * @legacy-covers ::__call
    */
   public function testChainableNonCallable(): void {
     $this->expectException(\BadMethodCallException::class);

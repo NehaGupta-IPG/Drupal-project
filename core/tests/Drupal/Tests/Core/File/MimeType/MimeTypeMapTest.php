@@ -98,8 +98,6 @@ class MimeTypeMapTest extends UnitTestCase {
 
   /**
    * Tests list extension.
-   *
-   * @legacy-covers ::listExtensions
    */
   public function testListExtension(): void {
     $extensions = $this->map->listExtensions();

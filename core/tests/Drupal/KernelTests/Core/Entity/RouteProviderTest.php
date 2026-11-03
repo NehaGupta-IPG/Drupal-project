@@ -67,8 +67,6 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * Tests html routes.
-   *
-   * @legacy-covers \Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider::getRoutes
    */
   public function testHtmlRoutes(): void {
     /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */
@@ -109,9 +107,6 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * Tests admin html routes.
-   *
-   * @legacy-covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getEditFormRoute
-   * @legacy-covers \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider::getDeleteFormRoute
    */
   public function testAdminHtmlRoutes(): void {
     /** @var \Drupal\Core\Routing\RouteProviderInterface $route_provider */

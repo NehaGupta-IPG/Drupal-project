@@ -155,10 +155,6 @@ class EntityUrlTest extends UnitTestCase {
    *   The link template to test.
    * @param string $expected_route_name
    *   The expected route name of the generated URL.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
-   * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplates')]
   public function testToUrlLinkTemplates($link_template, string $expected_route_name): void {
@@ -202,10 +198,6 @@ class EntityUrlTest extends UnitTestCase {
    *   The expected route name of the generated URL.
    * @param array $expected_route_parameters
    *   The expected route parameters of the generated URL.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
-   * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplateRevision')]
   public function testToUrlLinkTemplateRevision(bool $is_default_revision, string $link_template, string $expected_route_name, array $expected_route_parameters): void {
@@ -267,10 +259,6 @@ class EntityUrlTest extends UnitTestCase {
    *   The link template to test.
    * @param string $expected_route_name
    *   The expected route name of the generated URL.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
-   * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplateNoId')]
   public function testToUrlLinkTemplateNoId($link_template, string $expected_route_name): void {
@@ -310,10 +298,6 @@ class EntityUrlTest extends UnitTestCase {
    *   not have a bundle key.
    * @param array $expected_route_parameters
    *   The expected route parameters of the generated URL.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
-   * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplateAddForm')]
   public function testToUrlLinkTemplateAddForm(bool $has_bundle_key, ?string $bundle_entity_type, string|false $bundle_key, array $expected_route_parameters): void {
@@ -356,9 +340,6 @@ class EntityUrlTest extends UnitTestCase {
    *   An array of bundle info to register.
    * @param string $uri_callback
    *   The entity type URI callback to register.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
    */
   #[DataProvider('providerTestToUrlUriCallbackUndefined')]
   public function testToUrlUriCallbackUndefined(array $bundle_info, $uri_callback): void {
@@ -397,9 +378,6 @@ class EntityUrlTest extends UnitTestCase {
    *   An array of bundle info to register.
    * @param \Closure|null $uri_callback
    *   The entity type URI callback to register.
-   *
-   * @legacy-covers ::toUrl
-   * @legacy-covers ::linkTemplates
    */
   #[DataProvider('providerTestToUrlUriCallback')]
   public function testToUrlUriCallback(array $bundle_info, ?\Closure $uri_callback): void {

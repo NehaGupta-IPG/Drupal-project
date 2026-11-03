@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 // cSpell:ignore attgenerated attname attnum attrelid objid refobjid refobjsubid
 // cSpell:ignore regclass
 // cspell:ignore relkind relname
-
 /**
  * Tests schema API for the PostgreSQL driver.
  */
@@ -85,8 +84,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Tests introspect index schema.
-   *
-   * @legacy-covers \Drupal\pgsql\Driver\Database\pgsql\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [
@@ -260,8 +257,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Tests pgsql extension exists.
-   *
-   * @legacy-covers \Drupal\pgsql\Driver\Database\pgsql\Schema::extensionExists
    */
   public function testPgsqlExtensionExists(): void {
     // Test the method for a non existing extension.

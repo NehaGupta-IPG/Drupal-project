@@ -17,8 +17,7 @@ use PHPUnit\Framework\TestCase;
 class AttributeBaseTest extends TestCase {
 
   /**
-   * @legacy-covers ::getProvider
-   * @legacy-covers ::setProvider
+   * Tests set provider.
    */
   public function testSetProvider(): void {
     $plugin = new AttributeBaseStub(id: '1');
@@ -35,8 +34,7 @@ class AttributeBaseTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getClass
-   * @legacy-covers ::setClass
+   * Tests set class.
    */
   public function testSetClass(): void {
     $plugin = new AttributeBaseStub(id: '1');

@@ -103,8 +103,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field name.
-   *
-   * @legacy-covers ::getName
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldName(string $factory_name): void {
@@ -114,8 +112,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field label.
-   *
-   * @legacy-covers ::getLabel
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldLabel(string $factory_name): void {
@@ -127,9 +123,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests bundle.
-   *
-   * @legacy-covers ::setTargetBundle
-   * @legacy-covers ::getTargetBundle
    */
   #[DataProvider('factoryTypeProvider')]
   public function testBundle(string $factory_name): void {
@@ -141,8 +134,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field description.
-   *
-   * @legacy-covers ::getDescription
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldDescription(string $factory_name): void {
@@ -154,8 +145,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field type.
-   *
-   * @legacy-covers ::getType
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldType(string $factory_name): void {
@@ -165,10 +154,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field settings.
-   *
-   * @legacy-covers ::getSetting
-   * @legacy-covers ::setSetting
-   * @legacy-covers ::getSettings
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldSettings(string $factory_name): void {
@@ -183,10 +168,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests default field settings.
-   *
-   * @legacy-covers ::getSetting
-   * @legacy-covers ::setSetting
-   * @legacy-covers ::getSettings
    */
   #[DataProvider('factoryTypeProvider')]
   public function testDefaultFieldSettings(string $factory_name): void {
@@ -200,9 +181,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field default value.
-   *
-   * @legacy-covers ::getDefaultValue
-   * @legacy-covers ::setDefaultValue
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldDefaultValue(string $factory_name): void {
@@ -246,9 +224,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests field translatable methods.
-   *
-   * @legacy-covers ::isTranslatable
-   * @legacy-covers ::setTranslatable
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldTranslatable(string $factory_name): void {
@@ -267,9 +242,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests required.
-   *
-   * @legacy-covers ::isRequired
-   * @legacy-covers ::setRequired
    */
   #[DataProvider('factoryTypeProvider')]
   public function testFieldRequired(string $factory_name): void {
@@ -283,8 +255,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests default value callbacks.
-   *
-   * @legacy-covers ::setDefaultValueCallback
    */
   #[DataProvider('factoryTypeProvider')]
   public function testDefaultValueCallback(string $factory_name): void {
@@ -297,8 +267,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests invalid default value callbacks.
-   *
-   * @legacy-covers ::setDefaultValueCallback
    */
   #[DataProvider('factoryTypeProvider')]
   public function testInvalidDefaultValueCallback(string $factory_name): void {
@@ -310,8 +278,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests NULL default value callbacks.
-   *
-   * @legacy-covers ::setDefaultValueCallback
    */
   #[DataProvider('factoryTypeProvider')]
   public function testNullDefaultValueCallback(string $factory_name): void {
@@ -323,9 +289,6 @@ class FieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests the display configuration settings.
-   *
-   * @legacy-covers ::isDisplayConfigurable
-   * @legacy-covers ::getDisplayOptions
    */
   #[DataProvider('factoryTypeProvider')]
   public function testDisplayConfigurationSettings(string $factory_name): void {

@@ -33,8 +33,6 @@ class SaveActionTest extends KernelTestBase {
 
   /**
    * Tests get derivative definitions.
-   *
-   * @legacy-covers \Drupal\Core\Action\Plugin\Action\Derivative\EntityChangedActionDeriver::getDerivativeDefinitions
    */
   public function testGetDerivativeDefinitions(): void {
     $deriver = new EntityChangedActionDeriver(\Drupal::entityTypeManager(), \Drupal::translation());
@@ -50,8 +48,6 @@ class SaveActionTest extends KernelTestBase {
 
   /**
    * Tests save action.
-   *
-   * @legacy-covers \Drupal\Core\Action\Plugin\Action\SaveAction::execute
    */
   public function testSaveAction(): void {
     $entity = EntityTestMulChanged::create(['name' => 'test']);

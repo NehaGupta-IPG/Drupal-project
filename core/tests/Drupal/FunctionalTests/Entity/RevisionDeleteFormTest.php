@@ -61,8 +61,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    *   The entity type to test.
    * @param string $expectedQuestion
    *   The expected question/page title.
-   *
-   * @legacy-covers ::getQuestion
    */
   protected function doTestPageTitle(string $entityTypeId, string $expectedQuestion): void {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
@@ -107,8 +105,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
    * Test cannot delete latest revision.
-   *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   public function testAccessDeleteLatestDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -134,8 +130,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
    * Ensure that forward revision can be deleted.
-   *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteLatestForwardRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
@@ -160,8 +154,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
    * Test cannot delete default revision.
-   *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteDefault(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
@@ -195,8 +187,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
 
   /**
    * Test can delete non-latest revision.
-   *
-   * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteNonLatest(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -246,8 +236,6 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    *   Expected messenger message.
    * @param string|int $expectedDestination
    *   Expected destination after deletion.
-   *
-   * @legacy-covers ::submitForm
    */
   protected function doTestSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, int $totalRevisions, array $expectedLog, string $expectedMessage, $expectedDestination): void {
     if (count($permissions) > 0) {

@@ -24,8 +24,6 @@ class AutomatedCronTest extends KernelTestBase {
 
   /**
    * Tests that automated cron does not run cron on a CLI request.
-   *
-   * @legacy-covers \Drupal\automated_cron\EventSubscriber\AutomatedCron::onTerminate
    */
   public function testCronDoesNotRunOnCliRequest(): void {
     // Set automated_cron interval and times.

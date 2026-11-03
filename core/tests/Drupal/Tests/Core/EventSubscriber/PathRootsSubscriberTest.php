@@ -45,9 +45,6 @@ class PathRootsSubscriberTest extends UnitTestCase {
 
   /**
    * Tests altering and finished event.
-   *
-   * @legacy-covers ::onRouteAlter
-   * @legacy-covers ::onRouteFinished
    */
   public function testSubscribing(): void {
 

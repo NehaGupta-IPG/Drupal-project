@@ -35,8 +35,6 @@ class ValidationResultTest extends UnitTestCase {
 
   /**
    * Tests overall severity.
-   *
-   * @legacy-covers ::getOverallSeverity
    */
   public function testOverallSeverity(): void {
     // An error and a warning should be counted as an error.

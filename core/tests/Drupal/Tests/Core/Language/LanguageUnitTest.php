@@ -21,8 +21,6 @@ class LanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests construct.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstruct(): void {
     $name = $this->randomMachineName();
@@ -47,8 +45,6 @@ class LanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests get langcode.
-   *
-   * @legacy-covers ::getId
    */
   public function testGetLangcode(): void {
     $language_code = $this->randomMachineName(2);

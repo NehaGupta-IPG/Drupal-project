@@ -32,8 +32,6 @@ class YamlDirectoryDiscoveryTest extends TestCase {
 
   /**
    * Tests YAML directory discovery.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscovery(): void {
     vfsStream::setup('modules', NULL, [
@@ -146,8 +144,6 @@ class YamlDirectoryDiscoveryTest extends TestCase {
 
   /**
    * Tests YAML directory discovery with an alternate ID key.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryAlternateId(): void {
     vfsStream::setup('modules', NULL, [
@@ -175,9 +171,6 @@ class YamlDirectoryDiscoveryTest extends TestCase {
 
   /**
    * Tests YAML directory discovery with a missing ID key.
-   *
-   * @legacy-covers ::findAll
-   * @legacy-covers ::getIdentifier
    */
   public function testDiscoveryNoIdException(): void {
     $this->expectException(DiscoveryException::class);
@@ -197,8 +190,6 @@ class YamlDirectoryDiscoveryTest extends TestCase {
 
   /**
    * Tests YAML directory discovery with invalid YAML.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryInvalidYamlException(): void {
     $this->expectException(DiscoveryException::class);

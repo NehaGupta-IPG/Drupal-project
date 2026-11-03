@@ -20,8 +20,6 @@ class ConfigurableLanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests direction.
-   *
-   * @legacy-covers ::getDirection
    */
   public function testDirection(): void {
     // Direction of language writing, an integer. Usually either
@@ -37,9 +35,6 @@ class ConfigurableLanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests weight.
-   *
-   * @legacy-covers ::getWeight
-   * @legacy-covers ::setWeight
    */
   public function testWeight(): void {
     // The weight, an integer. Used to order languages with larger positive

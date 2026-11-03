@@ -76,8 +76,6 @@ class ReplaceOpTest extends TestCase {
 
   /**
    * Tests empty file.
-   *
-   * @legacy-covers ::process
    */
   public function testEmptyFile(): void {
     $fixtures = new Fixtures();

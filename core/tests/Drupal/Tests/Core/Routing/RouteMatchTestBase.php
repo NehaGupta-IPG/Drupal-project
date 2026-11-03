@@ -98,9 +98,6 @@ abstract class RouteMatchTestBase extends UnitTestCase {
 
   /**
    * Tests get parameter.
-   *
-   * @legacy-covers ::getParameter
-   * @legacy-covers \Drupal\Core\Routing\RouteMatch::getParameterNames
    */
   #[DataProvider('routeMatchProvider')]
   public function testGetParameter(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {
@@ -114,9 +111,6 @@ abstract class RouteMatchTestBase extends UnitTestCase {
 
   /**
    * Tests get parameters.
-   *
-   * @legacy-covers ::getParameters
-   * @legacy-covers \Drupal\Core\Routing\RouteMatch::getParameterNames
    */
   #[DataProvider('routeMatchProvider')]
   public function testGetParameters(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {
@@ -125,9 +119,6 @@ abstract class RouteMatchTestBase extends UnitTestCase {
 
   /**
    * Tests get raw parameter.
-   *
-   * @legacy-covers ::getRawParameter
-   * @legacy-covers \Drupal\Core\Routing\RouteMatch::getParameterNames
    */
   #[DataProvider('routeMatchProvider')]
   public function testGetRawParameter(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {
@@ -141,9 +132,6 @@ abstract class RouteMatchTestBase extends UnitTestCase {
 
   /**
    * Tests get raw parameters.
-   *
-   * @legacy-covers ::getRawParameters
-   * @legacy-covers \Drupal\Core\Routing\RouteMatch::getParameterNames
    */
   #[DataProvider('routeMatchProvider')]
   public function testGetRawParameters(RouteMatchInterface $route_match, Route $route, array $parameters, array $expected_filtered_parameters): void {

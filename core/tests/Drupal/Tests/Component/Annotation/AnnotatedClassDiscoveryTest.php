@@ -32,8 +32,7 @@ class AnnotatedClassDiscoveryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getPluginNamespaces
+   * Tests get plugin namespaces.
    */
   public function testGetPluginNamespaces(): void {
     $discovery = new AnnotatedClassDiscovery(['com/example' => [__DIR__]]);
@@ -44,9 +43,7 @@ class AnnotatedClassDiscoveryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDefinitions
-   * @legacy-covers ::prepareAnnotationDefinition
-   * @legacy-covers ::getAnnotationReader
+   * Tests get definitions.
    */
   public function testGetDefinitions(): void {
     $discovery = new AnnotatedClassDiscovery(['com\example' => [__DIR__ . '/Fixtures']]);

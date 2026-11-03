@@ -614,9 +614,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set items per page before pre render.
-   *
-   * @legacy-covers ::setItemsPerPage
-   * @legacy-covers ::getItemsPerPage
    */
   public function testSetItemsPerPageBeforePreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -629,9 +626,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set items per page during pre render.
-   *
-   * @legacy-covers ::setItemsPerPage
-   * @legacy-covers ::getItemsPerPage
    */
   public function testSetItemsPerPageDuringPreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -648,9 +642,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set offset before pre render.
-   *
-   * @legacy-covers ::setOffset
-   * @legacy-covers ::getOffset
    */
   public function testSetOffsetBeforePreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -663,9 +654,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set offset during pre render.
-   *
-   * @legacy-covers ::setOffset
-   * @legacy-covers ::getOffset
    */
   public function testSetOffsetDuringPreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -682,9 +670,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set current page before pre render.
-   *
-   * @legacy-covers ::setCurrentPage
-   * @legacy-covers ::getCurrentPage
    */
   public function testSetCurrentPageBeforePreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -697,9 +682,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests set current page during pre render.
-   *
-   * @legacy-covers ::setCurrentPage
-   * @legacy-covers ::getCurrentPage
    */
   public function testSetCurrentPageDuringPreRender(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
@@ -716,8 +698,6 @@ class ViewExecutableTest extends UnitTestCase {
 
   /**
    * Tests cache is ignored during preview.
-   *
-   * @legacy-covers ::execute
    */
   public function testCacheIsIgnoredDuringPreview(): void {
     $this->setUpMockCacheManager();

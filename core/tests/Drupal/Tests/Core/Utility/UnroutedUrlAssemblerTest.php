@@ -88,9 +88,6 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
 
   /**
    * Tests assemble with external url.
-   *
-   * @legacy-covers ::assemble
-   * @legacy-covers ::buildExternalUrl
    */
   #[DataProvider('providerTestAssembleWithExternalUrl')]
   public function testAssembleWithExternalUrl(string $uri, array $options, string $expected): void {
@@ -145,9 +142,6 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
 
   /**
    * Tests assemble with local uri.
-   *
-   * @legacy-covers ::assemble
-   * @legacy-covers ::buildLocalUrl
    */
   #[DataProvider('providerTestAssembleWithLocalUri')]
   public function testAssembleWithLocalUri(string $uri, array $options, bool $subdir, string $expected): void {

@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 // cSpell:ignore ilike
-
 /**
  * Tests Drupal\Core\Database\Query\Condition.
  */
@@ -40,8 +39,6 @@ class ConditionTest extends UnitTestCase {
 
   /**
    * Tests simple condition.
-   *
-   * @legacy-covers ::compile
    */
   #[DataProvider('providerSimpleCondition')]
   public function testSimpleCondition(string $expected, string $field_name): void {
@@ -184,8 +181,6 @@ class ConditionTest extends UnitTestCase {
 
   /**
    * Tests compile with an operator that appends a suffix to the field.
-   *
-   * @legacy-covers ::compile
    */
   public function testCompileWithFieldSuffixOperator(): void {
     $connection = $this->createStub(Connection::class);

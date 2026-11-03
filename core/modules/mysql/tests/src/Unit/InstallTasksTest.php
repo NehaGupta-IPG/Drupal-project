@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\mysql\Driver\Database\mysql\Install\Tasks;
 use Drupal\Tests\UnitTestCase;
@@ -56,7 +57,7 @@ class InstallTasksTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      protected function t($string, array $args = [], array $options = []) {
+      protected function t($string, array $args = [], array $options = []): TranslatableMarkup {
         return $string;
       }
 
@@ -82,14 +83,14 @@ class InstallTasksTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      protected function getConnection(): null {
+      protected function getConnection(): Connection {
         return NULL;
       }
 
       /**
        * {@inheritdoc}
        */
-      protected function t($string, array $args = [], array $options = []) {
+      protected function t($string, array $args = [], array $options = []): TranslatableMarkup {
         return $string;
       }
 
@@ -98,9 +99,6 @@ class InstallTasksTest extends UnitTestCase {
 
   /**
    * Tests name and minimum version.
-   *
-   * @legacy-covers ::minimumVersion
-   * @legacy-covers ::name
    */
   #[DataProvider('providerNameAndMinimumVersion')]
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
@@ -142,8 +140,6 @@ class InstallTasksTest extends UnitTestCase {
 
   /**
    * Tests name with no connection.
-   *
-   * @legacy-covers ::name
    */
   public function testNameWithNoConnection(): void {
     $tasks = $this->createTasksNoConnection();

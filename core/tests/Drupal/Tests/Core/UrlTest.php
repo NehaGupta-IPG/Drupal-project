@@ -250,8 +250,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUserInput method with invalid paths.
-   *
-   * @legacy-covers ::fromUserInput
    */
   #[DataProvider('providerFromInvalidInternalUri')]
   public function testFromInvalidUserInput(string $path): void {
@@ -261,8 +259,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests fromUri() method with a user-entered path not matching any route.
-   *
-   * @legacy-covers ::fromUri
    */
   public function testFromRoutedPathWithInvalidRoute(): void {
     $this->setUpMockPathValidator();
@@ -278,8 +274,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests fromUri() method with user-entered path matching a valid route.
-   *
-   * @legacy-covers ::fromUri
    */
   public function testFromRoutedPathWithValidRoute(): void {
     $this->setUpMockPathValidator();
@@ -319,8 +313,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests that an invalid request will thrown an exception.
-   *
-   * @legacy-covers ::createFromRequest
    */
   public function testUrlFromRequestInvalid(): void {
     $this->setUpMockRouter();
@@ -370,9 +362,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the getUri() and isExternal() methods for protocol-relative URLs.
-   *
-   * @legacy-covers ::getUri
-   * @legacy-covers ::isExternal
    */
   public function testGetUriForProtocolRelativeUrl(): void {
     $url = Url::fromUri('//example.com/test');
@@ -472,8 +461,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the setRouteParameters() with an unrouted URL.
-   *
-   * @legacy-covers ::setRouteParameters
    */
   public function testSetRouteParametersWithUnroutedUrl(): void {
     $url = Url::fromUri('https://example.com');
@@ -484,8 +471,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the setRouteParameter() with an unrouted URL.
-   *
-   * @legacy-covers ::setRouteParameter
    */
   public function testSetRouteParameterWithUnroutedUrl(): void {
     $url = Url::fromUri('https://example.com');
@@ -533,9 +518,6 @@ class UrlTest extends UnitTestCase {
    *
    * @param bool $access
    *   The access value.
-   *
-   * @legacy-covers ::access
-   * @legacy-covers ::accessManager
    */
   #[DataProvider('accessProvider')]
   public function testAccessRouted(bool $access): void {
@@ -630,8 +612,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUri() method with an entity: URI.
-   *
-   * @legacy-covers ::fromUri
    */
   #[DataProvider('providerTestEntityUris')]
   public function testEntityUris(string $uri, array $options, string $route_name, array $route_parameters, ?array $query, ?string $fragment): void {
@@ -644,8 +624,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUri() method with an invalid entity: URI.
-   *
-   * @legacy-covers ::fromUri
    */
   public function testInvalidEntityUriParameter(): void {
     $this->setUpMockUrlGenerator();
@@ -752,8 +730,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUri() method with a valid internal: URI.
-   *
-   * @legacy-covers ::fromUri
    */
   #[DataProvider('providerFromValidInternalUri')]
   public function testFromValidInternalUri(string $path): void {
@@ -792,8 +768,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUri() method with an invalid internal: URI.
-   *
-   * @legacy-covers ::fromUri
    */
   #[DataProvider('providerFromInvalidInternalUri')]
   public function testFromInvalidInternalUri(string $path): void {
@@ -886,8 +860,6 @@ class UrlTest extends UnitTestCase {
 
   /**
    * Tests from route uri with missing route name.
-   *
-   * @legacy-covers ::fromUri
    */
   public function testFromRouteUriWithMissingRouteName(): void {
     $this->expectException(\InvalidArgumentException::class);

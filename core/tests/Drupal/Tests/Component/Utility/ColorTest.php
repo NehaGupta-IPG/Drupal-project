@@ -16,12 +16,12 @@ use PHPUnit\Framework\TestCase;
 class ColorTest extends TestCase {
 
   /**
+   * Tests validate hex.
    *
    * @param bool $expected
    *   The expected result of validation.
    * @param string $value
    *   The hex color value.
-   * @legacy-covers \Drupal\Component\Utility\Color::validateHex
    */
   #[DataProvider('providerTestValidateHex')]
   public function testValidateHex(bool $expected, string|int $value): void {

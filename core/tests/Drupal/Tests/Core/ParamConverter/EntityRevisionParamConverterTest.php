@@ -54,8 +54,6 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests non applying route.
-   *
-   * @legacy-covers ::applies
    */
   public function testNonApplyingRoute(): void {
     $route = new Route('/test');
@@ -64,8 +62,6 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests applying route.
-   *
-   * @legacy-covers ::applies
    */
   public function testApplyingRoute(): void {
     $route = $this->getTestRoute();

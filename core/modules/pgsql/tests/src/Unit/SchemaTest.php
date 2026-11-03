@@ -28,8 +28,6 @@ class SchemaTest extends UnitTestCase {
    *   The constraint name.
    * @param string $expected
    *   The expected computed constraint name.
-   *
-   * @legacy-covers ::constraintExists
    */
   #[DataProvider('providerComputedConstraintName')]
   public function testComputedConstraintName(string $table_name, string $name, string $expected): void {

@@ -98,8 +98,6 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * Tests the sort helper exception if plugin not found.
-   *
-   * @legacy-covers ::sortHelper
    */
   public function testSortHelperException(): void {
     $this->setupPluginCollection($this->never());
@@ -260,8 +258,6 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * Tests configurable get configuration.
-   *
-   * @legacy-covers ::getConfiguration
    */
   public function testConfigurableGetConfiguration(): void {
     $this->setupPluginCollection($this->exactly(3));
@@ -271,8 +267,6 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * Tests configurable set configuration.
-   *
-   * @legacy-covers ::setConfiguration
    */
   public function testConfigurableSetConfiguration(): void {
     $this->setupPluginCollection($this->exactly(2));
@@ -294,8 +288,6 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
    * Tests that plugin methods are correctly attached to interfaces.
-   *
-   * @legacy-covers ::getConfiguration
    */
   public function testConfigurableInterface(): void {
     $configurable_plugin = $this->prophesize(ConfigurableInterface::class);

@@ -201,8 +201,6 @@ YAML,
 
   /**
    * Tests invalid plugin definitions.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::processDefinition
    */
   #[DataProvider('providerTestInvalidPluginDefinitions')]
   public function testInvalidPluginDefinitions(string $yaml, ?string $expected_exception = NULL, ?string $expected_message = NULL, ?array $additional_files = []): void {
@@ -1285,8 +1283,6 @@ PHP,
    * @param string $expected_readable_string
    *   The expected allowed tags and attributes as a string, typically used
    *   in the filter_html "Allowed tags" field.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getProvidedElements
    */
   #[DataProvider('providerTestProvidedElements')]
   public function testProvidedElements(array $plugins, array $text_editor_settings, array $expected_elements, string $expected_readable_string): void {
@@ -1534,8 +1530,6 @@ PHP,
    *
    * When multiple plugins support a given tag, this method decides which plugin
    * to return based on which provides the broadest attribute support.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::findPluginSupportingElement
    */
   #[DataProvider('providerTestPluginSupportingElement')]
   public function testPluginSupportingElement(string $tag, ?string $expected_plugin_id): void {
@@ -1590,8 +1584,6 @@ PHP,
 
   /**
    * Tests automatic link decorators disallowed.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateCKEditor5Aspects
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
@@ -1604,8 +1596,6 @@ PHP,
 
   /**
    * Tests external link automatic link decorator disallowed.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::validateCKEditor5Aspects
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
@@ -1618,8 +1608,6 @@ PHP,
 
   /**
    * Tests derived plugin definitions.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getDiscovery
    */
   #[DataProvider('providerTestDerivedPluginDefinitions')]
   #[IgnoreDeprecations]

@@ -32,8 +32,6 @@ class MigrationTest extends UnitTestCase {
    *
    * @param array $dependencies
    *   An array of migration dependencies.
-   *
-   * @legacy-covers ::__construct
    */
   #[DataProvider('getInvalidMigrationDependenciesProvider')]
   public function testMigrationDependenciesInConstructor(array $dependencies): void {
@@ -53,8 +51,6 @@ class MigrationTest extends UnitTestCase {
 
   /**
    * Tests checking requirements for source plugins.
-   *
-   * @legacy-covers ::checkRequirements
    */
   public function testRequirementsForSourcePlugin(): void {
     $migration = new TestMigration();
@@ -75,8 +71,6 @@ class MigrationTest extends UnitTestCase {
 
   /**
    * Tests checking requirements for destination plugins.
-   *
-   * @legacy-covers ::checkRequirements
    */
   public function testRequirementsForDestinationPlugin(): void {
     $migration = new TestMigration();
@@ -97,8 +91,6 @@ class MigrationTest extends UnitTestCase {
 
   /**
    * Tests checking requirements for destination plugins.
-   *
-   * @legacy-covers ::checkRequirements
    */
   public function testRequirementsForMigrations(): void {
     $migration = new TestMigration();
@@ -142,8 +134,6 @@ class MigrationTest extends UnitTestCase {
 
   /**
    * Tests getting requirement list.
-   *
-   * @legacy-covers ::getRequirements
    */
   public function testGetMigrations(): void {
     $migration = new TestMigration();
@@ -162,8 +152,6 @@ class MigrationTest extends UnitTestCase {
    *   The migration dependencies configuration array expected.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *
-   * @legacy-covers ::getMigrationDependencies
    */
   #[DataProvider('getValidMigrationDependenciesProvider')]
   public function testMigrationDependenciesWithValidConfig(?array $source, array $expected_value): void {
@@ -187,8 +175,6 @@ class MigrationTest extends UnitTestCase {
    *
    * @param array $dependencies
    *   An array of migration dependencies.
-   *
-   * @legacy-covers ::getMigrationDependencies
    */
   #[DataProvider('getInvalidMigrationDependenciesProvider')]
   public function testMigrationDependenciesWithInvalidConfig(array $dependencies): void {

@@ -168,8 +168,6 @@ class DateTest extends UnitTestCase {
 
   /**
    * Tests the getSampleDateFormats method.
-   *
-   * @legacy-covers \Drupal\Core\Datetime\DateFormatter::getSampleDateFormats
    */
   public function testGetSampleDateFormats(): void {
     $timestamp = strtotime('2015-03-22 14:23:00');
@@ -497,10 +495,6 @@ class DateTest extends UnitTestCase {
 
   /**
    * Tests FormattedDateDiff.
-   *
-   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::toRenderable
-   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::getString
-   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::getCacheMaxAge
    */
   public function testFormattedDateDiff(): void {
     $string = '10 minutes';
@@ -529,8 +523,6 @@ class DateTest extends UnitTestCase {
    * Tests that an RFC2822 formatted date always returns an English string.
    *
    * @see http://www.faqs.org/rfcs/rfc2822.html
-   *
-   * @legacy-covers ::format
    */
   public function testRfc2822DateFormat(): void {
     $timestamp = 1549110600;

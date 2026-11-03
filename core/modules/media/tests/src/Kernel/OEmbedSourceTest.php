@@ -129,8 +129,6 @@ class OEmbedSourceTest extends MediaKernelTestBase implements LoggerInterface {
    *   The extension that the downloaded thumbnail should have, or NULL if no
    *   extension can be determined and the source should fall back to the
    *   default thumbnail.
-   *
-   * @legacy-covers ::getLocalThumbnailUri
    */
   #[DataProvider('providerThumbnailUri')]
   public function testThumbnailUri(string $remote_thumbnail_url, array $thumbnail_headers, ?string $expected_extension): void {

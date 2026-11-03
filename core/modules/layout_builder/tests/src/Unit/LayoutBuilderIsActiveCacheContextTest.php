@@ -39,9 +39,6 @@ class LayoutBuilderIsActiveCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context non fieldable entity.
-   *
-   * @legacy-covers ::getContext
-   * @legacy-covers ::getDisplay
    */
   public function testGetContextNonFieldableEntity(): void {
     $route_match = $this->prophesize(RouteMatchInterface::class);
@@ -55,9 +52,6 @@ class LayoutBuilderIsActiveCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context.
-   *
-   * @legacy-covers ::getContext
-   * @legacy-covers ::getDisplay
    */
   #[DataProvider('providerTestGetContext')]
   public function testGetContext($is_overridden, $expected): void {

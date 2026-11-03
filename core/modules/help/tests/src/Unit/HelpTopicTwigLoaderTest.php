@@ -58,8 +58,6 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
 
   /**
    * Tests constructor.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstructor(): void {
     // Verify that the module/theme directories were added in the constructor,

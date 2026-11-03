@@ -26,8 +26,6 @@ class LinkTest extends UnitTestCase {
 
   /**
    * Tests link comparison.
-   *
-   * @legacy-covers ::compare
    */
   #[DataProvider('linkComparisonProvider')]
   public function testLinkComparison(array $a, array $b, bool $expected): void {
@@ -97,8 +95,6 @@ class LinkTest extends UnitTestCase {
 
   /**
    * Tests link merge.
-   *
-   * @legacy-covers ::merge
    */
   #[DataProvider('linkMergeProvider')]
   public function testLinkMerge(array $a, array $b, array $expected): void {

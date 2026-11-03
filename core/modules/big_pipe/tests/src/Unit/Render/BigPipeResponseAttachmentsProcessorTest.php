@@ -36,8 +36,6 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
 
   /**
    * Tests non html response.
-   *
-   * @legacy-covers ::processAttachments
    */
   #[DataProvider('nonHtmlResponseProvider')]
   public function testNonHtmlResponse(string $response_class): void {
@@ -60,8 +58,6 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
 
   /**
    * Tests html response.
-   *
-   * @legacy-covers ::processAttachments
    */
   #[DataProvider('attachmentsProvider')]
   public function testHtmlResponse(array $attachments): void {

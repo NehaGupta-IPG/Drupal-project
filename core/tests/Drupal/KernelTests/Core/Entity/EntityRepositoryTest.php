@@ -77,9 +77,6 @@ class EntityRepositoryTest extends KernelTestBase {
 
   /**
    * Tests retrieving active variants.
-   *
-   * @legacy-covers ::getActive
-   * @legacy-covers ::getActiveMultiple
    */
   public function testGetActive(): void {
     $en_contexts = $this->getLanguageContexts('en');
@@ -210,9 +207,6 @@ class EntityRepositoryTest extends KernelTestBase {
 
   /**
    * Tests retrieving canonical variants.
-   *
-   * @legacy-covers ::getCanonical
-   * @legacy-covers ::getCanonicalMultiple
    */
   public function testGetCanonical(): void {
     // Check that when the entity does not exist NULL is returned.

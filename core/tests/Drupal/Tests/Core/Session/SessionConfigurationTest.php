@@ -20,8 +20,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests whether the session.cookie_domain ini settings is computed correctly.
-   *
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedCookieDomain')]
   public function testGeneratedCookieDomain(string $uri, string $expected_domain): void {
@@ -57,9 +55,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests the constructor injected session.cookie_domain ini setting.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedCookieDomain')]
   public function testEnforcedCookieDomain(string $uri, string $expected_domain): void {
@@ -95,8 +90,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests whether the session.cookie_secure ini settings is computed correctly.
-   *
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
   public function testCookieSecure(string $uri, bool $expected_secure): void {
@@ -121,9 +114,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests that session.cookie_secure ini settings cannot be overridden.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
   public function testCookieSecureNotOverridable(string $uri, bool $expected_secure): void {
@@ -154,8 +144,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests whether the session.name ini settings is computed correctly.
-   *
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedSessionName')]
   public function testGeneratedSessionName(string $uri, $expected_name): void {
@@ -201,8 +189,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests whether the session.name ini settings is computed correctly.
-   *
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedSessionName')]
   public function testEnforcedSessionNameViaCookieDomain(string $uri, $expected_name): void {
@@ -248,8 +234,6 @@ class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Tests constructor's default settings.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstructorDefaultSettings(): void {
     $config = new SessionConfiguration([]);

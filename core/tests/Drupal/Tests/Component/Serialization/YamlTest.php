@@ -23,9 +23,6 @@ class YamlTest extends YamlTestBase {
 
   /**
    * Tests encoding and decoding basic data structures.
-   *
-   * @legacy-covers ::encode
-   * @legacy-covers ::decode
    */
   #[DataProvider('providerEncodeDecodeTests')]
   public function testEncodeDecode(array $data): void {
@@ -60,8 +57,6 @@ class YamlTest extends YamlTestBase {
 
   /**
    * Tests that invalid YAML throws an exception.
-   *
-   * @legacy-covers ::decode
    */
   public function testError(): void {
     $this->expectException(InvalidDataTypeException::class);

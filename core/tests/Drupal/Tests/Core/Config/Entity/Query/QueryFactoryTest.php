@@ -27,9 +27,6 @@ class QueryFactoryTest extends UnitTestCase {
 
   /**
    * Tests get keys.
-   *
-   * @legacy-covers ::getKeys
-   * @legacy-covers ::getValues
    */
   #[DataProvider('providerTestGetKeys')]
   public function testGetKeys(array $expected, string $key, array $sets): void {
@@ -114,9 +111,6 @@ class QueryFactoryTest extends UnitTestCase {
 
   /**
    * Tests get keys wild card end.
-   *
-   * @legacy-covers ::getKeys
-   * @legacy-covers ::getValues
    */
   public function testGetKeysWildCardEnd(): void {
     $config_factory = $this->createStub(ConfigFactoryInterface::class);

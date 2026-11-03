@@ -41,11 +41,6 @@ class CurrentRouteMatchTest extends RouteMatchTestBase {
 
   /**
    * Tests get current route object.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getRouteObject
-   * @legacy-covers ::getCurrentRouteMatch
-   * @legacy-covers ::getRouteMatch
    */
   public function testGetCurrentRouteObject(): void {
 

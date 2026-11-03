@@ -68,9 +68,6 @@ class StateTest extends UnitTestCase {
    *
    * Here testing a not existing variable and set and get the default value of
    * a key.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::getMultiple
    */
   public function testGetEmpty(): void {
     $this->setUpStateWithMockStorage();
@@ -97,9 +94,6 @@ class StateTest extends UnitTestCase {
    *
    * Here checking the key with it proper value. It is also a helper for
    * testGetStaticCache() function.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::getMultiple
    */
   public function testGet(): State {
     $this->setUpStateWithMockStorage();
@@ -126,9 +120,6 @@ class StateTest extends UnitTestCase {
    * Tests both get() & getMultiple() method.
    *
    * Here with the help of testGet() function, testing the key value again.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::getMultiple
    */
   #[Depends('testGet')]
   public function testGetStaticCache(State $state): void {
@@ -258,8 +249,6 @@ class StateTest extends UnitTestCase {
    *
    * @param \Drupal\Core\State\State $state
    *   The tested state.
-   *
-   * @legacy-covers ::get
    */
   #[Depends('testSet')]
   public function testSetBeforeGet(State $state): void {
@@ -333,8 +322,6 @@ class StateTest extends UnitTestCase {
    *
    * @param \Drupal\Core\State\State $state
    *   The tested state.
-   *
-   * @legacy-covers ::getMultiple
    */
   #[Depends('testSetMultiple')]
   public function testSetMultipleBeforeGetMultiple(State $state): void {
@@ -353,9 +340,6 @@ class StateTest extends UnitTestCase {
    *
    * @param \Drupal\Core\State\State $state
    *   The tested state.
-   *
-   * @legacy-covers ::delete
-   * @legacy-covers ::deleteMultiple
    */
   #[Depends('testSetMultiple')]
   public function testDelete(State $state): void {
@@ -381,9 +365,6 @@ class StateTest extends UnitTestCase {
    * Here testing the key and value after deleting the key's value.
    *
    * Ensure that deleting clears some static cache.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::delete
    */
   public function testDeleteAfterGet(): void {
     $this->setUpStateWithMockStorage();
@@ -429,10 +410,6 @@ class StateTest extends UnitTestCase {
    *
    * @param \Drupal\Core\State\State $state
    *   The tested state.
-   *
-   * @legacy-covers ::resetCache
-   * @legacy-covers ::get
-   * @legacy-covers ::getMultiple
    */
   #[Depends('testSet')]
   public function testResetCache(State $state): void {
@@ -491,8 +468,6 @@ class StateTest extends UnitTestCase {
 
   /**
    * Tests getValuesSetDuringRequest() method with an existing value.
-   *
-   * @legacy-covers ::getValuesSetDuringRequest
    */
   public function testExistingGetValuesSetDuringRequest(): void {
     $this->setUpState();

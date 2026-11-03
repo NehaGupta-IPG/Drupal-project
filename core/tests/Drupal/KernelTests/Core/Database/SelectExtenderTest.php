@@ -78,9 +78,6 @@ class SelectExtenderTest extends KernelTestBase {
 
   /**
    * Tests extend.
-   *
-   * @legacy-covers ::extend
-   * @legacy-covers \Drupal\Core\Database\Query\SelectExtender::extend
    */
   #[DataProvider('providerExtend')]
   public function testExtend(string $expected, string $namespace, string $extend): void {

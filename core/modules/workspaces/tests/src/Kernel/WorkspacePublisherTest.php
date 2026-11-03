@@ -14,9 +14,9 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\node\NodeInterface;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Drupal\workspaces\WorkspacePublisher;
@@ -203,8 +203,6 @@ class WorkspacePublisherTest extends KernelTestBase {
 
   /**
    * Tests submit form with exception.
-   *
-   * @legacy-covers \Drupal\workspaces\Form\WorkspacePublishForm::submitForm
    */
   public function testSubmitFormWithException(): void {
     /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */

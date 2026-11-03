@@ -22,8 +22,6 @@ class MethodFilterTest extends UnitTestCase {
 
   /**
    * Tests with allowed method.
-   *
-   * @legacy-covers ::filter
    */
   public function testWithAllowedMethod(): void {
     $request = Request::create('/test', 'GET');
@@ -39,8 +37,6 @@ class MethodFilterTest extends UnitTestCase {
 
   /**
    * Tests with allowed method and multiple matching routes.
-   *
-   * @legacy-covers ::filter
    */
   public function testWithAllowedMethodAndMultipleMatchingRoutes(): void {
     $request = Request::create('/test', 'GET');
@@ -59,8 +55,6 @@ class MethodFilterTest extends UnitTestCase {
 
   /**
    * Tests method not allowed exception.
-   *
-   * @legacy-covers ::filter
    */
   public function testMethodNotAllowedException(): void {
     $request = Request::create('/test', 'PATCH');
@@ -75,8 +69,6 @@ class MethodFilterTest extends UnitTestCase {
 
   /**
    * Tests method not allowed exception with multiple routes.
-   *
-   * @legacy-covers ::filter
    */
   public function testMethodNotAllowedExceptionWithMultipleRoutes(): void {
     $request = Request::create('/test', 'PATCH');
@@ -112,8 +104,6 @@ class MethodFilterTest extends UnitTestCase {
 
   /**
    * Ensures that the incoming and outgoing collections have the same order.
-   *
-   * @legacy-covers ::filter
    */
   public function testCollectionOrder(): void {
     $request = Request::create('/test', 'GET');

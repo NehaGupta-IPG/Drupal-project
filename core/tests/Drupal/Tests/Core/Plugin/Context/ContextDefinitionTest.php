@@ -188,9 +188,6 @@ class ContextDefinitionTest extends UnitTestCase {
 
   /**
    * Tests default value.
-   *
-   * @legacy-covers ::getDefaultValue
-   * @legacy-covers ::setDefaultValue
    */
   public function testDefaultValue(): void {
     $context_definition = new ContextDefinition();

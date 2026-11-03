@@ -20,11 +20,6 @@ class StateTest extends UnitTestCase {
 
   /**
    * Tests getters.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::id
-   * @legacy-covers ::label
-   * @legacy-covers ::weight
    */
   public function testGetters(): void {
     $state = new State(

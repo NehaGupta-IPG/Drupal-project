@@ -101,8 +101,6 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
 
   /**
    * Tests the behavior of the "revision_default" flag.
-   *
-   * @legacy-covers \Drupal\Core\Entity\ContentEntityBase::wasDefaultRevision
    */
   public function testWasDefaultRevision(): void {
     $entity_type_id = 'entity_test_mul_revlog';

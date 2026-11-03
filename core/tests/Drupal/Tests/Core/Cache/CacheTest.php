@@ -144,8 +144,6 @@ class CacheTest extends UnitTestCase {
 
   /**
    * Tests merge cache contexts.
-   *
-   * @legacy-covers ::mergeContexts
    */
   #[DataProvider('mergeCacheContextsProvide')]
   public function testMergeCacheContexts(array $expected, ...$contexts): void {

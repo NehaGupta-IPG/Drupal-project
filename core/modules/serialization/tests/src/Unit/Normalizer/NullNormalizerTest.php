@@ -45,9 +45,6 @@ class NullNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $mock = $this->createStub(TypedDataInterface::class);

@@ -36,8 +36,6 @@ class ConfigTest extends TestCase {
 
   /**
    * Tests no root merge config.
-   *
-   * @legacy-covers ::getAllCleanupPaths
    */
   public function testNoRootMergeConfig(): void {
     // Root package has no extra field.
@@ -59,8 +57,6 @@ class ConfigTest extends TestCase {
 
   /**
    * Tests root merge config.
-   *
-   * @legacy-covers ::getAllCleanupPaths
    */
   public function testRootMergeConfig(): void {
     // Root package has configuration in extra.
@@ -86,8 +82,6 @@ class ConfigTest extends TestCase {
 
   /**
    * Tests mixed case config cleanup packages.
-   *
-   * @legacy-covers ::getAllCleanupPaths
    */
   #[RunInSeparateProcess]
   public function testMixedCaseConfigCleanupPackages(): void {
@@ -121,8 +115,6 @@ class ConfigTest extends TestCase {
 
   /**
    * Tests skip clean.
-   *
-   * @legacy-covers ::getAllCleanupPaths
    */
   public function testSkipClean(): void {
     $root = $this->createMock(RootPackageInterface::class);

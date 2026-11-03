@@ -22,12 +22,6 @@ class IconBuilderTest extends KernelTestBase {
 
   /**
    * Tests build.
-   *
-   * @legacy-covers ::build
-   * @legacy-covers ::buildRenderArray
-   * @legacy-covers ::calculateSvgValues
-   * @legacy-covers ::getLength
-   * @legacy-covers ::getOffset
    */
   #[DataProvider('providerTestBuild')]
   public function testBuild(SvgIconBuilder $icon_builder, array $icon_map, $expected): void {

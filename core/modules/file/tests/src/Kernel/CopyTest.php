@@ -40,8 +40,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests file copying in the normal, base case.
-   *
-   * @legacy-covers ::copy
    */
   public function testNormal(): void {
     $contents = $this->randomMachineName(10);
@@ -71,8 +69,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests renaming when copying over a file that already exists.
-   *
-   * @legacy-covers ::copy
    */
   public function testExistingRename(): void {
     // Setup a file to overwrite.
@@ -113,8 +109,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests replacement when copying over a file that already exists.
-   *
-   * @legacy-covers ::copy
    */
   public function testExistingReplace(): void {
     // Setup a file to overwrite.
@@ -153,8 +147,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests that copying over an existing file fails when instructed to do so.
-   *
-   * @legacy-covers ::copy
    */
   public function testExistingError(): void {
     $contents = $this->randomMachineName(10);
@@ -184,8 +176,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests for an invalid stream wrapper.
-   *
-   * @legacy-covers ::copy
    */
   public function testInvalidStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
@@ -196,8 +186,6 @@ class CopyTest extends FileManagedUnitTestBase {
 
   /**
    * Tests for entity storage exception.
-   *
-   * @legacy-covers ::copy
    */
   public function testEntityStorageException(): void {
     /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */

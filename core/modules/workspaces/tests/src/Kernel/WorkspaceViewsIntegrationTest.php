@@ -9,13 +9,13 @@ use Drupal\Core\Form\FormState;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\taxonomy\Entity\Term;
-use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
@@ -109,9 +109,6 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
 
   /**
    * Tests workspace query alter for views.
-   *
-   * @legacy-covers \Drupal\workspaces\Hook\ViewsOperations::alterQueryForEntityType
-   * @legacy-covers \Drupal\workspaces\Hook\ViewsOperations::getRevisionTableJoin
    */
   public function testViewsQueryAlter(): void {
     // Create a test entity and two nodes.

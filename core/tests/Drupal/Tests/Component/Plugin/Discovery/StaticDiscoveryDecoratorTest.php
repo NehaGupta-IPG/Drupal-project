@@ -185,7 +185,7 @@ class StaticDiscoveryDecoratorTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::__call
+   * Tests call.
    */
   #[DataProvider('providerCall')]
   public function testCall(string $method, array $args): void {

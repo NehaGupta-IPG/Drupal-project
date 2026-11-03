@@ -190,8 +190,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get paged collection.
-   *
-   * @legacy-covers ::getCollection
    */
   public function testGetPagedCollection(): void {
     $request = Request::create('/jsonapi/node/article');
@@ -221,8 +219,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get empty collection.
-   *
-   * @legacy-covers ::getCollection
    */
   public function testGetEmptyCollection(): void {
     $request = Request::create('/jsonapi/node/article');

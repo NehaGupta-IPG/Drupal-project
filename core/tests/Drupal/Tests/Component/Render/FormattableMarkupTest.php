@@ -34,8 +34,7 @@ class FormattableMarkupTest extends TestCase {
   protected $lastErrorNumber;
 
   /**
-   * @legacy-covers ::__toString
-   * @legacy-covers ::jsonSerialize
+   * Tests to string.
    */
   public function testToString(): void {
     $string = 'Can I have a @replacement';
@@ -56,7 +55,7 @@ class FormattableMarkupTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::__toString
+   * Tests unexpected placeholder.
    */
   #[DataProvider('providerTestUnexpectedPlaceholder')]
   public function testUnexpectedPlaceholder(string $string, array $arguments, ?int $error_number, string $error_message): void {

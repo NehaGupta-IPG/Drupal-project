@@ -48,9 +48,6 @@ class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
   /**
    * Tests build new environment.
-   *
-   * @legacy-covers ::buildTestingResultsEnvironment
-   * @legacy-covers ::validateTestingResultsEnvironment
    */
   public function testBuildNewEnvironment(): void {
     $schema = $this->connection->schema();
@@ -68,12 +65,6 @@ class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
   /**
    * Tests build environment keeping existing results.
-   *
-   * @legacy-covers ::buildTestingResultsEnvironment
-   * @legacy-covers ::validateTestingResultsEnvironment
-   * @legacy-covers ::createNew
-   * @legacy-covers ::insertLogEntry
-   * @legacy-covers ::cleanUp
    */
   public function testBuildEnvironmentKeepingExistingResults(): void {
     $schema = $this->connection->schema();
@@ -109,12 +100,6 @@ class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
   /**
    * Tests get current test run state.
-   *
-   * @legacy-covers ::buildTestingResultsEnvironment
-   * @legacy-covers ::createNew
-   * @legacy-covers ::insertLogEntry
-   * @legacy-covers ::setDatabasePrefix
-   * @legacy-covers ::removeResults
    */
   public function testGetCurrentTestRunState(): void {
     $this->testRunResultsStorage->buildTestingResultsEnvironment(FALSE);
@@ -141,12 +126,6 @@ class SimpletestTestRunResultsStorageTest extends KernelTestBase {
 
   /**
    * Tests get log entries by test class.
-   *
-   * @legacy-covers ::buildTestingResultsEnvironment
-   * @legacy-covers ::createNew
-   * @legacy-covers ::insertLogEntry
-   * @legacy-covers ::setDatabasePrefix
-   * @legacy-covers ::getLogEntriesByTestClass
    */
   public function testGetLogEntriesByTestClass(): void {
     $this->testRunResultsStorage->buildTestingResultsEnvironment(FALSE);

@@ -22,8 +22,6 @@ class PluginExistsConstraintTest extends UnitTestCase {
 
   /**
    * Tests missing option.
-   *
-   * @legacy-covers ::create
    */
   public function testMissingOption(): void {
     $this->expectException(MissingOptionsException::class);
@@ -34,9 +32,6 @@ class PluginExistsConstraintTest extends UnitTestCase {
 
   /**
    * Tests plugin is created when manager option is set to a valid service ID.
-   *
-   * @legacy-covers ::create
-   * @legacy-covers ::__construct
    */
   public function testManagerOption(): void {
     $container = $this->createMock(ContainerInterface::class);

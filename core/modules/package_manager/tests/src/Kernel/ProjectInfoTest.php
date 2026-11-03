@@ -187,8 +187,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests a project with a status other than "published".
-   *
-   * @legacy-covers ::getInstallableReleases
    */
   public function testNotPublishedProject(): void {
     $this->setReleaseMetadata(['drupal' => __DIR__ . '/../../fixtures/release-history/drupal.9.8.2_unknown_status.xml']);
@@ -246,8 +244,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    * @param bool $expected_to_be_safe
    *   Whether the installed version of the project is expected to be found
    *   safe.
-   *
-   * @legacy-covers ::isInstalledVersionSafe
    */
   #[DataProvider('providerInstalledVersionSafe')]
   public function testInstalledVersionSafe(string $installed_version, string $release_xml, bool $expected_to_be_safe): void {

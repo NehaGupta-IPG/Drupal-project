@@ -157,9 +157,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string $expected
    *   The expected return value of
    *   SqlContentEntityStorage::getBaseTable().
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getBaseTable
    */
   #[DataProvider('providerTestGetBaseTable')]
   public function testGetBaseTable(?string $base_table, string $expected): void {
@@ -200,9 +197,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string $expected
    *   The expected return value of
    *   SqlContentEntityStorage::getRevisionTable().
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getRevisionTable
    */
   #[DataProvider('providerTestGetRevisionTable')]
   public function testGetRevisionTable(?string $revision_table, string $expected): void {
@@ -244,9 +238,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests SqlContentEntityStorage::getDataTable().
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getDataTable
    */
   public function testGetDataTable(): void {
     $this->setUpMockEntityType();
@@ -274,9 +265,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    * @param string $expected
    *   The expected return value of
    *   SqlContentEntityStorage::getRevisionDataTable().
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getRevisionDataTable
    */
   #[DataProvider('providerTestGetRevisionDataTable')]
   public function testGetRevisionDataTable(?string $revision_data_table, string $expected): void {
@@ -368,10 +356,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests ContentEntityDatabaseStorage::onEntityTypeCreate().
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::onEntityTypeCreate
-   * @legacy-covers ::getTableMapping
    */
   public function testOnEntityTypeCreate(): void {
     $this->setUpMockEntityType();
@@ -478,9 +462,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests getTableMapping() with an empty entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   public function testGetTableMappingEmpty(): void {
     $this->setUpEntityStorage();
@@ -496,9 +477,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingSimple(array $entity_keys): void {
@@ -527,9 +505,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingSimpleWithFields(array $entity_keys): void {
@@ -562,9 +537,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests getTableMapping() with a base field that requires a dedicated table.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   public function testGetTableMappingSimpleWithDedicatedStorageFields(): void {
     $base_field_names = ['multi_valued_base_field'];
@@ -601,9 +573,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingRevisionable(array $entity_keys): void {
@@ -653,9 +622,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingRevisionableWithFields(array $entity_keys): void {
@@ -744,9 +710,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingTranslatable(array $entity_keys): void {
@@ -801,9 +764,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingTranslatableWithFields(array $entity_keys): void {
@@ -862,9 +822,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingRevisionableTranslatable(array $entity_keys): void {
@@ -974,9 +931,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *
    * @param string[] $entity_keys
    *   A map of entity keys to use for the mocked entity type.
-   *
-   * @legacy-covers ::__construct
-   * @legacy-covers ::getTableMapping
    */
   #[DataProvider('providerTestGetTableMappingSimple')]
   public function testGetTableMappingRevisionableTranslatableWithFields(array $entity_keys): void {
@@ -1225,10 +1179,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load multiple persistent cached.
-   *
-   * @legacy-covers ::doLoadMultiple
-   * @legacy-covers ::buildCacheId
-   * @legacy-covers ::getFromPersistentCache
    */
   public function testLoadMultiplePersistentCached(): void {
     $this->setUpModuleHandlerNoImplementations();
@@ -1270,11 +1220,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load multiple no persistent cache.
-   *
-   * @legacy-covers ::doLoadMultiple
-   * @legacy-covers ::buildCacheId
-   * @legacy-covers ::getFromPersistentCache
-   * @legacy-covers ::setPersistentCache
    */
   public function testLoadMultipleNoPersistentCache(): void {
     $this->setUpModuleHandlerNoImplementations();
@@ -1338,11 +1283,6 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load multiple persistent cache miss.
-   *
-   * @legacy-covers ::doLoadMultiple
-   * @legacy-covers ::buildCacheId
-   * @legacy-covers ::getFromPersistentCache
-   * @legacy-covers ::setPersistentCache
    */
   public function testLoadMultiplePersistentCacheMiss(): void {
     $this->setUpModuleHandlerNoImplementations();

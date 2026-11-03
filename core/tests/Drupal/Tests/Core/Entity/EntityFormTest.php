@@ -51,8 +51,6 @@ class EntityFormTest extends UnitTestCase {
 
   /**
    * Tests the form ID generation.
-   *
-   * @legacy-covers ::getFormId
    */
   #[DataProvider('providerTestFormIds')]
   public function testFormId(string $expected, array $definition): void {

@@ -18,10 +18,6 @@ class TimerTest extends TestCase {
 
   /**
    * Tests Timer::read() time accumulation accuracy across multiple restarts.
-   *
-   * @legacy-covers ::start
-   * @legacy-covers ::stop
-   * @legacy-covers ::read
    */
   public function testTimer(): void {
     Timer::start('test');

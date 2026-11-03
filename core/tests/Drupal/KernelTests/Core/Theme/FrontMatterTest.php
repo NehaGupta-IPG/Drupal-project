@@ -71,9 +71,6 @@ class FrontMatterTest extends KernelTestBase {
 
   /**
    * Tests broken front matter.
-   *
-   * @legacy-covers \Drupal\Core\Template\TwigEnvironment::getTemplateMetadata
-   * @legacy-covers \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
    */
   public function testFrontMatterBroken(): void {
     $source = "---\ncollection:\n-  key: foo\n  foo: bar\n---\n" . ComponentFrontMatterTest::SOURCE;
@@ -92,9 +89,6 @@ class FrontMatterTest extends KernelTestBase {
    *   The expected line number where the source code starts.
    * @param string $content
    *   The content to use for testing purposes.
-   *
-   * @legacy-covers \Drupal\Core\Template\TwigEnvironment::compileSource
-   * @legacy-covers \Drupal\Core\Template\TwigEnvironment::getTemplateMetadata
    */
   #[DataProviderExternal(ComponentFrontMatterTest::class, 'providerFrontMatterData')]
   public function testFrontMatter(?array $yaml, $line, $content = ComponentFrontMatterTest::SOURCE): void {

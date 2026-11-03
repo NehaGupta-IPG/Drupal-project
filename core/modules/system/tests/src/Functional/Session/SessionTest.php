@@ -29,10 +29,6 @@ class SessionTest extends BrowserTestBase {
 
   /**
    * Tests session writing and regeneration.
-   *
-   * @legacy-covers \Drupal\Core\Session\WriteSafeSessionHandler::setSessionWritable
-   * @legacy-covers \Drupal\Core\Session\WriteSafeSessionHandler::isSessionWritable
-   * @legacy-covers \Drupal\Core\Session\SessionManager::regenerate
    */
   public function testSessionSaveRegenerate(): void {
     $session_handler = $this->container->get('session_handler.write_safe');
@@ -183,8 +179,6 @@ class SessionTest extends BrowserTestBase {
 
   /**
    * Tests that an invalid session ID in the cookie is rejected.
-   *
-   * @legacy-covers \Drupal\Core\Session\SessionManager::start
    */
   public function testAnonymousSessionFixation(): void {
 

@@ -18,8 +18,6 @@ class MenuLinkTreeElementTest extends UnitTestCase {
 
   /**
    * Tests construction.
-   *
-   * @legacy-covers ::__construct
    */
   public function testConstruction(): void {
     $link = MenuLinkMock::createMock(['id' => 'test']);

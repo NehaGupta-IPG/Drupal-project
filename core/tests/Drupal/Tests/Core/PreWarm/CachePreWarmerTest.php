@@ -63,8 +63,6 @@ class CachePreWarmerTest extends UnitTestCase {
 
   /**
    * Tests pre warm only one.
-   *
-   * @legacy-covers ::preWarmOneCache
    */
   public function testPreWarmOnlyOne(): void {
     $this->setupCacheServices();
@@ -82,8 +80,6 @@ class CachePreWarmerTest extends UnitTestCase {
 
   /**
    * Tests pre warm by one.
-   *
-   * @legacy-covers ::preWarmOneCache
    */
   public function testPreWarmByOne(): void {
     $this->setupCacheServices();
@@ -101,8 +97,6 @@ class CachePreWarmerTest extends UnitTestCase {
 
   /**
    * Tests pre warm all.
-   *
-   * @legacy-covers ::preWarmAllCaches
    */
   public function testPreWarmAll(): void {
     $this->setupCacheServices();

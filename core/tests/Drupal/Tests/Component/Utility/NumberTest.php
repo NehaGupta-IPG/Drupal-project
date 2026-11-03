@@ -122,9 +122,6 @@ class NumberTest extends TestCase {
    *   The integer value.
    * @param string $expected
    *   The expected alphadecimal value.
-   *
-   * @legacy-covers ::intToAlphadecimal
-   * @legacy-covers ::alphadecimalToInt
    */
   #[DataProvider('providerTestConversions')]
   public function testConversions(int $value, string $expected): void {

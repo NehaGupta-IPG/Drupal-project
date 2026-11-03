@@ -39,8 +39,6 @@ class ProxyServicesPassTest extends UnitTestCase {
 
   /**
    * Tests container without lazy services.
-   *
-   * @legacy-covers ::process
    */
   public function testContainerWithoutLazyServices(): void {
     $container = new ContainerBuilder();
@@ -54,8 +52,6 @@ class ProxyServicesPassTest extends UnitTestCase {
 
   /**
    * Tests container with lazy services.
-   *
-   * @legacy-covers ::process
    */
   public function testContainerWithLazyServices(): void {
     $container = new ContainerBuilder();
@@ -76,8 +72,6 @@ class ProxyServicesPassTest extends UnitTestCase {
 
   /**
    * Tests container with lazy services without proxy class.
-   *
-   * @legacy-covers ::process
    */
   public function testContainerWithLazyServicesWithoutProxyClass(): void {
     $container = new ContainerBuilder();

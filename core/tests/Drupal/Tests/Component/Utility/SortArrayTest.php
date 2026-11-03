@@ -26,9 +26,6 @@ class SortArrayTest extends TestCase {
    *   The second input array for the SortArray::sortByWeightElement().
    * @param int $expected
    *   The expected output from calling the method.
-   *
-   * @legacy-covers ::sortByWeightElement
-   * @legacy-covers ::sortByKeyInt
    */
   #[DataProvider('providerSortByWeightElement')]
   public function testSortByWeightElement(array $a, array $b, int $expected): void {
@@ -102,9 +99,6 @@ class SortArrayTest extends TestCase {
    *   The second input array for the SortArray::sortByWeightProperty().
    * @param int $expected
    *   The expected output from calling the method.
-   *
-   * @legacy-covers ::sortByWeightProperty
-   * @legacy-covers ::sortByKeyInt
    */
   #[DataProvider('providerSortByWeightProperty')]
   public function testSortByWeightProperty($a, $b, int $expected): void {
@@ -178,9 +172,6 @@ class SortArrayTest extends TestCase {
    *   The second item for comparison.
    * @param int $expected
    *   The expected output from calling the method.
-   *
-   * @legacy-covers ::sortByTitleElement
-   * @legacy-covers ::sortByKeyString
    */
   #[DataProvider('providerSortByTitleElement')]
   public function testSortByTitleElement($a, $b, int $expected): void {
@@ -247,9 +238,6 @@ class SortArrayTest extends TestCase {
    *   The second item for comparison.
    * @param int $expected
    *   The expected output from calling the method.
-   *
-   * @legacy-covers ::sortByTitleProperty
-   * @legacy-covers ::sortByKeyString
    */
   #[DataProvider('providerSortByTitleProperty')]
   public function testSortByTitleProperty($a, $b, int $expected): void {

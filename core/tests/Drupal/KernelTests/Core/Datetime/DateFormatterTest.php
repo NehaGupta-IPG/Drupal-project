@@ -119,8 +119,6 @@ class DateFormatterTest extends KernelTestBase {
    * Tests that an RFC2822 formatted date always returns an English string.
    *
    * @see http://www.faqs.org/rfcs/rfc2822.html
-   *
-   * @legacy-covers ::format
    */
   public function testRfc2822DateFormat(): void {
     $days_of_week_abbr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

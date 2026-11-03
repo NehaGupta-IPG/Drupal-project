@@ -107,8 +107,6 @@ class CallableResolverTest extends UnitTestCase {
 
   /**
    * Tests callback resolver exception handling.
-   *
-   * @legacy-covers ::getCallableFromDefinition
    */
   #[DataProvider('callableResolverExceptionHandlingTestCases')]
   public function testCallbackResolverExceptionHandling(string|array $definition, string $exception_class, string $exception_message): void {

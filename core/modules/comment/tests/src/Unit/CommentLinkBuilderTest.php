@@ -98,8 +98,6 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @param array $expected
    *   Array of expected links keyed by link ID. Can be either string (link
    *   title) or array of link properties.
-   *
-   * @legacy-covers ::buildCommentedEntityLinks
    */
   #[DataProvider('getLinkCombinations')]
   public function testCommentLinkBuilder(array $node_args, array $context, $has_access_comments, $has_post_comments, $is_anonymous, $expected): void {

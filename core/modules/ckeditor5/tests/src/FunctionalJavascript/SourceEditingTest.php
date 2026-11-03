@@ -17,7 +17,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore gramma sourceediting
-
 /**
  * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing.
  *
@@ -31,8 +30,6 @@ class SourceEditingTest extends SourceEditingTestBase {
 
   /**
    * Tests source editing settings form.
-   *
-   * @legacy-covers \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::buildConfigurationForm
    */
   public function testSourceEditingSettingsForm(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer filters']));

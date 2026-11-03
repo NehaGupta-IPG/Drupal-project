@@ -23,8 +23,6 @@ class HelpTopicDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests discovery exception missing label.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryExceptionMissingLabel(): void {
     vfsStream::setup('root');
@@ -48,8 +46,6 @@ class HelpTopicDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests discovery exception invalid yaml key.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryExceptionInvalidYamlKey(): void {
     vfsStream::setup('root');
@@ -78,8 +74,6 @@ EOF;
 
   /**
    * Tests discovery exception invalid top level.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryExceptionInvalidTopLevel(): void {
     vfsStream::setup('root');
@@ -108,8 +102,6 @@ EOF;
 
   /**
    * Tests discovery exception invalid related.
-   *
-   * @legacy-covers ::findAll
    */
   public function testDiscoveryExceptionInvalidRelated(): void {
     vfsStream::setup('root');
@@ -138,8 +130,6 @@ EOF;
 
   /**
    * Tests help topics extension provider special case.
-   *
-   * @legacy-covers ::findAll
    */
   public function testHelpTopicsExtensionProviderSpecialCase(): void {
     vfsStream::setup('root');
@@ -165,8 +155,6 @@ EOF;
 
   /**
    * Tests help topics in core.
-   *
-   * @legacy-covers ::findAll
    */
   public function testHelpTopicsInCore(): void {
     vfsStream::setup('root');
@@ -190,8 +178,6 @@ EOF;
 
   /**
    * Tests help topics broken yaml.
-   *
-   * @legacy-covers ::findAll
    */
   public function testHelpTopicsBrokenYaml(): void {
     vfsStream::setup('root');
@@ -219,8 +205,6 @@ EOF;
 
   /**
    * Tests help topics definition.
-   *
-   * @legacy-covers ::findAll
    */
   public function testHelpTopicsDefinition(): void {
     $container = new ContainerBuilder();

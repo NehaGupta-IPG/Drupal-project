@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 class HtRouterTest extends QuickStartTestBase {
 
   /**
-   * @legacy-covers ::instantiateServer
+   * Tests ht router.
    */
   public function testHtRouter(): void {
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];

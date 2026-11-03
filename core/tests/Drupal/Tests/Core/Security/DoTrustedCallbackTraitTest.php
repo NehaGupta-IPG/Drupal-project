@@ -25,8 +25,6 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
 
   /**
    * Tests trusted callbacks.
-   *
-   * @legacy-covers ::doTrustedCallback
    */
   #[DataProvider('providerTestTrustedCallbacks')]
   public function testTrustedCallbacks(callable $callback, $extra_trusted_interface = NULL): void {
@@ -36,8 +34,6 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
 
   /**
    * Tests trusted callback argument deprecation.
-   *
-   * @legacy-covers ::doTrustedCallback
    */
   #[DataProvider('providerTestTrustedCallbacks')]
   #[IgnoreDeprecations]
@@ -122,8 +118,6 @@ class DoTrustedCallbackTraitTest extends UnitTestCase {
 
   /**
    * Tests untrusted callbacks.
-   *
-   * @legacy-covers ::doTrustedCallback
    */
   #[DataProvider('providerTestUntrustedCallbacks')]
   public function testUntrustedCallbacks(callable $callback, $extra_trusted_interface = NULL): void {

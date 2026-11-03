@@ -19,11 +19,6 @@ class LruMemoryCacheTest extends UnitTestCase {
 
   /**
    * Tests getting, setting and deleting items from the LRU memory cache.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::set
-   * @legacy-covers ::delete
-   * @legacy-covers ::getMultiple
    */
   public function testGetSetDelete(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -204,10 +199,6 @@ class LruMemoryCacheTest extends UnitTestCase {
 
   /**
    * Tests invalidation from the LRU memory cache.
-   *
-   * @legacy-covers ::invalidate
-   * @legacy-covers ::invalidateMultiple
-   * @legacy-covers ::invalidateTags
    */
   public function testInvalidate(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -278,10 +269,6 @@ class LruMemoryCacheTest extends UnitTestCase {
 
   /**
    * Tests invalidation with numeric keys from the LRU memory cache.
-   *
-   * @legacy-covers ::invalidate
-   * @legacy-covers ::invalidateMultiple
-   * @legacy-covers ::invalidateTags
    */
   public function testInvalidateNumeric(): void {
     $lru_cache = $this->getLruMemoryCache(3);

@@ -42,8 +42,6 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    *   Expected cache tags.
    * @param bool $is_latest_revision
    *   If FALSE, the media is historic revision.
-   *
-   * @legacy-covers ::checkAccess
    */
   #[DataProvider('providerAccess')]
   public function testAccess(array $permissions, array $entity_values, string $operation, AccessResultInterface $expected_result, array $expected_cache_contexts, array $expected_cache_tags, bool $is_latest_revision): void {

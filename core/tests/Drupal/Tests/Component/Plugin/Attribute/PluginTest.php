@@ -17,8 +17,7 @@ use PHPUnit\Framework\TestCase;
 class PluginTest extends TestCase {
 
   /**
-   * @legacy-covers ::__construct
-   * @legacy-covers ::get
+   * Tests get.
    */
   public function testGet(): void {
     $plugin = new PluginStub(id: 'example', deriver: DerivedPluginStub::class);
@@ -31,8 +30,7 @@ class PluginTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::setProvider
-   * @legacy-covers ::getProvider
+   * Tests set provider.
    */
   public function testSetProvider(): void {
     $plugin = new Plugin(id: 'example');
@@ -49,8 +47,7 @@ class PluginTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::setClass
-   * @legacy-covers ::getClass
+   * Tests set class.
    */
   public function testSetClass(): void {
     $plugin = new Plugin(id: 'test');

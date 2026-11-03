@@ -50,8 +50,6 @@ class QueryTest extends UnitTestCase {
 
   /**
    * Tests entity query for entity type without base table.
-   *
-   * @legacy-covers ::prepare
    */
   public function testNoBaseTable(): void {
     $this->expectException(QueryException::class);
@@ -61,8 +59,6 @@ class QueryTest extends UnitTestCase {
 
   /**
    * Tests revision entity query for entity type without revision table.
-   *
-   * @legacy-covers ::prepare
    */
   public function testNoRevisionTable(): void {
     $this->expectException(QueryException::class);

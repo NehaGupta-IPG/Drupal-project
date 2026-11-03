@@ -153,9 +153,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests the isValid() method with a 'link to any page' permission.
-   *
-   * @legacy-covers ::isValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithLinkToAnyPageAccount(): void {
     $this->setUpMockAccessAwareRouter();
@@ -244,9 +241,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests the isValid() method with a user without access to the path.
-   *
-   * @legacy-covers ::isValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithAccessDenied(): void {
     $this->setUpMockAccessAwareRouter();
@@ -273,9 +267,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests is valid with resource not found.
-   *
-   * @legacy-covers ::isValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithResourceNotFound(): void {
     $this->setUpMockAccessAwareRouter();
@@ -302,9 +293,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests is valid with param not converted.
-   *
-   * @legacy-covers ::isValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithParamNotConverted(): void {
     $this->setUpMockAccessAwareRouter();
@@ -331,9 +319,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests is valid with method not allowed.
-   *
-   * @legacy-covers ::isValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testIsValidWithMethodNotAllowed(): void {
     $this->setUpMockAccessAwareRouter();
@@ -412,9 +397,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests the getUrlIfValid() method when there is access.
-   *
-   * @legacy-covers ::getUrlIfValid
-   * @legacy-covers ::getPathAttributes
    */
   public function testGetUrlIfValidWithAccess(): void {
     $this->setUpMockAccessAwareRouter();
@@ -517,9 +499,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests the getUrlIfValidWithoutAccessCheck() method.
-   *
-   * @legacy-covers ::getUrlIfValidWithoutAccessCheck
-   * @legacy-covers ::getPathAttributes
    */
   public function testGetUrlIfValidWithoutAccessCheck(): void {
     $this->setUpMockAccessAwareRouter();
@@ -552,9 +531,6 @@ class PathValidatorTest extends UnitTestCase {
 
   /**
    * Tests the getUrlIfValidWithoutAccessCheck() method with an invalid path.
-   *
-   * @legacy-covers ::getUrlIfValidWithoutAccessCheck
-   * @legacy-covers ::getUrl
    */
   public function testGetUrlIfValidWithoutAccessCheckWithInvalidPath(): void {
     $this->setUpMockInboundPathProcessor();

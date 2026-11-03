@@ -248,8 +248,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *
    * @param string $version
    *   The version string to test.
-   *
-   * @legacy-covers ::createFromVersionString
    */
   #[DataProvider('providerInvalidVersionNumber')]
   public function testInvalidVersionNumber(string $version): void {
@@ -292,8 +290,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *
    * @param string $version
    *   The version string to test.
-   *
-   * @legacy-covers ::createFromVersionString
    */
   #[DataProvider('providerInvalidVersionCorePrefix')]
   public function testInvalidVersionCorePrefix(string $version): void {
@@ -322,8 +318,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *
    * @param string $branch
    *   The branch to test.
-   *
-   * @legacy-covers ::createFromSupportBranch
    */
   #[DataProvider('providerInvalidBranchCorePrefix')]
   public function testInvalidBranchCorePrefix(string $branch): void {
@@ -405,8 +399,6 @@ class ExtensionVersionTest extends UnitTestCase {
    *
    * @param string $branch
    *   The branch to test.
-   *
-   * @legacy-covers ::createFromSupportBranch
    */
   #[DataProvider('provideInvalidBranch')]
   public function testInvalidBranch(string $branch): void {

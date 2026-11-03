@@ -171,9 +171,6 @@ class UpdateFetcherTest extends UnitTestCase {
 
   /**
    * Tests update fetcher no fallback.
-   *
-   * @legacy-covers ::doRequest
-   * @legacy-covers ::fetchProjectData
    */
   public function testUpdateFetcherNoFallback(): void {
     $this->mockClient(

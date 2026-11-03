@@ -56,8 +56,6 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
 
   /**
    * Tests set single third party setting.
-   *
-   * @legacy-covers \Drupal\Core\Config\Entity\ConfigEntityBase::getThirdPartySetting
    */
   public function testSetSingleThirdPartySetting(): void {
     $this->configActionManager->applyAction(

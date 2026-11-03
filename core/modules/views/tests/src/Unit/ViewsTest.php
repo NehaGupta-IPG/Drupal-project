@@ -85,8 +85,6 @@ class ViewsTest extends UnitTestCase {
 
   /**
    * Tests the getView() method against a non-existent view.
-   *
-   * @legacy-covers ::getView
    */
   public function testGetNonExistentView(): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);

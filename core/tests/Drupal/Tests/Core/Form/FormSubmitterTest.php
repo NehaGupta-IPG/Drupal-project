@@ -65,8 +65,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests handle form submission not submitted.
-   *
-   * @legacy-covers ::doSubmitForm
    */
   public function testHandleFormSubmissionNotSubmitted(): void {
     $form_submitter = $this->getFormSubmitter();
@@ -80,8 +78,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests handle form submission no redirect.
-   *
-   * @legacy-covers ::doSubmitForm
    */
   public function testHandleFormSubmissionNoRedirect(): void {
     $form_submitter = $this->getFormSubmitter();
@@ -97,8 +93,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests handle form submission with responses.
-   *
-   * @legacy-covers ::doSubmitForm
    */
   #[DataProvider('providerTestHandleFormSubmissionWithResponses')]
   public function testHandleFormSubmissionWithResponses(string $class, string $form_state_key): void {
@@ -127,8 +121,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests the redirectForm() method when the redirect is NULL.
-   *
-   * @legacy-covers ::redirectForm
    */
   public function testRedirectWithNull(): void {
     $form_state = $this->createMock('Drupal\Core\Form\FormStateInterface');
@@ -152,8 +144,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests redirectForm() when a redirect is a Url object.
-   *
-   * @legacy-covers ::redirectForm
    */
   #[DataProvider('providerTestRedirectWithUrl')]
   public function testRedirectWithUrl(Url $redirect_value, string $result, $status = 303): void {
@@ -201,8 +191,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests the redirectForm() method with a response object.
-   *
-   * @legacy-covers ::redirectForm
    */
   public function testRedirectWithResponseObject(): void {
     $form_submitter = $this->getFormSubmitter();
@@ -219,8 +207,6 @@ class FormSubmitterTest extends UnitTestCase {
 
   /**
    * Tests the redirectForm() method when no redirect is expected.
-   *
-   * @legacy-covers ::redirectForm
    */
   public function testRedirectWithoutResult(): void {
     $form_submitter = $this->getFormSubmitter();

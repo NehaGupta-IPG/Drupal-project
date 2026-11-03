@@ -22,9 +22,6 @@ class AdminRouteSubscriberTest extends UnitTestCase {
 
   /**
    * Tests alter routes.
-   *
-   * @legacy-covers ::alterRoutes
-   * @legacy-covers ::isHtmlRoute
    */
   #[DataProvider('providerTestAlterRoutes')]
   public function testAlterRoutes(Route $route, $is_admin): void {

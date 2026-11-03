@@ -138,8 +138,6 @@ class AccessAwareRouterTest extends UnitTestCase {
 
   /**
    * Ensure that methods are passed to the wrapped router.
-   *
-   * @legacy-covers ::__call
    */
   public function testCall(): void {
     $mock_router = $this->createStub(RouterInterface::class);

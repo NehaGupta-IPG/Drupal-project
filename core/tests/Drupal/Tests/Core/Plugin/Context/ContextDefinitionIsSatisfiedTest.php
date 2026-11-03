@@ -70,11 +70,6 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
    *   The context definition to check.
    * @param mixed $value
    *   (optional) The value to set on the context, defaults to NULL.
-   *
-   * @legacy-covers ::isSatisfiedBy
-   * @legacy-covers ::dataTypeMatches
-   * @legacy-covers ::getSampleValues
-   * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedBy')]
   public function testIsSatisfiedBy($expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL): void {

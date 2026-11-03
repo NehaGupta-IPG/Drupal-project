@@ -171,9 +171,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests create with predefined uuid.
-   *
-   * @legacy-covers ::create
-   * @legacy-covers ::doCreate
    */
   public function testCreateWithPredefinedUuid(): void {
     $this->entityType->expects($this->once())
@@ -200,9 +197,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests create without uuid key.
-   *
-   * @legacy-covers ::create
-   * @legacy-covers ::doCreate
    */
   public function testCreateWithoutUuidKey(): void {
     // Set up the entity storage to expect no UUID key.
@@ -230,9 +224,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests create.
-   *
-   * @legacy-covers ::create
-   * @legacy-covers ::doCreate
    */
   public function testCreate(): void {
     $entity = new EntityBaseTest([], 'test_entity_type');
@@ -261,9 +252,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save insert.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   public function testSaveInsert(): EntityInterface&MockObject {
     $this->setUpKeyValueEntityStorage();
@@ -307,9 +295,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   #[Depends('testSaveInsert')]
   public function testSaveUpdate(EntityInterface $entity): void {
@@ -348,9 +333,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save config entity.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   public function testSaveConfigEntity(): MockObject {
     $this->setUpKeyValueEntityStorage();
@@ -386,9 +368,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save rename config entity.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   #[Depends('testSaveConfigEntity')]
   public function testSaveRenameConfigEntity(ConfigEntityInterface $entity): void {
@@ -429,9 +408,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save content entity.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   public function testSaveContentEntity(): void {
     $this->entityType
@@ -467,9 +443,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save invalid.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   public function testSaveInvalid(): void {
     $this->setUpKeyValueEntityStorage();
@@ -489,9 +462,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save duplicate.
-   *
-   * @legacy-covers ::save
-   * @legacy-covers ::doSave
    */
   public function testSaveDuplicate(): void {
     $this->setUpKeyValueEntityStorage();
@@ -513,9 +483,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load.
-   *
-   * @legacy-covers ::load
-   * @legacy-covers ::postLoad
    */
   public function testLoad(): void {
     $entity = new EntityBaseTest([], 'test_entity_type');
@@ -551,11 +518,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load multiple all.
-   *
-   * @legacy-covers ::loadMultiple
-   * @legacy-covers ::postLoad
-   * @legacy-covers ::mapFromStorageRecords
-   * @legacy-covers ::doLoadMultiple
    */
   public function testLoadMultipleAll(): void {
     $expected['foo'] = new EntityBaseTest(['id' => 'foo'], 'test_entity_type');
@@ -579,11 +541,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests load multiple ids.
-   *
-   * @legacy-covers ::loadMultiple
-   * @legacy-covers ::postLoad
-   * @legacy-covers ::mapFromStorageRecords
-   * @legacy-covers ::doLoadMultiple
    */
   public function testLoadMultipleIds(): void {
     $entity = new EntityBaseTest(['id' => 'foo'], 'test_entity_type');
@@ -607,9 +564,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests delete.
-   *
-   * @legacy-covers ::delete
-   * @legacy-covers ::doDelete
    */
   public function testDelete(): void {
     $entities['foo'] = new EntityBaseTest(['id' => 'foo'], 'test_entity_type');
@@ -642,9 +596,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests delete nothing.
-   *
-   * @legacy-covers ::delete
-   * @legacy-covers ::doDelete
    */
   public function testDeleteNothing(): void {
     $this->setUpKeyValueEntityStorage();

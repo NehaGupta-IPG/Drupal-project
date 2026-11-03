@@ -34,8 +34,6 @@ class UpdateReportTest extends KernelTestBase {
 
   /**
    * Tests template preprocess update report.
-   *
-   * @legacy-covers ::preprocessUpdateReport
    */
   #[DataProvider('providerTemplatePreprocessUpdateReport')]
   public function testTemplatePreprocessUpdateReport(array $variables): void {
@@ -70,8 +68,6 @@ class UpdateReportTest extends KernelTestBase {
 
   /**
    * Tests the error message when failing to fetch data without dblog installed.
-   *
-   * @legacy-covers ::preprocessUpdateFetchErrorMessage
    */
   public function testTemplatePreprocessUpdateFetchErrorMessageNoDblog(): void {
     $build = [
@@ -91,8 +87,6 @@ class UpdateReportTest extends KernelTestBase {
 
   /**
    * Tests the error message when failing to fetch data with dblog installed.
-   *
-   * @legacy-covers ::preprocessUpdateFetchErrorMessage
    */
   public function testTemplatePreprocessUpdateFetchErrorMessageWithDblog(): void {
 

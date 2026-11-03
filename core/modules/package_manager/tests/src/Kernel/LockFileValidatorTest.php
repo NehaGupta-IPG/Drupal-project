@@ -72,8 +72,6 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests that if no active lock file exists, a stage cannot be created.
-   *
-   * @legacy-covers ::storeHash
    */
   public function testCreateWithNoLock(): void {
     unlink($this->activeDir . '/composer.lock');
@@ -90,9 +88,6 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests that if an active lock file exists, a stage can be created.
-   *
-   * @legacy-covers ::storeHash
-   * @legacy-covers ::deleteHash
    */
   public function testCreateWithLock(): void {
     $this->assertResults([]);

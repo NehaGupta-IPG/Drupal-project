@@ -43,8 +43,6 @@ class KernelTestBaseShutdownTest extends KernelTestBase {
 
   /**
    * Tests shutdown function.
-   *
-   * @legacy-covers ::assertPostConditions
    */
   public function testShutdownFunction(): void {
     $this->expectedShutdownCalled = ['shutdownFunction', 'shutdownFunction2'];
@@ -53,8 +51,6 @@ class KernelTestBaseShutdownTest extends KernelTestBase {
 
   /**
    * Tests no shutdown function.
-   *
-   * @legacy-covers ::assertPostConditions
    */
   public function testNoShutdownFunction(): void {
     $this->expectedShutdownCalled = [];

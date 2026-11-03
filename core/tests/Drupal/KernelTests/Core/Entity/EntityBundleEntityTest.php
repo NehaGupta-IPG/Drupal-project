@@ -39,8 +39,6 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
 
   /**
    * Tests an entity type with config entities for bundles.
-   *
-   * @legacy-covers ::getBundleEntity
    */
   public function testWithConfigBundleEntity(): void {
     $bundleEntity = EntityTestBundle::create([
@@ -61,8 +59,6 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
    * Tests an entity type without config entities for bundles.
    *
    * EntityTest doesn't have bundles, but does have the bundle entity key.
-   *
-   * @legacy-covers ::getBundleEntity
    */
   public function testWithoutBundleEntity(): void {
     $entity = EntityTest::create([
@@ -74,8 +70,6 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
 
   /**
    * Tests an entity type without the bundle entity key.
-   *
-   * @legacy-covers ::getBundleEntity
    */
   public function testWithBundleKeyEntity(): void {
     $entity = EntityTestNoBundleWithLabel::create([

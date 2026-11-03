@@ -212,9 +212,6 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception nested exception.
-   *
-   * @legacy-covers ::onException
-   * @legacy-covers ::getFormAjaxException
    */
   public function testOnExceptionNestedException(): void {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
@@ -239,8 +236,6 @@ class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on exception nested wrong exception.
-   *
-   * @legacy-covers ::getFormAjaxException
    */
   public function testOnExceptionNestedWrongException(): void {
     $nested_exception = new \Exception();

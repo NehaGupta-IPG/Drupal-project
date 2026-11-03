@@ -41,8 +41,7 @@ class FileCacheTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::get
-   * @legacy-covers ::__construct
+   * Tests get.
    */
   public function testGet(): void {
     // Test a cache miss.

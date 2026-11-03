@@ -248,9 +248,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace with hook tokens alter with bubbleable metadata.
-   *
-   * @legacy-covers ::replace
-   * @legacy-covers ::replace
    */
   public function testReplaceWithHookTokensAlterWithBubbleableMetadata(): void {
     $this->moduleHandler

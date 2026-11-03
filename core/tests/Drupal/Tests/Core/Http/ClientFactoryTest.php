@@ -44,8 +44,6 @@ class ClientFactoryTest extends UnitTestCase {
    *   The parameter configuration.
    * @param array $expected_config_keys
    *   The expected config keys.
-   *
-   * @legacy-covers ::fromOptions
    */
   #[DataProvider('providerTestCreateFromOptions')]
   public function testCreateFromOptions(array $settings_config, array $parameter_config, array $expected_config_keys): void {

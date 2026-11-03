@@ -58,9 +58,6 @@ class ToolkitGdTest extends KernelTestBase {
 
   /**
    * Tests supported extensions.
-   *
-   * @legacy-covers ::getSupportedExtensions
-   * @legacy-covers ::extensionToImageType
    */
   public function testSupportedExtensions(): void {
     // Test the list of supported extensions.

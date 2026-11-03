@@ -111,8 +111,6 @@ class InputTest extends KernelTestBase {
 
   /**
    * Tests prompt arguments are forwarded.
-   *
-   * @legacy-covers \Drupal\Core\Recipe\ConsoleInputCollector::collectValue
    */
   public function testPromptArgumentsAreForwarded(): void {
     $io = $this->createMock(StyleInterface::class);
@@ -148,8 +146,6 @@ YAML
 
   /**
    * Tests missing arguments throws exception.
-   *
-   * @legacy-covers \Drupal\Core\Recipe\ConsoleInputCollector::collectValue
    */
   public function testMissingArgumentsThrowsException(): void {
     $recipe = $this->createRecipe(<<<YAML
@@ -177,8 +173,6 @@ YAML
 
   /**
    * Tests getting the fallback default value from non-existing configuration.
-   *
-   * @legacy-covers \Drupal\Core\Recipe\InputConfigurator::getDefaultValue
    */
   public function testDefaultValueFromNonExistentConfigWithFallback(): void {
     $recipe_data = [
@@ -395,8 +389,6 @@ YAML
 
   /**
    * Tests getting a fallback value for an undefined environment variable.
-   *
-   * @legacy-covers \Drupal\Core\Recipe\InputConfigurator::getDefaultValue
    */
   public function testFallbackValueForUndefinedEnvironmentVariable(): void {
     $recipe_data = [

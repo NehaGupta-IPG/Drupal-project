@@ -59,9 +59,6 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * Tests checkpoint creation.
-   *
-   * @legacy-covers ::checkpoint
-   * @legacy-covers \Drupal\Core\Config\Checkpoint\Checkpoint
    */
   public function testCheckpointCreation(): void {
     $checkpoint = $this->storage->checkpoint('Test');
@@ -114,11 +111,6 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * Tests read operations.
-   *
-   * @legacy-covers ::exists
-   * @legacy-covers ::read
-   * @legacy-covers ::readMultiple
-   * @legacy-covers ::listAll
    */
   #[DataProvider('readMethodsProvider')]
   public function testReadOperations(string $method, array $arguments, array $fixture): void {
@@ -157,11 +149,6 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * Tests write operations.
-   *
-   * @legacy-covers ::write
-   * @legacy-covers ::delete
-   * @legacy-covers ::rename
-   * @legacy-covers ::deleteAll
    */
   #[DataProvider('writeMethodsProvider')]
   public function testWriteOperations(string $method, array $arguments, array $fixture): void {
@@ -211,10 +198,6 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * Tests collections.
-   *
-   * @legacy-covers ::getAllCollectionNames
-   * @legacy-covers ::getCollectionName
-   * @legacy-covers ::createCollection
    */
   public function testCollections(): void {
     $ref_readFromCheckpoint = new \ReflectionProperty($this->storage, 'readFromCheckpoint');
@@ -264,9 +247,6 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * Tests encode decode.
-   *
-   * @legacy-covers ::encode
-   * @legacy-covers ::decode
    */
   public function testEncodeDecode(): void {
     $array = (array) $this->getRandomGenerator()->object();

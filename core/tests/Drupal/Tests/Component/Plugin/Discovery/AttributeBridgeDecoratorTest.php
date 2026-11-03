@@ -50,8 +50,6 @@ class AttributeBridgeDecoratorTest extends TestCase {
 
   /**
    * Tests that the decorator of other methods works.
-   *
-   * @legacy-covers ::__call
    */
   public function testOtherMethod(): void {
     // Normally the attribute classes would be autoloaded.

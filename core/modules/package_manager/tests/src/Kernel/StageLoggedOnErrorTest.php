@@ -72,8 +72,6 @@ class StageLoggedOnErrorTest extends PackageManagerKernelTestBase {
    *
    * @param string $event_class
    *   The event class to throw an exception on.
-   *
-   * @legacy-covers \Drupal\package_manager\SandboxManagerBase::dispatch
    */
   #[DataProvider('providerLoggedOnError')]
   public function testLoggedOnError(string $event_class): void {

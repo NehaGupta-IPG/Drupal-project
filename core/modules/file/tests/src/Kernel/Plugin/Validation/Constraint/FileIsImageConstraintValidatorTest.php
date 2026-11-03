@@ -47,8 +47,6 @@ class FileIsImageConstraintValidatorTest extends FileValidatorTestBase {
 
   /**
    * This ensures a specific file is actually an image.
-   *
-   * @legacy-covers ::validate
    */
   public function testFileIsImage(): void {
     $this->assertFileExists($this->image->getFileUri());

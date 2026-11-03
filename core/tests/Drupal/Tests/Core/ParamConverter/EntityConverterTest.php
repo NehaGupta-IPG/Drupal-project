@@ -265,8 +265,6 @@ class EntityConverterTest extends UnitTestCase {
 
   /**
    * Tests getRouteRequirement().
-   *
-   * @legacy-covers ::getRouteRequirement
    */
   #[DataProvider('providerTestGetRouteRequirement')]
   public function testGetRouteRequirement(array $definition, ?string $expected): void {

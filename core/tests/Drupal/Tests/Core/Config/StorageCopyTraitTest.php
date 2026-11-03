@@ -123,8 +123,6 @@ class StorageCopyTraitTest extends UnitTestCase {
 
   /**
    * Tests replaceStorageContents() with config with an invalid configuration.
-   *
-   * @legacy-covers ::replaceStorageContents
    */
   public function testWithInvalidConfiguration(): void {
     $source = new TestStorage();

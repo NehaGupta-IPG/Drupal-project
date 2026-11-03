@@ -49,8 +49,6 @@ class ContextTest extends UnitTestCase {
 
   /**
    * Tests default value.
-   *
-   * @legacy-covers ::getContextValue
    */
   public function testDefaultValue(): void {
     $this->setUpDefaultValue('test');
@@ -62,8 +60,6 @@ class ContextTest extends UnitTestCase {
 
   /**
    * Tests default data value.
-   *
-   * @legacy-covers ::getContextData
    */
   public function testDefaultDataValue(): void {
     $this->setUpDefaultValue('test');
@@ -75,8 +71,6 @@ class ContextTest extends UnitTestCase {
 
   /**
    * Tests null data value.
-   *
-   * @legacy-covers ::getContextData
    */
   public function testNullDataValue(): void {
     $this->setUpDefaultValue();

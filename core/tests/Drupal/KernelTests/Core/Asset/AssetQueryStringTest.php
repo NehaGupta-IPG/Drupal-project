@@ -21,9 +21,6 @@ class AssetQueryStringTest extends KernelTestBase {
 
   /**
    * Tests reset get.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::reset
    */
   public function testResetGet(): void {
     $state = $this->container->get('state');
