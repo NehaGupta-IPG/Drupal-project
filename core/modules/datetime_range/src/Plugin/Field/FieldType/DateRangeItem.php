@@ -116,6 +116,13 @@ class DateRangeItem extends DateTimeItem {
   /**
    * {@inheritdoc}
    */
+  public static function mainPropertyName() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEmpty() {
     $start_value = $this->get('value')->getValue();
     $end_value = $this->get('end_value')->getValue();
