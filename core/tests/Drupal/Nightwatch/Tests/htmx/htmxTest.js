@@ -47,6 +47,36 @@ module.exports = {
       .assert.elementPresent(cssSelector);
   },
 
+  'Drupal load waits for assets': (browser) => {
+    browser
+      .drupalRelativeURL('/htmx-test-attachments/page')
+      .waitForElementVisible('body', 1000)
+      .execute(() => {
+        const originalAddAssets = Drupal.htmx.addAssets;
+        let resolveAssets;
+        const assetsLoaded = new Promise((resolve) => {
+          resolveAssets = resolve;
+        });
+
+        Drupal.htmx.addAssets = () => assetsLoaded;
+        htmx.on('htmx:afterSettle', () => {
+          document.body.dataset.htmxAfterSettle = true;
+        });
+        htmx.on('htmx:drupal:load', () => {
+          document.body.dataset.htmxDrupalLoad = true;
+        });
+        window.resolveHtmxAssets = () => {
+          Drupal.htmx.addAssets = originalAddAssets;
+          resolveAssets();
+        };
+      })
+      .click('[name="replace"]')
+      .waitForElementVisible('body[data-htmx-after-settle="true"]', 1000)
+      .assert.not.elementPresent('body[data-htmx-drupal-load="true"]')
+      .execute(() => window.resolveHtmxAssets())
+      .waitForElementVisible('body[data-htmx-drupal-load="true"]', 1000);
+  },
+
   'Asset Load with wrapper format': (browser) => {
     // Now load the page with the htmx enhanced button configured
     // to add the wrapper query parameter and verify the absence
