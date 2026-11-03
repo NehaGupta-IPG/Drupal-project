@@ -376,4 +376,25 @@ class UserPermissionsTest extends BrowserTestBase {
     $this->assertNotEmpty($header_row);
   }
 
+  /**
+   * Tests warning messages are displayed on restricted permissions.
+   */
+  public function testRestrictAccessWarning(): void {
+    $this->drupalLogin($this->adminUser);
+
+    \Drupal::service('module_installer')->install(['user_permissions_test']);
+    $this->drupalGet('admin/people/permissions');
+    $this->assertSession()->elementContains(
+      'css',
+      '[data-drupal-selector="edit-permissions-restricted"]',
+      'Warning: Give to trusted roles only; this permission has security implications.'
+    );
+    // Confirm that a message can be appended.
+    $this->assertSession()->elementContains(
+      'css',
+      '[data-drupal-selector="edit-permissions-restricted-warning"]',
+      'Warning: Give to trusted roles only; this permission has security implications. This is a warning.'
+    );
+  }
+
 }

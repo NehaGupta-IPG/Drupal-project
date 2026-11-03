@@ -6,3 +6,10 @@ b:
   title: 'Test permission'
 user_permissions_test:
   title: 'Permission with the same name as the module'
+restricted:
+  title: 'Restricted permission'
+  restrict access: true
+restricted_warning:
+  title: 'Restricted permission with additional warning'
+  restrict access: true
+  warning: 'This is a warning.'
