@@ -113,6 +113,53 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   public function revisionShow(NodeInterface $node_revision) {
     $node_view_controller = new EntityViewController($this->entityTypeManager(), $this->renderer);
     $page = $node_view_controller->view($node_revision);
+    $node = $page['#node'];
+    $nid = $node->nid->value;
+    $vid = $node->vid->value;
+    $langcode = $node->langcode->value;
+    $languageManager = \Drupal::languageManager();
+    $defaultLanguage = $languageManager->getDefaultLanguage();
+    $defaultTranslation = $defaultLanguage->getId();
+    if ($langcode === $defaultTranslation) {
+      $page['revert'] = [
+        '#type' => 'link',
+        '#title' => t('Revert Revision'),
+        '#url' => Url::fromRoute('node.revision_revert_confirm', ["node" => $nid, "node_revision" => $vid]),
+        '#attributes' => [
+          'class' => ['button revert'],
+        ],
+        '#weight' => 100,
+      ];
+    }
+    else {
+      $page['revert'] = [
+        '#type' => 'link',
+        '#title' => t('Revert Revision'),
+        '#url' => Url::fromRoute('node.revision_revert_translation_confirm', ["node" => $nid, "node_revision" => $vid, "langcode" => $langcode]),
+        '#attributes' => [
+          'class' => ['button revert'],
+        ],
+        '#weight' => 100,
+      ];
+    }
+    $page['revisions'] = [
+      '#type' => 'link',
+      '#title' => t('Back to Revision'),
+      '#url' => Url::fromRoute('entity.node.version_history', ["node" => $nid]),
+      '#attributes' => [
+        'class' => ['button revision'],
+      ],
+      '#weight' => 101,
+    ];
+    $page['delete'] = [
+      '#type' => 'link',
+      '#title' => t('Delete Revision'),
+      '#url' => Url::fromRoute('node.revision_delete_confirm', ["node" => $nid, "node_revision" => $vid]),
+      '#attributes' => [
+        'class' => ['button delete'],
+      ],
+      '#weight' => 102,
+    ];
     unset($page['nodes'][$node_revision->id()]['#cache']);
     return $page;
   }
