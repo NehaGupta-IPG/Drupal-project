@@ -33330,6 +33330,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Unit/MenuLinkPluginTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$workspace of method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:setActiveWorkspace\\(\\) expects Drupal\\\\workspaces\\\\WorkspaceInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreePendingRevisionsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$workspace_association in PHPDoc tag @var does not match assigned variable \\$workspace_tracker\\.$#',
+	'identifier' => 'varTag.differentVariable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreePendingRevisionsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$workspace of method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:setActiveWorkspace\\(\\) expects Drupal\\\\workspaces\\\\WorkspaceInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreeUiWorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$workspace_association in PHPDoc tag @var does not match assigned variable \\$workspace_tracker\\.$#',
+	'identifier' => 'varTag.differentVariable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_tree_ui/tests/src/Kernel/MenuTreeUiWorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -33398,7 +33422,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isLocked\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 3,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuForm.php',
 ];
 $ignoreErrors[] = [

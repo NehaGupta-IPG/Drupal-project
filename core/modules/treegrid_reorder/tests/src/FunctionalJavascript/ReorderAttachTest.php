@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid_reorder\FunctionalJavascript;
 
+use Drupal\FunctionalJavascriptTests\DrupalSelenium2Driver;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\treegrid_reorder_test\Controller\TreegridReorderTestController;
 use PHPUnit\Framework\Attributes\Group;
@@ -105,7 +106,9 @@ final class ReorderAttachTest extends WebDriverTestBase {
     );
     // A real key press (keydown and keyup), so the checkbox gets its native
     // Space behavior.
-    $session = $this->getSession()->getDriver()->getWebDriverSession();
+    $driver = $this->getSession()->getDriver();
+    assert($driver instanceof DrupalSelenium2Driver);
+    $session = $driver->getWebDriverSession();
     $key_actions = [
       'type' => 'key',
       'id' => 'keyboard',

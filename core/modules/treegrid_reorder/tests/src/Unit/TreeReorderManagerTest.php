@@ -25,7 +25,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
   /**
    * A recording fake of the domain seam.
    */
-  private TreeMoveHandlerInterface $handler;
+  private RecordingTreeMoveHandler $handler;
 
   /**
    * {@inheritdoc}
@@ -34,51 +34,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
     parent::setUp();
     $this->manager = new TreeReorderManager();
     $this->manager->setStringTranslation($this->getStringTranslationStub());
-    $this->handler = new class() implements TreeMoveHandlerInterface {
-
-      /**
-       * Ancestor ids returned for the cycle check.
-       *
-       * @var string[]
-       */
-      public array $ancestors = [];
-
-      /**
-       * The domain validation outcome to return.
-       *
-       * @var array<string, mixed>
-       */
-      public array $constraintResult = ['ok' => TRUE];
-
-      /**
-       * Ids of moves applied, in order.
-       *
-       * @var string[]
-       */
-      public array $applied = [];
-
-      /**
-       * {@inheritdoc}
-       */
-      public function validateConstraints(string $tree_id, MoveIntent $intent): array {
-        return $this->constraintResult;
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function getAncestorIds(string $tree_id, string $parent_id): array {
-        return $this->ancestors;
-      }
-
-      /**
-       * {@inheritdoc}
-       */
-      public function applyMove(string $tree_id, MoveIntent $intent): void {
-        $this->applied[] = $intent->id;
-      }
-
-    };
+    $this->handler = new RecordingTreeMoveHandler();
   }
 
   /**
@@ -185,7 +141,7 @@ final class TreeReorderManagerTest extends UnitTestCase {
    * already applied, so it fails only once the apply loop reaches it.
    */
   public function testPartialFailureReportsAppliedOps(): void {
-    $this->handler = new class() implements TreeMoveHandlerInterface {
+    $handler = new class() implements TreeMoveHandlerInterface {
 
       /**
        * Ids of moves applied, in order.
@@ -224,20 +180,20 @@ final class TreeReorderManagerTest extends UnitTestCase {
       ['type' => 'move', 'id' => 'b', 'new_parent' => '', 'before_id' => 'a'],
     ];
 
-    $result = $this->manager->commitWorkingCopy('t', $ops, $this->handler);
+    $result = $this->manager->commitWorkingCopy('t', $ops, $handler);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('cycle', $result['code']);
     $this->assertSame(1, $result['failed_op']);
     $this->assertSame([0], $result['applied_ops']);
-    $this->assertSame(['a'], $this->handler->applied);
+    $this->assertSame(['a'], $handler->applied);
   }
 
   /**
    * The batch is not validated up front, so earlier valid moves are written.
    */
   public function testInvalidLaterOpDoesNotBlockEarlierMoves(): void {
-    $this->handler = new class() implements TreeMoveHandlerInterface {
+    $handler = new class() implements TreeMoveHandlerInterface {
 
       /**
        * Ids of moves applied, in order.
@@ -276,13 +232,13 @@ final class TreeReorderManagerTest extends UnitTestCase {
       ['type' => 'move', 'id' => 'b', 'new_parent' => '', 'before_id' => 'a'],
     ];
 
-    $result = $this->manager->commitWorkingCopy('t', $ops, $this->handler);
+    $result = $this->manager->commitWorkingCopy('t', $ops, $handler);
 
     $this->assertFalse($result['ok']);
     $this->assertSame('not_moveable', $result['code']);
     $this->assertSame(1, $result['failed_op']);
     $this->assertSame([0], $result['applied_ops']);
-    $this->assertSame(['a'], $this->handler->applied);
+    $this->assertSame(['a'], $handler->applied);
   }
 
 }

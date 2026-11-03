@@ -97,7 +97,7 @@ final class MenuTreeUiAccessTest extends BrowserTestBase {
       ->setAbsolute(TRUE)
       ->toString();
 
-    $result = $client->post($url, [
+    $result = $client->request('POST', $url, [
       'cookies' => $this->getSessionCookies(),
       'headers' => ['Content-Type' => 'application/json'],
       'body' => json_encode(['id' => '', 'new_parent' => '', 'before_id' => NULL]),
@@ -141,7 +141,7 @@ final class MenuTreeUiAccessTest extends BrowserTestBase {
     $move_url = Url::fromRoute('menu_tree_ui.move', ['menu' => 'access-test-a'])
       ->setAbsolute(TRUE)
       ->toString();
-    $result = $client->post($move_url, [
+    $result = $client->request('POST', $move_url, [
       'cookies' => $this->getSessionCookies(),
       'headers' => [
         'Content-Type' => 'application/json',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\treegrid\Functional;
 
+use Behat\Mink\Driver\BrowserKitDriver;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\treegrid_test_ui\Controller\TreegridTestUiController;
@@ -42,7 +43,9 @@ final class TreegridTestUiColumnRouteTest extends BrowserTestBase {
     $token = $this->getSession()->getPage()->getContent();
     $body = ['column_id' => 'treegrid_test_a', 'row_id' => 'p1', 'value' => TRUE];
 
-    $client = $this->getSession()->getDriver()->getClient();
+    $driver = $this->getSession()->getDriver();
+    assert($driver instanceof BrowserKitDriver);
+    $client = $driver->getClient();
     $client->request(
       'POST',
       Url::fromRoute('treegrid_test_ui.column_update')->setAbsolute()->toString(),

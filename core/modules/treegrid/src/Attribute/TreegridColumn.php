@@ -34,7 +34,7 @@ final class TreegridColumn extends Plugin {
    *   The column header label.
    * @param int $weight
    *   Sort order: columns render left to right by ascending weight.
-   * @param string|null $deriver
+   * @param class-string|null $deriver
    *   Optional deriver class that expands this definition into multiple
    *   column definitions.
    */
