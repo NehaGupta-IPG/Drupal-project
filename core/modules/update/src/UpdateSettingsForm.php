@@ -35,21 +35,22 @@ class UpdateSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['update_check_frequency'] = [
       '#type' => 'radios',
-      '#title' => $this->t('Check for updates'),
+      '#title' => $this->t('Check for updates automatically'),
       '#config_target' => new ConfigTarget(
         'update.settings',
         'check.interval_days',
         toConfig: fn($value) => intval($value)),
       '#options' => [
+        0 => $this->t('Never (only check manually)'),
         1 => $this->t('Daily'),
         7 => $this->t('Weekly'),
       ],
-      '#description' => $this->t('Select how frequently you want to automatically check for new releases of your currently installed modules and themes.'),
+      '#description' => $this->t('Frequency of automated checks for new releases of modules and themes. <a href=":url">Check updates now</a>.', [':url' => Url::fromRoute('update.manual_status')->toString()]),
     ];
 
     $form['update_check_disabled'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Check for updates of uninstalled modules and themes'),
+      '#title' => $this->t('Include uninstalled modules and themes in checks'),
       '#config_target' => 'update.settings:check.disabled_extensions',
     ];
 

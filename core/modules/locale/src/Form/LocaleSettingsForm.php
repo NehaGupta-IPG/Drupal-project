@@ -48,14 +48,14 @@ class LocaleSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['update_interval_days'] = [
       '#type' => 'radios',
-      '#title' => $this->t('Check for updates'),
+      '#title' => $this->t('Check for updates automatically'),
       '#config_target' => 'locale.settings:translation.update_interval_days',
       '#options' => [
-        '0' => $this->t('Never (manually)'),
+        '0' => $this->t('Never (only check manually)'),
         '7' => $this->t('Weekly'),
         '30' => $this->t('Monthly'),
       ],
-      '#description' => $this->t('Select how frequently you want to check for new interface translations for your currently installed modules and themes. <a href=":url">Check updates now</a>.', [':url' => Url::fromRoute('locale.check_translation')->toString()]),
+      '#description' => $this->t('Frequency of automated checks for new interface translations of modules and themes. <a href=":url">Check updates now</a>.', [':url' => Url::fromRoute('locale.check_translation')->toString()]),
     ];
 
     $directory = TranslationsStream::basePath();
