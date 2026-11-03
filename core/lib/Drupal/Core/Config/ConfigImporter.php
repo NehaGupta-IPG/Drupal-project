@@ -1168,12 +1168,12 @@ class ConfigImporter {
    *   The callable to execute.
    */
   protected function callAndReInjectIfNeeded(callable $callable): void {
-    $container_id = spl_object_id(\Drupal::getContainer());
+    $container = \Drupal::getContainer();
     try {
       $callable();
     }
     finally {
-      if ($container_id !== spl_object_id(\Drupal::getContainer())) {
+      if ($container !== \Drupal::getContainer()) {
         // When rebuilding the container,
         // \Drupal\Core\DrupalKernel::initializeContainer() saves the hashes of
         // the old container and passes them to the new one. So __sleep() will
