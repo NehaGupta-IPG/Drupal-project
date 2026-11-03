@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -85,7 +86,7 @@ class TableTest extends KernelTestBase {
 
     $this->render($table);
     $this->removeWhiteSpace();
-    $this->assertRaw('<thead><tr><th>Header 1</th><th colspan="2">Header 2</th></tr>', 'Table header found.');
+    $this->assertRaw('<thead><tr><th scope="col">Header 1</th><th colspan="2" scope="col">Header 2</th></tr>', 'Table header found.');
     $this->assertRaw('<tr class="odd"><td colspan="3" class="empty message">Empty row.</td>', 'Colspan on #empty row found.');
   }
 
@@ -147,7 +148,7 @@ class TableTest extends KernelTestBase {
     ];
     $this->render($table);
     $this->removeWhiteSpace();
-    $this->assertRaw('<th>1</th><td>1</td><td>1</td>', 'The th and td tags was printed correctly.');
+    $this->assertRaw('<th scope="row">1</th><td>1</td><td>1</td>', 'The th and td tags was printed correctly.');
   }
 
   /**
@@ -216,9 +217,9 @@ class TableTest extends KernelTestBase {
       '#responsive' => TRUE,
     ];
     $this->render($table);
-    $this->assertRaw('<th class="priority-medium">1</th>', 'Header 1: the priority-medium class was applied correctly.');
-    $this->assertRaw('<th class="priority-low">2</th>', 'Header 2: the priority-low class was applied correctly.');
-    $this->assertRaw('<th>3</th>', 'Header 3: no priority classes were applied.');
+    $this->assertRaw('<th class="priority-medium" scope="col">1</th>', 'Header 1: the priority-medium class was applied correctly.');
+    $this->assertRaw('<th class="priority-low" scope="col">2</th>', 'Header 2: the priority-low class was applied correctly.');
+    $this->assertRaw('<th scope="col">3</th>', 'Header 3: no priority classes were applied.');
     $this->assertRaw('<td class="priority-medium">4</td>', 'Cell 1: the priority-medium class was applied correctly.');
     $this->assertRaw('<td class="priority-low">5</td>', 'Cell 2: the priority-low class was applied correctly.');
     $this->assertRaw('<td>6</td>', 'Cell 3: no priority classes were applied.');
@@ -252,7 +253,7 @@ class TableTest extends KernelTestBase {
     ];
     $this->render($table);
     $this->removeWhiteSpace();
-    $this->assertRaw('<thead><tr><th>one</th><th>two</th><th><b>three</b></th></tr>', 'Table header found.');
+    $this->assertRaw('<thead><tr><th scope="col">one</th><th scope="col">two</th><th scope="col"><b>three</b></th></tr>', 'Table header found.');
   }
 
   /**
@@ -304,6 +305,130 @@ class TableTest extends KernelTestBase {
     $this->render($form);
     $this->assertEscaped('Update <em>kitten</em>');
     $this->assertRaw('Update my favorite fruit is <strong>bananas</strong>');
+  }
+
+  /**
+   * Data provider for testThemeTableScopeAttributes.
+   *
+   * @return array
+   *   Test cases for scope attribute behavior.
+   */
+  public static function tableScopeAttributesDataProvider(): array {
+    return [
+      'simple column headers' => [
+        'header' => ['Name', 'Age', 'Location'],
+        'rows' => [['John', '25', 'New York']],
+        'footer' => [],
+        'expected' => [
+          '<th scope="col">Name</th>',
+          '<th scope="col">Age</th>',
+          '<th scope="col">Location</th>',
+        ],
+        'not_expected' => [],
+      ],
+      'complex column headers with attributes' => [
+        'header' => [
+          ['data' => 'Column 1'],
+          ['data' => 'Column 2', 'class' => ['custom-class']],
+          ['data' => 'Column 3', 'colspan' => 2],
+        ],
+        'rows' => [['a', 'b', 'c', 'd']],
+        'footer' => [],
+        'expected' => [
+          '<th scope="col">Column 1</th>',
+          '<th class="custom-class" scope="col">Column 2</th>',
+          '<th colspan="2" scope="col">Column 3</th>',
+        ],
+        'not_expected' => [],
+      ],
+      'row headers in tbody' => [
+        'header' => ['Name', 'Value'],
+        'rows' => [
+          [['data' => 'Row Header 1', 'header' => TRUE], 'Data 1'],
+          [['data' => 'Row Header 2', 'header' => TRUE], 'Data 2'],
+        ],
+        'footer' => [],
+        'expected' => [
+          '<th scope="row">Row Header 1</th>',
+          '<th scope="row">Row Header 2</th>',
+          '<td>Data 1</td>',
+        ],
+        'not_expected' => [],
+      ],
+      'row headers in tfoot' => [
+        'header' => ['Description', 'Amount'],
+        'rows' => [['Item 1', '$10']],
+        'footer' => [[['data' => 'Total', 'header' => TRUE], '$30']],
+        'expected' => [
+          '<tfoot><tr><th scope="row">Total</th><td>$30</td></tr></tfoot>',
+        ],
+        'not_expected' => [],
+      ],
+      'explicit scope preserved' => [
+        'header' => [
+          ['data' => 'Header 1', 'scope' => 'colgroup'],
+          ['data' => 'Header 2'],
+        ],
+        'rows' => [[['data' => 'Row Header', 'header' => TRUE, 'scope' => 'rowgroup'], 'Data']],
+        'footer' => [],
+        'expected' => [
+          '<th scope="colgroup">Header 1</th>',
+          '<th scope="col">Header 2</th>',
+          '<th scope="rowgroup">Row Header</th>',
+        ],
+        'not_expected' => [],
+      ],
+      'mixed column and row headers' => [
+        'header' => ['Category', 'Q1', 'Q2'],
+        'rows' => [
+          [['data' => 'Sales', 'header' => TRUE], '100', '150'],
+          [['data' => 'Expenses', 'header' => TRUE], '80', '90'],
+        ],
+        'footer' => [],
+        'expected' => [
+          '<th scope="col">Category</th>',
+          '<th scope="col">Q1</th>',
+          '<th scope="row">Sales</th>',
+          '<th scope="row">Expenses</th>',
+        ],
+        'not_expected' => [],
+      ],
+      'header=FALSE renders as td without scope' => [
+        'header' => [
+          ['data' => 'Header', 'header' => TRUE],
+          ['data' => 'Not a header', 'header' => FALSE],
+        ],
+        'rows' => [['Data 1', 'Data 2']],
+        'footer' => [],
+        'expected' => [
+          '<th scope="col">Header</th>',
+          '<td>Not a header</td>',
+        ],
+        'not_expected' => ['<td scope='],
+      ],
+    ];
+  }
+
+  /**
+   * Tests scope attributes for WCAG 1.3.1 compliance.
+   */
+  #[DataProvider('tableScopeAttributesDataProvider')]
+  public function testThemeTableScopeAttributes(array $header, array $rows, array $footer, array $expected, array $not_expected): void {
+    $table = [
+      '#type' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#footer' => $footer ?: NULL,
+      '#responsive' => FALSE,
+    ];
+    $this->render($table);
+    $this->removeWhiteSpace();
+    foreach ($expected as $fragment) {
+      $this->assertRaw($fragment);
+    }
+    foreach ($not_expected as $fragment) {
+      $this->assertNoRaw($fragment);
+    }
   }
 
 }
