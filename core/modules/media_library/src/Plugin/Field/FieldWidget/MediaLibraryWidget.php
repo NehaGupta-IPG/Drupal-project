@@ -464,13 +464,17 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $remaining = $element['#cardinality'] - count($referenced_entities);
+    $cardinality = $element['#cardinality'];
+    $cardinality_message = '';
 
     // Inform the user of how many items are remaining.
     if (!$cardinality_unlimited) {
       if ($remaining) {
-        $cardinality_message = $this->formatPlural($remaining, 'One media item remaining.', '@count media items remaining.');
+        if ($remaining > 1) {
+          $cardinality_message = $this->formatPlural($remaining, 'One media item remaining.', '@count media items remaining.');
+        }
       }
-      else {
+      elseif ($cardinality > 1) {
         $cardinality_message = $this->t('The maximum number of media items have been selected.');
       }
 
